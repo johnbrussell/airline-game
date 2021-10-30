@@ -1,2 +1,8 @@
 <h1>Airlne Game</h1>
-<h2>The number of games is <%= @games.count %></h2>
+<h2 id="game_count">There <%="is".pluralize(@games.count)%> <%= @games.count %> <%="game".pluralize(@games.count)%> in progress.</h2>
+
+<ul>
+  <% @games.each do |game| %>
+    <li> Start date: <%= game.start_date %> End date: <%= game.end_date %> Current date: <%= game.current_date %></li>
+  <% end %>
+</ul>
