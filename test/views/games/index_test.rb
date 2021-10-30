@@ -12,7 +12,7 @@ class IndexTest < ActionDispatch::IntegrationTest
     assert_response(:success)
 
     assert_select "h2", "There is 1 game in progress."
-    assert_select "li", "Start date: #{today} End date: #{tomorrow} Current date: #{today}"
+    assert_select "li", "Game ID: 1 Start date: #{today} End date: #{tomorrow} Current date: #{today}"
   end
 
   test "all games are listed on the page" do
@@ -23,7 +23,7 @@ class IndexTest < ActionDispatch::IntegrationTest
     assert_response(:success)
 
     assert_select "h2", "There are 2 games in progress."
-    assert_select "li", "Start date: #{today} End date: #{tomorrow} Current date: #{today}"
-    assert_select "li", "Start date: #{tomorrow} End date: #{tomorrow} Current date: #{tomorrow}"
+    assert_select "li", "Game ID: 1 Start date: #{today} End date: #{tomorrow} Current date: #{today}"
+    assert_select "li", "Game ID: 2 Start date: #{tomorrow} End date: #{tomorrow} Current date: #{tomorrow}"
   end
 end

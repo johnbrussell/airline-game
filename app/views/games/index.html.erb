@@ -3,6 +3,6 @@
 
 <ul>
   <% @games.each do |game| %>
-    <li> Start date: <%= game.start_date %> End date: <%= game.end_date %> Current date: <%= game.current_date %></li>
+    <li>Game ID: <%= game.id %> Start date: <%= game.start_date %> End date: <%= game.end_date %> Current date: <%= game.current_date %></li>
   <% end %>
 </ul>
