@@ -1,18 +1,18 @@
-Metro area,Year,Population,Notes
-Boston,2020,4873019,"Boston includes Suffolk, Middlesex, Norfolk, Essex, and Plymouth counties.  Income is average family income."
-Provincetown,2020,33664,Provincetown’s summer population is 60000; took wealthiest family income in Middlesex County to backfill the 56k who don’t live there full time for income
-Portsmouth,2020,287721,Includes half of Rockingham County population and all of Strafford County
-Los Angeles,2019,14643573,"Thank you to CensusReporter for providing urbanized area data here.  Apparently the national average percentage of travel that is for business is 12, though this was impossible to verify. "
-Hyannis,2020,341638,Summer population of roughly 250000.  Just Barnstable County (exc. Provincetown)
-Chicago,2020,7421160,"Includes Cook, DuPage, Lake, and Lake (IN) counties"
-New York City,2019,16530972,"Includes NYC, Bergen County, Hudston County, Passaic County, Westchester County, Middlesex County, Somerset County, Essex County, Union County, Morris County, and Nassau County"
-Provincetown,1920,4246,
-Majuro,2010,27797,
-Pohnpei,2010,34789,https://www.fsmstatistics.fm/wp-content/uploads/2019/02/1998_HIES_Main_Analysis_Report.pdf
-Kosrae,2010,6616,
-Yap,2010,7371,
-Chuuk,2010,36158,
-Funafuti,2017,6320,http://prdrse4all.spc.int/system/files/tuvalu_hies_report_2010.pdf
-Nauru,2020,10000,"https://spccfpstore1.blob.core.windows.net/digitallibrary-docs/files/9c/9c62fdc3882f7fa1a03d24da772c2da0.pdf?sv=2015-12-11&sr=b&sig=JcD%2F5Mr7zYd%2FJedq%2BL7QfWHTt44OSpC5ENfJLOIgw8w%3D&se=2022-04-11T17%3A23%3A28Z&sp=r&rscc=public%2C%20max-age%3D864000%2C%20max-stale%3D86400&rsct=application%2Fpdf&rscd=inline%3B%20filename%3D""Nauru_2006_HIES_Report.pdf"""
-Kwajalien,2000,14500,
-Kosrae,1980,5491,
+Metro area,Year,Population,Notes,
+Boston,2020,4873019,"Boston includes Suffolk, Middlesex, Norfolk, Essex, and Plymouth counties.  Income is average family income.",
+Provincetown,2020,33664,Provincetown’s summer population is 60000, took wealthiest family income in Middlesex County to backfill the 56k who don’t live there full time for income
+Portsmouth,2020,287721,Includes half of Rockingham County population and all of Strafford County,
+Los Angeles,2019,14643573,"Thank you to CensusReporter for providing urbanized area data here.  Apparently the national average percentage of travel that is for business is 12, though this was impossible to verify. ",
+Hyannis,2020,341638,Summer population of roughly 250000.  Just Barnstable County (exc. Provincetown),
+Chicago,2020,7421160,"Includes Cook, DuPage, Lake, and Lake (IN) counties",
+New York City,2019,16869301,"Includes NYC, Bergen County, Hudson County, Passaic County, Westchester County, Middlesex County, Somerset County, Essex County, Union County, Morris County, Rockland County, and Nassau County",
+Provincetown,1920,4246,,
+Majuro,2010,27797,,
+Pohnpei,2010,34789,https://www.fsmstatistics.fm/wp-content/uploads/2019/02/1998_HIES_Main_Analysis_Report.pdf,
+Kosrae,2010,6616,,
+Yap,2010,7371,,
+Chuuk,2010,36158,,
+Funafuti,2017,6320,http://prdrse4all.spc.int/system/files/tuvalu_hies_report_2010.pdf,
+Nauru,2020,10000,https://spccfpstore1.blob.core.windows.net/digitallibrary-docs/files/9c/9c62fdc3882f7fa1a03d24da772c2da0.pdf ,
+Kwajalien,2000,14500,,
+Kosrae,1980,5491,,
