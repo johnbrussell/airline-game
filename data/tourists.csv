@@ -1,0 +1,27 @@
+Metro area,Year,Visitors,Notes
+Boston,2019,5932719,Assume 2/13 domestic visitors fly and all international visitors fly
+Provincetown,2020,1000,Total guess
+Portsmouth,2020,10000,Total guess
+Los Angeles,2018,15933333,https://www.discoverlosangeles.com/sites/default/files/2019-05/2018%20QUICK%20FACTS.pdf  – assume all international visitors fly and 1/3rd of domestic ones dottps://www.discoverlosangeles.com/sites/default/files/2019-05/2018%20QUICK%20FACTS.pdf
+Hyannis,2020,10000,Total guess
+Chicago,2013,6140000,Assume 1/5th of domestic visitors fly and all international visitors fly
+New York City,2019,20957143,https://www.baruch.cuny.edu/nycdata/tourism/visitors.htm – assume all international visitors and 1/7th of domestic visitors fly
+Majuro,2018,6761,https://pic.or.jp/ja/wp-content/uploads/2019/07/2018-Annual-Visitor-Arrivals-ReportF.pdf – seems high for Nauru so dividing by 2
+Pohnpei,2013,2238,https://www.fsmstatistics.fm/wp-content/uploads/2019/10/4-FSM-National-Tourism-Policy-Vol-1a_W-Foreword_8July.pdf
+Kosrae,2013,585,
+Yap,2013,3484,
+Chuuk,2013,6408,
+Funafuti,2017,2729,
+Nauru,2016,1519,
+Kwajalien,2020,100,Total guess
+Pohnpei,1997,2794,https://www.fsmstatistics.fm/wp-content/uploads/2019/10/4-FSM-National-Tourism-Policy-Vol-1a_W-Foreword_8July.pdf
+Kosrae,1997,803,
+Yap,1997,4432,
+Chuuk,1997,8029,
+Pohnpei,2007,2792,https://www.fsmstatistics.fm/wp-content/uploads/2019/10/4-FSM-National-Tourism-Policy-Vol-1a_W-Foreword_8July.pdf
+Kosrae,2007,802,
+Yap,2007,4429,
+Chuuk,2007,8024,
+New York City,2013,17614286,https://www.baruch.cuny.edu/nycdata/tourism/visitors.htm – assume all international visitors and 1/7th of domestic visitors fly
+New York City,2007,14100000,https://www.baruch.cuny.edu/nycdata/tourism/visitors.htm – assume all international visitors and 1/7th of domestic visitors fly
+New York City,2000,11000000,https://www.baruch.cuny.edu/nycdata/tourism/visitors.htm – assume all international visitors and 1/7th of domestic visitors fly
