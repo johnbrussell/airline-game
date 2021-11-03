@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_10_29_121346) do
+ActiveRecord::Schema.define(version: 2021_10_31_105733) do
 
   create_table "games", force: :cascade do |t|
     t.date "start_date", null: false
@@ -18,6 +18,17 @@ ActiveRecord::Schema.define(version: 2021_10_29_121346) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.date "current_date", null: false
+  end
+
+  create_table "markets", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "country", null: false
+    t.integer "income", null: false
+    t.boolean "is_national_capital", default: false, null: false
+    t.boolean "is_island", default: false, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["name"], name: "index_markets_on_name", unique: true
   end
 
 end
