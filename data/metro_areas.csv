@@ -1,16 +1,16 @@
-Metro Area,Income,Country,IsNationalCapital
-Los Angeles,75629,United States,No
-New York City,77399,United States,No
-Chicago,70009,United States,No
-Boston,118453,United States,No
-Provincetown,212306,United States,No
-Portsmouth,82210,United States,No
-Hyannis,148042,United States,No
-Nauru,19000,Nauru,Yes
-Funafuti,30495,Tuvalu,Yes
-Majuro,12011,Marshall Islands,Yes
-Pohnpei,18736,Federated States of Micronesia,Yes
-Kwajalien,14956,Marshall Islands,No
-Kosrae,24025,Federated States of Micronesia,No
-Chuuk,15613,Federated States of Micronesia,No
-Yap,20789,Federated States of Micronesia,No
+Metro Area,Income,Country,IsNationalCapital,isIsland
+Los Angeles,75629,United States,No,No
+New York City,77399,United States,No,No
+Chicago,70009,United States,No,No
+Boston,118453,United States,No,No
+Provincetown,212306,United States,No,Yes
+Portsmouth,82210,United States,No,No
+Hyannis,148042,United States,No,No
+Nauru,19000,Nauru,Yes,Yes
+Funafuti,30495,Tuvalu,Yes,Yes
+Majuro,12011,Marshall Islands,Yes,Yes
+Pohnpei,18736,Federated States of Micronesia,Yes,Yes
+Kwajalien,14956,Marshall Islands,No,Yes
+Kosrae,24025,Federated States of Micronesia,No,Yes
+Chuuk,15613,Federated States of Micronesia,No,Yes
+Yap,20789,Federated States of Micronesia,No,Yes
