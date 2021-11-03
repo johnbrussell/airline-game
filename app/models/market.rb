@@ -4,4 +4,6 @@ class Market < ApplicationRecord
   validates :income, presence: true
   validates :is_national_capital, presence: true
   validates :is_island, presence: true
+
+  validates_uniqueness_of :name
 end
