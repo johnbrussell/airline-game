@@ -27,7 +27,7 @@ class GameData::Inputter < ApplicationRecord
           income: data_point["Income"],
           is_national_capital: data_point["isNationalCapital"].downcase == "yes",
           is_island: data_point["isIsland"].downcase == "yes",
-        ).save
+        ).save!
       end
     end
 
