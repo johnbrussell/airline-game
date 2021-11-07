@@ -6,4 +6,6 @@ class Market < ApplicationRecord
   validates :is_island, :inclusion => { :in => [true, false] }
 
   validates_uniqueness_of :name
+
+  has_many :populations
 end
