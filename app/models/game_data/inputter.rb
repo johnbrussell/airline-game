@@ -4,6 +4,15 @@ class GameData::Inputter < ApplicationRecord
   def self.run
     data = CSV.parse(File.read("data/metro_areas.csv"), headers: true)
     data.by_row.each do |data_point|
+      self.create_or_update_market(data_point)
+    end
+
+    self.population
+  end
+
+  private
+
+    def self.create_or_update_market(data_point)
       if Market.exists?(name: data_point["Metro Area"])
         Market.find_by(name: data_point["Metro Area"]).update!(
           country: data_point["Country"],
@@ -21,11 +30,6 @@ class GameData::Inputter < ApplicationRecord
         ).save
       end
     end
-
-    self.population
-  end
-
-  private
 
     def self.population
       Population.all.delete_all
