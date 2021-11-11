@@ -9,4 +9,6 @@ class Airport < ApplicationRecord
   validates :easy_gates, presence: true
   validates :latitude, presence: true
   validates :longitude, presence: true
+
+  validates_uniqueness_of :iata
 end
