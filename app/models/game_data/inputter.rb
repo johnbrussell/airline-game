@@ -8,6 +8,7 @@ class GameData::Inputter < ApplicationRecord
     end
 
     self.population
+    self.tourists
   end
 
   private
@@ -40,6 +41,20 @@ class GameData::Inputter < ApplicationRecord
         Population.create!(
           market_id: market.id,
           population: data_point["Population"],
+          year: data_point["Year"],
+        )
+      end
+    end
+
+    def self.tourists
+      Tourists.all.delete_all
+
+      data = CSV.parse(File.read("data/tourists.csv"), headers: true)
+      data.by_row.each do |data_point|
+        market = Market.find_by!(name: data_point["Metro area"])
+        Tourists.create!(
+          market_id: market.id,
+          volume: data_point["Visitors"],
           year: data_point["Year"],
         )
       end

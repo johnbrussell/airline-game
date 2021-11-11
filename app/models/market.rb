@@ -8,4 +8,5 @@ class Market < ApplicationRecord
   validates_uniqueness_of :name
 
   has_many :populations
+  has_many :tourists, class_name: "Tourists"
 end
