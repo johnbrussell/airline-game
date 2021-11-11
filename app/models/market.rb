@@ -9,4 +9,5 @@ class Market < ApplicationRecord
 
   has_many :populations
   has_many :tourists, class_name: "Tourists"
+  has_many :airports
 end
