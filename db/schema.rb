@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_07_163830) do
+ActiveRecord::Schema.define(version: 2021_11_10_210902) do
 
   create_table "games", force: :cascade do |t|
     t.date "start_date", null: false
@@ -38,6 +38,15 @@ ActiveRecord::Schema.define(version: 2021_11_07_163830) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["market_id"], name: "index_populations_on_market_id"
+  end
+
+  create_table "tourists", force: :cascade do |t|
+    t.integer "market_id"
+    t.integer "volume", null: false
+    t.integer "year", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["market_id"], name: "index_tourists_on_market_id"
   end
 
 end
