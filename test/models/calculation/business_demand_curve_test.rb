@@ -57,6 +57,27 @@ class Calculation::BusinessDemandCurveTest < ActiveSupport::TestCase
     assert subject.relative_demand < 100
   end
 
+  test "demand is greater than 100 for an island trip of shorter than SHORT_THRESHOLD_DISTANCE" do
+    subject = create_subject(Calculation::BusinessDemandCurve::SHORT_THRESHOLD_DISTANCE / 2)
+
+    assert 100 < subject.relative_demand_island
+  end
+
+  test "demand is equal to 100 for an island trip of between SHORT_THRESHOLD_DISTANCE and LONG_THRESHOLD_DISTANCE" do
+    subject = create_subject((Calculation::BusinessDemandCurve::SHORT_THRESHOLD_DISTANCE + Calculation::BusinessDemandCurve::LONG_THRESHOLD_DISTANCE) / 2)
+    expected = 100
+    delta = 0.001
+
+    assert_in_delta(subject.relative_demand_island, expected, delta)
+  end
+
+  test "demand is less than 100 for an island trip of more than LONG_THRESHOLD_DISTANCE" do
+    subject = create_subject(Calculation::BusinessDemandCurve::LONG_THRESHOLD_DISTANCE + 1)
+
+    assert 0 < subject.relative_demand_island
+    assert subject.relative_demand_island < 100
+  end
+
   def create_subject(distance)
     Calculation::BusinessDemandCurve.new(distance)
   end

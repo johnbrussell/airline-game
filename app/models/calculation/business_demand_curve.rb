@@ -19,6 +19,14 @@ class Calculation::BusinessDemandCurve
     end
   end
 
+  def relative_demand_island
+    if @distance < SHORT_THRESHOLD_DISTANCE
+      short_island
+    else
+      relative_demand
+    end
+  end
+
   private
 
     def long
@@ -31,5 +39,9 @@ class Calculation::BusinessDemandCurve
 
     def short
       SHORT_CONSTANT * (@distance ** SHORT_EXPONENT) * SHORT_SIGNIFICANCE
+    end
+
+    def short_island
+      SHORT_THRESHOLD_DISTANCE * 100 / @distance
     end
 end
