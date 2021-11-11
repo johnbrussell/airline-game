@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_10_214848) do
+ActiveRecord::Schema.define(version: 2021_11_11_093815) do
 
   create_table "airports", force: :cascade do |t|
     t.integer "market_id"
@@ -24,6 +24,7 @@ ActiveRecord::Schema.define(version: 2021_11_10_214848) do
     t.float "longitude", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["iata"], name: "index_airports_on_iata", unique: true
     t.index ["market_id"], name: "index_airports_on_market_id"
   end
 
