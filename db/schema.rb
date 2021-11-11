@@ -10,7 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_10_210902) do
+ActiveRecord::Schema.define(version: 2021_11_10_214848) do
+
+  create_table "airports", force: :cascade do |t|
+    t.integer "market_id"
+    t.string "iata", null: false
+    t.float "exclusive_catchment", default: 0.0, null: false
+    t.integer "runway", null: false
+    t.integer "elevation", null: false
+    t.integer "start_gates", null: false
+    t.integer "easy_gates", null: false
+    t.float "latitude", null: false
+    t.float "longitude", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["market_id"], name: "index_airports_on_market_id"
+  end
 
   create_table "games", force: :cascade do |t|
     t.date "start_date", null: false
