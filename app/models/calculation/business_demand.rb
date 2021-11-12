@@ -22,9 +22,9 @@ class Calculation::BusinessDemand
 
     def distance_demand
       if origin_market.is_island
-        Calculation::BusinessDemandCurve.new(distance).relative_demand_island
+        Calculation::DemandCurve.new(distance, :business).relative_demand_island
       else
-        Calculation::BusinessDemandCurve.new(distance).relative_demand
+        Calculation::DemandCurve.new(distance, :business).relative_demand
       end
     end
 end
