@@ -1,9 +1,9 @@
 class Calculation::DemandCurve
-  SHORT_CONSTANTS = { :business => 1.3223140496 }
-  SHORT_EXPONENTS = { :business => 2 }
-  SHORT_SIGNIFICANCES = { :business => 10 ** -3 }
-  SHORT_THRESHOLD_DISTANCES = { :business => 275 }
-  LONG_THRESHOLD_DISTANCES = { :business => 400 }
+  SHORT_CONSTANTS = { :business => 1.3223140496, :leisure => 1.5625 }
+  SHORT_EXPONENTS = { :business => 2, :leisure => 3 }
+  SHORT_SIGNIFICANCES = { :business => 10 ** -3, :leisure => 10 ** -6 }
+  SHORT_THRESHOLD_DISTANCES = { :business => 275, :leisure => 400 }
+  LONG_THRESHOLD_DISTANCES = { :business => 400, :leisure => 600 }
 
   def initialize(distance, curve_type)
     @distance = distance
