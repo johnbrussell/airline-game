@@ -1,9 +1,9 @@
 class Calculation::DemandCurve
-  SHORT_CONSTANT = 1.3223140496
-  SHORT_EXPONENT = 2
-  SHORT_SIGNIFICANCE = 10 ** -3
-  SHORT_THRESHOLD_DISTANCE = 275
-  LONG_THRESHOLD_DISTANCE = 400
+  SHORT_CONSTANTS = { :business => 1.3223140496 }
+  SHORT_EXPONENTS = { :business => 2 }
+  SHORT_SIGNIFICANCES = { :business => 10 ** -3 }
+  SHORT_THRESHOLD_DISTANCES = { :business => 275 }
+  LONG_THRESHOLD_DISTANCES = { :business => 400 }
 
   def initialize(distance, curve_type)
     @distance = distance
@@ -11,9 +11,9 @@ class Calculation::DemandCurve
   end
 
   def relative_demand
-    if @distance < SHORT_THRESHOLD_DISTANCE
+    if @distance < short_threshold_distance
       short
-    elsif @distance > LONG_THRESHOLD_DISTANCE
+    elsif @distance > long_threshold_distance
       long
     else
       moderate
@@ -21,7 +21,7 @@ class Calculation::DemandCurve
   end
 
   def relative_demand_island
-    if @distance < SHORT_THRESHOLD_DISTANCE
+    if @distance < short_threshold_distance
       short_island
     else
       relative_demand
@@ -31,7 +31,11 @@ class Calculation::DemandCurve
   private
 
     def long
-      LONG_THRESHOLD_DISTANCE * 100 / @distance
+      long_threshold_distance * 100 / @distance
+    end
+
+    def long_threshold_distance
+      @long_threshold_distance ||= LONG_THRESHOLD_DISTANCES.fetch(@curve_type)
     end
 
     def moderate
@@ -39,10 +43,26 @@ class Calculation::DemandCurve
     end
 
     def short
-      SHORT_CONSTANT * (@distance ** SHORT_EXPONENT) * SHORT_SIGNIFICANCE
+      short_constant * (@distance ** short_exponent) * short_significance
+    end
+
+    def short_constant
+      @short_constant ||= SHORT_CONSTANTS.fetch(@curve_type)
+    end
+
+    def short_exponent
+      @short_exponent ||= SHORT_EXPONENTS.fetch(@curve_type)
     end
 
     def short_island
-      SHORT_THRESHOLD_DISTANCE * 100 / @distance
+      short_threshold_distance * 100 / @distance
+    end
+
+    def short_significance
+      @short_significance ||= SHORT_SIGNIFICANCES.fetch(@curve_type)
+    end
+
+    def short_threshold_distance
+      @short_threshold_distance ||= SHORT_THRESHOLD_DISTANCES.fetch(@curve_type)
     end
 end
