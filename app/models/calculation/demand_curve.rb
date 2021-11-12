@@ -1,4 +1,4 @@
-class Calculation::BusinessDemandCurve
+class Calculation::DemandCurve
   SHORT_CONSTANT = 1.3223140496
   SHORT_EXPONENT = 2
   SHORT_SIGNIFICANCE = 10 ** -3
