@@ -5,8 +5,9 @@ class Calculation::BusinessDemandCurve
   SHORT_THRESHOLD_DISTANCE = 275
   LONG_THRESHOLD_DISTANCE = 400
 
-  def initialize(distance)
+  def initialize(distance, curve_type)
     @distance = distance
+    @curve_type = curve_type
   end
 
   def relative_demand

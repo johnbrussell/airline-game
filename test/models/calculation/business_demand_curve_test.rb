@@ -79,6 +79,6 @@ class Calculation::BusinessDemandCurveTest < ActiveSupport::TestCase
   end
 
   def create_subject(distance)
-    Calculation::BusinessDemandCurve.new(distance)
+    Calculation::BusinessDemandCurve.new(distance, :business)
   end
 end
