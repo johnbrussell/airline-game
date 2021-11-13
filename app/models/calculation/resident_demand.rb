@@ -20,12 +20,28 @@ class Calculation::ResidentDemand
       end
     end
 
+    def business_demand_curve
+      @business_demand_curve ||= Calculation::DemandCurve.new(:business)
+    end
+
+    def demand_curve(type)
+      if type == :business
+        business_demand_curve
+      elsif type == :leisure
+        leisure_demand_curve
+      end
+    end
+
     def distance_demand(type)
       if origin_market.is_island
-        Calculation::DemandCurve.new(type).relative_demand_island(distance)
+        demand_curve(type).relative_demand_island(distance)
       else
-        Calculation::DemandCurve.new(type).relative_demand(distance)
+        demand_curve(type).relative_demand(distance)
       end
+    end
+
+    def leisure_demand_curve
+      @leisure_demand_curve ||= Calculation::DemandCurve.new(:leisure)
     end
 
     def raw_demand(type)
