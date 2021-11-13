@@ -3,7 +3,7 @@ require "test_helper"
 class Calculation::DemandCurveTest < ActiveSupport::TestCase
   business_subject = Calculation::DemandCurve.new(:business)
   leisure_subject = Calculation::DemandCurve.new(:leisure)
-  
+
   test "demand is zero for a business trip of zero miles" do
     subject = business_subject
     expected = 0
@@ -71,17 +71,8 @@ class Calculation::DemandCurveTest < ActiveSupport::TestCase
     assert 100 < subject.relative_demand_island(distance)
   end
 
-  test "demand is equal to 100 for an island business trip of between SHORT_THRESHOLD_DISTANCE and LONG_THRESHOLD_DISTANCE" do
-    distance = (Calculation::DemandCurve::SHORT_THRESHOLD_DISTANCES.fetch(:business) + Calculation::DemandCurve::LONG_THRESHOLD_DISTANCES.fetch(:business)) / 2
-    subject = business_subject
-    expected = 100
-    delta = 0.001
-
-    assert_in_delta(subject.relative_demand_island(distance), expected, delta)
-  end
-
-  test "demand is less than 100 for an island business trip of more than LONG_THRESHOLD_DISTANCE" do
-    distance = Calculation::DemandCurve::LONG_THRESHOLD_DISTANCES.fetch(:business) + 1
+  test "demand is less than 100 for an island business trip of more than SHORT_THRESHOLD_DISTANCE" do
+    distance = Calculation::DemandCurve::SHORT_THRESHOLD_DISTANCES.fetch(:business) + 1
     subject = business_subject
 
     assert 0 < subject.relative_demand_island(distance)
@@ -155,17 +146,8 @@ class Calculation::DemandCurveTest < ActiveSupport::TestCase
     assert 100 < subject.relative_demand_island(distance)
   end
 
-  test "demand is equal to 100 for an island leisure trip of between SHORT_THRESHOLD_DISTANCE and LONG_THRESHOLD_DISTANCE" do
-    distance = (Calculation::DemandCurve::SHORT_THRESHOLD_DISTANCES.fetch(:leisure) + Calculation::DemandCurve::LONG_THRESHOLD_DISTANCES.fetch(:leisure)) / 2
-    subject = leisure_subject
-    expected = 100
-    delta = 0.001
-
-    assert_in_delta(subject.relative_demand_island(distance), expected, delta)
-  end
-
-  test "demand is less than 100 for an island leisure trip of more than LONG_THRESHOLD_DISTANCE" do
-    distance = Calculation::DemandCurve::LONG_THRESHOLD_DISTANCES.fetch(:leisure) + 1
+  test "demand is less than 100 for an island leisure trip of more than SHORT_THRESHOLD_DISTANCE" do
+    distance = Calculation::DemandCurve::SHORT_THRESHOLD_DISTANCES.fetch(:leisure) + 1
     subject = leisure_subject
 
     assert 0 < subject.relative_demand_island(distance)

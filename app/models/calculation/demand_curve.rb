@@ -20,11 +20,7 @@ class Calculation::DemandCurve
   end
 
   def relative_demand_island(distance)
-    if distance < short_threshold_distance
-      short_island(distance)
-    else
-      relative_demand(distance)
-    end
+    short_threshold_distance * 100 / distance
   end
 
   private
@@ -51,10 +47,6 @@ class Calculation::DemandCurve
 
     def short_exponent
       @short_exponent ||= SHORT_EXPONENTS.fetch(@curve_type)
-    end
-
-    def short_island(distance)
-      short_threshold_distance * 100 / distance
     end
 
     def short_significance

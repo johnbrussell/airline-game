@@ -91,24 +91,24 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     assert actual_leisure == expected
   end
 
-  test "business demand is equivalent to the destination population when between islands, domestic, and the demand-maximizing distance" do
+  test "business demand is equivalent to the island demand curve when between islands, domestic, and the demand-maximizing distance" do
     pohnpei = Market.find_by!(name: "Pohnpei")
     kosrae = Market.find_by!(name: "Kosrae")
 
     actual = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).business_demand
-    expected = 1000
+    expected = Calculation::DemandCurve.new(:business).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, kosrae.airports.first)) / 100.0 * kosrae.populations.first.population
 
     assert actual == expected
   end
 
-  test "leisure demand is equivalent to the destination population when between islands, domestic, and the demand-maximizing distance" do
+  test "leisure demand is equivalent to the island demand curve when between islands, domestic, and the demand-maximizing distance" do
     pohnpei = Market.find_by!(name: "Pohnpei")
     micronesia = Market.find_by!(name: "Micronesia")
 
     actual = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
-    expected = micronesia.populations.first.population
+    expected = Calculation::DemandCurve.new(:leisure).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, micronesia.airports.last)) / 100.0 * micronesia.populations.first.population
 
-    assert actual == expected
+    assert_in_epsilon actual, expected, 0.000001
   end
 
   test "business demand is halved when the destination is not an island" do
@@ -118,7 +118,7 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     kosrae = Market.find_by!(name: "Kosrae")
 
     actual = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).business_demand
-    expected = 500
+    expected = Calculation::DemandCurve.new(:business).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, kosrae.airports.first)) / 100.0 * kosrae.populations.first.population / 2.0
 
     assert actual == expected
   end
@@ -130,9 +130,9 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     micronesia = Market.find_by!(name: "Micronesia")
 
     actual = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
-    expected = micronesia.populations.first.population / 2.0
+    expected = Calculation::DemandCurve.new(:leisure).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, micronesia.airports.last)) / 100.0 * micronesia.populations.first.population / 2.0
 
-    assert actual == expected
+    assert_in_epsilon actual, expected, 0.000001
   end
 
   test "demand is halved when the origin is not an island" do
@@ -159,7 +159,7 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     kosrae = Market.find_by!(name: "Kosrae")
 
     actual = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).business_demand
-    expected = 1000 / 12.0
+    expected = Calculation::DemandCurve.new(:business).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, kosrae.airports.first)) / 100.0 * kosrae.populations.first.population / 12.0
 
     assert actual == expected
   end
@@ -171,9 +171,9 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     micronesia = Market.find_by!(name: "Micronesia")
 
     actual = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
-    expected = micronesia.populations.first.population / 12.0
+    expected = Calculation::DemandCurve.new(:leisure).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, micronesia.airports.last)) / 100.0 * micronesia.populations.first.population / 12.0
 
-    assert actual == expected
+    assert_in_epsilon actual, expected, 0.000001
   end
 
   test "demand is reduced by an additional factor of 4 when the origin is not an island and the destination is international" do

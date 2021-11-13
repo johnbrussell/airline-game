@@ -18,7 +18,7 @@ class Calculation::TouristDemandTest < ActiveSupport::TestCase
     )
     Market.new(
       name: "Pohnpei",
-      is_island: true,
+      is_island: false,
       country: "Micronesia",
       income: 100,
       airports: [airport_1],
@@ -40,7 +40,7 @@ class Calculation::TouristDemandTest < ActiveSupport::TestCase
     )
     Market.new(
       name: "Kosrae",
-      is_island: true,
+      is_island: false,
       country: "Micronesia",
       income: 100,
       airports: [airport_2],
@@ -72,7 +72,7 @@ class Calculation::TouristDemandTest < ActiveSupport::TestCase
     )
     Market.new(
       name: "Micronesia",
-      is_island: true,
+      is_island: false,
       country: "Micronesia",
       income: 100,
       airports: [airport_3a, airport_3b],
@@ -112,6 +112,8 @@ class Calculation::TouristDemandTest < ActiveSupport::TestCase
   end
 
   test "demand uses the island demand curve when the origin is an island" do
+    Market.find_by!(name: "Micronesia").update!(is_island: true)
+    
     micronesia = Market.find_by!(name: "Micronesia")
     kosrae = Market.find_by!(name: "Kosrae")
 
@@ -123,7 +125,7 @@ class Calculation::TouristDemandTest < ActiveSupport::TestCase
   end
 
   test "demand uses the mainland demand curve when the origin is not an island" do
-    Market.find_by!(name: "Micronesia").update!(is_island: false)
+    Market.find_by!(name: "Kosrae").update!(is_island: true)
 
     micronesia = Market.find_by!(name: "Micronesia")
     kosrae = Market.find_by!(name: "Kosrae")
