@@ -17,9 +17,9 @@ class Calculation::TouristDemand
 
     def distance_demand(type)
       if origin_market.is_island
-        Calculation::DemandCurve.new(distance, type).relative_demand_island
+        Calculation::DemandCurve.new(distance, type).relative_demand_island(distance)
       else
-        Calculation::DemandCurve.new(distance, type).relative_demand
+        Calculation::DemandCurve.new(distance, type).relative_demand(distance)
       end
     end
 end

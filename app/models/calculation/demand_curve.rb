@@ -10,7 +10,7 @@ class Calculation::DemandCurve
     @curve_type = curve_type
   end
 
-  def relative_demand
+  def relative_demand(distance)
     if @distance < short_threshold_distance
       short
     elsif @distance > long_threshold_distance
@@ -20,11 +20,11 @@ class Calculation::DemandCurve
     end
   end
 
-  def relative_demand_island
+  def relative_demand_island(distance)
     if @distance < short_threshold_distance
       short_island
     else
-      relative_demand
+      relative_demand(distance)
     end
   end
 
