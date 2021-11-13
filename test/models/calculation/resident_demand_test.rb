@@ -84,7 +84,7 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     micronesia = Market.find_by!(name: "Micronesia")
 
     actual_business = Calculation::ResidentDemand.new(micronesia.airports.first, micronesia.airports.last, Date.today).business_demand
-    actual_leisure = Calculation::ResidentDemand.new(micronesia.airports.first, micronesia.airports.last, Date.today).business_demand
+    actual_leisure = Calculation::ResidentDemand.new(micronesia.airports.first, micronesia.airports.last, Date.today).leisure_demand
     expected = 0
 
     assert actual_business == expected
