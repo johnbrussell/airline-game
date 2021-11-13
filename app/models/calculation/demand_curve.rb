@@ -5,33 +5,28 @@ class Calculation::DemandCurve
   SHORT_THRESHOLD_DISTANCES = { :business => 275, :leisure => 400 }
   LONG_THRESHOLD_DISTANCES = { :business => 400, :leisure => 600 }
 
-  def initialize(distance, curve_type)
-    @distance = distance
+  def initialize(curve_type)
     @curve_type = curve_type
   end
 
-  def relative_demand
-    if @distance < short_threshold_distance
-      short
-    elsif @distance > long_threshold_distance
-      long
+  def relative_demand(distance)
+    if distance < short_threshold_distance
+      short(distance)
+    elsif distance > long_threshold_distance
+      long(distance)
     else
       moderate
     end
   end
 
-  def relative_demand_island
-    if @distance < short_threshold_distance
-      short_island
-    else
-      relative_demand
-    end
+  def relative_demand_island(distance)
+    short_threshold_distance * 100 / distance
   end
 
   private
 
-    def long
-      long_threshold_distance * 100 / @distance
+    def long(distance)
+      long_threshold_distance * 100 / distance
     end
 
     def long_threshold_distance
@@ -42,8 +37,8 @@ class Calculation::DemandCurve
       100
     end
 
-    def short
-      short_constant * (@distance ** short_exponent) * short_significance
+    def short(distance)
+      short_constant * (distance ** short_exponent) * short_significance
     end
 
     def short_constant
@@ -52,10 +47,6 @@ class Calculation::DemandCurve
 
     def short_exponent
       @short_exponent ||= SHORT_EXPONENTS.fetch(@curve_type)
-    end
-
-    def short_island
-      short_threshold_distance * 100 / @distance
     end
 
     def short_significance

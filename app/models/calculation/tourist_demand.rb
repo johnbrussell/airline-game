@@ -5,7 +5,7 @@ class Calculation::TouristDemand
     if origin_market == destination_market
       0
     else
-      airport_population / 100.0 * distance_demand(:leisure) * border_multiplier
+      airport_population / 100.0 * distance_demand * border_multiplier
     end
   end
 
@@ -15,11 +15,15 @@ class Calculation::TouristDemand
       domestic? ? 1 : 1/3.0
     end
 
-    def distance_demand(type)
+    def demand_curve
+      @demand_curve ||= Calculation::DemandCurve.new(:leisure)
+    end
+
+    def distance_demand
       if origin_market.is_island
-        Calculation::DemandCurve.new(distance, type).relative_demand_island
+        demand_curve.relative_demand_island(distance)
       else
-        Calculation::DemandCurve.new(distance, type).relative_demand
+        demand_curve.relative_demand(distance)
       end
     end
 end
