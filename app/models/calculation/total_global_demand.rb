@@ -1,9 +1,9 @@
 class Calculation::TotalGlobalDemand
   def self.calculate(date, origin_airport)
-    global_demand = GlobalDemand.find_by(market_id: origin_airport.market.id, date: date)
+    global_demand = GlobalDemand.find_by(airport_id: origin_airport.id, date: date)
     if global_demand.nil?
       GlobalDemand.create!(
-        market_id: origin_airport.market.id,
+        airport_id: origin_airport.id,
         date: date,
         business: market_business_demands(origin_airport, date).sum,
         government: market_government_demands(origin_airport, date).sum,
