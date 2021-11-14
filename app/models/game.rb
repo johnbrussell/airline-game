@@ -5,6 +5,8 @@ class Game < ApplicationRecord
   validate :current_date_greater_than_start_date
   validate :current_date_less_than_end_date
 
+  has_many :airlines
+
   private
 
   def current_date_greater_than_start_date
