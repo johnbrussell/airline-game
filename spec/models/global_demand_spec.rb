@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Calculation::TotalGlobalDemand do
+RSpec.describe GlobalDemand do
   market_1 = Market.new
   market_2 = Market.new
   market_3 = Market.new
@@ -29,7 +29,7 @@ RSpec.describe Calculation::TotalGlobalDemand do
 
       global_demand_count = GlobalDemand.count
 
-      actual = Calculation::TotalGlobalDemand.calculate(date, origin_airport)
+      actual = GlobalDemand.calculate(date, origin_airport)
 
       assert GlobalDemand.count == global_demand_count + 1
 
@@ -54,7 +54,7 @@ RSpec.describe Calculation::TotalGlobalDemand do
 
       global_demand_count = GlobalDemand.count
 
-      actual = Calculation::TotalGlobalDemand.calculate(date, origin_airport)
+      actual = GlobalDemand.calculate(date, origin_airport)
 
       assert global_demand_count == GlobalDemand.count
       assert actual.date == date
