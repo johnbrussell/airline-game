@@ -11,7 +11,6 @@ class Market < ApplicationRecord
   has_many :populations
   has_many :tourists, class_name: "Tourists"
   has_many :airports
-  has_many :global_demands
 
   def shared_catchment
     100 - airports.map(&:exclusive_catchment).sum

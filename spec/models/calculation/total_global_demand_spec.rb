@@ -4,7 +4,7 @@ RSpec.describe Calculation::TotalGlobalDemand do
   market_1 = Market.new
   market_2 = Market.new
   market_3 = Market.new
-  origin_airport = Airport.new(iata: "TVC", market: Market.new(id: 3))
+  origin_airport = Airport.new(iata: "TVC", id: 3)
   date = Date.today
 
   context "calculate" do
@@ -36,7 +36,7 @@ RSpec.describe Calculation::TotalGlobalDemand do
       last = GlobalDemand.last
       assert actual.id == last.id
       assert actual.date == date
-      assert actual.market_id == 3
+      assert actual.airport_id == 3
       assert actual.business == 700
       assert actual.government == 0
       assert actual.leisure == 7000
@@ -44,7 +44,7 @@ RSpec.describe Calculation::TotalGlobalDemand do
     end
 
     it "returns the known GlobalDemand when it has already been calculated" do
-      GlobalDemand.create!(market_id: 3, date: date, business: 1, government: 2, leisure: 3, tourist: 4)
+      GlobalDemand.create!(airport_id: 3, date: date, business: 1, government: 2, leisure: 3, tourist: 4)
 
       expect(Market).not_to receive(:all)
       expect(Calculation::TotalMarketDemand).not_to receive(:business)
@@ -58,7 +58,7 @@ RSpec.describe Calculation::TotalGlobalDemand do
 
       assert global_demand_count == GlobalDemand.count
       assert actual.date == date
-      assert actual.market_id == 3
+      assert actual.airport_id == 3
       assert actual.business == 1
       assert actual.government == 2
       assert actual.leisure == 3

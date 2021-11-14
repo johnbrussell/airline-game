@@ -18,4 +18,6 @@ class Airport < ApplicationRecord
   validates :longitude, numericality: { greater_than: -180, less_than: 180 }
 
   validates_uniqueness_of :iata
+
+  has_many :global_demands
 end

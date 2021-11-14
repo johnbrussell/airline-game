@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_13_135859) do
+ActiveRecord::Schema.define(version: 2021_11_14_113856) do
 
   create_table "airports", force: :cascade do |t|
     t.integer "market_id"
@@ -37,7 +37,6 @@ ActiveRecord::Schema.define(version: 2021_11_13_135859) do
   end
 
   create_table "global_demands", force: :cascade do |t|
-    t.integer "market_id"
     t.date "date", null: false
     t.integer "business", limit: 8, null: false
     t.integer "leisure", limit: 8, null: false
@@ -45,7 +44,8 @@ ActiveRecord::Schema.define(version: 2021_11_13_135859) do
     t.datetime "updated_at", precision: 6, null: false
     t.integer "tourist", limit: 8, null: false
     t.integer "government", limit: 8, null: false
-    t.index ["market_id"], name: "index_global_demands_on_market_id"
+    t.integer "airport_id"
+    t.index ["airport_id"], name: "index_global_demands_on_airport_id"
   end
 
   create_table "markets", force: :cascade do |t|
