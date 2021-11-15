@@ -1,0 +1,17 @@
+Manufacturer,Family,Name,Production Start,Square inches,Range,Fuel burn per hour,Speed,Num pilots,Num flight attendants,Price,Takeoff length,Useful life,Winglet availability,Notes
+Benoist,XIV,XIV,1914,306,100,13,64,1,0,117000,0,2,0,Guessed a lot of the purchase prices
+Sikorsky,Ilya Muromets,Ilya Muromets,1914,4896,340,26,68,3,0,1500000,0,5,0,
+Farman,F.60 Goliath,F.60 Goliath,1919,4284,500,35,105,3,0,1900000,0,5,0,
+Ford,Trimotor,Trimotor,1925,3366,570,43,107,2,1,1400000,0,30,0,
+De Havilland,Dragon,DH.84 Dragon,1933,1836,460,13,128,1,0,700000,1700,8,0,
+De Havilland,Dragon,DH.89 Dragon,1934,2448,556,26,157,1,0,800000,870,8,0,
+Boeing,247,247,1933,3060,745,69,189,2,1,1600000,0,30,0,
+Douglas,DC-2,DC-2,1934,4284,1000,60,190,2,1,1700000,0,30,0,
+Douglas,DC-3,DC-3,1936,6426,1580,108,207,2,1,1400000,1640,30,0,
+Douglas,DC-4,DC-4,1942,26316,2500,400,227,2,2,9200000,5500,30,0,
+Convair,CV-240,CV-240,1947,13464,1200,233,280,2,1,4800000,3970,30,0,
+Douglas,DC-7,DC-7,1953,32130,4635,584,346,2,3,8500000,6360,30,0,
+Douglas,DC-8,DC-8-50,1958,57834,6700,2015,556,3,4,130000000,9843,30,0,
+Boeing,737 Classic,737-200,1968,41616,1900,1471,556,2,3,40000000,9150,30,0,Standard day + 15 takeoff length at sea level. 
+Boeing,737 Classic,737-200 Advanced,1971,41616,1950,1461,556,2,3,45000000,8100,30,0,JT8D-17R/17AR Engines
+Airbus,A320,A320-200,1988,55080,2474,1417,556,2,4,60000000,7250,30,2012,
