@@ -12,7 +12,13 @@ class Calculation::TouristDemand
   private
 
     def border_multiplier
-      domestic? ? 1 : 1/3.0
+      if domestic?
+        1
+      elsif same_country_group?
+        2/3.0
+      else
+        1/3.0
+      end
     end
 
     def demand_curve

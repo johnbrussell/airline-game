@@ -11,6 +11,7 @@ class PopulatableTest < ActiveSupport::TestCase
       is_island: true,
       is_national_capital: true,
       country: "Nauru",
+      country_group: "Nauru",
       airports: [
         Airport.new(
           iata: "INU",

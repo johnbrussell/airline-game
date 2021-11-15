@@ -20,6 +20,7 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
       name: "Pohnpei",
       is_island: true,
       country: "Micronesia",
+      country_group: "United States",
       income: 100,
       airports: [airport_1],
       populations: [population_1],
@@ -42,6 +43,7 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
       name: "Kosrae",
       is_island: true,
       country: "Micronesia",
+      country_group: "United States",
       income: 100,
       airports: [airport_2],
       populations: [population_2],
@@ -74,6 +76,7 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
       name: "Micronesia",
       is_island: true,
       country: "Micronesia",
+      country_group: "United States",
       income: 100,
       airports: [airport_3a, airport_3b],
       populations: [population_3],
@@ -153,7 +156,7 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
   end
 
   test "business demand is reduced by a factor of 12 when the origin is an island and the destination is international" do
-    Market.find_by!(name: "Kosrae").update!(country: "Kosrae Republic")
+    Market.find_by!(name: "Kosrae").update!(country: "Kosrae Republic", country_group: "Kosrae Republic")
 
     pohnpei = Market.find_by!(name: "Pohnpei")
     kosrae = Market.find_by!(name: "Kosrae")
@@ -164,8 +167,20 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     assert actual == expected
   end
 
+  test "business demand is reduced by a factor of 4/3rds when the origin is an island and the destination is international but in the same country group" do
+    Market.find_by!(name: "Kosrae").update!(country: "Kosrae Republic")
+
+    pohnpei = Market.find_by!(name: "Pohnpei")
+    kosrae = Market.find_by!(name: "Kosrae")
+
+    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).business_demand
+    expected = Calculation::DemandCurve.new(:business).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, kosrae.airports.first)) / 100.0 * kosrae.populations.first.population / 12.0 * 9
+
+    assert_in_epsilon actual, expected, 0.000001
+  end
+
   test "leisure demand is reduced by a factor of 12 when the origin is an island and the destination is international" do
-    Market.find_by!(name: "Micronesia").update!(country: "Federated States of Micronesia")
+    Market.find_by!(name: "Micronesia").update!(country: "Federated States of Micronesia", country_group: "Federated States of Micronesia")
 
     pohnpei = Market.find_by!(name: "Pohnpei")
     micronesia = Market.find_by!(name: "Micronesia")
@@ -176,8 +191,20 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     assert_in_epsilon actual, expected, 0.000001
   end
 
+  test "leisure demand is reduced by a factor of 4/3rds when the origin is an island and the destination is international but in the same country group" do
+    Market.find_by!(name: "Micronesia").update!(country: "Federated States of Micronesia")
+
+    pohnpei = Market.find_by!(name: "Pohnpei")
+    micronesia = Market.find_by!(name: "Micronesia")
+
+    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
+    expected = Calculation::DemandCurve.new(:leisure).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, micronesia.airports.last)) / 100.0 * micronesia.populations.first.population / 12.0 * 9
+
+    assert_in_epsilon actual, expected, 0.000001
+  end
+
   test "demand is reduced by an additional factor of 4 when the origin is not an island and the destination is international" do
-    Market.find_by!(name: "Pohnpei").update!(country: "Pohnpei Republic", is_island: false)
+    Market.find_by!(name: "Pohnpei").update!(country: "Pohnpei Republic", is_island: false, country_group: "Pohnpei Republic")
 
     pohnpei = Market.find_by!(name: "Pohnpei")
     kosrae = Market.find_by!(name: "Kosrae")
@@ -188,6 +215,23 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
 
     actual_leisure = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
     expected_leisure = micronesia.populations.first.population / 8.0
+
+    assert actual_business == expected_business
+    assert actual_leisure == expected_leisure
+  end
+
+  test "demand is reduced by an additional factor of 4/3rds when the origin is not an island and the destination is international but in the same country group" do
+    Market.find_by!(name: "Pohnpei").update!(country: "Pohnpei Republic", is_island: false)
+
+    pohnpei = Market.find_by!(name: "Pohnpei")
+    kosrae = Market.find_by!(name: "Kosrae")
+    micronesia = Market.find_by!(name: "Micronesia")
+
+    actual_business = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).business_demand
+    expected_business = 1000 / 8.0 * 3
+
+    actual_leisure = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
+    expected_leisure = micronesia.populations.first.population / 8.0 * 3
 
     assert actual_business == expected_business
     assert actual_leisure == expected_leisure

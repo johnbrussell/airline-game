@@ -1,6 +1,7 @@
 class Market < ApplicationRecord
   validates :name, presence: true
   validates :country, presence: true
+  validates :country_group, presence: true
   validates :income, presence: true
   validates :income, numericality: { greater_than: 0 }
   validates :is_national_capital, :inclusion => { :in => [true, false] }
