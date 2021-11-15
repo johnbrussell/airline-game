@@ -13,7 +13,13 @@ class Calculation::GovernmentDemand
   private
 
     def border_multiplier
-      domestic? ? 1 : 1/100.0
+      if domestic?
+        1
+      elsif same_country_group?
+        33/100.0
+      else
+        1/100.0
+      end
     end
 
     def demand_curve

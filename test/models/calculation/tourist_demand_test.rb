@@ -103,13 +103,25 @@ class Calculation::TouristDemandTest < ActiveSupport::TestCase
   end
 
   test "demand is reduced by a factor of 3 when the destination is international" do
-    Market.find_by!(name: "Micronesia").update!(country: "Federated States of Micronesia")
+    Market.find_by!(name: "Micronesia").update!(country: "Federated States of Micronesia", country_group: "Federated States of Micronesia")
 
     pohnpei = Market.find_by!(name: "Pohnpei")
     micronesia = Market.find_by!(name: "Micronesia")
 
     actual = Calculation::TouristDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).demand
     expected = micronesia.populations.first.population / 3.0
+
+    assert actual == expected
+  end
+
+  test "demand is reduced by a factor of 3/2s when the destination is international but in the same country group" do
+    Market.find_by!(name: "Micronesia").update!(country: "Federated States of Micronesia")
+
+    pohnpei = Market.find_by!(name: "Pohnpei")
+    micronesia = Market.find_by!(name: "Micronesia")
+
+    actual = Calculation::TouristDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).demand
+    expected = micronesia.populations.first.population / 3.0 * 2
 
     assert actual == expected
   end

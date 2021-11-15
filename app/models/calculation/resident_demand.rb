@@ -13,11 +13,7 @@ class Calculation::ResidentDemand
   private
 
     def border_multiplier
-      if origin_market.is_island
-        domestic? ? 1 : 1/12.0
-      else
-        domestic? ? 1 : 1/4.0
-      end
+      origin_market.is_island ? island_border_multiplier : mainland_border_multiplier
     end
 
     def business_demand_curve
@@ -40,8 +36,28 @@ class Calculation::ResidentDemand
       end
     end
 
+    def island_border_multiplier
+      if domestic?
+        1
+      elsif same_country_group?
+        3/4.0
+      else
+        1/12.0
+      end
+    end
+
     def leisure_demand_curve
       @leisure_demand_curve ||= Calculation::DemandCurve.new(:leisure)
+    end
+
+    def mainland_border_multiplier
+      if domestic?
+        1
+      elsif same_country_group?
+        3/4.0
+      else
+        1/4.0
+      end
     end
 
     def raw_demand(type)
