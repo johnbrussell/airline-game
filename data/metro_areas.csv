@@ -1,34 +1,34 @@
-Metro Area,Income,Country,isNationalCapital,isIsland
-Los Angeles,75629,United States,No,No
-New York City,78039,United States,No,No
-Chicago,70009,United States,No,No
-Boston,118453,United States,No,No
-Provincetown,212306,United States,No,Yes
-Portsmouth,82210,United States,No,No
-Hyannis,148042,United States,No,No
-Nauru,19000,Nauru,Yes,Yes
-Funafuti,30495,Tuvalu,Yes,Yes
-Majuro,12011,Marshall Islands,Yes,Yes
-Pohnpei,18736,Federated States of Micronesia,Yes,Yes
-Kwajalien,14956,Marshall Islands,No,Yes
-Kosrae,24025,Federated States of Micronesia,No,Yes
-Chuuk,15613,Federated States of Micronesia,No,Yes
-Yap,20789,Federated States of Micronesia,No,Yes
-Danbury,74420,United States,No,No
-Bridgeport,109317,United States,No,No
-Waterbury,63082,United States,No,No
-New Haven,80496,United States,No,No
-Hartford,73487,United States,No,No
-Providence,65715,United States,No,No
-New London,82886,United States,No,No
-Newport,82477,United States,No,No
-Block Island,143456.620681672,United States,No,Yes
-Nantucket,168863.775367281,United States,No,Yes
-Martha’s Vineyard,177071,United States,No,Yes
-New Bedford,70161,United States,No,No
-Pittsfield,64783,United States,No,No
-Worcester,79121,United States,No,No
-Keene,63255.981883761,United States,No,No
-Lebanon,64415,United States,No,No
-Rutland,58790,United States,No,No
-Montpelier,65076.0339335025,United States,No,No
+Metro Area,Income,Country,Country group,isNationalCapital,isIsland
+Los Angeles,75629,United States,United States,No,No
+New York City,78039,United States,United States,No,No
+Chicago,70009,United States,United States,No,No
+Boston,118453,United States,United States,No,No
+Provincetown,212306,United States,United States,No,Yes
+Portsmouth,82210,United States,United States,No,No
+Hyannis,148042,United States,United States,No,No
+Nauru,19000,Nauru,Nauru,Yes,Yes
+Funafuti,30495,Tuvalu,Tuvalu,Yes,Yes
+Majuro,12011,Marshall Islands,United States,Yes,Yes
+Pohnpei,18736,Federated States of Micronesia,United States,Yes,Yes
+Kwajalien,14956,Marshall Islands,United States,No,Yes
+Kosrae,24025,Federated States of Micronesia,United States,No,Yes
+Chuuk,15613,Federated States of Micronesia,United States,No,Yes
+Yap,20789,Federated States of Micronesia,United States,No,Yes
+Danbury,74420,United States,United States,No,No
+Bridgeport,109317,United States,United States,No,No
+Waterbury,63082,United States,United States,No,No
+New Haven,80496,United States,United States,No,No
+Hartford,73487,United States,United States,No,No
+Providence,65715,United States,United States,No,No
+New London,82886,United States,United States,No,No
+Newport,82477,United States,United States,No,No
+Block Island,143456.620681672,United States,United States,No,Yes
+Nantucket,168863.775367281,United States,United States,No,Yes
+Martha’s Vineyard,177071,United States,United States,No,Yes
+New Bedford,70161,United States,United States,No,No
+Pittsfield,64783,United States,United States,No,No
+Worcester,79121,United States,United States,No,No
+Keene,63255.981883761,United States,United States,No,No
+Lebanon,64415,United States,United States,No,No
+Rutland,58790,United States,United States,No,No
+Montpelier,65076.0339335025,United States,United States,No,No
