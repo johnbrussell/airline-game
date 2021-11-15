@@ -24,4 +24,8 @@ module Demandable
     def origin_market
       @origin_market ||= @origin.market
     end
+
+    def same_country_group?
+      origin_market.country_group == destination_market.country_group
+    end
 end
