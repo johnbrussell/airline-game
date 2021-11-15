@@ -2,13 +2,14 @@ require "test_helper"
 
 class GameData::InputterTest < ActiveSupport::TestCase
   def setup
-    Market.new(name: "Yaren", income: 100000, is_island: true, is_national_capital: true, country: "Nauru").save!
+    Market.new(name: "Yaren", income: 100000, is_island: true, is_national_capital: true, country: "Nauru", country_group: "Nauru").save!
   end
 
   test "new Markets created" do
     data_point = {
       "Metro Area" => "Funafuti",
       "Country" => "Tuvalu",
+      "Country group" => "Tuvalu",
       "Income" => 40000,
       "isNationalCapital" => "yes",
       "isIsland" => "yes",
@@ -22,6 +23,7 @@ class GameData::InputterTest < ActiveSupport::TestCase
 
     assert_equal(last_market.name, "Funafuti")
     assert_equal(last_market.country, "Tuvalu")
+    assert_equal(last_market.country_group, "Tuvalu")
     assert_equal(last_market.income, 40000)
     assert_equal(last_market.is_national_capital, true)
     assert_equal(last_market.is_island, true)
@@ -31,6 +33,7 @@ class GameData::InputterTest < ActiveSupport::TestCase
     data_point = {
       "Metro Area" => "Yaren",
       "Country" => "Republic of Nauru",
+      "Country group" => "Republic of Nauru",
       "Income" => 100001,
       "isNationalCapital" => "no",
       "isIsland" => "no",
@@ -44,6 +47,7 @@ class GameData::InputterTest < ActiveSupport::TestCase
 
     assert_equal(last_market.name, "Yaren")
     assert_equal(last_market.country, "Republic of Nauru")
+    assert_equal(last_market.country_group, "Republic of Nauru")
     assert_equal(last_market.income, 100001)
     assert_equal(last_market.is_national_capital, false)
     assert_equal(last_market.is_island, false)
