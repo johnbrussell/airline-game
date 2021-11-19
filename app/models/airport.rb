@@ -22,4 +22,5 @@ class Airport < ApplicationRecord
   validates_uniqueness_of :iata
 
   has_many :global_demands
+  has_many :slots
 end
