@@ -10,9 +10,38 @@ class GameData::Inputter < ApplicationRecord
     self.airports
     self.population
     self.tourists
+    self.aircraft_models
   end
 
   private
+
+    def self.aircraft_models
+      data = CSV.parse(File.read("data/aircraft.csv"), headers: true)
+      min_runway = Airport.minimum(:runway) - 1
+      data.by_row.each do |data_point|
+        data_map = {
+          manufacturer: data_point["Manufacturer"],
+          family: data_point["Family"],
+          name: data_point["Name"],
+          production_start_year: data_point["Production Start"],
+          floor_space: data_point["Square inches"],
+          max_range: data_point["Range"],
+          fuel_burn: data_point["Fuel burn per hour"],
+          speed: data_point["Speed"],
+          num_pilots: data_point["Num pilots"],
+          num_flight_attendants: data_point["Num flight attendants"],
+          price: data_point["Price"],
+          takeoff_distance: [data_point["Takeoff length"].to_i, min_runway].max,
+          useful_life: data_point["Useful life"],
+        }
+
+        if AircraftModel.exists?(manufacturer: data_point["Manufacturer"], name: data_point["Name"])
+          AircraftModel.find_by!(manufacturer: data_point["Manufacturer"], name: data_point["Name"]).update!(**data_map)
+        else
+          AircraftModel.create!(**data_map)
+        end
+      end
+    end
 
     def self.airports
       Airport.all.delete_all
