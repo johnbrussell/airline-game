@@ -20,4 +20,8 @@ class Airport < ApplicationRecord
   validates_uniqueness_of :iata
 
   has_many :global_demands
+
+  def is_on_island?
+    market.is_island
+  end
 end
