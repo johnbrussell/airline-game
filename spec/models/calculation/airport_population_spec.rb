@@ -26,7 +26,13 @@ RSpec.describe Calculation::AirportPopulation do
           year: 2010,
           population: 10000,
         )
-      ]
+      ],
+      tourists: [
+        Tourists.new(
+          year: 2010,
+          volume: 100000,
+        )
+      ],
     ).save!
   end
 
@@ -94,6 +100,50 @@ RSpec.describe Calculation::AirportPopulation do
       assert subject_2014.send(:market_population) < 10050
       assert 10100 < subject_2019.send(:market_population)
       assert subject_2019.send(:market_population) < 10300
+    end
+  end
+
+  context "market_tourists" do
+    it "is the most recent tourists when there is no next tourists" do
+      nauru = Market.last
+
+      subject = described_class.new(nauru.airports.first, Date.today)
+
+      assert subject.send(:market_tourists) == 100000
+    end
+
+    it "is the next tourists when there is no previous tourists" do
+      nauru = Market.last
+
+      subject = described_class.new(nauru.airports.first, "2009-01-01".to_date)
+
+      assert subject.send(:market_tourists) == 100000
+    end
+
+    it "is the current year when there is tourists data for the year" do
+      nauru = Market.last
+
+      nauru.tourists.create!(year: 2020, volume: 105000)
+      nauru.tourists.create!(year: 2018, volume: 101000)
+
+      subject = described_class.new(nauru.airports.first, "2018-06-30".to_date)
+
+      assert subject.send(:market_tourists) == 101000
+    end
+
+    it "calculates the growth rate and assumes a tourists when no data for the year exists" do
+      nauru = Market.last
+
+      nauru.tourists.create!(year: 2020, volume: 105000)
+      nauru.tourists.create!(year: 2018, volume: 101000)
+
+      subject_2014 = described_class.new(nauru.airports.first, "2014-02-02".to_date)
+      subject_2019 = described_class.new(nauru.airports.first, "2019-06-30".to_date)
+
+      assert 100000 < subject_2014.send(:market_tourists)
+      assert subject_2014.send(:market_tourists) < 100500
+      assert 101000 < subject_2019.send(:market_tourists)
+      assert subject_2019.send(:market_tourists) < 103000
     end
   end
 end
