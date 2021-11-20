@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Gates do
   context "build_new_gate" do
-    it "creates new slots for the appropriate airline and updates the number of gates on the Airport" do
+    it "creates new slots for the appropriate airline and updates the number of gates on the Airport and charges the airline" do
       Market.create!(
         name: "Bar",
         country: "Baz",
@@ -16,14 +16,14 @@ RSpec.describe Gates do
         elevation: 10,
         start_gates: 1,
         current_gates: 1,
-        easy_gates: 1,
+        easy_gates: 2,
         latitude: 40,
         longitude: -70,
         market: Market.last,
       )
       airline = Airline.create!(
         name: "Foo",
-        cash_on_hand: 100,
+        cash_on_hand: 1000000000,
         is_user_airline: false,
       )
       date = Date.today
@@ -31,18 +31,29 @@ RSpec.describe Gates do
       gates = Gates.create!(airport: airport, current_gates: 1, game: game)
 
       old_slots = gates.slots.count
+      old_cash_on_hand = airline.cash_on_hand
 
       gates.build_new_gate(airline, date)
       gates.reload
 
       expected_slots = old_slots + Gates::SLOTS_PER_GATE
 
-      assert expected_slots == gates.slots.count
+      expect(expected_slots).to eq gates.slots.count
 
       slot = Slot.last
 
-      assert slot.lessee_id == airline.id
-      assert slot.lease_expiry == date + Gates::NEW_SLOT_LEASE_DURATION
+      expect(slot.lessee_id).to eq airline.id
+      expect(slot.lease_expiry).to eq date + Gates::NEW_SLOT_LEASE_DURATION
+
+      airline.reload
+
+      expect(airline.cash_on_hand).to eq old_cash_on_hand - Gates::EASY_GATE_COST
+
+      gates.build_new_gate(airline, date)
+
+      airline.reload
+
+      expect(airline.cash_on_hand).to eq old_cash_on_hand - Gates::EASY_GATE_COST - Gates::DIFFICULT_GATE_COST
     end
   end
 
