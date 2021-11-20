@@ -27,6 +27,7 @@ class Gates < ApplicationRecord
         "gates_id": id,
         "lessee_id": airline.id,
         "lease_expiry": current_date + NEW_SLOT_LEASE_DURATION,
+        "rent": Calculation::SlotRent.calculate(airport, game),
         "created_at": Time.now,
         "updated_at": Time.now,
       }

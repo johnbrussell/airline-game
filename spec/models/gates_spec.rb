@@ -58,6 +58,8 @@ RSpec.describe Gates do
       old_slots = gates.slots.count
       old_cash_on_hand = airline.cash_on_hand
 
+      expect(Calculation::SlotRent).to receive(:calculate).with(airport, game).and_return 100
+
       gates.build_new_gate(airline, date)
       gates.reload
 
@@ -69,16 +71,25 @@ RSpec.describe Gates do
 
       expect(slot.lessee_id).to eq airline.id
       expect(slot.lease_expiry).to eq date + Gates::NEW_SLOT_LEASE_DURATION
+      expect(slot.rent).to eq 100
 
       airline.reload
 
       expect(airline.cash_on_hand).to eq old_cash_on_hand - Gates::EASY_GATE_COST
+
+      expect(Calculation::SlotRent).to receive(:calculate).with(airport, game).and_return 150
 
       gates.build_new_gate(airline, date)
 
       airline.reload
 
       expect(airline.cash_on_hand).to eq old_cash_on_hand - Gates::EASY_GATE_COST - Gates::DIFFICULT_GATE_COST
+
+      slot = Slot.last
+
+      expect(slot.lessee_id).to eq airline.id
+      expect(slot.lease_expiry).to eq date + Gates::NEW_SLOT_LEASE_DURATION
+      expect(slot.rent).to eq 150
     end
   end
 
