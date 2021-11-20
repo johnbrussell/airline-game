@@ -13,6 +13,14 @@ class Gates < ApplicationRecord
   EASY_GATE_COST = 10000000
   DIFFICULT_GATE_COST = 100000000
 
+  def self.at_airport(airport, game)
+    if find_by(airport: airport, game: game).present?
+      find_by(airport: airport, game: game)
+    else
+      create!(airport: airport, game: game, current_gates: airport.start_gates)
+    end
+  end
+
   def build_new_gate(airline, current_date)
     Slot.insert_all!([
       {
