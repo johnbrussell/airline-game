@@ -10,7 +10,7 @@ class Gates < ApplicationRecord
   private
 
     def current_gates_greater_than_start_gates
-      if current_gates <= airport.start_gates
+      if current_gates < airport.start_gates
         errors.add(:current_gates, "cannot be less than minimum gates at airport")
       end
     end

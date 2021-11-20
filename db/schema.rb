@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_19_215239) do
+ActiveRecord::Schema.define(version: 2021_11_19_222158) do
 
   create_table "aircraft_models", force: :cascade do |t|
     t.string "manufacturer", null: false
@@ -109,12 +109,12 @@ ActiveRecord::Schema.define(version: 2021_11_19_215239) do
   end
 
   create_table "slots", force: :cascade do |t|
-    t.integer "airport_id"
     t.integer "lessee_id"
     t.date "lease_expiry"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["airport_id"], name: "index_slots_on_airport_id"
+    t.integer "gates_id"
+    t.index ["gates_id"], name: "index_slots_on_gates_id"
   end
 
   create_table "tourists", force: :cascade do |t|
