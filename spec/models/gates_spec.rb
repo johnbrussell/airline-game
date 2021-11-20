@@ -1,6 +1,32 @@
 require "rails_helper"
 
 RSpec.describe Gates do
+  context "at_airport" do
+    it "returns an extant gates when one exists" do
+      market = Market.create!(name: "Bar", country: "Baz", country_group: "BarBaz", income: 1)
+      airport = Airport.create!(start_gates: 1, easy_gates: 1, latitude: 1, longitude: 1, runway: 1, elevation: 1, iata: "Foo", market: market)
+      game = Game.create!(current_date: Date.today, start_date: Date.today, end_date: Date.today)
+      Gates.create!(airport: airport, game: game, current_gates: 1)
+      expected_gate = Gates.last
+
+      expect(Gates.at_airport(airport, game)).to eq expected_gate
+    end
+
+    it "creates a gates when none exists" do
+      market = Market.create!(name: "Bar", country: "Baz", country_group: "BarBaz", income: 1)
+      airport = Airport.create!(start_gates: 1, easy_gates: 1, latitude: 1, longitude: 1, runway: 1, elevation: 1, iata: "Foo", market: market)
+      game = Game.create!(current_date: Date.today, start_date: Date.today, end_date: Date.today)
+
+      old_gates_count = Gates.count
+
+      gates = Gates.at_airport(airport, game)
+
+      expect(Gates.count).to eq old_gates_count + 1
+      expect(Gates.last.airport).to eq airport
+      expect(Gates.last.game).to eq game
+    end
+  end
+
   context "build_new_gate" do
     it "creates new slots for the appropriate airline and updates the number of gates on the Airport and charges the airline" do
       Market.create!(
@@ -32,6 +58,8 @@ RSpec.describe Gates do
       old_slots = gates.slots.count
       old_cash_on_hand = airline.cash_on_hand
 
+      expect(Calculation::SlotRent).to receive(:calculate).with(airport, game).and_return 100
+
       gates.build_new_gate(airline, date)
       gates.reload
 
@@ -43,16 +71,25 @@ RSpec.describe Gates do
 
       expect(slot.lessee_id).to eq airline.id
       expect(slot.lease_expiry).to eq date + Gates::NEW_SLOT_LEASE_DURATION
+      expect(slot.rent).to eq 100
 
       airline.reload
 
       expect(airline.cash_on_hand).to eq old_cash_on_hand - Gates::EASY_GATE_COST
+
+      expect(Calculation::SlotRent).to receive(:calculate).with(airport, game).and_return 150
 
       gates.build_new_gate(airline, date)
 
       airline.reload
 
       expect(airline.cash_on_hand).to eq old_cash_on_hand - Gates::EASY_GATE_COST - Gates::DIFFICULT_GATE_COST
+
+      slot = Slot.last
+
+      expect(slot.lessee_id).to eq airline.id
+      expect(slot.lease_expiry).to eq date + Gates::NEW_SLOT_LEASE_DURATION
+      expect(slot.rent).to eq 150
     end
   end
 

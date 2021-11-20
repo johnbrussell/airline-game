@@ -13,14 +13,23 @@ class Gates < ApplicationRecord
   EASY_GATE_COST = 10000000
   DIFFICULT_GATE_COST = 100000000
 
+  def self.at_airport(airport, game)
+    if find_by(airport: airport, game: game).present?
+      find_by(airport: airport, game: game)
+    else
+      create!(airport: airport, game: game, current_gates: airport.start_gates)
+    end
+  end
+
   def build_new_gate(airline, current_date)
     Slot.insert_all!([
       {
-      "gates_id": id,
-      "lessee_id": airline.id,
-      "lease_expiry": current_date + NEW_SLOT_LEASE_DURATION,
-      "created_at": Time.now,
-      "updated_at": Time.now,
+        "gates_id": id,
+        "lessee_id": airline.id,
+        "lease_expiry": current_date + NEW_SLOT_LEASE_DURATION,
+        "rent": Calculation::SlotRent.calculate(airport, game),
+        "created_at": Time.now,
+        "updated_at": Time.now,
       }
     ] * SLOTS_PER_GATE)
     airline.update!(cash_on_hand: airline.cash_on_hand - gate_cost)
