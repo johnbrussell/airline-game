@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_19_173023) do
+ActiveRecord::Schema.define(version: 2021_11_19_231339) do
 
   create_table "aircraft_models", force: :cascade do |t|
     t.string "manufacturer", null: false
@@ -52,7 +52,6 @@ ActiveRecord::Schema.define(version: 2021_11_19_173023) do
     t.float "longitude", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "current_gates", null: false
     t.index ["iata"], name: "index_airports_on_iata", unique: true
     t.index ["market_id"], name: "index_airports_on_market_id"
   end
@@ -63,6 +62,16 @@ ActiveRecord::Schema.define(version: 2021_11_19_173023) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.date "current_date", null: false
+  end
+
+  create_table "gates", force: :cascade do |t|
+    t.integer "airport_id"
+    t.integer "game_id"
+    t.integer "current_gates", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["airport_id"], name: "index_gates_on_airport_id"
+    t.index ["game_id"], name: "index_gates_on_game_id"
   end
 
   create_table "global_demands", force: :cascade do |t|
@@ -96,6 +105,15 @@ ActiveRecord::Schema.define(version: 2021_11_19_173023) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["market_id"], name: "index_populations_on_market_id"
+  end
+
+  create_table "slots", force: :cascade do |t|
+    t.integer "lessee_id"
+    t.date "lease_expiry"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.integer "gates_id"
+    t.index ["gates_id"], name: "index_slots_on_gates_id"
   end
 
   create_table "tourists", force: :cascade do |t|
