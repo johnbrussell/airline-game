@@ -59,6 +59,37 @@ RSpec.describe Calculation::AirportPopulation do
     end
   end
 
+  context "government_workers" do
+    it "is 0 when the market is not a national capital" do
+      nauru = Market.last
+      nauru.update!(is_national_capital: false)
+
+      subject = described_class.new(nauru.airports.first, Date.today)
+
+      expect(subject.government_workers).to eq 0
+    end
+
+    it "is CAPITAL_GOVERNMENT_WORKERS when the market is a national capital" do
+      nauru = Market.last
+
+      subject = described_class.new(nauru.airports.first, "2009-01-01".to_date)
+
+      expect(subject.government_workers).to eq described_class::CAPITAL_GOVERNMENT_WORKERS
+    end
+
+    it "scales for different catchment sizes" do
+      nauru = Market.last
+      Airport.create!(market: nauru, iata: "FOO", exclusive_catchment: 20, runway: 100, latitude: 10, longitude: 10, start_gates: 1, easy_gates: 1, elevation: -100)
+      nauru.reload
+
+      subject_inu = described_class.new(nauru.airports.first, Date.today)
+      subject_foo = described_class.new(nauru.airports.last, Date.today)
+
+      expect(subject_inu.government_workers).to eq 8000
+      expect(subject_foo.government_workers).to eq 10000
+    end
+  end
+
   context "market_population" do
     it "is the most recent population when there is no next population" do
       nauru = Market.last

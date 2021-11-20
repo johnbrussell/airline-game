@@ -1,15 +1,21 @@
 class Calculation::AirportPopulation
+  CAPITAL_GOVERNMENT_WORKERS = 10000
+
   def initialize(airport, current_date)
     @airport = airport
     @current_date = current_date
   end
 
+  def government_workers
+    scale_for_available_catchment(market_government_workers)
+  end
+
   def population
-    available_catchment / 100.0 * market_population
+    scale_for_available_catchment(market_population)
   end
 
   def tourists
-    available_catchment / 100.0 * market_tourists
+    scale_for_available_catchment(market_tourists)
   end
 
   private
@@ -20,6 +26,10 @@ class Calculation::AirportPopulation
 
     def market
       @market ||= @airport.market
+    end
+
+    def market_government_workers
+      market.is_national_capital ? CAPITAL_GOVERNMENT_WORKERS : 0
     end
 
     def market_population
@@ -64,6 +74,10 @@ class Calculation::AirportPopulation
 
     def population_growth_rate
       (next_known_population.population.to_f / most_recent_known_population.population) ** (1.0 / years_between_population_sample)
+    end
+
+    def scale_for_available_catchment(num)
+      available_catchment / 100.0 * num
     end
 
     def tourism_growth_rate
