@@ -56,7 +56,6 @@ class GameData::Inputter < ApplicationRecord
           runway: data_point["Runway"],
           elevation: data_point["Elevation"],
           start_gates: data_point["Start gates"],
-          current_gates: data_point["Start gates"],
           easy_gates: data_point["Easy build gates"],
           latitude: data_point["Lat"],
           longitude: data_point["Long"],
