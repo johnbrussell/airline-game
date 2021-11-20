@@ -12,8 +12,6 @@ class Airport < ApplicationRecord
   validates :start_gates, numericality: { greater_than_or_equal_to: 1 }
   validates :easy_gates, presence: true
   validates :easy_gates, numericality: { greater_than_or_equal_to: :start_gates }
-  validates :current_gates, presence: true
-  validates :current_gates, numericality: { greater_than_or_equal_to: :start_gates }
   validates :latitude, presence: true
   validates :latitude, numericality: { greater_than: -90, less_than: 90 }
   validates :longitude, presence: true
@@ -22,21 +20,4 @@ class Airport < ApplicationRecord
   validates_uniqueness_of :iata
 
   has_many :global_demands
-  has_many :slots
-
-  SLOTS_PER_GATE = 70
-  NEW_SLOT_LEASE_DURATION = 3.years
-
-  def build_new_gate(airline, current_date)
-    Slot.insert_all!([
-      {
-      "airport_id": id,
-      "lessee_id": airline.id,
-      "lease_expiry": current_date + NEW_SLOT_LEASE_DURATION,
-      "created_at": Time.now,
-      "updated_at": Time.now,
-      }
-    ] * SLOTS_PER_GATE)
-    update!(current_gates: current_gates + 1)
-  end
 end
