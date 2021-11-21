@@ -21,5 +21,5 @@ class AircraftModel < ApplicationRecord
   validates :useful_life, presence: true
   validates :useful_life, numericality: { greater_than: 0 }
 
-  belongs_to :aircraft_family
+  belongs_to :family, class_name: "AircraftFamily"
 end
