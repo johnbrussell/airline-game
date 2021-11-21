@@ -1,6 +1,4 @@
 class AircraftModel < ApplicationRecord
-  validates :manufacturer, presence: true
-  validates :family, presence: true
   validates :name, presence: true
   validates :production_start_year, presence: true
   validates :production_start_year, numericality: { greater_than_or_equal_to: 1914 }
