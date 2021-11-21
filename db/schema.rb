@@ -10,23 +10,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_21_154303) do
+ActiveRecord::Schema.define(version: 2021_11_21_155432) do
 
-  create_table "aircraft_family", force: :cascade do |t|
+  create_table "aircraft_families", force: :cascade do |t|
     t.string "name", null: false
     t.string "manufacturer", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "aircraft_manufacturing_queue", force: :cascade do |t|
+  create_table "aircraft_manufacturing_queues", force: :cascade do |t|
     t.integer "game_id"
     t.integer "aircraft_family_id"
     t.float "production_rate"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["aircraft_family_id"], name: "index_aircraft_manufacturing_queue_on_aircraft_family_id"
-    t.index ["game_id"], name: "index_aircraft_manufacturing_queue_on_game_id"
+    t.index ["aircraft_family_id"], name: "index_aircraft_manufacturing_queues_on_aircraft_family_id"
+    t.index ["game_id"], name: "index_aircraft_manufacturing_queues_on_game_id"
   end
 
   create_table "aircraft_models", force: :cascade do |t|
