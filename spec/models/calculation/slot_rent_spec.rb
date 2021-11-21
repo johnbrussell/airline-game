@@ -13,7 +13,7 @@ RSpec.describe Calculation::SlotRent do
       expect(Calculation::MarketDollars).to receive(:new).with(airport_mock, Date.today).and_return(market_dollars_mock)
       expect(market_mock).to receive(:airports).and_return([airport_mock])
 
-      expect(described_class.calculate(airport_mock, game_mock)).to eq 900 * Calculation::SlotRent::SCALE_CONSTANT
+      assert_in_epsilon described_class.calculate(airport_mock, game_mock), 900 * Calculation::SlotRent::SCALE_CONSTANT, 0.0000001
     end
   end
 end
