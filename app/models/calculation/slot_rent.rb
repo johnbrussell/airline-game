@@ -1,5 +1,5 @@
 class Calculation::SlotRent
-  SCALE_CONSTANT = 0.00544331054
+  SCALE_CONSTANT = 0.00233284737
 
   def self.calculate(airport, game)
     gates = Gates.at_airport(airport, game)
