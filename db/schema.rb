@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_21_152529) do
+ActiveRecord::Schema.define(version: 2021_11_21_153147) do
 
   create_table "aircraft_family", force: :cascade do |t|
     t.string "name", null: false
@@ -35,6 +35,8 @@ ActiveRecord::Schema.define(version: 2021_11_21_152529) do
     t.integer "useful_life", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "aircraft_families_id"
+    t.index ["aircraft_families_id"], name: "index_aircraft_models_on_aircraft_families_id"
   end
 
   create_table "airlines", force: :cascade do |t|
