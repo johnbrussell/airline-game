@@ -10,7 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_21_151951) do
+ActiveRecord::Schema.define(version: 2021_11_21_152529) do
+
+  create_table "aircraft_family", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "manufacturer", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
 
   create_table "aircraft_models", force: :cascade do |t|
     t.string "manufacturer", null: false
