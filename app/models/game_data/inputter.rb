@@ -37,7 +37,7 @@ class GameData::Inputter < ApplicationRecord
       data.by_row.each do |data_point|
         family = AircraftFamily.find_by!(manufacturer: data_point["Manufacturer"], name: data_point["Family"])
         data_map = {
-          aircraft_families_id: family.id,
+          family: family,
           name: data_point["Name"],
           production_start_year: data_point["Production Start"],
           floor_space: data_point["Square inches"],
