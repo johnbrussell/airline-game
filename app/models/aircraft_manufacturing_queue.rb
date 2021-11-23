@@ -1,0 +1,2 @@
+class AircraftManufacturingQueue < ApplicationRecord
+end
