@@ -8,7 +8,7 @@ class AircraftManufacturingQueue < ApplicationRecord
   START_PRODUCTION_RATE = 1.0
 
   def start_production(aircraft_model)
-    if production_rate == 0
+    if airplanes.none?
       start_family_production(aircraft_model)
     else
       start_model_production(aircraft_model)
