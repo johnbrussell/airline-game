@@ -30,7 +30,7 @@ class AircraftManufacturingQueue < ApplicationRecord
     end
 
     def last_unbuilt_aircraft
-      airplanes.select { |airplane| airplane.construction_date > game.current_date }.max_by(&:construction_date)
+      undelivered_aircraft.max_by(&:construction_date)
     end
 
     def num_months_to_produce_for_extant_family
