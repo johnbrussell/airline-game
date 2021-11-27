@@ -6,4 +6,6 @@ class Airplane < ApplicationRecord
   validates :economy_seats, numericality: { greater_than_or_equal_to: 0 }
   validates :premium_economy_seats, presence: true
   validates :premium_economy_seats, numericality: { greater_than_or_equal_to: 0 }
+
+  ECONOMY_SEAT_SIZE = 28 * 17
 end
