@@ -15,13 +15,29 @@ class GameData::Inputter < ApplicationRecord
 
   private
 
-    def self.aircraft_models
+    def self.aircraft_families
       data = CSV.parse(File.read("data/aircraft.csv"), headers: true)
-      min_runway = Airport.minimum(:runway) - 1
       data.by_row.each do |data_point|
         data_map = {
           manufacturer: data_point["Manufacturer"],
-          family: data_point["Family"],
+          name: data_point["Family"],
+        }
+        if AircraftFamily.exists?(manufacturer: data_point["Manufacturer"], name: data_point["Family"])
+          AircraftFamily.find_by!(manufacturer: data_point["Manufacturer"], name: data_point["Family"]).update!(**data_map)
+        else
+          AircraftFamily.create!(**data_map)
+        end
+      end
+    end
+
+    def self.aircraft_models
+      self.aircraft_families
+      data = CSV.parse(File.read("data/aircraft.csv"), headers: true)
+      min_runway = Airport.minimum(:runway) - 1
+      data.by_row.each do |data_point|
+        family = AircraftFamily.find_by!(manufacturer: data_point["Manufacturer"], name: data_point["Family"])
+        data_map = {
+          family: family,
           name: data_point["Name"],
           production_start_year: data_point["Production Start"],
           floor_space: data_point["Square inches"],
@@ -35,8 +51,8 @@ class GameData::Inputter < ApplicationRecord
           useful_life: data_point["Useful life"],
         }
 
-        if AircraftModel.exists?(manufacturer: data_point["Manufacturer"], name: data_point["Name"])
-          AircraftModel.find_by!(manufacturer: data_point["Manufacturer"], name: data_point["Name"]).update!(**data_map)
+        if AircraftModel.exists?(name: data_point["Name"])
+          AircraftModel.find_by!(name: data_point["Name"]).update!(**data_map)
         else
           AircraftModel.create!(**data_map)
         end

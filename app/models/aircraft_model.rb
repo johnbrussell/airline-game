@@ -1,6 +1,4 @@
 class AircraftModel < ApplicationRecord
-  validates :manufacturer, presence: true
-  validates :family, presence: true
   validates :name, presence: true
   validates :production_start_year, presence: true
   validates :production_start_year, numericality: { greater_than_or_equal_to: 1914 }
@@ -22,4 +20,6 @@ class AircraftModel < ApplicationRecord
   validates :takeoff_distance, numericality: { greater_than: 0 }
   validates :useful_life, presence: true
   validates :useful_life, numericality: { greater_than: 0 }
+
+  belongs_to :family, class_name: "AircraftFamily", foreign_key: "aircraft_family_id"
 end

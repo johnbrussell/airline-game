@@ -10,11 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_20_212356) do
+ActiveRecord::Schema.define(version: 2021_11_27_091738) do
+
+  create_table "aircraft_families", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "manufacturer", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "aircraft_manufacturing_queues", force: :cascade do |t|
+    t.integer "game_id"
+    t.integer "aircraft_family_id"
+    t.float "production_rate"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["aircraft_family_id"], name: "index_aircraft_manufacturing_queues_on_aircraft_family_id"
+    t.index ["game_id"], name: "index_aircraft_manufacturing_queues_on_game_id"
+  end
 
   create_table "aircraft_models", force: :cascade do |t|
-    t.string "manufacturer", null: false
-    t.string "family", null: false
     t.string "name", null: false
     t.integer "production_start_year", null: false
     t.integer "floor_space", null: false
@@ -28,6 +43,8 @@ ActiveRecord::Schema.define(version: 2021_11_20_212356) do
     t.integer "useful_life", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "aircraft_family_id"
+    t.index ["aircraft_family_id"], name: "index_aircraft_models_on_aircraft_family_id"
   end
 
   create_table "airlines", force: :cascade do |t|
@@ -41,15 +58,16 @@ ActiveRecord::Schema.define(version: 2021_11_20_212356) do
   end
 
   create_table "airplanes", force: :cascade do |t|
-    t.integer "game_id"
     t.integer "aircraft_model_id"
     t.integer "business_seats", default: 0, null: false
     t.integer "premium_economy_seats", default: 0, null: false
     t.integer "economy_seats", default: 0, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.date "construction_date", null: false
+    t.integer "aircraft_manufacturing_queue_id"
+    t.index ["aircraft_manufacturing_queue_id"], name: "index_airplanes_on_aircraft_manufacturing_queue_id"
     t.index ["aircraft_model_id"], name: "index_airplanes_on_aircraft_model_id"
-    t.index ["game_id"], name: "index_airplanes_on_game_id"
   end
 
   create_table "airports", force: :cascade do |t|
