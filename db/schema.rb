@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_22_182453) do
+ActiveRecord::Schema.define(version: 2021_11_27_091738) do
 
   create_table "aircraft_families", force: :cascade do |t|
     t.string "name", null: false
@@ -58,7 +58,6 @@ ActiveRecord::Schema.define(version: 2021_11_22_182453) do
   end
 
   create_table "airplanes", force: :cascade do |t|
-    t.integer "game_id"
     t.integer "aircraft_model_id"
     t.integer "business_seats", default: 0, null: false
     t.integer "premium_economy_seats", default: 0, null: false
@@ -66,8 +65,9 @@ ActiveRecord::Schema.define(version: 2021_11_22_182453) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.date "construction_date", null: false
+    t.integer "aircraft_manufacturing_queue_id"
+    t.index ["aircraft_manufacturing_queue_id"], name: "index_airplanes_on_aircraft_manufacturing_queue_id"
     t.index ["aircraft_model_id"], name: "index_airplanes_on_aircraft_model_id"
-    t.index ["game_id"], name: "index_airplanes_on_game_id"
   end
 
   create_table "airports", force: :cascade do |t|
