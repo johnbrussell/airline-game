@@ -33,18 +33,18 @@ class AircraftManufacturingQueue < ApplicationRecord
     end
 
     def num_to_produce_for_extant_family
-      [[QUEUE_LENGTH_MONTHS, time_to_last_unbuilt_aircraft_months + 1].max - PRODUCTION_START_ADVANCE_NOTICE_MONTHS, 1].max
+      [[QUEUE_LENGTH_MONTHS, time_to_last_unbuilt_aircraft_months].max - PRODUCTION_START_ADVANCE_NOTICE_MONTHS, 0].max
     end
 
     def start_family_production(aircraft_model)
-      (0..(QUEUE_LENGTH_MONTHS - 1)).to_a.each do |month|
+      (0..(QUEUE_LENGTH_MONTHS)).to_a.each do |month|
         create_new_airplane(aircraft_model, PRODUCTION_START_ADVANCE_NOTICE_MONTHS + month.to_f / START_PRODUCTION_RATE)
       end
       update!(production_rate: START_PRODUCTION_RATE)
     end
 
     def start_model_production(aircraft_model)
-      (0..(num_to_produce_for_extant_family - 1)).to_a.each do |month|
+      (0..(num_to_produce_for_extant_family)).to_a.each do |month|
         create_new_airplane(aircraft_model, PRODUCTION_START_ADVANCE_NOTICE_MONTHS + month.to_f / START_PRODUCTION_RATE)
       end
       update!(production_rate: [START_PRODUCTION_RATE, production_rate].max)
