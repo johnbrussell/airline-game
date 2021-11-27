@@ -75,6 +75,7 @@ RSpec.describe AircraftManufacturingQueue do
 
         queue.start_production(model_1)
         queue.update!(production_rate: AircraftManufacturingQueue::START_PRODUCTION_RATE * 2.0)
+        game.update!(current_date: game.current_date + 10.days)
 
         expected_aircraft_1 = old_aircraft + AircraftManufacturingQueue::QUEUE_LENGTH_MONTHS * AircraftManufacturingQueue::START_PRODUCTION_RATE
         actual_aircraft_1 = Airplane.count
@@ -84,7 +85,7 @@ RSpec.describe AircraftManufacturingQueue do
 
         queue.start_production(model_2)
 
-        expected_aircraft_2 = expected_aircraft_1 + ([0, (AircraftManufacturingQueue::QUEUE_LENGTH_MONTHS - 1)].max + 1)
+        expected_aircraft_2 = expected_aircraft_1 + AircraftManufacturingQueue::QUEUE_LENGTH_MONTHS
         actual_aircraft_2 = Airplane.count
 
         expect(actual_aircraft_2).to eq expected_aircraft_2

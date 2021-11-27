@@ -33,7 +33,7 @@ class AircraftManufacturingQueue < ApplicationRecord
     end
 
     def num_to_produce_for_extant_family
-      [[QUEUE_LENGTH_MONTHS, time_to_last_unbuilt_aircraft_months].max - PRODUCTION_START_ADVANCE_NOTICE_MONTHS, 1].max
+      [[QUEUE_LENGTH_MONTHS, time_to_last_unbuilt_aircraft_months + 1].max - PRODUCTION_START_ADVANCE_NOTICE_MONTHS, 1].max
     end
 
     def start_family_production(aircraft_model)
@@ -52,7 +52,7 @@ class AircraftManufacturingQueue < ApplicationRecord
 
     def time_to_last_unbuilt_aircraft_months
       if last_unbuilt_aircraft.present?
-        ((last_unbuilt_aircraft.construction_date - game.current_date).to_f / DAYS_PER_MONTH).ceil()
+        ((last_unbuilt_aircraft.construction_date - game.current_date).to_f / DAYS_PER_MONTH).floor()
       else
         0
       end
