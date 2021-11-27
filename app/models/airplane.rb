@@ -8,4 +8,8 @@ class Airplane < ApplicationRecord
   validates :premium_economy_seats, numericality: { greater_than_or_equal_to: 0 }
 
   ECONOMY_SEAT_SIZE = 28 * 17
+
+  def is_owned?
+    operator_id.present?
+  end
 end
