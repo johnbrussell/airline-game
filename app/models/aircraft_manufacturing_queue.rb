@@ -28,6 +28,14 @@ class AircraftManufacturingQueue < ApplicationRecord
       )
     end
 
+    def last_unbuilt_aircraft
+      airplanes.select { |airplane| airplane.construction_date > game.current_date }.max_by(&:construction_date)
+    end
+
+    def num_to_produce_for_extant_family
+      [[QUEUE_LENGTH_MONTHS, time_to_last_unbuilt_aircraft_months].max - PRODUCTION_START_ADVANCE_NOTICE_MONTHS, 1].max
+    end
+
     def start_family_production(aircraft_model)
       (0..(QUEUE_LENGTH_MONTHS - 1)).to_a.each do |month|
         create_new_airplane(aircraft_model, PRODUCTION_START_ADVANCE_NOTICE_MONTHS + month.to_f / START_PRODUCTION_RATE)
@@ -36,9 +44,17 @@ class AircraftManufacturingQueue < ApplicationRecord
     end
 
     def start_model_production(aircraft_model)
-      (0..([QUEUE_LENGTH_MONTHS - 1 - PRODUCTION_START_ADVANCE_NOTICE_MONTHS, 0].max)).to_a.each do |month|
+      (0..(num_to_produce_for_extant_family - 1)).to_a.each do |month|
         create_new_airplane(aircraft_model, PRODUCTION_START_ADVANCE_NOTICE_MONTHS + month.to_f / START_PRODUCTION_RATE)
       end
       update!(production_rate: [START_PRODUCTION_RATE, production_rate].max)
+    end
+
+    def time_to_last_unbuilt_aircraft_months
+      if last_unbuilt_aircraft.present?
+        ((last_unbuilt_aircraft.construction_date - game.current_date).to_f / DAYS_PER_MONTH).ceil()
+      else
+        0
+      end
     end
 end
