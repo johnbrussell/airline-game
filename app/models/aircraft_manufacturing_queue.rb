@@ -8,8 +8,10 @@ class AircraftManufacturingQueue < ApplicationRecord
   START_PRODUCTION_RATE = 1.0
 
   def start_production(aircraft_model)
-    (0..(QUEUE_LENGTH_MONTHS - 1)).to_a.each do |month|
-      create_new_airplane(aircraft_model, PRODUCTION_START_ADVANCE_NOTICE_MONTHS + month.to_f / START_PRODUCTION_RATE)
+    if production_rate == 0
+      start_family_production(aircraft_model)
+    else
+      start_model_production(aircraft_model)
     end
   end
 
@@ -24,5 +26,17 @@ class AircraftManufacturingQueue < ApplicationRecord
         construction_date: game.current_date + (months_until_delivery * DAYS_PER_MONTH).ceil().days,
         aircraft_manufacturing_queue_id: id,
       )
+    end
+
+    def start_family_production(aircraft_model)
+      (0..(QUEUE_LENGTH_MONTHS - 1)).to_a.each do |month|
+        create_new_airplane(aircraft_model, PRODUCTION_START_ADVANCE_NOTICE_MONTHS + month.to_f / START_PRODUCTION_RATE)
+      end
+    end
+
+    def start_model_production(aircraft_model)
+      (0..([QUEUE_LENGTH_MONTHS - 1 - PRODUCTION_START_ADVANCE_NOTICE_MONTHS, 0].max)).to_a.each do |month|
+        create_new_airplane(aircraft_model, PRODUCTION_START_ADVANCE_NOTICE_MONTHS + month.to_f / START_PRODUCTION_RATE)
+      end
     end
 end
