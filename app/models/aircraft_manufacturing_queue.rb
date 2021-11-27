@@ -32,11 +32,13 @@ class AircraftManufacturingQueue < ApplicationRecord
       (0..(QUEUE_LENGTH_MONTHS - 1)).to_a.each do |month|
         create_new_airplane(aircraft_model, PRODUCTION_START_ADVANCE_NOTICE_MONTHS + month.to_f / START_PRODUCTION_RATE)
       end
+      update!(production_rate: START_PRODUCTION_RATE)
     end
 
     def start_model_production(aircraft_model)
       (0..([QUEUE_LENGTH_MONTHS - 1 - PRODUCTION_START_ADVANCE_NOTICE_MONTHS, 0].max)).to_a.each do |month|
         create_new_airplane(aircraft_model, PRODUCTION_START_ADVANCE_NOTICE_MONTHS + month.to_f / START_PRODUCTION_RATE)
       end
+      update!(production_rate: [START_PRODUCTION_RATE, production_rate].max)
     end
 end
