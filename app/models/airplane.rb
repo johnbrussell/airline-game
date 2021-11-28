@@ -12,9 +12,14 @@ class Airplane < ApplicationRecord
   delegate :game, :to => :aircraft_manufacturing_queue
 
   ECONOMY_SEAT_SIZE = 28 * 17
+  PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE = 0.4
 
   def has_operator?
     operator_id.present?
+  end
+
+  def lease_rate_per_day(lease_in_days)
+    (value - value_at_age(age_in_days + lease_in_days)) * lease_premium / lease_in_days
   end
 
   def purchase_price
@@ -27,15 +32,19 @@ class Airplane < ApplicationRecord
       (game.current_date - construction_date).to_i
     end
 
+    def lease_premium
+      model.price / (model.price - value_at_age(PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE * model.useful_life * AircraftModel::DAYS_PER_YEAR))
+    end
+
     def model
       @model ||= AircraftModel.find_by(id: aircraft_model_id)
     end
 
     def value
-      value_in_days([age_in_days, 0].max)
+      value_at_age([age_in_days, 0].max)
     end
 
-    def value_in_days(days)
+    def value_at_age(days)
       model.price * model.daily_value_retention ** days
     end
 end
