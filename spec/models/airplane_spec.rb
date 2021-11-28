@@ -2,10 +2,16 @@ require "rails_helper"
 
 RSpec.describe Airplane do
   context "has_operator?" do
+    before(:each) do
+      game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
+      AircraftManufacturingQueue.create!(game: game)
+    end
+
     it "is true when the airplane is owned" do
       subject = Airplane.create!(
         operator_id: 1,
         construction_date: Date.today,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
       )
 
       expect(subject.has_operator?).to be true
@@ -15,9 +21,85 @@ RSpec.describe Airplane do
       subject = Airplane.create!(
         operator_id: nil,
         construction_date: Date.today,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
       )
 
       expect(subject.has_operator?).to be false
+    end
+  end
+
+  context "purchase_price" do
+    purchase_price_new = 100000000
+
+    before(:each) do
+      game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
+      queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0)
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      model = AircraftModel.create!(
+        name: "737-100",
+        production_start_year: 1969,
+        floor_space: 1000,
+        max_range: 1200,
+        speed: 500,
+        fuel_burn: 1500,
+        num_pilots: 2,
+        num_flight_attendants: 3,
+        price: purchase_price_new,
+        takeoff_distance: 5000,
+        useful_life: 30,
+        family: family,
+      )
+      Airplane.create!(
+        business_seats: 0,
+        premium_economy_seats: 0,
+        economy_seats: 1,
+        construction_date: game.current_date + 1.day,
+        aircraft_manufacturing_queue: queue,
+        operator_id: nil,
+        aircraft_model_id: model.id,
+      )
+    end
+
+    it "is the price of the aircraft model when the plane has not been built" do
+      subject = Airplane.last
+
+      expect(subject.purchase_price).to eq purchase_price_new
+    end
+
+    it "depreciates every day" do
+      subject = Airplane.last
+      game = Game.last
+
+      linear_decline_per_day = (AircraftModel.last.price - AircraftModel.last.price * AircraftModel::PERCENT_VALUE_MAINTAINED_AT_END_OF_USEFUL_LIFE) / (AircraftModel.last.useful_life * AircraftModel::DAYS_PER_YEAR)
+
+      subject.update!(construction_date: game.current_date)
+      subject.reload
+
+      expect(subject.purchase_price).to eq purchase_price_new
+
+      subject.update!(construction_date: game.current_date - 1.day)
+      subject.reload
+
+      day_2_price = subject.purchase_price
+
+      expect(subject.purchase_price).to be < purchase_price_new
+      expect(subject.purchase_price).to be < purchase_price_new - linear_decline_per_day
+
+      subject.update!(construction_date: game.current_date - 2.days)
+      subject.reload
+
+      expect(subject.purchase_price).to be < day_2_price
+      expect(subject.purchase_price).to be < purchase_price_new - linear_decline_per_day * 2
+    end
+
+    it "is very low past the end of its useful life" do
+      subject = Airplane.last
+      game = Game.last
+
+      subject.update!(construction_date: game.current_date - (AircraftModel::DAYS_PER_YEAR * subject.send(:model).useful_life).days)
+      subject.reload
+
+      assert_in_epsilon subject.purchase_price, AircraftModel.last.price * AircraftModel::PERCENT_VALUE_MAINTAINED_AT_END_OF_USEFUL_LIFE, 0.001
     end
   end
 end
