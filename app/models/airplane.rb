@@ -32,6 +32,10 @@ class Airplane < ApplicationRecord
     end
 
     def value
-      model.price * model.daily_value_retention ** [age_in_days, 0].max
+      value_in_days([age_in_days, 0].max)
+    end
+
+    def value_in_days(days)
+      model.price * model.daily_value_retention ** days
     end
 end
