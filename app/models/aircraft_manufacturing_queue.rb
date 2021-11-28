@@ -4,6 +4,10 @@ class AircraftManufacturingQueue < ApplicationRecord
   has_many :undelivered_aircraft, ->(amq) { where("construction_date > ?", amq.game.current_date) }, class_name: "Airplane"
 
   DAYS_PER_MONTH = 365.24 / 12
+  LOW_PRODUCTION_RATES = [1/6.0, 1/4.0, 1/3.0, 1/2.0]
+  PERCENT_UNBOUGHT_TO_DECREASE_PRODUCTION = 0.5
+  PERCENT_UNBOUGHT_TO_INCREASE_PRODUCTION = 0.95
+  PRODUCTION_RATE_CHANGE_INTERVAL = 0.5
   PRODUCTION_START_ADVANCE_NOTICE_MONTHS = 6.0
   QUEUE_LENGTH_MONTHS = 12.0
   START_PRODUCTION_RATE = 1.0
@@ -29,12 +33,52 @@ class AircraftManufacturingQueue < ApplicationRecord
       )
     end
 
+    def decrease_production_rate
+      if production_rate > LOW_PRODUCTION_RATES.max + PRODUCTION_RATE_CHANGE_INTERVAL
+        update!(production_rate: production_rate - PRODUCTION_RATE_CHANGE_INTERVAL)
+      else
+        decrease_production_rate_using_low_rate_scale
+      end
+    end
+
+    def decrease_production_rate_using_low_rate_scale
+      if production_rate < LOW_PRODUCTION_RATES.min * 1.001
+        update!(production_rate: 0)
+      else
+        update!(production_rate: LOW_PRODUCTION_RATES.select { |rate| rate < production_rate * 0.999 }.max)
+      end
+    end
+
+    def increase_production_rate
+      if 0 < production_rate && production_rate < LOW_PRODUCTION_RATES.max * 0.999
+        update!(production_rate: LOW_PRODUCTION_RATES.select { |rate| rate > production_rate * 1.001 }.min)
+      elsif 0 < production_rate
+        update!(production_rate: production_rate + PRODUCTION_RATE_CHANGE_INTERVAL)
+      end
+    end
+
     def last_unbuilt_aircraft
       undelivered_aircraft.max_by(&:construction_date)
     end
 
     def num_months_to_produce_for_extant_family
       [[QUEUE_LENGTH_MONTHS, time_to_last_unbuilt_aircraft_months].max - PRODUCTION_START_ADVANCE_NOTICE_MONTHS, 0].max
+    end
+
+    def num_bought_undelivered_aircraft
+      undelivered_aircraft.count(&:is_owned?)
+    end
+
+    def optimize_production_rate
+      if percent_unbought > PERCENT_UNBOUGHT_TO_INCREASE_PRODUCTION
+        increase_production_rate
+      elsif percent_unbought < PERCENT_UNBOUGHT_TO_DECREASE_PRODUCTION
+        decrease_production_rate
+      end
+    end
+
+    def percent_unbought
+      num_bought_undelivered_aircraft.to_f / undelivered_aircraft.count
     end
 
     def start_family_production(aircraft_model)

@@ -165,4 +165,168 @@ RSpec.describe AircraftManufacturingQueue do
       end
     end
   end
+
+  context "optimize_production_rate" do
+    context "increasing" do
+      it "does not increase when the production rate is 0" do
+        queue = AircraftManufacturingQueue.last
+        game = queue.game
+        Airplane.create!(
+          business_seats: 0,
+          premium_economy_seats: 0,
+          economy_seats: 1,
+          construction_date: game.current_date + 180.days,
+          aircraft_manufacturing_queue_id: queue.id,
+          operator_id: 1,
+        )
+
+        queue.send(:optimize_production_rate)
+        queue.reload
+
+        expect(queue.production_rate).to eq 0
+      end
+
+      it "increases within the low production rate scale" do
+        queue = AircraftManufacturingQueue.last
+        min_rate = AircraftManufacturingQueue::LOW_PRODUCTION_RATES.min
+        queue.update!(production_rate: min_rate)
+        game = queue.game
+        Airplane.create!(
+          business_seats: 0,
+          premium_economy_seats: 0,
+          economy_seats: 1,
+          construction_date: game.current_date + 180.days,
+          aircraft_manufacturing_queue_id: queue.id,
+          operator_id: 1,
+        )
+
+        queue.send(:optimize_production_rate)
+        queue.reload
+
+        expect(queue.production_rate).to eq AircraftManufacturingQueue::LOW_PRODUCTION_RATES.select { |rate| rate > min_rate }.min
+      end
+
+      it "graduates from the low production rate scale when it reaches the top" do
+        queue = AircraftManufacturingQueue.last
+        max_rate = AircraftManufacturingQueue::LOW_PRODUCTION_RATES.max
+        queue.update!(production_rate: max_rate)
+        game = queue.game
+        Airplane.create!(
+          business_seats: 0,
+          premium_economy_seats: 0,
+          economy_seats: 1,
+          construction_date: game.current_date + 180.days,
+          aircraft_manufacturing_queue_id: queue.id,
+          operator_id: 1,
+        )
+
+        queue.send(:optimize_production_rate)
+        queue.reload
+
+        expect(queue.production_rate).to eq max_rate + AircraftManufacturingQueue::PRODUCTION_RATE_CHANGE_INTERVAL
+      end
+
+      it "increases by the production rate interval when not on the low production rate scale" do
+        queue = AircraftManufacturingQueue.last
+        initial_rate = 345.432745
+        queue.update!(production_rate: initial_rate)
+        game = queue.game
+        Airplane.create!(
+          business_seats: 0,
+          premium_economy_seats: 0,
+          economy_seats: 1,
+          construction_date: game.current_date + 180.days,
+          aircraft_manufacturing_queue_id: queue.id,
+          operator_id: 1,
+        )
+
+        queue.send(:optimize_production_rate)
+        queue.reload
+
+        expect(queue.production_rate).to eq initial_rate + AircraftManufacturingQueue::PRODUCTION_RATE_CHANGE_INTERVAL
+      end
+    end
+
+    context "decreasing" do
+      it "decreases by the production rate interval when not on the low production rate scale" do
+        queue = AircraftManufacturingQueue.last
+        initial_rate = 345.432745
+        queue.update!(production_rate: initial_rate)
+        game = queue.game
+        Airplane.create!(
+          business_seats: 0,
+          premium_economy_seats: 0,
+          economy_seats: 1,
+          construction_date: game.current_date + 180.days,
+          aircraft_manufacturing_queue_id: queue.id,
+          operator_id: nil,
+        )
+
+        queue.send(:optimize_production_rate)
+        queue.reload
+
+        expect(queue.production_rate).to eq initial_rate - AircraftManufacturingQueue::PRODUCTION_RATE_CHANGE_INTERVAL
+      end
+
+      it "uses the low production rate scale when at the threshold for it" do
+        queue = AircraftManufacturingQueue.last
+        initial_rate = AircraftManufacturingQueue::LOW_PRODUCTION_RATES.max + AircraftManufacturingQueue::PRODUCTION_RATE_CHANGE_INTERVAL / 10.0
+        queue.update!(production_rate: initial_rate)
+        game = queue.game
+        Airplane.create!(
+          business_seats: 0,
+          premium_economy_seats: 0,
+          economy_seats: 1,
+          construction_date: game.current_date + 180.days,
+          aircraft_manufacturing_queue_id: queue.id,
+          operator_id: nil,
+        )
+
+        queue.send(:optimize_production_rate)
+        queue.reload
+
+        expect(queue.production_rate).to eq AircraftManufacturingQueue::LOW_PRODUCTION_RATES.max
+      end
+
+      it "decreases within the low production rate scale" do
+        queue = AircraftManufacturingQueue.last
+        initial_rate = AircraftManufacturingQueue::LOW_PRODUCTION_RATES.max
+        queue.update!(production_rate: initial_rate)
+        game = queue.game
+        Airplane.create!(
+          business_seats: 0,
+          premium_economy_seats: 0,
+          economy_seats: 1,
+          construction_date: game.current_date + 180.days,
+          aircraft_manufacturing_queue_id: queue.id,
+          operator_id: nil,
+        )
+
+        queue.send(:optimize_production_rate)
+        queue.reload
+
+        expect(queue.production_rate).to eq AircraftManufacturingQueue::LOW_PRODUCTION_RATES.select { |rate| rate < initial_rate }.max
+      end
+
+      it "stops production when reducing from the minimum production rate" do
+        queue = AircraftManufacturingQueue.last
+        initial_rate = AircraftManufacturingQueue::LOW_PRODUCTION_RATES.min
+        queue.update!(production_rate: initial_rate)
+        game = queue.game
+        Airplane.create!(
+          business_seats: 0,
+          premium_economy_seats: 0,
+          economy_seats: 1,
+          construction_date: game.current_date + 180.days,
+          aircraft_manufacturing_queue_id: queue.id,
+          operator_id: nil,
+        )
+
+        queue.send(:optimize_production_rate)
+        queue.reload
+
+        expect(queue.production_rate).to eq 0
+      end
+    end
+  end
 end
