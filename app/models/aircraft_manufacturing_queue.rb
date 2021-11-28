@@ -92,7 +92,7 @@ class AircraftManufacturingQueue < ApplicationRecord
     end
 
     def num_bought_undelivered_aircraft
-      undelivered_aircraft.count(&:is_owned?)
+      undelivered_aircraft.count(&:has_operator?)
     end
 
     def num_to_add_to_production_queue

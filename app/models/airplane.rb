@@ -9,7 +9,7 @@ class Airplane < ApplicationRecord
 
   ECONOMY_SEAT_SIZE = 28 * 17
 
-  def is_owned?
+  def has_operator?
     operator_id.present?
   end
 end
