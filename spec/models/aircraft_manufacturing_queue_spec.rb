@@ -260,7 +260,7 @@ RSpec.describe AircraftManufacturingQueue do
           operator_id: 1,
         )
 
-        queue.send(:optimize_production_rate)
+        queue.optimize_production_rate
         queue.reload
 
         expect(queue.production_rate).to eq 0
@@ -280,7 +280,7 @@ RSpec.describe AircraftManufacturingQueue do
           operator_id: 1,
         )
 
-        queue.send(:optimize_production_rate)
+        queue.optimize_production_rate
         queue.reload
 
         expect(queue.production_rate).to eq AircraftManufacturingQueue::LOW_PRODUCTION_RATES.select { |rate| rate > min_rate }.min
@@ -300,7 +300,7 @@ RSpec.describe AircraftManufacturingQueue do
           operator_id: 1,
         )
 
-        queue.send(:optimize_production_rate)
+        queue.optimize_production_rate
         queue.reload
 
         expect(queue.production_rate).to eq max_rate + AircraftManufacturingQueue::PRODUCTION_RATE_CHANGE_INTERVAL
@@ -320,7 +320,7 @@ RSpec.describe AircraftManufacturingQueue do
           operator_id: 1,
         )
 
-        queue.send(:optimize_production_rate)
+        queue.optimize_production_rate
         queue.reload
 
         expect(queue.production_rate).to eq initial_rate + AircraftManufacturingQueue::PRODUCTION_RATE_CHANGE_INTERVAL
@@ -342,7 +342,7 @@ RSpec.describe AircraftManufacturingQueue do
           operator_id: nil,
         )
 
-        queue.send(:optimize_production_rate)
+        queue.optimize_production_rate
         queue.reload
 
         expect(queue.production_rate).to eq initial_rate - AircraftManufacturingQueue::PRODUCTION_RATE_CHANGE_INTERVAL
@@ -362,7 +362,7 @@ RSpec.describe AircraftManufacturingQueue do
           operator_id: nil,
         )
 
-        queue.send(:optimize_production_rate)
+        queue.optimize_production_rate
         queue.reload
 
         expect(queue.production_rate).to eq AircraftManufacturingQueue::LOW_PRODUCTION_RATES.max
@@ -382,7 +382,7 @@ RSpec.describe AircraftManufacturingQueue do
           operator_id: nil,
         )
 
-        queue.send(:optimize_production_rate)
+        queue.optimize_production_rate
         queue.reload
 
         expect(queue.production_rate).to eq AircraftManufacturingQueue::LOW_PRODUCTION_RATES.select { |rate| rate < initial_rate }.max
@@ -402,7 +402,7 @@ RSpec.describe AircraftManufacturingQueue do
           operator_id: nil,
         )
 
-        queue.send(:optimize_production_rate)
+        queue.optimize_production_rate
         queue.reload
 
         expect(queue.production_rate).to eq 0
