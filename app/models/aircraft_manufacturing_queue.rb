@@ -12,6 +12,20 @@ class AircraftManufacturingQueue < ApplicationRecord
   QUEUE_LENGTH_MONTHS = 12.0
   START_PRODUCTION_RATE = 1.0
 
+  def add_to_production_queue(model)
+    (1..(num_to_add_to_production_queue)).to_a.each do |plane_number|
+      create_new_airplane(model, last_unbuilt_aircraft.construction_date + (days_between_airframes * plane_number).days)
+    end
+  end
+
+  def optimize_production_rate
+    if percent_unbought > PERCENT_UNBOUGHT_TO_INCREASE_PRODUCTION
+      increase_production_rate
+    elsif percent_unbought < PERCENT_UNBOUGHT_TO_DECREASE_PRODUCTION
+      decrease_production_rate
+    end
+  end
+
   def start_production(aircraft_model)
     if airplanes.none?
       start_family_production(aircraft_model)
@@ -22,15 +36,27 @@ class AircraftManufacturingQueue < ApplicationRecord
 
   private
 
-    def create_new_airplane(model, months_until_delivery)
+    def create_new_airplane(model, construction_date)
       Airplane.create!(
         aircraft_model_id: model.id,
         business_seats: 0,
         premium_economy_seats: 0,
         economy_seats: (model.floor_space / Airplane::ECONOMY_SEAT_SIZE).floor(),
-        construction_date: game.current_date + (months_until_delivery * DAYS_PER_MONTH).ceil().days,
+        construction_date: construction_date,
         aircraft_manufacturing_queue_id: id,
       )
+    end
+
+    def create_new_airplane_in_future(model, months_until_delivery)
+      create_new_airplane(model, game.current_date + (months_until_delivery * DAYS_PER_MONTH).ceil().days)
+    end
+
+    def days_between_airframes
+      DAYS_PER_MONTH / production_rate
+    end
+
+    def days_in_production_queue
+      (last_unbuilt_aircraft.construction_date - game.current_date).to_i
     end
 
     def decrease_production_rate
@@ -69,12 +95,8 @@ class AircraftManufacturingQueue < ApplicationRecord
       undelivered_aircraft.count(&:is_owned?)
     end
 
-    def optimize_production_rate
-      if percent_unbought > PERCENT_UNBOUGHT_TO_INCREASE_PRODUCTION
-        increase_production_rate
-      elsif percent_unbought < PERCENT_UNBOUGHT_TO_DECREASE_PRODUCTION
-        decrease_production_rate
-      end
+    def num_to_add_to_production_queue
+      [((QUEUE_LENGTH_MONTHS + 1) * DAYS_PER_MONTH - days_in_production_queue) * (production_rate / DAYS_PER_MONTH), 1].max
     end
 
     def percent_unbought
@@ -83,14 +105,14 @@ class AircraftManufacturingQueue < ApplicationRecord
 
     def start_family_production(aircraft_model)
       (0..(QUEUE_LENGTH_MONTHS * START_PRODUCTION_RATE)).to_a.each do |month|
-        create_new_airplane(aircraft_model, PRODUCTION_START_ADVANCE_NOTICE_MONTHS + month.to_f / START_PRODUCTION_RATE)
+        create_new_airplane_in_future(aircraft_model, PRODUCTION_START_ADVANCE_NOTICE_MONTHS + month.to_f / START_PRODUCTION_RATE)
       end
       update!(production_rate: START_PRODUCTION_RATE)
     end
 
     def start_model_production(aircraft_model)
       (0..(num_months_to_produce_for_extant_family * START_PRODUCTION_RATE)).to_a.each do |month|
-        create_new_airplane(aircraft_model, PRODUCTION_START_ADVANCE_NOTICE_MONTHS + month.to_f / START_PRODUCTION_RATE)
+        create_new_airplane_in_future(aircraft_model, PRODUCTION_START_ADVANCE_NOTICE_MONTHS + month.to_f / START_PRODUCTION_RATE)
       end
       update!(production_rate: [START_PRODUCTION_RATE, production_rate].max)
     end

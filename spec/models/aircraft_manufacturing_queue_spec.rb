@@ -21,6 +21,86 @@ RSpec.describe AircraftManufacturingQueue do
     )
   end
 
+  context "add_to_production_queue" do
+    it "adds one plane when the existing queue is long and the production rate is low" do
+      queue = AircraftManufacturingQueue.last
+      queue.update!(production_rate: AircraftManufacturingQueue::LOW_PRODUCTION_RATES.min)
+      queue.reload
+      game = Game.last
+      model = AircraftModel.last
+      last_plane = Airplane.create!(
+        business_seats: 0,
+        premium_economy_seats: 0,
+        economy_seats: 1,
+        construction_date: game.current_date + (AircraftManufacturingQueue::QUEUE_LENGTH_MONTHS * 2 * AircraftManufacturingQueue::DAYS_PER_MONTH).days,
+        aircraft_manufacturing_queue_id: queue.id,
+        operator_id: nil,
+      )
+
+      old_num_planes = Airplane.count
+
+      queue.add_to_production_queue(model)
+
+      plane = Airplane.last
+
+      assert_in_delta (plane.construction_date - last_plane.construction_date).to_i, AircraftManufacturingQueue::DAYS_PER_MONTH / AircraftManufacturingQueue::LOW_PRODUCTION_RATES.min, 2
+      expect(Airplane.count).to eq old_num_planes + 1
+      expect(plane.aircraft_model_id).to eq model.id
+    end
+
+    it "adds one plane when the existing queue is long and the production rate is high" do
+      queue = AircraftManufacturingQueue.last
+      queue.update!(production_rate: 30)
+      queue.reload
+      game = Game.last
+      model = AircraftModel.last
+      last_plane = Airplane.create!(
+        business_seats: 0,
+        premium_economy_seats: 0,
+        economy_seats: 1,
+        construction_date: game.current_date + (AircraftManufacturingQueue::QUEUE_LENGTH_MONTHS * 2 * AircraftManufacturingQueue::DAYS_PER_MONTH).days,
+        aircraft_manufacturing_queue_id: queue.id,
+        operator_id: nil,
+      )
+
+      old_num_planes = Airplane.count
+
+      queue.add_to_production_queue(model)
+
+      plane = Airplane.last
+
+      assert_in_delta (plane.construction_date - last_plane.construction_date).to_i, 1, 1
+      expect(Airplane.count).to eq old_num_planes + 1
+      expect(plane.aircraft_model_id).to eq model.id
+    end
+
+    it "adds multiple planes when the existing queue is short" do
+      queue = AircraftManufacturingQueue.last
+      queue.update!(production_rate: 2)
+      queue.reload
+      game = Game.last
+      model = AircraftModel.last
+      last_plane = Airplane.create!(
+        business_seats: 0,
+        premium_economy_seats: 0,
+        economy_seats: 1,
+        construction_date: game.current_date + 30.days,
+        aircraft_manufacturing_queue_id: queue.id,
+        operator_id: nil,
+      )
+
+      old_num_planes = Airplane.count
+
+      queue.add_to_production_queue(model)
+
+      plane = Airplane.last
+
+      assert_in_delta (plane.construction_date - last_plane.construction_date).to_i, AircraftManufacturingQueue::QUEUE_LENGTH_MONTHS * AircraftManufacturingQueue::DAYS_PER_MONTH, 2
+      expect(Airplane.count).to eq old_num_planes + 24
+      expect(plane.aircraft_model_id).to eq model.id
+    end
+  end
+
   context "start_production" do
     context "start_family_production" do
       it "creates a production queue of length QUEUE_LENGTH_MONTHS starting PRODUCTION_START_ADVANCE_NOTICE_MONTHS in the future" do
@@ -180,7 +260,7 @@ RSpec.describe AircraftManufacturingQueue do
           operator_id: 1,
         )
 
-        queue.send(:optimize_production_rate)
+        queue.optimize_production_rate
         queue.reload
 
         expect(queue.production_rate).to eq 0
@@ -200,7 +280,7 @@ RSpec.describe AircraftManufacturingQueue do
           operator_id: 1,
         )
 
-        queue.send(:optimize_production_rate)
+        queue.optimize_production_rate
         queue.reload
 
         expect(queue.production_rate).to eq AircraftManufacturingQueue::LOW_PRODUCTION_RATES.select { |rate| rate > min_rate }.min
@@ -220,7 +300,7 @@ RSpec.describe AircraftManufacturingQueue do
           operator_id: 1,
         )
 
-        queue.send(:optimize_production_rate)
+        queue.optimize_production_rate
         queue.reload
 
         expect(queue.production_rate).to eq max_rate + AircraftManufacturingQueue::PRODUCTION_RATE_CHANGE_INTERVAL
@@ -240,7 +320,7 @@ RSpec.describe AircraftManufacturingQueue do
           operator_id: 1,
         )
 
-        queue.send(:optimize_production_rate)
+        queue.optimize_production_rate
         queue.reload
 
         expect(queue.production_rate).to eq initial_rate + AircraftManufacturingQueue::PRODUCTION_RATE_CHANGE_INTERVAL
@@ -262,7 +342,7 @@ RSpec.describe AircraftManufacturingQueue do
           operator_id: nil,
         )
 
-        queue.send(:optimize_production_rate)
+        queue.optimize_production_rate
         queue.reload
 
         expect(queue.production_rate).to eq initial_rate - AircraftManufacturingQueue::PRODUCTION_RATE_CHANGE_INTERVAL
@@ -282,7 +362,7 @@ RSpec.describe AircraftManufacturingQueue do
           operator_id: nil,
         )
 
-        queue.send(:optimize_production_rate)
+        queue.optimize_production_rate
         queue.reload
 
         expect(queue.production_rate).to eq AircraftManufacturingQueue::LOW_PRODUCTION_RATES.max
@@ -302,7 +382,7 @@ RSpec.describe AircraftManufacturingQueue do
           operator_id: nil,
         )
 
-        queue.send(:optimize_production_rate)
+        queue.optimize_production_rate
         queue.reload
 
         expect(queue.production_rate).to eq AircraftManufacturingQueue::LOW_PRODUCTION_RATES.select { |rate| rate < initial_rate }.max
@@ -322,7 +402,7 @@ RSpec.describe AircraftManufacturingQueue do
           operator_id: nil,
         )
 
-        queue.send(:optimize_production_rate)
+        queue.optimize_production_rate
         queue.reload
 
         expect(queue.production_rate).to eq 0
