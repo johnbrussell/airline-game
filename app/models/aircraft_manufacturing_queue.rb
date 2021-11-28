@@ -12,6 +12,14 @@ class AircraftManufacturingQueue < ApplicationRecord
   QUEUE_LENGTH_MONTHS = 12.0
   START_PRODUCTION_RATE = 1.0
 
+  def optimize_production_rate
+    if percent_unbought > PERCENT_UNBOUGHT_TO_INCREASE_PRODUCTION
+      increase_production_rate
+    elsif percent_unbought < PERCENT_UNBOUGHT_TO_DECREASE_PRODUCTION
+      decrease_production_rate
+    end
+  end
+
   def start_production(aircraft_model)
     if airplanes.none?
       start_family_production(aircraft_model)
@@ -67,14 +75,6 @@ class AircraftManufacturingQueue < ApplicationRecord
 
     def num_bought_undelivered_aircraft
       undelivered_aircraft.count(&:is_owned?)
-    end
-
-    def optimize_production_rate
-      if percent_unbought > PERCENT_UNBOUGHT_TO_INCREASE_PRODUCTION
-        increase_production_rate
-      elsif percent_unbought < PERCENT_UNBOUGHT_TO_DECREASE_PRODUCTION
-        decrease_production_rate
-      end
     end
 
     def percent_unbought
