@@ -1,4 +1,6 @@
 class Calculation::DemandCurve
+  PERCENT_ISLAND_NORMAL = Calculation::MarketDollars::PERCENT_INCOME_SPENT_ON_TRAVEL.to_f / \
+    (Calculation::MarketDollars::PERCENT_INCOME_SPENT_ON_TRAVEL + Calculation::MarketDollars::PERCENT_INCOME_SPENT_ON_TRAVEL_ISLAND)
   SHORT_CONSTANTS = { :business => 1.3223140496, :leisure => 1.5625 }
   SHORT_EXPONENTS = { :business => 2, :leisure => 3 }
   SHORT_SIGNIFICANCES = { :business => 10 ** -3, :leisure => 10 ** -6 }
@@ -20,7 +22,7 @@ class Calculation::DemandCurve
   end
 
   def relative_demand_island(distance)
-    short_threshold_distance * 100 / distance
+    (1 - PERCENT_ISLAND_NORMAL) * relative_demand_island_additional_travel(distance) + PERCENT_ISLAND_NORMAL * relative_demand(distance)
   end
 
   private
@@ -35,6 +37,13 @@ class Calculation::DemandCurve
 
     def moderate
       100
+    end
+
+    def relative_demand_island_additional_travel(distance)
+      [
+        (short_threshold_distance / distance) ** 2,
+        short_threshold_distance / distance,
+      ].min * 100
     end
 
     def short(distance)

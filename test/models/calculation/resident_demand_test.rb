@@ -101,7 +101,7 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     actual = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).business_demand
     expected = Calculation::DemandCurve.new(:business).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, kosrae.airports.first)) / 100.0 * kosrae.populations.first.population
 
-    assert actual == expected
+    assert_in_epsilon actual, expected, 0.000001
   end
 
   test "leisure demand is equivalent to the island demand curve when between islands, domestic, and the demand-maximizing distance" do
@@ -123,7 +123,7 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     actual = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).business_demand
     expected = Calculation::DemandCurve.new(:business).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, kosrae.airports.first)) / 100.0 * kosrae.populations.first.population / 2.0
 
-    assert actual == expected
+    assert_in_epsilon actual, expected, 0.000001
   end
 
   test "leisure demand is halved when the destination is not an island" do
@@ -164,7 +164,7 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     actual = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).business_demand
     expected = Calculation::DemandCurve.new(:business).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, kosrae.airports.first)) / 100.0 * kosrae.populations.first.population / 12.0
 
-    assert actual == expected
+    assert_in_epsilon actual, expected, 0.000001
   end
 
   test "business demand is reduced by a factor of 4/3rds when the origin is an island and the destination is international but in the same country group" do

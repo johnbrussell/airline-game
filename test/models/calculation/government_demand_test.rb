@@ -110,7 +110,7 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
     actual = Calculation::GovernmentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).demand
     expected = Calculation::DemandCurve.new(:business).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, kosrae.airports.first)) / 100.0 * kosrae.populations.first.population
 
-    assert actual == expected
+    assert_in_epsilon actual, expected, 0.000001
   end
 
   test "business demand is halved when the destination is not an island" do
@@ -122,7 +122,7 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
     actual = Calculation::GovernmentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).demand
     expected = Calculation::DemandCurve.new(:business).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, kosrae.airports.first)) / 100.0 * kosrae.populations.first.population / 2.0
 
-    assert actual == expected
+    assert_in_epsilon actual, expected, 0.000001
   end
 
   test "demand is halved when the origin is not an island" do
