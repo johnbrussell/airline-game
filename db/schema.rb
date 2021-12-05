@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_28_113246) do
+ActiveRecord::Schema.define(version: 2021_12_05_114132) do
 
   create_table "aircraft_families", force: :cascade do |t|
     t.string "name", null: false
@@ -47,6 +47,17 @@ ActiveRecord::Schema.define(version: 2021_11_28_113246) do
     t.index ["aircraft_family_id"], name: "index_aircraft_models_on_aircraft_family_id"
   end
 
+  create_table "airline_routes", force: :cascade do |t|
+    t.float "economy_price", null: false
+    t.float "premium_economy_price", null: false
+    t.float "business_price", null: false
+    t.string "origin_airport_id", null: false
+    t.string "destination_airport_id", null: false
+    t.integer "distance", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "airlines", force: :cascade do |t|
     t.string "name", null: false
     t.boolean "is_user_airline", default: false, null: false
@@ -55,6 +66,18 @@ ActiveRecord::Schema.define(version: 2021_11_28_113246) do
     t.datetime "updated_at", precision: 6, null: false
     t.float "cash_on_hand", null: false
     t.index ["game_id"], name: "index_airlines_on_game_id"
+  end
+
+  create_table "airplane_routes", force: :cascade do |t|
+    t.integer "airline_route_id"
+    t.integer "airplane_id"
+    t.integer "frequencies", null: false
+    t.integer "block_time_mins", null: false
+    t.float "flight_cost", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["airline_route_id"], name: "index_airplane_routes_on_airline_route_id"
+    t.index ["airplane_id"], name: "index_airplane_routes_on_airplane_id"
   end
 
   create_table "airplanes", force: :cascade do |t|
@@ -88,6 +111,17 @@ ActiveRecord::Schema.define(version: 2021_11_28_113246) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["iata"], name: "index_airports_on_iata", unique: true
     t.index ["market_id"], name: "index_airports_on_market_id"
+  end
+
+  create_table "frequency_tiers", force: :cascade do |t|
+    t.integer "airline_route_id"
+    t.integer "seats", null: false
+    t.float "passengers", null: false
+    t.string "class_of_service", null: false
+    t.float "reputation"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["airline_route_id"], name: "index_frequency_tiers_on_airline_route_id"
   end
 
   create_table "games", force: :cascade do |t|
