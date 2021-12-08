@@ -1,5 +1,5 @@
 class GamesController < ApplicationController
-  def index
+  def show
     @game = Game.find(params[:id])
   end
 end
