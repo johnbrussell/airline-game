@@ -1,60 +1,60 @@
-Metro area,Year,Population,Notes,
-Boston,2020,4873019,"Boston includes Suffolk, Middlesex, Norfolk, Essex, and Plymouth counties.  Income is average family income.",
-Provincetown,2020,33664,Provincetown’s summer population is 60000, took wealthiest family income in Middlesex County to backfill the 56k who don’t live there full time for income
-Portsmouth,2020,287721,Includes half of Rockingham County population and all of Strafford County,
-Los Angeles,2019,14643573,Thank you to CensusReporter for providing urbanized area data here. ,
-Hyannis,2020,341638,Summer population of roughly 250000.  Just Barnstable County (exc. Provincetown),
-Chicago,2020,7421160,"Includes Cook, DuPage, Lake, and Lake (IN) counties",
-New York City,2019,17348011,"Includes NYC and Bergen, Hudson, Passaic, Westchester, Middlesex, Somerset, Essex, Union, Morris, Rockland, and Nassau counties, and half of Fairfield County CT",
-Provincetown,1920,4246,,
-Majuro,2010,27797,,
-Pohnpei,2010,34789,https://www.fsmstatistics.fm/wp-content/uploads/2019/02/1998_HIES_Main_Analysis_Report.pdf,
-Kosrae,2010,6616,,
-Yap,2010,7371,,
-Chuuk,2010,36158,,
-Funafuti,2017,6320,http://prdrse4all.spc.int/system/files/tuvalu_hies_report_2010.pdf,
-Nauru,2020,10000,https://spccfpstore1.blob.core.windows.net/digitallibrary-docs/files/9c/9c62fdc3882f7fa1a03d24da772c2da0.pdf ,
-Kwajalien,2000,14500,,
-Kosrae,1980,5491,,
-Danbury,2020,119677,1/8th of population of Fairfield County,
-Bridgeport,2020,359032,3/8ths of population of Fairfield County,
-Waterbury,2020,154812,"Populations of Waterbury, Oxford, Middlebury, and Southbury",
-New Haven,2020,710023,New Haven County exc. Waterbury metro area population,
-Hartford,2020,1526153,"Includes Hartford, Hampden, and Hampshire Counties",
-Providence,2020,873512,"Includes Providence, Kent, and Bristol counties",
-New London,2020,389373,"Includes New London County and Washington County RI, exc. New Shoreham",
-Newport,2019,82082,Newport County only,
-Block Island,2020,3110,New Shoreham only; 3400 summer only residents,
-Nantucket,2020,32128,Nantucket County; summer population 50000,
-Martha’s Vineyard,2020,110300,Summer population roughly 200000; year round 20600,
-New Bedford,2020,579200,Bristol County MA only,
-Pittsfield,2020,124944,Berkshire County MA only,
-Worcester,2020,862111,Worcester County MA only,
-Keene,2019,121990,Cheshire County NH and Windham County VT,
-Lebanon,2020,190785,"Sullivan and Grafton counties, NH; Windsor County VT",
-Rutland,2020,60572,Rutland County only,
-Montpelier,2020,89086,Washington and Orange counties,
-"Burlington, VT",2020,262925,"Chittenden, Grand Isle, Addison, and Franklin counties",
-"Manchester, NH",2020,796352,"½ Rockingham, Hillsborough, Merrimack, Belknap counties",
-"Portland, ME",2020,586374,"Cumberland, York, Sagadahoc, Lincoln counties",
-"Augusta, ME",2020,123642,Kennebec County only,
-Rockland,2020,79487,Knox and Waldo counties,
-Bangor,2020,168933,Piscataquis and Penobscot counties,
-Bar Harbor,2020,54987,Hancock County,
-Auburn/Lewiston,2020,111139,Androscoggin County,
-Presque Isle,2020,67105,Aroostook County,
-Stowe,2020,53338,Lamoille and Orleans counties,
-Pittsburgh,2020,2176568,"Allegheny, Beaver, Butler, Washington, and Westmoreland counties",
-Erie,2020,354814,Erie and Crawford counties,
-Cumberland,2020,118762,"Allegany County MD, Mineral County WV, ½ of Bedford County PA",
-Hagerstown,2020,625134,Washington County MD and Franklin County PA,
-Frederick,2020,271717,Frederick County,
-Salisbury,2020,422140,"Wicomico, Worcester, Somerset Counties MD; Sussex County DE",
-Baltimore/Washington,2020,8124805,"Harford, Baltimore, Anne Arundel, Montgomery, Howard, Prince George’s, Charles, Farquier, Arlington, Prince William, Loudoun, Fairfax counties; Baltimore, DC, Fairfax, Falls Church, Alexandria, Manassas, Manassas Park cities",
-Richmond,2020,1088341,"Chesterfield, Henrico, Hanover counties; Richmond, Petersburg, Hopewell, Colonial Heights",
-Norfolk,2020,1655049,"York, James City, Isle of Wight counties; Newport News, Williamsburg, Poquoson, Hampton, Norfolk, Virginia Beach, Chesapeake, Portsmouth, Suffolk",
-Pyongyang,2008,3255388,http://m.koreatimes.co.kr/pages/article.asp?newsIdx=191014,
-Pyongyang,1938,235000,,
-Chongjin,2008,1336507,,
-Havana,2018,2130517,Could not find income source.  Country avg income seems to be roughly $22/month.  Perhaps Havana is 1.9 times that. ,
+Metro area,Year,Population,Notes
+Boston,2020,4873019,"Boston includes Suffolk, Middlesex, Norfolk, Essex, and Plymouth counties.  Income is average family income."
+Provincetown,2020,33664,Provincetown’s summer population is 60000.  Took wealthiest family income in Middlesex County to backfill the 56k who don’t live there full time for income
+Portsmouth,2020,287721,Includes half of Rockingham County population and all of Strafford County
+Los Angeles,2019,14643573,Thank you to CensusReporter for providing urbanized area data here. 
+Hyannis,2020,341638,Summer population of roughly 250000.  Just Barnstable County (exc. Provincetown)
+Chicago,2020,7421160,"Includes Cook, DuPage, Lake, and Lake (IN) counties"
+New York City,2019,17348011,"Includes NYC and Bergen, Hudson, Passaic, Westchester, Middlesex, Somerset, Essex, Union, Morris, Rockland, and Nassau counties, and half of Fairfield County CT"
+Provincetown,1920,4246,
+Majuro,2010,27797,
+Pohnpei,2010,34789,https://www.fsmstatistics.fm/wp-content/uploads/2019/02/1998_HIES_Main_Analysis_Report.pdf
+Kosrae,2010,6616,
+Yap,2010,7371,
+Chuuk,2010,36158,
+Funafuti,2017,6320,http://prdrse4all.spc.int/system/files/tuvalu_hies_report_2010.pdf
+Nauru,2020,10000,https://spccfpstore1.blob.core.windows.net/digitallibrary-docs/files/9c/9c62fdc3882f7fa1a03d24da772c2da0.pdf 
+Kwajalien,2000,14500,
+Kosrae,1980,5491,
+Danbury,2020,119677,1/8th of population of Fairfield County
+Bridgeport,2020,359032,3/8ths of population of Fairfield County
+Waterbury,2020,154812,"Populations of Waterbury, Oxford, Middlebury, and Southbury"
+New Haven,2020,710023,New Haven County exc. Waterbury metro area population
+Hartford,2020,1526153,"Includes Hartford, Hampden, and Hampshire Counties"
+Providence,2020,873512,"Includes Providence, Kent, and Bristol counties"
+New London,2020,389373,"Includes New London County and Washington County RI, exc. New Shoreham"
+Newport,2019,82082,Newport County only
+Block Island,2020,3110,New Shoreham only.  3400 summer residents
+Nantucket,2020,32128,Nantucket County.  Summer population 50000
+Martha’s Vineyard,2020,110300,Summer population roughly 200000.  Year round 20600
+New Bedford,2020,579200,Bristol County MA only
+Pittsfield,2020,124944,Berkshire County MA only
+Worcester,2020,862111,Worcester County MA only
+Keene,2019,121990,Cheshire County NH and Windham County VT
+Lebanon,2020,190785,"Sullivan and Grafton counties, NH; Windsor County VT"
+Rutland,2020,60572,Rutland County only
+Montpelier,2020,89086,Washington and Orange counties
+"Burlington, VT",2020,262925,"Chittenden, Grand Isle, Addison, and Franklin counties"
+"Manchester, NH",2020,796352,"½ Rockingham, Hillsborough, Merrimack, Belknap counties"
+"Portland, ME",2020,586374,"Cumberland, York, Sagadahoc, Lincoln counties"
+"Augusta, ME",2020,123642,Kennebec County only
+Rockland,2020,79487,Knox and Waldo counties
+Bangor,2020,168933,Piscataquis and Penobscot counties
+Bar Harbor,2020,54987,Hancock County
+Auburn/Lewiston,2020,111139,Androscoggin County
+Presque Isle,2020,67105,Aroostook County
+Stowe,2020,53338,Lamoille and Orleans counties
+Pittsburgh,2020,2176568,"Allegheny, Beaver, Butler, Washington, and Westmoreland counties"
+Erie,2020,354814,Erie and Crawford counties
+Cumberland,2020,118762,"Allegany County MD, Mineral County WV, ½ of Bedford County PA"
+Hagerstown,2020,625134,Washington County MD and Franklin County PA
+Frederick,2020,271717,Frederick County
+Salisbury,2020,422140,"Wicomico, Worcester, Somerset Counties MD; Sussex County DE"
+Baltimore/Washington,2020,8124805,"Harford, Baltimore, Anne Arundel, Montgomery, Howard, Prince George’s, Charles, Farquier, Arlington, Prince William, Loudoun, Fairfax counties; Baltimore, DC, Fairfax, Falls Church, Alexandria, Manassas, Manassas Park cities"
+Richmond,2020,1088341,"Chesterfield, Henrico, Hanover counties; Richmond, Petersburg, Hopewell, Colonial Heights"
+Norfolk,2020,1655049,"York, James City, Isle of Wight counties; Newport News, Williamsburg, Poquoson, Hampton, Norfolk, Virginia Beach, Chesapeake, Portsmouth, Suffolk"
+Pyongyang,2008,3255388,http://m.koreatimes.co.kr/pages/article.asp?newsIdx=191014
+Pyongyang,1938,235000,
+Chongjin,2008,1336507,
+Havana,2018,2130517,Could not find income source.  Country avg income seems to be roughly $22/month.  Perhaps Havana is 1.9 times that. 
 Roanoke,2020,373807,"Roanoke; Salem; Radford; Roanoke, Montgomery, and Botetourt counties"
