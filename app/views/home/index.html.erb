@@ -1,1 +1,12 @@
 <h1>Airline Game</h1>
+<h2 id="game_count">There <%="is".pluralize(@games.count)%> <%= @games.count %> <%="game".pluralize(@games.count)%> in progress.</h2>
+
+<ul>
+  <% @games.each do |game| %>
+    <li>
+      Game ID: <%= game.id %> Start date: <%= game.start_date %> End date: <%= game.end_date %> Current date: <%= game.current_date %>
+      There <%="is".pluralize(game.airlines.count)%> <%= game.airlines.count %> <%="airline".pluralize(game.airlines.count)%> in the game.
+      <%= button_to "Enter", game_path(game.id), method: :get %>
+    </li>
+  <% end %>
+</ul>
