@@ -5,6 +5,16 @@ class GameTest < ActiveSupport::TestCase
   yesterday = today - 1
   tomorrow = today + 1
 
+  test "user_airline finds the user airline" do
+    subject = Game.create!(start_date: yesterday, end_date: tomorrow, current_date: today)
+
+    airline_1 = Airline.create!(game_id: subject.id, cash_on_hand: 1, name: "foo", is_user_airline: true)
+    airline_2 = Airline.create!(game_id: subject.id, cash_on_hand: 1, name: "bar", is_user_airline: false)
+
+    subject.reload
+    assert subject.user_airline.id == airline_1.id
+  end
+
   test "current_date fails validation when less than start_date" do
     subject = Game.new(start_date: today, end_date: tomorrow, current_date: yesterday)
 

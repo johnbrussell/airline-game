@@ -7,6 +7,10 @@ class Game < ApplicationRecord
 
   has_many :airlines
 
+  def user_airline
+    airlines.find { |a| a.is_user_airline }
+  end
+
   private
 
   def current_date_greater_than_start_date
