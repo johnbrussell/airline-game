@@ -1,0 +1,10 @@
+<h1>Airline Game</h1>
+<h2>There <%="is".pluralize(@airlines.count)%> <%= @airlines.count %> <%="airline".pluralize(@airlines.count)%> in the game.</h2>
+
+<ul>
+  <% @airlines.each do |airline| %>
+    <li>
+      <%= airline.name %>
+    </li>
+  <% end %>
+</ul>
