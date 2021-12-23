@@ -40,6 +40,10 @@ RSpec.describe "airlines/index", type: :feature do
       expect(page).to have_content("A Air")
       expect(page).to have_content("B Air")
       expect(page).not_to have_content("C Air")
+
+      click_on "A Air"
+      expect(page).to have_content("A Air")
+      expect(page).not_to have_content("B Air")
     end
 
     it "includes a link back to the game homepage" do
