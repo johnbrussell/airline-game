@@ -24,11 +24,22 @@ RSpec.describe "airlines/index", type: :feature do
   context "index" do
     it "shows the name of each airline" do
       game = Game.last
+      other_game = Game.create!(
+        start_date: Date.tomorrow,
+        current_date: Date.tomorrow + 1.day,
+        end_date: Date.tomorrow + 2.days,
+      )
+      Airline.create!(
+        game_id: other_game.id,
+        name: "C Air",
+        cash_on_hand: 0,
+      )
 
       visit game_airlines_path(game.id)
 
-      expect(page).to have_content(Airline.first.name)
-      expect(page).to have_content(Airline.last.name)
+      expect(page).to have_content("A Air")
+      expect(page).to have_content("B Air")
+      expect(page).not_to have_content("C Air")
     end
 
     it "includes a link back to the game homepage" do
