@@ -1,5 +1,6 @@
 class AirlinesController < ApplicationController
   def index
-    @airlines = Airline.all
+    @game = Game.find(params[:game_id])
+    @airlines = @game.airlines
   end
 end
