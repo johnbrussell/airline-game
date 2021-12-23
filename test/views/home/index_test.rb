@@ -19,7 +19,7 @@ class IndexTest < ApplicationSystemTestCase
 
     click_on "Enter"
 
-    assert_selector "h1", text: "Airline 2"
+    assert_selector "h2", text: "Airline 2"
   end
 
   test "all games are listed on the page" do

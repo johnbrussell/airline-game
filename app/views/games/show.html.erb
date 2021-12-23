@@ -2,4 +2,5 @@
 <h2> <%= @game.user_airline.name %> </h2>
 <h3> Cash on hand: $<%= @game.user_airline.cash_on_hand %> </h3>
 
-<h4> <a href=<%= game_airlines_path(@game.id) %>> View airlines in game </a> </h4>
+<p> <a href=<%= game_airlines_path(@game.id) %>> View airlines in game </a> <br/>
+<a href=<%= game_airline_path(@game.id, @game.user_airline.id) %>> View <%= @game.user_airline.name %> </a> </p>
