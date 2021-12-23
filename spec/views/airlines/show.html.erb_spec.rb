@@ -42,7 +42,7 @@ RSpec.describe "airlines/index", type: :feature do
       expect(page).not_to have_content("C Air")
 
       click_on "A Air"
-      expect(page).to have_content("Airline Game")
+      expect(page).to have_content("A Air")
       expect(page).not_to have_content("B Air")
     end
 
