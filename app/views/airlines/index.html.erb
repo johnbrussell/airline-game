@@ -5,7 +5,7 @@
 <ul>
   <% @airlines.each do |airline| %>
     <li>
-      <%= airline.name %>
+      <a href=<%=game_airline_path(@game.id, airline.id) %>><%= airline.name %></a>
     </li>
   <% end %>
 </ul>
