@@ -23,14 +23,27 @@ RSpec.describe Airline do
       expect(Airline.count).to eq 2
     end
 
-    it "is false when creating an airline and a user airline exists" do
-      Airline.create!(cash_on_hand: 1, name: "foo", is_user_airline: true)
+    it "is true when creating an airline and a user airline exists in another game" do
+      game = Game.create!(start_date: Date.yesterday, end_date: Date.tomorrow, current_date: Date.today)
+      Airline.create!(cash_on_hand: 1, name: "foo", is_user_airline: true, game_id: game.id)
 
-      new_airline = Airline.new(cash_on_hand: 1, name: "bar", is_user_airline: true)
+      new_game = Game.create!(start_date: Date.yesterday, end_date: Date.tomorrow, current_date: Date.today)
+      new_airline = Airline.new(cash_on_hand: 1, name: "bar", is_user_airline: true, game_id: new_game.id)
+
+      expect(new_airline.valid?).to be true
+      expect(new_airline.save).to be true
+      expect(Airline.count).to eq 2
+    end
+
+    it "is false when creating an airline and a user airline exists in the game" do
+      game = Game.create!(start_date: Date.yesterday, end_date: Date.tomorrow, current_date: Date.today)
+      Airline.create!(cash_on_hand: 1, name: "foo", is_user_airline: true, game_id: game.id)
+
+      new_airline = Airline.new(cash_on_hand: 1, name: "bar", is_user_airline: true, game_id: game.id)
 
       expect(new_airline.valid?).to be false
       expect(new_airline.save).to be false
-      expect(new_airline.errors.map{ |error| "#{error.attribute} #{error.message}" }).to include ("is_user_airline cannot be true for multiple airlines")
+      expect(new_airline.errors.map{ |error| "#{error.attribute} #{error.message}" }).to include ("is_user_airline cannot be true for multiple airlines within a game")
     end
   end
 
