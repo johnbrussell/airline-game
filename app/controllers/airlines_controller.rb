@@ -1,5 +1,6 @@
 class AirlinesController < ApplicationController
   def index
-    @airlines = Airline.all
+    @game = params[:game_id]
+    @airlines = Airline.all # should be @game.airlines, not Airline.all
   end
 end
