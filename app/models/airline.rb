@@ -1,4 +1,5 @@
 class Airline < ApplicationRecord
+  validates :base_id, presence: true
   validates :cash_on_hand, presence: true
   validates :name, presence: true
   validates :is_user_airline, :inclusion => { :in => [true, false] }
