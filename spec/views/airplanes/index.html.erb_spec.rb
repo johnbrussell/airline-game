@@ -19,6 +19,7 @@ RSpec.describe "airplanes/index", type: :feature do
       name: "A Air",
       cash_on_hand: 100,
       base_id: market.id,
+      is_user_airline: true,
     )
     aircraft_manufacturing_queue = AircraftManufacturingQueue.create!(game: game)
     Airplane.create!(
@@ -65,6 +66,23 @@ RSpec.describe "airplanes/index", type: :feature do
       visit game_airline_airplanes_path(game.id, airline.id)
 
       expect(page).to have_content "A Air operates 1 airplane"
+    end
+
+    it "has links back to the airline page and game overview page" do
+      game = Game.last
+      airline = Airline.last
+
+      visit game_airline_airplanes_path(game.id, airline.id)
+
+      click_link "Return to airline page"
+
+      expect(page).to have_content "A Air"
+      expect(page).to have_content "Based in AB, AB"
+
+      click_link "View airplanes"
+      click_link "Return to game overview"
+
+      expect(page).to have_content "Airline Game Home"
     end
   end
 end
