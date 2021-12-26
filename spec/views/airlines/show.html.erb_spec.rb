@@ -8,11 +8,17 @@ RSpec.describe "airlines/index", type: :feature do
       end_date: Date.tomorrow,
       current_date: Date.tomorrow,
     )
+    market = Market.create!(
+      name: "Nauru",
+      country: "Nauru",
+      country_group: "A",
+      income: 1000,
+    )
     Airline.create!(
       game_id: game.id,
       name: "A Air",
       cash_on_hand: 100,
-      base_id: 1,
+      base_id: market.id,
     )
   end
 
@@ -26,6 +32,7 @@ RSpec.describe "airlines/index", type: :feature do
       expect(page).to have_content("A Air")
       expect(page).to have_content("View airplanes")
       expect(page).to have_content("View routes")
+      expect(page).to have_content("Based in Nauru, Nauru")
     end
   end
 end

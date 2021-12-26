@@ -7,6 +7,10 @@ class Airline < ApplicationRecord
 
   before_destroy :validate_a_user_airline_exists
 
+  def base
+    Market.find(base_id)
+  end
+
   private
 
     def only_one_user_airline_exists

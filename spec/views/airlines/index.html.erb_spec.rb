@@ -8,18 +8,24 @@ RSpec.describe "airlines/index", type: :feature do
       end_date: Date.tomorrow,
       current_date: Date.tomorrow,
     )
+    market = Market.create!(
+      name: "AB",
+      country: "AB",
+      country_group: "AB",
+      income: 1000,
+    )
     Airline.create!(
       game_id: game.id,
       name: "A Air",
       cash_on_hand: 100,
-      base_id: 1,
+      base_id: market.id,
     )
     Airline.create!(
       game_id: game.id,
       name: "B Air",
       cash_on_hand: 100,
       is_user_airline: true,
-      base_id: 1,
+      base_id: market.id,
     )
   end
 
