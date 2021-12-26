@@ -2,7 +2,7 @@ require 'test_helper'
 require 'application_system_test_case'
 
 class IndexTest < ApplicationSystemTestCase
-  airline = Airline.new(name: "Nauru Airlines", cash_on_hand: 1234.56, is_user_airline: true)
+  airline = Airline.new(name: "Nauru Airlines", cash_on_hand: 1234.56, is_user_airline: true, base_id: 1)
   today = Date.today
   tomorrow = today + 1
   game = Game.new(start_date: today, end_date: tomorrow, current_date: today, airlines: [airline])

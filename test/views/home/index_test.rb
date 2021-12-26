@@ -2,9 +2,9 @@ require 'test_helper'
 require 'application_system_test_case'
 
 class IndexTest < ApplicationSystemTestCase
-  airline_1 = Airline.new(name: "Airline 1", cash_on_hand: 1234.56, is_user_airline: false)
-  airline_2 = Airline.new(name: "Airline 2", cash_on_hand: 1234.56, is_user_airline: true)
-  airline_3 = Airline.new(name: "Airline 3", cash_on_hand: 1234.56, is_user_airline: false)
+  airline_1 = Airline.new(name: "Airline 1", cash_on_hand: 1234.56, is_user_airline: false, base_id: 1)
+  airline_2 = Airline.new(name: "Airline 2", cash_on_hand: 1234.56, is_user_airline: true, base_id: 1)
+  airline_3 = Airline.new(name: "Airline 3", cash_on_hand: 1234.56, is_user_airline: false, base_id: 1)
   today = Date.today
   tomorrow = today + 1
   game_1 = Game.new(start_date: today, end_date: tomorrow, current_date: today, airlines: [airline_2, airline_1, airline_3])
@@ -24,7 +24,7 @@ class IndexTest < ApplicationSystemTestCase
 
   test "all games are listed on the page" do
     game_1.save!
-    Game.new(start_date: tomorrow, end_date: tomorrow, current_date: tomorrow, airlines: [Airline.new(name: "4", cash_on_hand: 1, is_user_airline: false)]).save!
+    Game.new(start_date: tomorrow, end_date: tomorrow, current_date: tomorrow, airlines: [Airline.new(name: "4", cash_on_hand: 1, is_user_airline: false, base_id: 1)]).save!
 
     visit "/"
 

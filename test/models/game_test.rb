@@ -8,8 +8,8 @@ class GameTest < ActiveSupport::TestCase
   test "user_airline finds the user airline" do
     subject = Game.create!(start_date: yesterday, end_date: tomorrow, current_date: today)
 
-    airline_1 = Airline.create!(game_id: subject.id, cash_on_hand: 1, name: "foo", is_user_airline: true)
-    airline_2 = Airline.create!(game_id: subject.id, cash_on_hand: 1, name: "bar", is_user_airline: false)
+    airline_1 = Airline.create!(game_id: subject.id, cash_on_hand: 1, name: "foo", is_user_airline: true, base_id: 1)
+    airline_2 = Airline.create!(game_id: subject.id, cash_on_hand: 1, name: "bar", is_user_airline: false, base_id: 1)
 
     subject.reload
     assert subject.user_airline.id == airline_1.id

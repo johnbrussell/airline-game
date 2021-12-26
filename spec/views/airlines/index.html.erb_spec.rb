@@ -12,12 +12,14 @@ RSpec.describe "airlines/index", type: :feature do
       game_id: game.id,
       name: "A Air",
       cash_on_hand: 100,
+      base_id: 1,
     )
     Airline.create!(
       game_id: game.id,
       name: "B Air",
       cash_on_hand: 100,
       is_user_airline: true,
+      base_id: 1,
     )
   end
 
@@ -33,6 +35,7 @@ RSpec.describe "airlines/index", type: :feature do
         game_id: other_game.id,
         name: "C Air",
         cash_on_hand: 0,
+        base_id: 1,
       )
 
       visit game_airlines_path(game.id)

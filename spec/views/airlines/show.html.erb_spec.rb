@@ -12,6 +12,7 @@ RSpec.describe "airlines/index", type: :feature do
       game_id: game.id,
       name: "A Air",
       cash_on_hand: 100,
+      base_id: 1,
     )
   end
 
