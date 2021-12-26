@@ -5,5 +5,9 @@ Rails.application.routes.draw do
     resources :airlines do
       resources :airplanes
     end
+
+    namespace :game do
+      resources :airplanes
+    end
   end
 end
