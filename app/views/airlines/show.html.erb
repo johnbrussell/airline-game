@@ -4,5 +4,5 @@
 
 <p>Based in <%= "#{@airline.base.name}, #{@airline.base.country}" %> </p>
 
-<p>View airplanes <br/>
+<p> <a href=<%=game_airline_airplanes_path(@game, @airline) %> > View airplanes </a> <br/>
 View routes</p>

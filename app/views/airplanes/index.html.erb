@@ -1,0 +1,7 @@
+<h1>Airline Game</h1>
+
+<p><a href=<%=game_path(@game)%> >Return to game overview</a><br/>
+<a href=<%=game_airline_path(@game, @airline)%>>Return to airline page</a></p>
+
+<h2><%="#{@airline.name} fleet"%></h2>
+<p><%="#{@airline.name} operates #{@airplanes.count} airplane".pluralize(@airplanes.count)%></p>
