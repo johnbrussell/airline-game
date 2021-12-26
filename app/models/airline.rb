@@ -9,7 +9,7 @@ class Airline < ApplicationRecord
   private
 
     def only_one_user_airline_exists
-      if is_user_airline && Airline.where(is_user_airline: true, game_id: game_id).count > 0
+      if is_user_airline && Airline.where(is_user_airline: true, game_id: game_id).where.not(id: id).count > 0
         errors.add(:is_user_airline, "cannot be true for multiple airlines within a game")
       end
     end

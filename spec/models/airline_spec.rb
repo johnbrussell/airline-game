@@ -35,6 +35,12 @@ RSpec.describe Airline do
       expect(Airline.count).to eq 2
     end
 
+    it "is true when updating an airline" do
+      airline = Airline.create!(cash_on_hand: 1, name: "foo", is_user_airline: true)
+
+      expect(airline.update(name: "bar")).to eq true
+    end
+
     it "is false when creating an airline and a user airline exists in the game" do
       game = Game.create!(start_date: Date.yesterday, end_date: Date.tomorrow, current_date: Date.today)
       Airline.create!(cash_on_hand: 1, name: "foo", is_user_airline: true, game_id: game.id)
