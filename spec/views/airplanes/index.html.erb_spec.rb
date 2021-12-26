@@ -52,5 +52,19 @@ RSpec.describe "airplanes/index", type: :feature do
 
       expect(page).to have_content "A Air operates 2 airplanes"
     end
+
+    it "excludes unconstructed airplanes" do
+      game = Game.last
+      airline = Airline.last
+      Airplane.create!(
+        operator_id: airline.id,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+        construction_date: game.current_date + 1.day,
+      )
+
+      visit game_airline_airplanes_path(game.id, airline.id)
+
+      expect(page).to have_content "A Air operates 1 airplane"
+    end
   end
 end
