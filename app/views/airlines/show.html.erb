@@ -1,5 +1,6 @@
 <h1>Airline Game</h1>
-<p><a href=<%=game_path(@game)%>>Return to game overview</a></p>
+<p><a href=<%=game_path(@game)%>>Return to game overview</a><br/>
+<a href=<%=game_airlines_path(@game)%>>View all airlines</a></p>
 <h2><%=@airline.name%></h2>
 
 <p>Based in <%= "#{@airline.base.name}, #{@airline.base.country}" %> </p>
