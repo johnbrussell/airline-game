@@ -50,6 +50,7 @@ RSpec.describe Gates do
         name: "Foo",
         cash_on_hand: 1000000000,
         is_user_airline: false,
+        base_id: 1,
       )
       date = Date.today
       game = Game.create!(current_date: date, start_date: date, end_date: date)
