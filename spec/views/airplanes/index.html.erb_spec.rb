@@ -44,6 +44,7 @@ RSpec.describe "airplanes/index", type: :feature do
       aircraft_manufacturing_queue: aircraft_manufacturing_queue,
       operator_id: airline.id,
       construction_date: Date.yesterday,
+      end_of_useful_life: Date.tomorrow,
       aircraft_model: model,
     )
   end
@@ -66,6 +67,7 @@ RSpec.describe "airplanes/index", type: :feature do
         operator_id: airline.id,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
         construction_date: Date.yesterday,
+        end_of_useful_life: Date.tomorrow,
         aircraft_model: AircraftModel.last,
       )
 
@@ -81,6 +83,7 @@ RSpec.describe "airplanes/index", type: :feature do
         operator_id: airline.id,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
         construction_date: game.current_date + 1.day,
+        end_of_useful_life: game.current_date + 1.year,
         aircraft_model: AircraftModel.last,
       )
 

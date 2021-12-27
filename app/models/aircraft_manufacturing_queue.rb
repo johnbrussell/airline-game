@@ -43,6 +43,7 @@ class AircraftManufacturingQueue < ApplicationRecord
         premium_economy_seats: 0,
         economy_seats: (model.floor_space / Airplane::ECONOMY_SEAT_SIZE).floor(),
         construction_date: construction_date,
+        end_of_useful_life: construction_date + model.useful_life.years,
         aircraft_manufacturing_queue_id: id,
       )
     end

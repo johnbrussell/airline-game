@@ -29,6 +29,7 @@ RSpec.describe Airplane do
       subject = Airplane.create!(
         operator_id: 1,
         construction_date: Date.today,
+        end_of_useful_life: Date.tomorrow,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
         aircraft_model: AircraftModel.last,
       )
@@ -40,6 +41,7 @@ RSpec.describe Airplane do
       subject = Airplane.create!(
         operator_id: nil,
         construction_date: Date.today,
+        end_of_useful_life: Date.tomorrow,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
         aircraft_model: AircraftModel.last,
       )
@@ -74,6 +76,7 @@ RSpec.describe Airplane do
         premium_economy_seats: 0,
         economy_seats: 1,
         construction_date: game.current_date + 1.day,
+        end_of_useful_life: game.current_date + 1.year,
         aircraft_manufacturing_queue: queue,
         operator_id: nil,
         aircraft_model_id: model.id,
@@ -149,6 +152,7 @@ RSpec.describe Airplane do
         premium_economy_seats: 0,
         economy_seats: 1,
         construction_date: game.current_date - 1.day,
+        end_of_useful_life: game.current_date + 1.year,
         aircraft_manufacturing_queue: queue,
         operator_id: nil,
         aircraft_model_id: model.id,
