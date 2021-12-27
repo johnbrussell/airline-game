@@ -4,6 +4,7 @@ class Airplane < ApplicationRecord
   validates :construction_date, presence: true
   validates :economy_seats, presence: true
   validates :economy_seats, numericality: { greater_than_or_equal_to: 0 }
+  validates :end_of_useful_life, presence: true
   validates :premium_economy_seats, presence: true
   validates :premium_economy_seats, numericality: { greater_than_or_equal_to: 0 }
 
