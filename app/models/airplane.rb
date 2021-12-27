@@ -8,6 +8,7 @@ class Airplane < ApplicationRecord
   validates :premium_economy_seats, numericality: { greater_than_or_equal_to: 0 }
 
   belongs_to :aircraft_manufacturing_queue
+  belongs_to :aircraft_model
 
   delegate :game, :to => :aircraft_manufacturing_queue
 

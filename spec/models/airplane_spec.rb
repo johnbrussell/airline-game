@@ -5,6 +5,24 @@ RSpec.describe Airplane do
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
       AircraftManufacturingQueue.create!(game: game)
+      family = AircraftFamily.create!(
+        name: "737",
+        manufacturer: "Boeing",
+      )
+      AircraftModel.create!(
+        name: "737-300",
+        production_start_year: 1980,
+        floor_space: 1000,
+        max_range: 100,
+        speed: 500,
+        num_pilots: 2,
+        num_flight_attendants: 3,
+        price: 100000000,
+        takeoff_distance: 6000,
+        useful_life: 30,
+        fuel_burn: 100,
+        family: family,
+      )
     end
 
     it "is true when the airplane is owned" do
@@ -12,6 +30,7 @@ RSpec.describe Airplane do
         operator_id: 1,
         construction_date: Date.today,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+        aircraft_model: AircraftModel.last,
       )
 
       expect(subject.has_operator?).to be true
@@ -22,6 +41,7 @@ RSpec.describe Airplane do
         operator_id: nil,
         construction_date: Date.today,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+        aircraft_model: AircraftModel.last,
       )
 
       expect(subject.has_operator?).to be false

@@ -35,6 +35,7 @@ RSpec.describe AircraftManufacturingQueue do
         construction_date: game.current_date + (AircraftManufacturingQueue::QUEUE_LENGTH_MONTHS * 2 * AircraftManufacturingQueue::DAYS_PER_MONTH).days,
         aircraft_manufacturing_queue_id: queue.id,
         operator_id: nil,
+        aircraft_model: AircraftModel.last,
       )
 
       old_num_planes = Airplane.count
@@ -61,6 +62,7 @@ RSpec.describe AircraftManufacturingQueue do
         construction_date: game.current_date + (AircraftManufacturingQueue::QUEUE_LENGTH_MONTHS * 2 * AircraftManufacturingQueue::DAYS_PER_MONTH).days,
         aircraft_manufacturing_queue_id: queue.id,
         operator_id: nil,
+        aircraft_model: AircraftModel.last,
       )
 
       old_num_planes = Airplane.count
@@ -87,6 +89,7 @@ RSpec.describe AircraftManufacturingQueue do
         construction_date: game.current_date + 30.days,
         aircraft_manufacturing_queue_id: queue.id,
         operator_id: nil,
+        aircraft_model: AircraftModel.last,
       )
 
       old_num_planes = Airplane.count
@@ -258,6 +261,7 @@ RSpec.describe AircraftManufacturingQueue do
           construction_date: game.current_date + 180.days,
           aircraft_manufacturing_queue_id: queue.id,
           operator_id: 1,
+          aircraft_model: AircraftModel.last,
         )
 
         queue.optimize_production_rate
@@ -278,6 +282,7 @@ RSpec.describe AircraftManufacturingQueue do
           construction_date: game.current_date + 180.days,
           aircraft_manufacturing_queue_id: queue.id,
           operator_id: 1,
+          aircraft_model: AircraftModel.last,
         )
 
         queue.optimize_production_rate
@@ -298,6 +303,7 @@ RSpec.describe AircraftManufacturingQueue do
           construction_date: game.current_date + 180.days,
           aircraft_manufacturing_queue_id: queue.id,
           operator_id: 1,
+          aircraft_model: AircraftModel.last,
         )
 
         queue.optimize_production_rate
@@ -318,6 +324,7 @@ RSpec.describe AircraftManufacturingQueue do
           construction_date: game.current_date + 180.days,
           aircraft_manufacturing_queue_id: queue.id,
           operator_id: 1,
+          aircraft_model: AircraftModel.last,
         )
 
         queue.optimize_production_rate
@@ -340,6 +347,7 @@ RSpec.describe AircraftManufacturingQueue do
           construction_date: game.current_date + 180.days,
           aircraft_manufacturing_queue_id: queue.id,
           operator_id: nil,
+          aircraft_model: AircraftModel.last,
         )
 
         queue.optimize_production_rate
@@ -360,6 +368,7 @@ RSpec.describe AircraftManufacturingQueue do
           construction_date: game.current_date + 180.days,
           aircraft_manufacturing_queue_id: queue.id,
           operator_id: nil,
+          aircraft_model: AircraftModel.last,
         )
 
         queue.optimize_production_rate
@@ -380,6 +389,7 @@ RSpec.describe AircraftManufacturingQueue do
           construction_date: game.current_date + 180.days,
           aircraft_manufacturing_queue_id: queue.id,
           operator_id: nil,
+          aircraft_model: AircraftModel.last,
         )
 
         queue.optimize_production_rate
@@ -400,6 +410,7 @@ RSpec.describe AircraftManufacturingQueue do
           construction_date: game.current_date + 180.days,
           aircraft_manufacturing_queue_id: queue.id,
           operator_id: nil,
+          aircraft_model: AircraftModel.last,
         )
 
         queue.optimize_production_rate
