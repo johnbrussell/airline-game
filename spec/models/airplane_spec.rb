@@ -1,6 +1,70 @@
 require "rails_helper"
 
 RSpec.describe Airplane do
+  context "all_available_used_airplanes" do
+    useful_life_years = 30
+
+    before(:each) do
+      game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
+      AircraftManufacturingQueue.create!(game: game)
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      AircraftModel.create!(
+        name: "737-100",
+        production_start_year: 1969,
+        floor_space: 1000,
+        max_range: 1200,
+        speed: 500,
+        fuel_burn: 1500,
+        num_pilots: 2,
+        num_flight_attendants: 3,
+        price: 10000000,
+        takeoff_distance: 5000,
+        useful_life: useful_life_years,
+        family: family,
+      )
+    end
+
+    it "includes only airplanes in the current game that don't currently have operators, have already been produced, and are within their useful life" do
+      game = Game.first
+      other_game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
+      AircraftManufacturingQueue.create!(game: other_game)
+
+      valid_airplane = Airplane.create!(
+        construction_date: game.current_date,
+        end_of_useful_life: game.current_date + useful_life_years.years,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
+        operator_id: nil,
+        aircraft_model: AircraftModel.last,
+      )
+      no_operator_plane = Airplane.create!(
+        construction_date: game.current_date,
+        end_of_useful_life: game.current_date + useful_life_years.years,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
+        operator_id: 1,
+        aircraft_model: AircraftModel.last,
+      )
+      future_plane = Airplane.create!(
+        construction_date: game.current_date + 1.day,
+        end_of_useful_life: game.current_date + useful_life_years.years + 1.day,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
+        operator_id: nil,
+        aircraft_model: AircraftModel.last,
+      )
+      old_plane = Airplane.create!(
+        construction_date: game.current_date - useful_life_years.years - 1.day,
+        end_of_useful_life: game.current_date - 1.day,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
+        operator_id: nil,
+        aircraft_model: AircraftModel.last,
+      )
+
+      actual = Airplane.all_available_used_airplanes(game)
+
+      expect(actual.length).to eq 1
+      expect(actual).to include valid_airplane
+    end
+  end
+
   context "has_operator?" do
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
