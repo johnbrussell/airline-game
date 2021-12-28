@@ -4,3 +4,4 @@
 
 <p> <a href=<%= game_airlines_path(@game.id) %>> View airlines in game </a> <br/>
 <a href=<%= game_airline_path(@game.id, @game.user_airline.id) %>> View <%= @game.user_airline.name %> </a> </p>
+<p> <a href=<%= game_game_airplanes_path(@game) %>> View airplanes for purchase or lease </p>
