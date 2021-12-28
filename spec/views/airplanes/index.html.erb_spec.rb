@@ -43,7 +43,7 @@ RSpec.describe "airplanes/index", type: :feature do
     Airplane.create!(
       aircraft_manufacturing_queue: aircraft_manufacturing_queue,
       operator_id: airline.id,
-      construction_date: Date.yesterday,
+      construction_date: "2020-01-01".to_date,
       end_of_useful_life: Date.tomorrow,
       aircraft_model: model,
     )
@@ -58,6 +58,27 @@ RSpec.describe "airplanes/index", type: :feature do
 
       expect(page).to have_content("A Air fleet")
       expect(page).to have_content("A Air operates 1 airplane")
+    end
+
+    it "shows details about the fleet" do
+      game = Game.last
+      airline = Airline.last
+      Airplane.create!(
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+        operator_id: airline.id,
+        construction_date: "2019-01-01".to_date,
+        end_of_useful_life: Date.tomorrow,
+        aircraft_model: AircraftModel.last,
+        economy_seats: 100,
+        premium_economy_seats: 10,
+        business_seats: 8,
+      )
+
+      visit game_airline_airplanes_path(game.id, airline.id)
+
+      expect(page).to have_content("A Air operates 2 airplanes")
+      expect(page).to have_content("Boeing 737-300 constructed 2020-01-01. 0 economy, 0 premium economy, 0 business.")
+      expect(page).to have_content("Boeing 737-300 constructed 2019-01-01. 100 economy, 10 premium economy, 8 business.")
     end
 
     it "correctly pluralizes as the fleet grows" do

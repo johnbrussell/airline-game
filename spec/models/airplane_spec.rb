@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Airplane do
-  context "all_available_new_airplanes" do
+  context "available_new" do
     useful_life_years = 30
 
     before(:each) do
@@ -58,14 +58,14 @@ RSpec.describe Airplane do
         aircraft_model: AircraftModel.last,
       )
 
-      actual = Airplane.all_available_new_airplanes(game)
+      actual = Airplane.available_new(game)
 
       expect(actual.length).to eq 1
       expect(actual).to include valid_airplane
     end
   end
 
-  context "all_available_used_airplanes" do
+  context "available_used" do
     useful_life_years = 30
 
     before(:each) do
@@ -129,10 +129,55 @@ RSpec.describe Airplane do
         aircraft_model: AircraftModel.last,
       )
 
-      actual = Airplane.all_available_used_airplanes(game)
+      actual = Airplane.available_used(game)
 
       expect(actual.length).to eq 1
       expect(actual).to include valid_airplane
+    end
+  end
+
+  context "with_operator" do
+    before(:each) do
+      game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      queue = AircraftManufacturingQueue.create!(game: game, aircraft_family_id: family.id, production_rate: 1)
+      model = AircraftModel.create!(
+        name: "737-100",
+        production_start_year: 1969,
+        floor_space: 1000,
+        max_range: 1200,
+        speed: 500,
+        fuel_burn: 1500,
+        num_pilots: 2,
+        num_flight_attendants: 3,
+        price: 10000000,
+        takeoff_distance: 5000,
+        useful_life: 30,
+        family: family,
+      )
+      Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, operator_id: 2, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
+    end
+
+    it "only includes planes with the specified operator" do
+      model = AircraftModel.last
+      queue = AircraftManufacturingQueue.last
+      airplane = Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, operator_id: 1, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
+      expected = [airplane]
+
+      actual = Airplane.with_operator(1)
+
+      expect(actual).to eq expected
+    end
+
+    it "works for nil" do
+      model = AircraftModel.last
+      queue = AircraftManufacturingQueue.last
+      airplane = Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, operator_id: nil, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
+      expected = [airplane]
+
+      actual = Airplane.with_operator(nil)
+
+      expect(actual).to eq expected
     end
   end
 

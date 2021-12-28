@@ -13,20 +13,26 @@ class Airplane < ApplicationRecord
 
   delegate :game, :to => :aircraft_manufacturing_queue
 
+  scope :available_new, ->(game) {
+    joins(:aircraft_manufacturing_queue).
+    where(operator_id: nil).
+    where("construction_date > ?", game.current_date).
+    where(aircraft_manufacturing_queue: { game: game } )
+  }
+  scope :available_used, ->(game) {
+    joins(:aircraft_manufacturing_queue).
+    where(operator_id: nil).
+    where("construction_date <= ?", game.current_date).where("end_of_useful_life > ?", game.current_date).
+    where(aircraft_manufacturing_queue: { game: game } )
+  }
+  scope :neatly_sorted, -> {
+    joins(aircraft_model: :family).
+    order("aircraft_families.manufacturer", "aircraft_families.name", "aircraft_models.name", "construction_date DESC")
+  }
+  scope :with_operator, ->(operator_id) { where(operator_id: operator_id) }
+
   ECONOMY_SEAT_SIZE = 28 * 17
   PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE = 0.4
-
-  def self.all_available_new_airplanes(game)
-    Airplane.where(operator_id: nil).where("construction_date > ?", game.current_date).joins(:aircraft_manufacturing_queue).where(aircraft_manufacturing_queue: { game: game } )
-  end
-
-  def self.all_available_used_airplanes(game)
-    Airplane.
-      joins(:aircraft_manufacturing_queue).
-      where(operator_id: nil).
-      where("construction_date <= ?", game.current_date).where("end_of_useful_life > ?", game.current_date).
-      where(aircraft_manufacturing_queue: { game: game } )
-  end
 
   def has_operator?
     operator_id.present?
