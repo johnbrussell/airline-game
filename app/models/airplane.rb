@@ -25,6 +25,10 @@ class Airplane < ApplicationRecord
     where("construction_date <= ?", game.current_date).where("end_of_useful_life > ?", game.current_date).
     where(aircraft_manufacturing_queue: { game: game } )
   }
+  scope :neatly_sorted, -> {
+    joins(aircraft_model: :family).
+    order("aircraft_families.manufacturer", "aircraft_families.name", "aircraft_models.name", "construction_date DESC")
+  }
   scope :with_operator, ->(operator_id) { where(operator_id: operator_id) }
 
   ECONOMY_SEAT_SIZE = 28 * 17
