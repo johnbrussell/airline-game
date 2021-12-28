@@ -1,3 +1,5 @@
 <h1>Airline Game</h1>
+<p> <a href=<%=game_path(@game)%> >Return to game overview</a> <br/>
+<a href=<%= game_new_airplanes_airplanes_path(@game) %>> View new airplanes for purchase or lease </a> </p>
 <h2>Buy or lease used aircraft</h2>
 <h3>There <%="is".pluralize(@used_airplanes.count)%> <%=@used_airplanes.count%> used <%="airplane".pluralize(@used_airplanes.count)%> available to buy or lease</h3>

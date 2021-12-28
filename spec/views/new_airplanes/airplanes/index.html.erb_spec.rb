@@ -13,6 +13,8 @@ RSpec.describe "new_airplanes/airplanes/index", type: :feature do
       visit game_new_airplanes_airplanes_path(game)
 
       expect(page).to have_content "There is 1 new airplane available to buy or lease"
+      expect(page).to have_link "Return to game overview"
+      expect(page).to have_link "View used airplanes for purchase or lease"
     end
   end
 end
