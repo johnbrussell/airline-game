@@ -25,6 +25,7 @@ class Airplane < ApplicationRecord
     where("construction_date <= ?", game.current_date).where("end_of_useful_life > ?", game.current_date).
     where(aircraft_manufacturing_queue: { game: game } )
   }
+  scope :with_operator, ->(operator_id) { where(operator_id: operator_id) }
 
   ECONOMY_SEAT_SIZE = 28 * 17
   PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE = 0.4
