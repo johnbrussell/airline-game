@@ -8,7 +8,7 @@ RSpec.describe "new_airplanes/airplanes/index", type: :feature do
 
       new_airplane = instance_double(Airplane)
       new_aircraft = [new_airplane]
-      expect(Airplane).to receive(:all_available_new_airplanes).and_return(new_aircraft)
+      expect(Airplane).to receive(:available_new).and_return(new_aircraft)
 
       visit game_new_airplanes_airplanes_path(game)
 

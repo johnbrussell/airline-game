@@ -9,7 +9,7 @@ RSpec.describe "used_airplanes/airplanes/index", type: :feature do
       used_airplane_1 = instance_double(Airplane)
       used_airplane_2 = instance_double(Airplane)
       used_aircraft = [used_airplane_1, used_airplane_2]
-      expect(Airplane).to receive(:all_available_used_airplanes).and_return(used_aircraft)
+      expect(Airplane).to receive(:available_used).and_return(used_aircraft)
 
       visit game_used_airplanes_airplanes_path(game)
 

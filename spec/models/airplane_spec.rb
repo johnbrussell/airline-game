@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Airplane do
-  context "all_available_new_airplanes" do
+  context "available_new" do
     useful_life_years = 30
 
     before(:each) do
@@ -58,14 +58,14 @@ RSpec.describe Airplane do
         aircraft_model: AircraftModel.last,
       )
 
-      actual = Airplane.all_available_new_airplanes(game)
+      actual = Airplane.available_new(game)
 
       expect(actual.length).to eq 1
       expect(actual).to include valid_airplane
     end
   end
 
-  context "all_available_used_airplanes" do
+  context "available_used" do
     useful_life_years = 30
 
     before(:each) do
@@ -129,7 +129,7 @@ RSpec.describe Airplane do
         aircraft_model: AircraftModel.last,
       )
 
-      actual = Airplane.all_available_used_airplanes(game)
+      actual = Airplane.available_used(game)
 
       expect(actual.length).to eq 1
       expect(actual).to include valid_airplane
