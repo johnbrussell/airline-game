@@ -6,7 +6,7 @@ Rails.application.routes.draw do
       resources :airplanes
     end
 
-    namespace :game do
+    namespace :new_airplanes do
       resources :airplanes
     end
   end

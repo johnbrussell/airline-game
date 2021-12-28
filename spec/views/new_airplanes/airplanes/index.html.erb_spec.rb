@@ -1,7 +1,7 @@
 require "rails_helper"
 require "capybara/rspec"
 
-RSpec.describe "game/airplanes/index", type: :feature do
+RSpec.describe "new_airplanes/airplanes/index", type: :feature do
   context "index" do
     it "shows the number of new aircraft and number of used aircraft available" do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow)
@@ -14,7 +14,7 @@ RSpec.describe "game/airplanes/index", type: :feature do
       expect(Airplane).to receive(:all_available_new_airplanes).and_return(new_aircraft)
       expect(Airplane).to receive(:all_available_used_airplanes).and_return(used_aircraft)
 
-      visit game_game_airplanes_path(game)
+      visit game_new_airplanes_airplanes_path(game)
 
       expect(page).to have_content "There is 1 new airplane available to buy or lease"
       expect(page).to have_content "There are 2 used airplanes available to buy or lease"
