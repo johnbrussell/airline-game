@@ -4,5 +4,6 @@
 
 <p> <a href=<%= game_airlines_path(@game.id) %>> View airlines in game </a> <br/>
 <a href=<%= game_airline_path(@game.id, @game.user_airline.id) %>> View <%= @game.user_airline.name %> </a> </p>
-<p> <a href=<%= game_new_airplanes_airplanes_path(@game) %>> View new airplanes for purchase or lease <br/>
-<a href=<%= game_used_airplanes_airplanes_path(@game) %>> View used airplanes for purchase or lease </p>
+<p> <a href=<%= game_new_airplanes_airplanes_path(@game) %>> View new airplanes for purchase or lease </a> <br/>
+<a href=<%= game_used_airplanes_airplanes_path(@game) %>> View used airplanes for purchase or lease </a> <br/>
+<a href=<%= game_airline_airplanes_path(@game, @game.user_airline) %>> View <%= @game.user_airline.name %> fleet </a></p>
