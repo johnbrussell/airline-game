@@ -9,5 +9,9 @@ Rails.application.routes.draw do
     namespace :new_airplanes do
       resources :airplanes
     end
+
+    namespace :used_airplanes do
+      resources :airplanes
+    end
   end
 end
