@@ -17,11 +17,15 @@ class Airplane < ApplicationRecord
   PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE = 0.4
 
   def self.all_available_new_airplanes(game)
-    Airplane.where(operator_id: nil).where("construction_date > ?", game.current_date)
+    Airplane.where(operator_id: nil).where("construction_date > ?", game.current_date).joins(:aircraft_manufacturing_queue).where(aircraft_manufacturing_queue: { game: game } )
   end
 
   def self.all_available_used_airplanes(game)
-    Airplane.where(operator_id: nil).where("construction_date <= ?", game.current_date).where("end_of_useful_life > ?", game.current_date)
+    Airplane.
+      joins(:aircraft_manufacturing_queue).
+      where(operator_id: nil).
+      where("construction_date <= ?", game.current_date).where("end_of_useful_life > ?", game.current_date).
+      where(aircraft_manufacturing_queue: { game: game } )
   end
 
   def has_operator?

@@ -1,4 +1,7 @@
 class AircraftManufacturingQueue < ApplicationRecord
+  validates :aircraft_family_id, presence: true
+  validates :production_rate, presence: true
+
   belongs_to :game
   has_many :airplanes
   has_many :undelivered_aircraft, ->(amq) { where("construction_date > ?", amq.game.current_date) }, class_name: "Airplane"

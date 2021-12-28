@@ -6,8 +6,8 @@ RSpec.describe Airplane do
 
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-      AircraftManufacturingQueue.create!(game: game)
       family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      AircraftManufacturingQueue.create!(game: game, aircraft_family_id: family.id, production_rate: 1)
       AircraftModel.create!(
         name: "737-100",
         production_start_year: 1969,
@@ -27,7 +27,7 @@ RSpec.describe Airplane do
     it "includes only airplanes in the current game that don't currently have operators and have not already been produced" do
       game = Game.first
       other_game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-      AircraftManufacturingQueue.create!(game: other_game)
+      other_queue = AircraftManufacturingQueue.create!(game: other_game, aircraft_family_id: 1, production_rate: 1)
 
       valid_airplane = Airplane.create!(
         construction_date: game.current_date + 1.day,
@@ -50,6 +50,13 @@ RSpec.describe Airplane do
         operator_id: nil,
         aircraft_model: AircraftModel.last,
       )
+      Airplane.create!(
+        construction_date: game.current_date + 1.day,
+        end_of_useful_life: game.current_date + useful_life_years.years,
+        aircraft_manufacturing_queue: other_queue,
+        operator_id: nil,
+        aircraft_model: AircraftModel.last,
+      )
 
       actual = Airplane.all_available_new_airplanes(game)
 
@@ -63,8 +70,8 @@ RSpec.describe Airplane do
 
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-      AircraftManufacturingQueue.create!(game: game)
       family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      AircraftManufacturingQueue.create!(game: game, aircraft_family_id: family.id, production_rate: 1)
       AircraftModel.create!(
         name: "737-100",
         production_start_year: 1969,
@@ -84,7 +91,7 @@ RSpec.describe Airplane do
     it "includes only airplanes in the current game that don't currently have operators, have already been produced, and are within their useful life" do
       game = Game.first
       other_game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-      AircraftManufacturingQueue.create!(game: other_game)
+      other_queue = AircraftManufacturingQueue.create!(game: other_game, aircraft_family_id: 1, production_rate: 1)
 
       valid_airplane = Airplane.create!(
         construction_date: game.current_date,
@@ -93,24 +100,31 @@ RSpec.describe Airplane do
         operator_id: nil,
         aircraft_model: AircraftModel.last,
       )
-      no_operator_plane = Airplane.create!(
+      Airplane.create!(
         construction_date: game.current_date,
         end_of_useful_life: game.current_date + useful_life_years.years,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
         operator_id: 1,
         aircraft_model: AircraftModel.last,
       )
-      future_plane = Airplane.create!(
+      Airplane.create!(
         construction_date: game.current_date + 1.day,
         end_of_useful_life: game.current_date + useful_life_years.years + 1.day,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
         operator_id: nil,
         aircraft_model: AircraftModel.last,
       )
-      old_plane = Airplane.create!(
+      Airplane.create!(
         construction_date: game.current_date - useful_life_years.years - 1.day,
         end_of_useful_life: game.current_date - 1.day,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
+        operator_id: nil,
+        aircraft_model: AircraftModel.last,
+      )
+      Airplane.create!(
+        construction_date: game.current_date,
+        end_of_useful_life: game.current_date + useful_life_years.years,
+        aircraft_manufacturing_queue: other_queue,
         operator_id: nil,
         aircraft_model: AircraftModel.last,
       )
@@ -125,11 +139,8 @@ RSpec.describe Airplane do
   context "has_operator?" do
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-      AircraftManufacturingQueue.create!(game: game)
-      family = AircraftFamily.create!(
-        name: "737",
-        manufacturer: "Boeing",
-      )
+      family = AircraftFamily.create!(name: "737", manufacturer: "Boeing")
+      AircraftManufacturingQueue.create!(game: game, aircraft_family_id: family.id, production_rate: 1)
       AircraftModel.create!(
         name: "737-300",
         production_start_year: 1980,
@@ -176,8 +187,8 @@ RSpec.describe Airplane do
 
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-      queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0)
       family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
       model = AircraftModel.create!(
         name: "737-100",
         production_start_year: 1969,
@@ -252,8 +263,8 @@ RSpec.describe Airplane do
 
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-      queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0)
       family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
       model = AircraftModel.create!(
         name: "737-100",
         production_start_year: 1969,

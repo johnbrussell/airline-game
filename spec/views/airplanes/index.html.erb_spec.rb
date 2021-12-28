@@ -21,11 +21,11 @@ RSpec.describe "airplanes/index", type: :feature do
       base_id: market.id,
       is_user_airline: true,
     )
-    aircraft_manufacturing_queue = AircraftManufacturingQueue.create!(game: game)
     family = AircraftFamily.create!(
       name: "737",
       manufacturer: "Boeing",
     )
+    aircraft_manufacturing_queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0.1, aircraft_family_id: family.id)
     model = AircraftModel.create!(
       name: "737-300",
       production_start_year: 1980,
