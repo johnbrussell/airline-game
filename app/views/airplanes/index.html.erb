@@ -4,4 +4,4 @@
 <a href=<%=game_airline_path(@game, @airline)%>>Return to airline page</a></p>
 
 <h2><%="#{@airline.name} fleet"%></h2>
-<p><%="#{@airline.name} operates #{@airplanes.count} airplane".pluralize(@airplanes.count)%></p>
+<h3><%="#{@airline.name} operates #{@airplanes.count} airplane".pluralize(@airplanes.count)%></h3>
