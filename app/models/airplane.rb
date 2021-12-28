@@ -4,15 +4,29 @@ class Airplane < ApplicationRecord
   validates :construction_date, presence: true
   validates :economy_seats, presence: true
   validates :economy_seats, numericality: { greater_than_or_equal_to: 0 }
+  validates :end_of_useful_life, presence: true
   validates :premium_economy_seats, presence: true
   validates :premium_economy_seats, numericality: { greater_than_or_equal_to: 0 }
 
   belongs_to :aircraft_manufacturing_queue
+  belongs_to :aircraft_model
 
   delegate :game, :to => :aircraft_manufacturing_queue
 
   ECONOMY_SEAT_SIZE = 28 * 17
   PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE = 0.4
+
+  def self.all_available_new_airplanes(game)
+    Airplane.where(operator_id: nil).where("construction_date > ?", game.current_date).joins(:aircraft_manufacturing_queue).where(aircraft_manufacturing_queue: { game: game } )
+  end
+
+  def self.all_available_used_airplanes(game)
+    Airplane.
+      joins(:aircraft_manufacturing_queue).
+      where(operator_id: nil).
+      where("construction_date <= ?", game.current_date).where("end_of_useful_life > ?", game.current_date).
+      where(aircraft_manufacturing_queue: { game: game } )
+  end
 
   def has_operator?
     operator_id.present?

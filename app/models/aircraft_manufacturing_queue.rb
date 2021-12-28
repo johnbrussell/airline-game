@@ -1,4 +1,7 @@
 class AircraftManufacturingQueue < ApplicationRecord
+  validates :aircraft_family_id, presence: true
+  validates :production_rate, presence: true
+
   belongs_to :game
   has_many :airplanes
   has_many :undelivered_aircraft, ->(amq) { where("construction_date > ?", amq.game.current_date) }, class_name: "Airplane"
@@ -43,6 +46,7 @@ class AircraftManufacturingQueue < ApplicationRecord
         premium_economy_seats: 0,
         economy_seats: (model.floor_space / Airplane::ECONOMY_SEAT_SIZE).floor(),
         construction_date: construction_date,
+        end_of_useful_life: construction_date + model.useful_life.years,
         aircraft_manufacturing_queue_id: id,
       )
     end

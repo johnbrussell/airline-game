@@ -3,8 +3,8 @@ require "rails_helper"
 RSpec.describe AircraftManufacturingQueue do
   before(:each) do
     game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-    AircraftManufacturingQueue.create!(game: game, production_rate: 0)
     family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+    AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
     AircraftModel.create!(
       name: "737-100",
       production_start_year: 1969,
@@ -33,8 +33,10 @@ RSpec.describe AircraftManufacturingQueue do
         premium_economy_seats: 0,
         economy_seats: 1,
         construction_date: game.current_date + (AircraftManufacturingQueue::QUEUE_LENGTH_MONTHS * 2 * AircraftManufacturingQueue::DAYS_PER_MONTH).days,
+        end_of_useful_life: game.current_date + 10.years,
         aircraft_manufacturing_queue_id: queue.id,
         operator_id: nil,
+        aircraft_model: AircraftModel.last,
       )
 
       old_num_planes = Airplane.count
@@ -59,8 +61,10 @@ RSpec.describe AircraftManufacturingQueue do
         premium_economy_seats: 0,
         economy_seats: 1,
         construction_date: game.current_date + (AircraftManufacturingQueue::QUEUE_LENGTH_MONTHS * 2 * AircraftManufacturingQueue::DAYS_PER_MONTH).days,
+        end_of_useful_life: game.current_date + 10.years,
         aircraft_manufacturing_queue_id: queue.id,
         operator_id: nil,
+        aircraft_model: AircraftModel.last,
       )
 
       old_num_planes = Airplane.count
@@ -85,8 +89,10 @@ RSpec.describe AircraftManufacturingQueue do
         premium_economy_seats: 0,
         economy_seats: 1,
         construction_date: game.current_date + 30.days,
+        end_of_useful_life: game.current_date + 10.years,
         aircraft_manufacturing_queue_id: queue.id,
         operator_id: nil,
+        aircraft_model: AircraftModel.last,
       )
 
       old_num_planes = Airplane.count
@@ -214,6 +220,7 @@ RSpec.describe AircraftManufacturingQueue do
           premium_economy_seats: 0,
           economy_seats: 1,
           construction_date: game.current_date + AircraftManufacturingQueue::PRODUCTION_START_ADVANCE_NOTICE_MONTHS * AircraftManufacturingQueue::DAYS_PER_MONTH + 1.day,
+          end_of_useful_life: game.current_date + 10.years,
           aircraft_manufacturing_queue_id: queue.id,
         )
         queue.update!(production_rate: AircraftManufacturingQueue::START_PRODUCTION_RATE / 2.0)
@@ -256,8 +263,10 @@ RSpec.describe AircraftManufacturingQueue do
           premium_economy_seats: 0,
           economy_seats: 1,
           construction_date: game.current_date + 180.days,
+          end_of_useful_life: game.current_date + 10.years,
           aircraft_manufacturing_queue_id: queue.id,
           operator_id: 1,
+          aircraft_model: AircraftModel.last,
         )
 
         queue.optimize_production_rate
@@ -276,8 +285,10 @@ RSpec.describe AircraftManufacturingQueue do
           premium_economy_seats: 0,
           economy_seats: 1,
           construction_date: game.current_date + 180.days,
+          end_of_useful_life: game.current_date + 10.years,
           aircraft_manufacturing_queue_id: queue.id,
           operator_id: 1,
+          aircraft_model: AircraftModel.last,
         )
 
         queue.optimize_production_rate
@@ -296,8 +307,10 @@ RSpec.describe AircraftManufacturingQueue do
           premium_economy_seats: 0,
           economy_seats: 1,
           construction_date: game.current_date + 180.days,
+          end_of_useful_life: game.current_date + 10.years,
           aircraft_manufacturing_queue_id: queue.id,
           operator_id: 1,
+          aircraft_model: AircraftModel.last,
         )
 
         queue.optimize_production_rate
@@ -316,8 +329,10 @@ RSpec.describe AircraftManufacturingQueue do
           premium_economy_seats: 0,
           economy_seats: 1,
           construction_date: game.current_date + 180.days,
+          end_of_useful_life: game.current_date + 10.years,
           aircraft_manufacturing_queue_id: queue.id,
           operator_id: 1,
+          aircraft_model: AircraftModel.last,
         )
 
         queue.optimize_production_rate
@@ -338,8 +353,10 @@ RSpec.describe AircraftManufacturingQueue do
           premium_economy_seats: 0,
           economy_seats: 1,
           construction_date: game.current_date + 180.days,
+          end_of_useful_life: game.current_date + 10.years,
           aircraft_manufacturing_queue_id: queue.id,
           operator_id: nil,
+          aircraft_model: AircraftModel.last,
         )
 
         queue.optimize_production_rate
@@ -358,8 +375,10 @@ RSpec.describe AircraftManufacturingQueue do
           premium_economy_seats: 0,
           economy_seats: 1,
           construction_date: game.current_date + 180.days,
+          end_of_useful_life: game.current_date + 10.years,
           aircraft_manufacturing_queue_id: queue.id,
           operator_id: nil,
+          aircraft_model: AircraftModel.last,
         )
 
         queue.optimize_production_rate
@@ -378,8 +397,10 @@ RSpec.describe AircraftManufacturingQueue do
           premium_economy_seats: 0,
           economy_seats: 1,
           construction_date: game.current_date + 180.days,
+          end_of_useful_life: game.current_date + 10.years,
           aircraft_manufacturing_queue_id: queue.id,
           operator_id: nil,
+          aircraft_model: AircraftModel.last,
         )
 
         queue.optimize_production_rate
@@ -398,8 +419,10 @@ RSpec.describe AircraftManufacturingQueue do
           premium_economy_seats: 0,
           economy_seats: 1,
           construction_date: game.current_date + 180.days,
+          end_of_useful_life: game.current_date + 10.years,
           aircraft_manufacturing_queue_id: queue.id,
           operator_id: nil,
+          aircraft_model: AircraftModel.last,
         )
 
         queue.optimize_production_rate
