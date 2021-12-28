@@ -1,16 +1,7 @@
 class Game::AirplanesController < ApplicationController
   def index
-    @game = game
-    @airplanes = airplanes
+    @game = Game.find(params[:game_id])
+    @new_airplanes = Airplane.all_available_new_airplanes(@game)
+    @used_airplanes = Airplane.all_available_used_airplanes(@game)
   end
-
-  private
-
-    def airplanes
-      @airplanes ||= Airplane.all
-    end
-
-    def game
-      @game ||= Game.find(params[:game_id])
-    end
 end
