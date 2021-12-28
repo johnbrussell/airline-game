@@ -34,13 +34,11 @@ class IndexTest < ApplicationSystemTestCase
     assert_selector "a", text: "View new airplanes for purchase or lease"
     click_link "View new airplanes for purchase or lease"
     assert_selector "h3", text: "There are 0 new airplanes available to buy or lease"
-    assert_selector "h3", text: "There are 0 used airplanes available to buy or lease"
 
     visit game_path(game.id)
 
     assert_selector "a", text: "View used airplanes for purchase or lease"
     click_link "View used airplanes for purchase or lease"
-    assert_selector "h3", text: "There are 0 new airplanes available to buy or lease"
     assert_selector "h3", text: "There are 0 used airplanes available to buy or lease"
   end
 end
