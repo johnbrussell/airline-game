@@ -31,7 +31,7 @@ RSpec.describe "airlines/index", type: :feature do
       visit game_airline_path(game.id, airline.id)
 
       expect(page).to have_content("A Air")
-      expect(page).to have_content("View airplanes")
+      expect(page).to have_content("View fleet")
       expect(page).to have_content("View routes")
       expect(page).to have_content("View slot holdings")
       expect(page).to have_content("View financial history")
@@ -44,7 +44,7 @@ RSpec.describe "airlines/index", type: :feature do
 
       click_link "View A Air"
 
-      click_link "View airplanes"
+      click_link "View fleet"
 
       expect(page).to have_content "A Air fleet"
 
