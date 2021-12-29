@@ -33,6 +33,8 @@ RSpec.describe "airlines/index", type: :feature do
       expect(page).to have_content("A Air")
       expect(page).to have_content("View airplanes")
       expect(page).to have_content("View routes")
+      expect(page).to have_content("View slot holdings")
+      expect(page).to have_content("View financial history")
       expect(page).to have_content("Based in Nauru, Nauru")
       expect(page).to have_content("Return to game overview")
 
