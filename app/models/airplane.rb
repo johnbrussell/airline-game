@@ -8,6 +8,8 @@ class Airplane < ApplicationRecord
   validates :premium_economy_seats, presence: true
   validates :premium_economy_seats, numericality: { greater_than_or_equal_to: 0 }
 
+  validate :operator_changes_appropriately, unless: :new_record?
+
   belongs_to :aircraft_manufacturing_queue
   belongs_to :aircraft_model
 
@@ -58,6 +60,13 @@ class Airplane < ApplicationRecord
 
     def model
       @model ||= AircraftModel.find_by(id: aircraft_model_id)
+    end
+
+    def operator_changes_appropriately
+      copy = Airplane.find(id)
+      if copy.operator_id != operator_id && copy.operator_id.present? && operator_id.present?
+        errors.add(:operator_id, "cannot be changed from one airline directly to another; must be put on the market first")
+      end
     end
 
     def value

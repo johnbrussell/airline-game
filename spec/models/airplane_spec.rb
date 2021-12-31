@@ -227,6 +227,70 @@ RSpec.describe Airplane do
     end
   end
 
+  context "operator_changes_appropriately" do
+    before(:each) do
+      game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
+      model = AircraftModel.create!(
+        name: "737-100",
+        production_start_year: 1969,
+        floor_space: 1000,
+        max_range: 1200,
+        speed: 500,
+        fuel_burn: 1500,
+        num_pilots: 2,
+        num_flight_attendants: 3,
+        price: 1000,
+        takeoff_distance: 5000,
+        useful_life: 30,
+        family: family,
+      )
+      Airplane.create!(
+        business_seats: 0,
+        premium_economy_seats: 0,
+        economy_seats: 1,
+        construction_date: game.current_date + 1.day,
+        end_of_useful_life: game.current_date + 1.year,
+        aircraft_manufacturing_queue: queue,
+        operator_id: nil,
+        aircraft_model_id: model.id,
+      )
+    end
+
+    it "is true when buying an airplane" do
+      subject = Airplane.last
+      expect(subject.update(operator_id: 1)).to be true
+    end
+
+    it "is true when selling an airplane" do
+      subject = Airplane.last
+      subject.update(operator_id: 1)
+
+      expect(subject.update(operator_id: nil)).to be true
+    end
+
+    it "is true when updating an unowned airplane" do
+      subject = Airplane.last
+      expect(subject.update(economy_seats: 100)).to be true
+    end
+
+    it "is true when updating an owned airplane" do
+      subject = Airplane.last
+      subject.update(operator_id: 1)
+
+      expect(subject.update(economy_seats: 100)).to be true
+    end
+
+    it "is false when selling an airplane from one airline to another" do
+      subject = Airplane.last
+      subject.update(operator_id: 1)
+
+      expect(subject.update(operator_id: 2)).to be false
+      expect(subject.errors.map{ |error| "#{error.attribute} #{error.message}" }).to include "operator_id cannot be changed from one airline directly to another; must be put on the market first"
+    end
+  end
+
   context "purchase_price" do
     purchase_price_new = 100000000.01
 
