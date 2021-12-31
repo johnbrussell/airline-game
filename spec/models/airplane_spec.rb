@@ -228,7 +228,7 @@ RSpec.describe Airplane do
   end
 
   context "purchase_price" do
-    purchase_price_new = 100000000
+    purchase_price_new = 100000000.01
 
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
@@ -260,10 +260,11 @@ RSpec.describe Airplane do
       )
     end
 
-    it "is the price of the aircraft model when the plane has not been built" do
+    it "is the rounded price of the aircraft model when the plane has not been built" do
       subject = Airplane.last
 
-      expect(subject.purchase_price).to eq purchase_price_new
+      expect(subject.purchase_price).to eq 100000000
+      expect(subject.purchase_price).not_to eq purchase_price_new
     end
 
     it "depreciates every day" do
@@ -275,7 +276,7 @@ RSpec.describe Airplane do
       subject.update!(construction_date: game.current_date)
       subject.reload
 
-      expect(subject.purchase_price).to eq purchase_price_new
+      expect(subject.purchase_price).to eq 100000000
 
       subject.update!(construction_date: game.current_date - 1.day)
       subject.reload

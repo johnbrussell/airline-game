@@ -43,7 +43,7 @@ class Airplane < ApplicationRecord
   end
 
   def purchase_price
-    value
+    value.round
   end
 
   private
