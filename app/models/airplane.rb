@@ -9,6 +9,7 @@ class Airplane < ApplicationRecord
   validates :premium_economy_seats, numericality: { greater_than_or_equal_to: 0 }
 
   validate :operator_changes_appropriately, unless: :new_record?
+  validate :seats_fit_on_plane
 
   belongs_to :aircraft_manufacturing_queue
   belongs_to :aircraft_model
@@ -34,6 +35,8 @@ class Airplane < ApplicationRecord
   scope :with_operator, ->(operator_id) { where(operator_id: operator_id) }
 
   ECONOMY_SEAT_SIZE = 28 * 17
+  PREMIUM_ECONOMY_SEAT_SIZE = 36 * 17
+  BUSINESS_SEAT_SIZE = 84 * 20
   PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE = 0.4
 
   def has_operator?
@@ -70,6 +73,12 @@ class Airplane < ApplicationRecord
       copy = Airplane.find(id)
       if copy.operator_id != operator_id && copy.operator_id.present? && operator_id.present?
         errors.add(:operator_id, "cannot be changed from one airline directly to another; must be put on the market first")
+      end
+    end
+
+    def seats_fit_on_plane
+      if ECONOMY_SEAT_SIZE * economy_seats + PREMIUM_ECONOMY_SEAT_SIZE * premium_economy_seats + BUSINESS_SEAT_SIZE * business_seats > aircraft_model.floor_space
+        errors.add(:seats, "require more total floor space than available on airplane")
       end
     end
 

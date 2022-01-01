@@ -29,7 +29,7 @@ RSpec.describe "airplanes/index", type: :feature do
     model = AircraftModel.create!(
       name: "737-300",
       production_start_year: 1980,
-      floor_space: 1000,
+      floor_space: 100000,
       max_range: 100,
       speed: 500,
       num_pilots: 2,

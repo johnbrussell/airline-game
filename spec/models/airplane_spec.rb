@@ -272,14 +272,14 @@ RSpec.describe Airplane do
 
     it "is true when updating an unowned airplane" do
       subject = Airplane.last
-      expect(subject.update(economy_seats: 100)).to be true
+      expect(subject.update(economy_seats: 2)).to be true
     end
 
     it "is true when updating an owned airplane" do
       subject = Airplane.last
       subject.update(operator_id: 1)
 
-      expect(subject.update(economy_seats: 100)).to be true
+      expect(subject.update(economy_seats: 2)).to be true
     end
 
     it "is false when selling an airplane from one airline to another" do
@@ -495,6 +495,152 @@ RSpec.describe Airplane do
       lease_rate = subject.lease_rate_per_day(lease_length_days)
 
       assert_in_epsilon lease_rate, model.price / lease_length_days, 0.001
+    end
+  end
+
+  context "seats_fit_on_plane" do
+    before(:each) do
+      game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
+      AircraftModel.create!(
+        name: "737-100",
+        production_start_year: 1969,
+        floor_space: Airplane::BUSINESS_SEAT_SIZE * 2,
+        max_range: 1200,
+        speed: 500,
+        fuel_burn: 1500,
+        num_pilots: 2,
+        num_flight_attendants: 3,
+        price: 100,
+        takeoff_distance: 5000,
+        useful_life: 30,
+        family: family,
+      )
+    end
+
+    it "is true when the economy seats fit on the plane" do
+      subject = Airplane.new(
+        business_seats: 0,
+        premium_economy_seats: 0,
+        economy_seats: Airplane::BUSINESS_SEAT_SIZE * 2 / Airplane::ECONOMY_SEAT_SIZE,
+        construction_date: Game.last.current_date - 1.day,
+        end_of_useful_life: Game.last.current_date + 1.year,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+        operator_id: nil,
+        aircraft_model_id: AircraftModel.last.id,
+      )
+
+      expect(subject.save).to be true
+    end
+
+    it "is true when the premium economy seats fit on the plane" do
+      subject = Airplane.new(
+        business_seats: 0,
+        premium_economy_seats: Airplane::BUSINESS_SEAT_SIZE * 2 / Airplane::PREMIUM_ECONOMY_SEAT_SIZE,
+        economy_seats: 0,
+        construction_date: Game.last.current_date - 1.day,
+        end_of_useful_life: Game.last.current_date + 1.year,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+        operator_id: nil,
+        aircraft_model_id: AircraftModel.last.id,
+      )
+
+      expect(subject.save).to be true
+    end
+
+    it "is true when the business seats fit on the plane" do
+      subject = Airplane.new(
+        business_seats: 2,
+        premium_economy_seats: 0,
+        economy_seats: 0,
+        construction_date: Game.last.current_date - 1.day,
+        end_of_useful_life: Game.last.current_date + 1.year,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+        operator_id: nil,
+        aircraft_model_id: AircraftModel.last.id,
+      )
+
+      expect(subject.save).to be true
+    end
+
+    it "is true when the seats fit on the plane" do
+      subject = Airplane.new(
+        business_seats: 1,
+        premium_economy_seats: 1,
+        economy_seats: (Airplane::BUSINESS_SEAT_SIZE - Airplane::PREMIUM_ECONOMY_SEAT_SIZE) / Airplane::ECONOMY_SEAT_SIZE,
+        construction_date: Game.last.current_date - 1.day,
+        end_of_useful_life: Game.last.current_date + 1.year,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+        operator_id: nil,
+        aircraft_model_id: AircraftModel.last.id,
+      )
+
+      expect(subject.save).to be true
+    end
+
+    it "is false when there are too many economy seats" do
+      subject = Airplane.new(
+        business_seats: 0,
+        premium_economy_seats: 0,
+        economy_seats: Airplane::BUSINESS_SEAT_SIZE * 2 / Airplane::ECONOMY_SEAT_SIZE + 1,
+        construction_date: Game.last.current_date - 1.day,
+        end_of_useful_life: Game.last.current_date + 1.year,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+        operator_id: nil,
+        aircraft_model_id: AircraftModel.last.id,
+      )
+
+      expect(subject.save).to be false
+      expect(subject.errors.map{ |error| "#{error.attribute} #{error.message}" }).to include "seats require more total floor space than available on airplane"
+    end
+
+    it "is false when there are too many premium economy seats" do
+      subject = Airplane.new(
+        business_seats: 0,
+        premium_economy_seats: Airplane::BUSINESS_SEAT_SIZE * 2 / Airplane::PREMIUM_ECONOMY_SEAT_SIZE + 1,
+        economy_seats: 0,
+        construction_date: Game.last.current_date - 1.day,
+        end_of_useful_life: Game.last.current_date + 1.year,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+        operator_id: nil,
+        aircraft_model_id: AircraftModel.last.id,
+      )
+
+      expect(subject.save).to be false
+      expect(subject.errors.map{ |error| "#{error.attribute} #{error.message}" }).to include "seats require more total floor space than available on airplane"
+    end
+
+    it "is false when there are too many business seats" do
+      subject = Airplane.new(
+        business_seats: 3,
+        premium_economy_seats: 0,
+        economy_seats: 0,
+        construction_date: Game.last.current_date - 1.day,
+        end_of_useful_life: Game.last.current_date + 1.year,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+        operator_id: nil,
+        aircraft_model_id: AircraftModel.last.id,
+      )
+
+      expect(subject.save).to be false
+      expect(subject.errors.map{ |error| "#{error.attribute} #{error.message}" }).to include "seats require more total floor space than available on airplane"
+    end
+
+    it "is false when the seats do not fit on the plane" do
+      subject = Airplane.new(
+        business_seats: 1,
+        premium_economy_seats: 1,
+        economy_seats: (Airplane::BUSINESS_SEAT_SIZE - Airplane::PREMIUM_ECONOMY_SEAT_SIZE) / Airplane::ECONOMY_SEAT_SIZE + 1,
+        construction_date: Game.last.current_date - 1.day,
+        end_of_useful_life: Game.last.current_date + 1.year,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+        operator_id: nil,
+        aircraft_model_id: AircraftModel.last.id,
+      )
+
+      expect(subject.save).to be false
+      expect(subject.errors.map{ |error| "#{error.attribute} #{error.message}" }).to include "seats require more total floor space than available on airplane"
     end
   end
 end
