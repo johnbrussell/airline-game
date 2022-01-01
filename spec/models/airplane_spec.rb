@@ -291,8 +291,8 @@ RSpec.describe Airplane do
     end
   end
 
-  context "purchase_price" do
-    purchase_price_new = 100000000.01
+  context "new_plane_payment" do
+    purchase_price_new = 100000000
 
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
@@ -327,8 +327,47 @@ RSpec.describe Airplane do
     it "is the rounded price of the aircraft model when the plane has not been built" do
       subject = Airplane.last
 
-      expect(subject.purchase_price).to eq 100000000
-      expect(subject.purchase_price).not_to eq purchase_price_new
+      expect(subject.new_plane_payment).to eq 50000000
+    end
+  end
+
+  context "purchase_price" do
+    purchase_price_new = 100000000
+
+    before(:each) do
+      game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
+      model = AircraftModel.create!(
+        name: "737-100",
+        production_start_year: 1969,
+        floor_space: 1000,
+        max_range: 1200,
+        speed: 500,
+        fuel_burn: 1500,
+        num_pilots: 2,
+        num_flight_attendants: 3,
+        price: purchase_price_new,
+        takeoff_distance: 5000,
+        useful_life: 30,
+        family: family,
+      )
+      Airplane.create!(
+        business_seats: 0,
+        premium_economy_seats: 0,
+        economy_seats: 1,
+        construction_date: game.current_date + 1.day,
+        end_of_useful_life: game.current_date + 1.year,
+        aircraft_manufacturing_queue: queue,
+        operator_id: nil,
+        aircraft_model_id: model.id,
+      )
+    end
+
+    it "is the price of the aircraft model when the plane has not been built" do
+      subject = Airplane.last
+
+      expect(subject.purchase_price).to eq purchase_price_new
     end
 
     it "depreciates every day" do
@@ -340,7 +379,7 @@ RSpec.describe Airplane do
       subject.update!(construction_date: game.current_date)
       subject.reload
 
-      expect(subject.purchase_price).to eq 100000000
+      expect(subject.purchase_price).to eq purchase_price_new
 
       subject.update!(construction_date: game.current_date - 1.day)
       subject.reload

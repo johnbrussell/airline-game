@@ -44,8 +44,12 @@ class Airplane < ApplicationRecord
     (value - value_at_age(age_in_days + lease_in_days)) * lease_premium / lease_in_days
   end
 
+  def new_plane_payment
+    value / 2.0
+  end
+
   def purchase_price
-    value.round
+    value
   end
 
   private
