@@ -87,6 +87,31 @@ RSpec.describe "airplanes/lease_information", type: :feature do
       expect(airplane.economy_seats).to eq 1
     end
 
+    it "does not show the airplane on the new airplane page again after leasing" do
+      game = Game.last
+      airplane = Airplane.last
+
+      visit game_new_airplanes_airplanes_path(game)
+
+      expect(page).to have_content "There is 1 new airplane available to buy or lease"
+      expect(page).to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
+
+      click_button "Lease"
+
+      fill_in :airplane_days, with: 1
+      fill_in :airplane_business_seats, with: 1
+      fill_in :airplane_premium_economy_seats, with: 1
+      fill_in :airplane_economy_seats, with: 1
+      click_button "Lease"
+
+      expect(page).to have_content "A Air fleet"
+
+      visit game_new_airplanes_airplanes_path(game)
+
+      expect(page).to have_content "There are 0 new airplanes available to buy or lease"
+      expect(page).not_to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
+    end
+
     it "does not redirect to the airline fleet page when a validation error occurs" do
       game = Game.last
       airplane = Airplane.last
