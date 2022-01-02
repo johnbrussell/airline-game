@@ -1,3 +1,7 @@
 .error {
   color: #da0707;
 }
+
+.button_to {
+  display: inline-block;
+}
