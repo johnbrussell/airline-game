@@ -498,6 +498,158 @@ RSpec.describe Airplane do
     end
   end
 
+  context "purchase_new" do
+    purchase_price_new = 100000000
+
+    before(:each) do
+      game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
+      model = AircraftModel.create!(
+        name: "737-100",
+        production_start_year: 1969,
+        floor_space: 1000000,
+        max_range: 1200,
+        speed: 500,
+        fuel_burn: 1500,
+        num_pilots: 2,
+        num_flight_attendants: 3,
+        price: purchase_price_new,
+        takeoff_distance: 5000,
+        useful_life: 30,
+        family: family,
+      )
+      Airplane.create!(
+        business_seats: 0,
+        premium_economy_seats: 0,
+        economy_seats: 0,
+        construction_date: game.current_date + 1.day,
+        end_of_useful_life: game.current_date + 1.year,
+        aircraft_manufacturing_queue: queue,
+        operator_id: nil,
+        aircraft_model_id: model.id,
+      )
+      Airline.create!(cash_on_hand: purchase_price_new * 2, name: "J Air", base_id: 1)
+    end
+
+    it "returns true, assigns the plane to the airline, installs the right number of seats, and deducts the purchase price from the airline's cash" do
+      subject = Airplane.last
+      buyer = Airline.last
+
+      initial_cash_on_hand = buyer.cash_on_hand
+
+      expect(subject.purchase_new(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be true
+
+      subject.reload
+      buyer.reload
+
+      expect(buyer.cash_on_hand).to eq initial_cash_on_hand - purchase_price_new / 2
+      expect(subject.operator_id).to eq buyer.id
+      expect(subject.business_seats).to eq 3
+      expect(subject.premium_economy_seats).to eq 4
+      expect(subject.economy_seats).to eq 5
+    end
+
+    it "returns false if the aircraft has already been built" do
+      subject = Airplane.last
+      buyer = Airline.last
+      game = Game.last
+
+      subject.update(construction_date: game.current_date)
+      initial_cash_on_hand = buyer.cash_on_hand
+
+      expect(subject.purchase_new(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
+
+      subject.reload
+      buyer.reload
+
+      expect(buyer.cash_on_hand).to eq initial_cash_on_hand
+      expect(subject.operator_id).to be nil
+      expect(subject.business_seats).to eq 0
+      expect(subject.premium_economy_seats).to eq 0
+      expect(subject.economy_seats).to eq 0
+    end
+
+    it "returns false if the airline does not have enough money" do
+      subject = Airplane.last
+      buyer = Airline.last
+
+      buyer.update(cash_on_hand: 100)
+      buyer.reload
+
+      expect(subject.purchase_new(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
+
+      subject.reload
+      buyer.reload
+
+      expect(buyer.cash_on_hand).to eq 100
+      expect(subject.operator_id).to be nil
+      expect(subject.business_seats).to eq 0
+      expect(subject.premium_economy_seats).to eq 0
+      expect(subject.economy_seats).to eq 0
+    end
+
+    it "returns false if the number of seats requested requires too much square footage" do
+      subject = Airplane.last
+      buyer = Airline.last
+
+      initial_cash_on_hand = buyer.cash_on_hand
+
+      expect(subject.purchase_new(airline = buyer, business_seats = 1, premium_economy_seats = 1, economy_seats = subject.aircraft_model.floor_space / Airplane::ECONOMY_SEAT_SIZE + 1)).to be false
+
+      subject.reload
+      buyer.reload
+
+      expect(buyer.cash_on_hand).to eq initial_cash_on_hand
+      expect(subject.operator_id).to be nil
+      expect(subject.business_seats).to eq 0
+      expect(subject.premium_economy_seats).to eq 0
+      expect(subject.economy_seats).to eq 0
+    end
+
+    it "returns false if the plane is already owned by the buyer" do
+      subject = Airplane.last
+      buyer = Airline.last
+
+      subject.update(operator_id: buyer.id)
+      subject.reload
+
+      initial_cash_on_hand = buyer.cash_on_hand
+
+      expect(subject.purchase_new(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
+
+      subject.reload
+      buyer.reload
+
+      expect(buyer.cash_on_hand).to eq initial_cash_on_hand
+      expect(subject.operator_id).to be buyer.id
+      expect(subject.business_seats).to eq 0
+      expect(subject.premium_economy_seats).to eq 0
+      expect(subject.economy_seats).to eq 0
+    end
+
+    it "returns false if the plane is already owned by another airline" do
+      subject = Airplane.last
+      buyer = Airline.last
+
+      subject.update(operator_id: buyer.id + 1)
+      subject.reload
+
+      initial_cash_on_hand = buyer.cash_on_hand
+
+      expect(subject.purchase_new(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
+
+      subject.reload
+      buyer.reload
+
+      expect(buyer.cash_on_hand).to eq initial_cash_on_hand
+      expect(subject.operator_id).to be buyer.id + 1
+      expect(subject.business_seats).to eq 0
+      expect(subject.premium_economy_seats).to eq 0
+      expect(subject.economy_seats).to eq 0
+    end
+  end
+
   context "seats_fit_on_plane" do
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)

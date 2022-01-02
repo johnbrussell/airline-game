@@ -36,7 +36,7 @@ class Airplane < ApplicationRecord
 
   ECONOMY_SEAT_SIZE = 28 * 17
   PREMIUM_ECONOMY_SEAT_SIZE = 36 * 17
-  BUSINESS_SEAT_SIZE = 84 * 20
+  BUSINESS_SEAT_SIZE = 72 * 17
   PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE = 0.4
 
   def has_operator?
@@ -49,6 +49,30 @@ class Airplane < ApplicationRecord
 
   def new_plane_payment
     value / 2.0
+  end
+
+  def purchase_new(airline, business_seats, premium_economy_seats, economy_seats)
+    assign_attributes(
+      business_seats: business_seats,
+      premium_economy_seats: premium_economy_seats,
+      economy_seats: economy_seats,
+    )
+    validate
+
+    if operator_id.present?
+      errors.add(:operator_id, "cannot be present before buying an airplane")
+    end
+    if airline.cash_on_hand < new_plane_payment
+      errors.add(:buyer, "does not have enough cash on hand to purchase")
+    end
+    if aircraft_manufacturing_queue.game.current_date >= construction_date
+      errors.add(:construction_date, "must be in the future")
+    end
+
+    errors.none? &&
+      save &&
+      update(operator_id: airline.id) &&
+      airline.update!(cash_on_hand: airline.cash_on_hand - new_plane_payment)
   end
 
   def purchase_price
