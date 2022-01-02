@@ -1,1 +1,56 @@
-<h1>Airline Game <%="#{@game.id}, #{@airplane.id}, #{@airline.id}"%></h1>
+<h1>Airline Game</h1>
+<h2>Lease a new <%= @airplane.aircraft_model.name%> </h2>
+
+<h3>Delivery date</h3>
+<ul>
+  <li><%= @airplane.construction_date %></li>
+</ul>
+
+<h3>Cost</h3>
+<p>Sample lease prices per day:</p>
+<ul>
+  <li>1 year lease: $<%= number_with_precision(@airplane.lease_rate_per_day(365), :precision => 2) %></li>
+  <li>5 year lease: $<%= number_with_precision(@airplane.lease_rate_per_day(1826), :precision => 2) %></li>
+  <li>10 year lease: $<%= number_with_precision(@airplane.lease_rate_per_day(3652), :precision => 2) %></li>
+</ul>
+<p><%= @game.user_airline.name %> has $<%= number_with_precision(@game.user_airline.cash_on_hand, :precision => 2) %> on hand.</p>
+
+<%= form_with model: @airplane, url: game_airplane_lease_path(@game, @airplane), method: "patch" do |form| %>
+  <h3>Lease duration</h3>
+  <p>Lease rate is up to $<%= number_with_precision(@airplane.lease_rate_per_day(1), :precision => 2) %> per day with discounts for longer leases</p>
+  <div>
+    <%= form.label :days, "Days:" %>
+    <%= form.number_field :days, in: 1..((@airplane.end_of_useful_life - @airplane.construction_date).to_i), :required => 'required' %>
+  </div>
+
+  <h3>Configure seats</h3>
+  <p><%="#{@airplane.aircraft_model.name}s have #{@airplane.aircraft_model.floor_space} square inches of floor space."%> <br/>
+    <%="Business seats take #{Airplane::BUSINESS_SEAT_SIZE} square inches;
+    premium economy seats take #{Airplane::PREMIUM_ECONOMY_SEAT_SIZE} square inches;
+    economy seats take #{Airplane::ECONOMY_SEAT_SIZE} square inches." %>
+  </p>
+  <div>
+    <%= form.label :business_seats, "Business seats:" %>
+    <%= form.number_field :business_seats, in: 0..(@airplane.aircraft_model.max_business_seats) %>
+  </div>
+  <div>
+    <%= form.label :premium_economy_seats, "Premium economy seats:" %>
+    <%= form.number_field :premium_economy_seats, in: 0..(@airplane.aircraft_model.max_premium_economy_seats) %>
+  </div>
+  <div>
+    <%= form.label :economy_seats, "Economy seats:" %>
+    <%= form.number_field :economy_seats, in: 0..(@airplane.aircraft_model.max_economy_seats) %>
+  </div>
+
+  <% if @airplane.errors.any? %>
+    <p>
+      <% @airplane.errors.full_messages.each do |message| %>
+        <div class="error"><%= message %></div>
+      <% end %>
+    </p>
+  <% end %>
+
+  <h3>
+    <%= form.submit "Lease" %>
+  </h3>
+<% end %>

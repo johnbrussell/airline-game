@@ -37,10 +37,35 @@ class Airplane < ApplicationRecord
   ECONOMY_SEAT_SIZE = 28 * 17
   PREMIUM_ECONOMY_SEAT_SIZE = 36 * 17
   BUSINESS_SEAT_SIZE = 72 * 17
+  MAX_LEASE_DAYS = 3652
+  MIN_PERCENT_OF_LEASE_NEEDED_AS_CASH_ON_HAND_TO_LEASE = 0.08
   PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE = 0.4
 
   def has_operator?
     operator_id.present?
+  end
+
+  def lease_new(airline, length_in_days, business_seats, premium_economy_seats, economy_seats)
+    assign_attributes(
+      business_seats: business_seats,
+      premium_economy_seats: premium_economy_seats,
+      economy_seats: economy_seats,
+    )
+    validate
+
+    if operator_id.present?
+      errors.add(:operator_id, "cannot be present before leasing an airplane")
+    end
+    if airline.cash_on_hand < lease_rate_per_day(length_in_days * MIN_PERCENT_OF_LEASE_NEEDED_AS_CASH_ON_HAND_TO_LEASE)
+      errors.add(:buyer, "does not have enough cash on hand to lease")
+    end
+    if aircraft_manufacturing_queue.game.current_date >= construction_date
+      errors.add(:construction_date, "must be in the future")
+    end
+
+    errors.none? &&
+      save &&
+      update(operator_id: airline.id, lease_expiry: construction_date + length_in_days.to_i.days) # airline can no longer operate plane on day lease expires
   end
 
   def lease_rate_per_day(lease_in_days)
@@ -82,7 +107,7 @@ class Airplane < ApplicationRecord
   private
 
     def age_in_days
-      (game.current_date - construction_date).to_i
+      [(game.current_date - construction_date).to_i, 0].max
     end
 
     def lease_premium
@@ -107,7 +132,7 @@ class Airplane < ApplicationRecord
     end
 
     def value
-      value_at_age([age_in_days, 0].max)
+      value_at_age(age_in_days)
     end
 
     def value_at_age(days)
