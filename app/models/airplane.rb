@@ -104,6 +104,10 @@ class Airplane < ApplicationRecord
     value
   end
 
+  def built?
+    construction_date <= aircraft_manufacturing_queue.game.current_date
+  end
+
   private
 
     def age_in_days

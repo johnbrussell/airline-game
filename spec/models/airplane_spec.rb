@@ -953,4 +953,52 @@ RSpec.describe Airplane do
       expect(subject.errors.map{ |error| "#{error.attribute} #{error.message}" }).to include "seats require more total floor space than available on airplane"
     end
   end
+
+  context "built?" do
+    purchase_price_new = 100000000
+
+    before(:each) do
+      game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
+      model = AircraftModel.create!(
+        name: "737-100",
+        production_start_year: 1969,
+        floor_space: 1000,
+        max_range: 1200,
+        speed: 500,
+        fuel_burn: 1500,
+        num_pilots: 2,
+        num_flight_attendants: 3,
+        price: purchase_price_new,
+        takeoff_distance: 5000,
+        useful_life: 30,
+        family: family,
+      )
+      Airplane.create!(
+        business_seats: 0,
+        premium_economy_seats: 0,
+        economy_seats: 1,
+        construction_date: game.current_date - 1.day,
+        end_of_useful_life: game.current_date + 1.year,
+        aircraft_manufacturing_queue: queue,
+        operator_id: nil,
+        aircraft_model_id: model.id,
+      )
+    end
+
+    it "is false when the aircraft is not yet build" do
+      subject = Airplane.last
+      subject.update(construction_date: Date.tomorrow)
+      subject.reload
+
+      expect(subject.built?).to be false
+    end
+
+    it "is true when the aircraft has already been built" do
+      subject = Airplane.last
+
+      expect(subject.built?).to be true
+    end
+  end
 end
