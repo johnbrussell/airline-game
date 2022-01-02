@@ -84,6 +84,23 @@ RSpec.describe "airplanes/purchase_information", type: :feature do
       expect(airplane.economy_seats).to eq 1
     end
 
+    it "has a functional cancel button" do
+      game = Game.last
+      airplane = Airplane.last
+
+      visit game_new_airplanes_airplanes_path(game)
+
+      expect(page).to have_content "There is 1 new airplane available to buy or lease"
+      expect(page).to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
+
+      click_button "Buy"
+
+      click_button "Cancel"
+
+      expect(page).to have_content "There is 1 new airplane available to buy or lease"
+      expect(page).to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
+    end
+
     it "does not show the airplane on the new airplane page again after buying" do
       game = Game.last
       airplane = Airplane.last
