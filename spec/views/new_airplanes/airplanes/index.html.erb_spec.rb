@@ -17,6 +17,7 @@ RSpec.describe "new_airplanes/airplanes/index", type: :feature do
         premium_economy_seats: 9,
         business_seats: 8,
         purchase_price: 100000,
+        id: 1,
       )
       new_aircraft = [new_airplane]
       expect(Airplane).to receive(:available_new).and_return(unsorted_aircraft)
