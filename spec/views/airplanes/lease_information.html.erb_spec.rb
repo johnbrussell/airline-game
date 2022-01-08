@@ -43,29 +43,6 @@ RSpec.describe "airplanes/lease_information", type: :feature do
   end
 
   context "lease_information" do
-    it "has a functional cancel button" do
-      game = Game.last
-      airplane = Airplane.create!(
-        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
-        operator_id: nil,
-        construction_date: Date.tomorrow + 1.day,
-        end_of_useful_life: Date.tomorrow + 1.year,
-        aircraft_model: AircraftModel.last,
-      )
-
-      visit game_new_airplanes_airplanes_path(game)
-
-      expect(page).to have_content "There is 1 new airplane available to buy or lease"
-      expect(page).to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
-
-      click_button "Lease"
-
-      click_button "Cancel"
-
-      expect(page).to have_content "There is 1 new airplane available to buy or lease"
-      expect(page).to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
-    end
-
     context "new airplane" do
       before(:each) do
         Airplane.create!(
@@ -155,6 +132,23 @@ RSpec.describe "airplanes/lease_information", type: :feature do
         expect(page).to have_content "Seats require more total floor space than available on airplane"
         expect(page).not_to have_content "A Air fleet"
       end
+
+      it "has a functional cancel button" do
+        game = Game.last
+        airplane = Airplane.last
+
+        visit game_new_airplanes_airplanes_path(game)
+
+        expect(page).to have_content "There is 1 new airplane available to buy or lease"
+        expect(page).to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
+
+        click_button "Lease"
+
+        click_button "Cancel"
+
+        expect(page).to have_content "There is 1 new airplane available to buy or lease"
+        expect(page).to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
+      end
     end
 
     context "used airplane" do
@@ -237,6 +231,23 @@ RSpec.describe "airplanes/lease_information", type: :feature do
 
         expect(page).to have_content "Buyer does not have enough cash on hand to lease"
         expect(page).not_to have_content "A Air fleet"
+      end
+
+      it "has a functional cancel button" do
+        game = Game.last
+        airplane = Airplane.last
+
+        visit game_used_airplanes_airplanes_path(game)
+
+        expect(page).to have_content "There is 1 used airplane available to buy or lease"
+        expect(page).to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
+
+        click_button "Lease"
+
+        click_button "Cancel"
+
+        expect(page).to have_content "There is 1 used airplane available to buy or lease"
+        expect(page).to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
       end
     end
   end
