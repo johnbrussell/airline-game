@@ -12,10 +12,10 @@ class AirplanesController < ApplicationController
     @game = Game.find(params[:game_id])
     @airplane = Airplane.find(params[:airplane_id])
     days = params[:airplane][:days].to_i
-    business_seats = params[:airplane][:business_seats]
-    premium_economy_seats = params[:airplane][:premium_economy_seats]
-    economy_seats = params[:airplane][:economy_seats]
-    if @airplane.lease_new(@game.user_airline, days, business_seats, premium_economy_seats, economy_seats)
+    business_seats = if @airplane.built? then nil else params[:airplane][:business_seats] end
+    premium_economy_seats = if @airplane.built? then nil else params[:airplane][:premium_economy_seats] end
+    economy_seats = if @airplane.built? then nil else params[:airplane][:economy_seats] end
+    if @airplane.lease(@game.user_airline, days, business_seats, premium_economy_seats, economy_seats)
       redirect_to game_airline_airplanes_path(@game, @game.user_airline)
     else
       render :lease_information
