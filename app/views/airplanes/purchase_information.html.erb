@@ -37,6 +37,7 @@
   <% end %>
 
   <h3><%= button_to "Purchase", game_airplane_purchase_path(@game, @airplane), method: :patch %><br/></h3>
+  <%= button_to "Cancel", game_used_airplanes_airplanes_path(@game), method: :get %>
 <% else %>
   <%= form_with model: @airplane, url: game_airplane_purchase_path(@game, @airplane), method: "patch" do |form| %>
     <h3>Configure seats</h3>
@@ -70,6 +71,5 @@
       <%= form.submit "Purchase" %>
     </h3>
   <% end %>
+  <%= button_to "Cancel", game_new_airplanes_airplanes_path(@game), method: :get %>
 <% end %>
-
-<%= button_to "Cancel", game_new_airplanes_airplanes_path(@game), method: :get %>

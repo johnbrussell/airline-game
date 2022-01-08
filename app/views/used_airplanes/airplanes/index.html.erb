@@ -10,6 +10,7 @@
       <%= "#{airplane.aircraft_model.family.manufacturer} #{airplane.aircraft_model.name} constructed #{airplane.construction_date}.
            #{airplane.economy_seats} economy, #{airplane.premium_economy_seats} premium economy, #{airplane.business_seats} business.
            $#{airplane.purchase_price} value." %>
+      <%= button_to "Buy", game_airplane_purchase_path(@game.id, airplane.id), method: :get %>
       <%= button_to "Lease", game_airplane_lease_path(@game.id, airplane.id), method: :get %>
     </li>
   <% end %>
