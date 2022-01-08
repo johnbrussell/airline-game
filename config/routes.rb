@@ -6,6 +6,13 @@ Rails.application.routes.draw do
       resources :airplanes
     end
 
+    resources :airplanes do
+      get "/purchase", to: "airplanes#purchase_information"
+      get "/lease", to: "airplanes#lease_information"
+      patch "/purchase", to: "airplanes#purchase"
+      patch "/lease", to: "airplanes#lease"
+    end
+
     namespace :new_airplanes do
       resources :airplanes
     end

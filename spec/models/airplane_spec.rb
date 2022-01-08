@@ -227,6 +227,110 @@ RSpec.describe Airplane do
     end
   end
 
+  context "operator_changes_appropriately" do
+    before(:each) do
+      game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
+      model = AircraftModel.create!(
+        name: "737-100",
+        production_start_year: 1969,
+        floor_space: 1000,
+        max_range: 1200,
+        speed: 500,
+        fuel_burn: 1500,
+        num_pilots: 2,
+        num_flight_attendants: 3,
+        price: 1000,
+        takeoff_distance: 5000,
+        useful_life: 30,
+        family: family,
+      )
+      Airplane.create!(
+        business_seats: 0,
+        premium_economy_seats: 0,
+        economy_seats: 1,
+        construction_date: game.current_date + 1.day,
+        end_of_useful_life: game.current_date + 1.year,
+        aircraft_manufacturing_queue: queue,
+        operator_id: nil,
+        aircraft_model_id: model.id,
+      )
+    end
+
+    it "is true when buying an airplane" do
+      subject = Airplane.last
+      expect(subject.update(operator_id: 1)).to be true
+    end
+
+    it "is true when selling an airplane" do
+      subject = Airplane.last
+      subject.update(operator_id: 1)
+
+      expect(subject.update(operator_id: nil)).to be true
+    end
+
+    it "is true when updating an unowned airplane" do
+      subject = Airplane.last
+      expect(subject.update(economy_seats: 2)).to be true
+    end
+
+    it "is true when updating an owned airplane" do
+      subject = Airplane.last
+      subject.update(operator_id: 1)
+
+      expect(subject.update(economy_seats: 2)).to be true
+    end
+
+    it "is false when selling an airplane from one airline to another" do
+      subject = Airplane.last
+      subject.update(operator_id: 1)
+
+      expect(subject.update(operator_id: 2)).to be false
+      expect(subject.errors.map{ |error| "#{error.attribute} #{error.message}" }).to include "operator_id cannot be changed from one airline directly to another; must be put on the market first"
+    end
+  end
+
+  context "new_plane_payment" do
+    purchase_price_new = 100000000
+
+    before(:each) do
+      game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
+      model = AircraftModel.create!(
+        name: "737-100",
+        production_start_year: 1969,
+        floor_space: 1000,
+        max_range: 1200,
+        speed: 500,
+        fuel_burn: 1500,
+        num_pilots: 2,
+        num_flight_attendants: 3,
+        price: purchase_price_new,
+        takeoff_distance: 5000,
+        useful_life: 30,
+        family: family,
+      )
+      Airplane.create!(
+        business_seats: 0,
+        premium_economy_seats: 0,
+        economy_seats: 1,
+        construction_date: game.current_date + 1.day,
+        end_of_useful_life: game.current_date + 1.year,
+        aircraft_manufacturing_queue: queue,
+        operator_id: nil,
+        aircraft_model_id: model.id,
+      )
+    end
+
+    it "is the rounded price of the aircraft model when the plane has not been built" do
+      subject = Airplane.last
+
+      expect(subject.new_plane_payment).to eq 50000000
+    end
+  end
+
   context "purchase_price" do
     purchase_price_new = 100000000
 
@@ -300,6 +404,176 @@ RSpec.describe Airplane do
       subject.reload
 
       assert_in_epsilon subject.purchase_price, AircraftModel.last.price * AircraftModel::PERCENT_VALUE_MAINTAINED_AT_END_OF_USEFUL_LIFE, 0.001
+    end
+  end
+
+  context "lease" do
+    purchase_price_new = 100000000
+
+    before(:each) do
+      game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
+      model = AircraftModel.create!(
+        name: "737-100",
+        production_start_year: 1969,
+        floor_space: 1000000,
+        max_range: 1200,
+        speed: 500,
+        fuel_burn: 1500,
+        num_pilots: 2,
+        num_flight_attendants: 3,
+        price: purchase_price_new,
+        takeoff_distance: 5000,
+        useful_life: 30,
+        family: family,
+      )
+      Airplane.create!(
+        business_seats: 0,
+        premium_economy_seats: 0,
+        economy_seats: 0,
+        construction_date: game.current_date + 1.day,
+        end_of_useful_life: game.current_date + 1.year,
+        aircraft_manufacturing_queue: queue,
+        operator_id: nil,
+        aircraft_model_id: model.id,
+      )
+      Airline.create!(cash_on_hand: purchase_price_new * 2, name: "J Air", base_id: 1)
+    end
+
+    it "returns false if the airline does not have enough money" do
+      subject = Airplane.last
+      buyer = Airline.last
+
+      buyer.update(cash_on_hand: 100)
+      buyer.reload
+
+      expect(subject.lease(airline = buyer, length_in_days = 100, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
+
+      subject.reload
+      buyer.reload
+
+      expect(buyer.cash_on_hand).to eq 100
+      expect(subject.operator_id).to be nil
+      expect(subject.business_seats).to eq 0
+      expect(subject.premium_economy_seats).to eq 0
+      expect(subject.economy_seats).to eq 0
+      expect(subject.lease_expiry).to be nil
+    end
+
+    it "returns false if the plane is already owned by the buyer" do
+      subject = Airplane.last
+      buyer = Airline.last
+
+      subject.update(operator_id: buyer.id)
+      subject.reload
+
+      initial_cash_on_hand = buyer.cash_on_hand
+
+      expect(subject.lease(airline = buyer, length_in_days = 100, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
+
+      subject.reload
+      buyer.reload
+
+      expect(buyer.cash_on_hand).to eq initial_cash_on_hand
+      expect(subject.operator_id).to be buyer.id
+      expect(subject.business_seats).to eq 0
+      expect(subject.premium_economy_seats).to eq 0
+      expect(subject.economy_seats).to eq 0
+      expect(subject.lease_expiry).to be nil
+    end
+
+    it "returns false if the plane is already owned by another airline" do
+      subject = Airplane.last
+      buyer = Airline.last
+
+      subject.update(operator_id: buyer.id + 1)
+      subject.reload
+
+      initial_cash_on_hand = buyer.cash_on_hand
+
+      expect(subject.lease(airline = buyer, length_in_days = 100, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
+
+      subject.reload
+      buyer.reload
+
+      expect(buyer.cash_on_hand).to eq initial_cash_on_hand
+      expect(subject.operator_id).to be buyer.id + 1
+      expect(subject.business_seats).to eq 0
+      expect(subject.premium_economy_seats).to eq 0
+      expect(subject.economy_seats).to eq 0
+      expect(subject.lease_expiry).to be nil
+    end
+
+    context "new plane" do
+      it "returns true, assigns the plane to the airline, and installs the right number of seats" do
+        subject = Airplane.last
+        buyer = Airline.last
+        game = Game.last
+
+        initial_cash_on_hand = buyer.cash_on_hand
+
+        expect(subject.lease(airline = buyer, length_in_days = 100, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be true
+
+        subject.reload
+        buyer.reload
+
+        expect(buyer.cash_on_hand).to eq initial_cash_on_hand
+        expect(subject.operator_id).to eq buyer.id
+        expect(subject.business_seats).to eq 3
+        expect(subject.premium_economy_seats).to eq 4
+        expect(subject.economy_seats).to eq 5
+        expect(subject.lease_expiry).to eq subject.construction_date + 100.days
+      end
+
+      it "returns false if the number of seats requested requires too much square footage" do
+        subject = Airplane.last
+        buyer = Airline.last
+
+        initial_cash_on_hand = buyer.cash_on_hand
+
+        expect(subject.lease(
+          airline = buyer,
+          length_in_days = 100,
+          business_seats = 1,
+          premium_economy_seats = 1,
+          economy_seats = subject.aircraft_model.floor_space / Airplane::ECONOMY_SEAT_SIZE + 1)
+        ).to be false
+
+        subject.reload
+        buyer.reload
+
+        expect(buyer.cash_on_hand).to eq initial_cash_on_hand
+        expect(subject.operator_id).to be nil
+        expect(subject.business_seats).to eq 0
+        expect(subject.premium_economy_seats).to eq 0
+        expect(subject.economy_seats).to eq 0
+        expect(subject.lease_expiry).to be nil
+      end
+    end
+
+    context "used plane" do
+      it "does not update the seating configuration" do
+        subject = Airplane.last
+        buyer = Airline.last
+        game = Game.last
+
+        subject.update(construction_date: game.current_date)
+        subject.reload
+        initial_cash_on_hand = buyer.cash_on_hand
+
+        expect(subject.lease(airline = buyer, length_in_days = 100, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be true
+
+        subject.reload
+        buyer.reload
+
+        expect(buyer.cash_on_hand).to be < initial_cash_on_hand
+        expect(subject.operator_id).to eq buyer.id
+        expect(subject.business_seats).to eq 0
+        expect(subject.premium_economy_seats).to eq 0
+        expect(subject.economy_seats).to eq 0
+        expect(subject.lease_expiry).to eq game.current_date + 100.days
+      end
     end
   end
 
@@ -391,6 +665,357 @@ RSpec.describe Airplane do
       lease_rate = subject.lease_rate_per_day(lease_length_days)
 
       assert_in_epsilon lease_rate, model.price / lease_length_days, 0.001
+    end
+  end
+
+  context "purchase" do
+    purchase_price_new = 100000000
+
+    before(:each) do
+      game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
+      model = AircraftModel.create!(
+        name: "737-100",
+        production_start_year: 1969,
+        floor_space: 1000000,
+        max_range: 1200,
+        speed: 500,
+        fuel_burn: 1500,
+        num_pilots: 2,
+        num_flight_attendants: 3,
+        price: purchase_price_new,
+        takeoff_distance: 5000,
+        useful_life: 30,
+        family: family,
+      )
+      Airplane.create!(
+        business_seats: 0,
+        premium_economy_seats: 0,
+        economy_seats: 0,
+        construction_date: game.current_date + 1.day,
+        end_of_useful_life: game.current_date + 1.year,
+        aircraft_manufacturing_queue: queue,
+        operator_id: nil,
+        aircraft_model_id: model.id,
+      )
+      Airline.create!(cash_on_hand: purchase_price_new * 2, name: "J Air", base_id: 1)
+    end
+
+    it "returns false if the airline does not have enough money" do
+      subject = Airplane.last
+      buyer = Airline.last
+
+      buyer.update(cash_on_hand: 100)
+      buyer.reload
+
+      expect(subject.purchase(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
+
+      subject.reload
+      buyer.reload
+
+      expect(buyer.cash_on_hand).to eq 100
+      expect(subject.operator_id).to be nil
+      expect(subject.business_seats).to eq 0
+      expect(subject.premium_economy_seats).to eq 0
+      expect(subject.economy_seats).to eq 0
+    end
+
+    it "returns false if the plane is already owned by the buyer" do
+      subject = Airplane.last
+      buyer = Airline.last
+
+      subject.update(operator_id: buyer.id)
+      subject.reload
+
+      initial_cash_on_hand = buyer.cash_on_hand
+
+      expect(subject.purchase(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
+
+      subject.reload
+      buyer.reload
+
+      expect(buyer.cash_on_hand).to eq initial_cash_on_hand
+      expect(subject.operator_id).to be buyer.id
+      expect(subject.business_seats).to eq 0
+      expect(subject.premium_economy_seats).to eq 0
+      expect(subject.economy_seats).to eq 0
+    end
+
+    it "returns false if the plane is already owned by another airline" do
+      subject = Airplane.last
+      buyer = Airline.last
+
+      subject.update(operator_id: buyer.id + 1)
+      subject.reload
+
+      initial_cash_on_hand = buyer.cash_on_hand
+
+      expect(subject.purchase(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
+
+      subject.reload
+      buyer.reload
+
+      expect(buyer.cash_on_hand).to eq initial_cash_on_hand
+      expect(subject.operator_id).to be buyer.id + 1
+      expect(subject.business_seats).to eq 0
+      expect(subject.premium_economy_seats).to eq 0
+      expect(subject.economy_seats).to eq 0
+    end
+
+    context "new" do
+      it "returns true, assigns the plane to the airline, installs the right number of seats, and deducts the purchase price from the airline's cash" do
+        subject = Airplane.last
+        buyer = Airline.last
+
+        initial_cash_on_hand = buyer.cash_on_hand
+
+        expect(subject.purchase(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be true
+
+        subject.reload
+        buyer.reload
+
+        expect(buyer.cash_on_hand).to eq initial_cash_on_hand - purchase_price_new / 2
+        expect(subject.operator_id).to eq buyer.id
+        expect(subject.business_seats).to eq 3
+        expect(subject.premium_economy_seats).to eq 4
+        expect(subject.economy_seats).to eq 5
+      end
+
+      it "returns false if the number of seats requested requires too much square footage" do
+        subject = Airplane.last
+        buyer = Airline.last
+
+        initial_cash_on_hand = buyer.cash_on_hand
+
+        expect(subject.purchase(airline = buyer, business_seats = 1, premium_economy_seats = 1, economy_seats = subject.aircraft_model.floor_space / Airplane::ECONOMY_SEAT_SIZE + 1)).to be false
+
+        subject.reload
+        buyer.reload
+
+        expect(buyer.cash_on_hand).to eq initial_cash_on_hand
+        expect(subject.operator_id).to be nil
+        expect(subject.business_seats).to eq 0
+        expect(subject.premium_economy_seats).to eq 0
+        expect(subject.economy_seats).to eq 0
+      end
+    end
+
+    context "used" do
+      it "does not update the seating configuration" do
+        subject = Airplane.last
+        buyer = Airline.last
+        game = Game.last
+
+        subject.update(construction_date: game.current_date)
+        subject.reload
+        initial_cash_on_hand = buyer.cash_on_hand
+
+        expect(subject.purchase(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be true
+
+        subject.reload
+        buyer.reload
+
+        expect(buyer.cash_on_hand).to be < initial_cash_on_hand
+        expect(subject.operator_id).to eq buyer.id
+        expect(subject.business_seats).to eq 0
+        expect(subject.premium_economy_seats).to eq 0
+        expect(subject.economy_seats).to eq 0
+      end
+    end
+  end
+
+  context "seats_fit_on_plane" do
+    before(:each) do
+      game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
+      AircraftModel.create!(
+        name: "737-100",
+        production_start_year: 1969,
+        floor_space: Airplane::BUSINESS_SEAT_SIZE * 2,
+        max_range: 1200,
+        speed: 500,
+        fuel_burn: 1500,
+        num_pilots: 2,
+        num_flight_attendants: 3,
+        price: 100,
+        takeoff_distance: 5000,
+        useful_life: 30,
+        family: family,
+      )
+    end
+
+    it "is true when the economy seats fit on the plane" do
+      subject = Airplane.new(
+        business_seats: 0,
+        premium_economy_seats: 0,
+        economy_seats: Airplane::BUSINESS_SEAT_SIZE * 2 / Airplane::ECONOMY_SEAT_SIZE,
+        construction_date: Game.last.current_date - 1.day,
+        end_of_useful_life: Game.last.current_date + 1.year,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+        operator_id: nil,
+        aircraft_model_id: AircraftModel.last.id,
+      )
+
+      expect(subject.save).to be true
+    end
+
+    it "is true when the premium economy seats fit on the plane" do
+      subject = Airplane.new(
+        business_seats: 0,
+        premium_economy_seats: Airplane::BUSINESS_SEAT_SIZE * 2 / Airplane::PREMIUM_ECONOMY_SEAT_SIZE,
+        economy_seats: 0,
+        construction_date: Game.last.current_date - 1.day,
+        end_of_useful_life: Game.last.current_date + 1.year,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+        operator_id: nil,
+        aircraft_model_id: AircraftModel.last.id,
+      )
+
+      expect(subject.save).to be true
+    end
+
+    it "is true when the business seats fit on the plane" do
+      subject = Airplane.new(
+        business_seats: 2,
+        premium_economy_seats: 0,
+        economy_seats: 0,
+        construction_date: Game.last.current_date - 1.day,
+        end_of_useful_life: Game.last.current_date + 1.year,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+        operator_id: nil,
+        aircraft_model_id: AircraftModel.last.id,
+      )
+
+      expect(subject.save).to be true
+    end
+
+    it "is true when the seats fit on the plane" do
+      subject = Airplane.new(
+        business_seats: 1,
+        premium_economy_seats: 1,
+        economy_seats: (Airplane::BUSINESS_SEAT_SIZE - Airplane::PREMIUM_ECONOMY_SEAT_SIZE) / Airplane::ECONOMY_SEAT_SIZE,
+        construction_date: Game.last.current_date - 1.day,
+        end_of_useful_life: Game.last.current_date + 1.year,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+        operator_id: nil,
+        aircraft_model_id: AircraftModel.last.id,
+      )
+
+      expect(subject.save).to be true
+    end
+
+    it "is false when there are too many economy seats" do
+      subject = Airplane.new(
+        business_seats: 0,
+        premium_economy_seats: 0,
+        economy_seats: Airplane::BUSINESS_SEAT_SIZE * 2 / Airplane::ECONOMY_SEAT_SIZE + 1,
+        construction_date: Game.last.current_date - 1.day,
+        end_of_useful_life: Game.last.current_date + 1.year,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+        operator_id: nil,
+        aircraft_model_id: AircraftModel.last.id,
+      )
+
+      expect(subject.save).to be false
+      expect(subject.errors.map{ |error| "#{error.attribute} #{error.message}" }).to include "seats require more total floor space than available on airplane"
+    end
+
+    it "is false when there are too many premium economy seats" do
+      subject = Airplane.new(
+        business_seats: 0,
+        premium_economy_seats: Airplane::BUSINESS_SEAT_SIZE * 2 / Airplane::PREMIUM_ECONOMY_SEAT_SIZE + 1,
+        economy_seats: 0,
+        construction_date: Game.last.current_date - 1.day,
+        end_of_useful_life: Game.last.current_date + 1.year,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+        operator_id: nil,
+        aircraft_model_id: AircraftModel.last.id,
+      )
+
+      expect(subject.save).to be false
+      expect(subject.errors.map{ |error| "#{error.attribute} #{error.message}" }).to include "seats require more total floor space than available on airplane"
+    end
+
+    it "is false when there are too many business seats" do
+      subject = Airplane.new(
+        business_seats: 3,
+        premium_economy_seats: 0,
+        economy_seats: 0,
+        construction_date: Game.last.current_date - 1.day,
+        end_of_useful_life: Game.last.current_date + 1.year,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+        operator_id: nil,
+        aircraft_model_id: AircraftModel.last.id,
+      )
+
+      expect(subject.save).to be false
+      expect(subject.errors.map{ |error| "#{error.attribute} #{error.message}" }).to include "seats require more total floor space than available on airplane"
+    end
+
+    it "is false when the seats do not fit on the plane" do
+      subject = Airplane.new(
+        business_seats: 1,
+        premium_economy_seats: 1,
+        economy_seats: (Airplane::BUSINESS_SEAT_SIZE - Airplane::PREMIUM_ECONOMY_SEAT_SIZE) / Airplane::ECONOMY_SEAT_SIZE + 1,
+        construction_date: Game.last.current_date - 1.day,
+        end_of_useful_life: Game.last.current_date + 1.year,
+        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+        operator_id: nil,
+        aircraft_model_id: AircraftModel.last.id,
+      )
+
+      expect(subject.save).to be false
+      expect(subject.errors.map{ |error| "#{error.attribute} #{error.message}" }).to include "seats require more total floor space than available on airplane"
+    end
+  end
+
+  context "built?" do
+    purchase_price_new = 100000000
+
+    before(:each) do
+      game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
+      model = AircraftModel.create!(
+        name: "737-100",
+        production_start_year: 1969,
+        floor_space: 1000,
+        max_range: 1200,
+        speed: 500,
+        fuel_burn: 1500,
+        num_pilots: 2,
+        num_flight_attendants: 3,
+        price: purchase_price_new,
+        takeoff_distance: 5000,
+        useful_life: 30,
+        family: family,
+      )
+      Airplane.create!(
+        business_seats: 0,
+        premium_economy_seats: 0,
+        economy_seats: 1,
+        construction_date: game.current_date - 1.day,
+        end_of_useful_life: game.current_date + 1.year,
+        aircraft_manufacturing_queue: queue,
+        operator_id: nil,
+        aircraft_model_id: model.id,
+      )
+    end
+
+    it "is false when the aircraft is not yet build" do
+      subject = Airplane.last
+      subject.update(construction_date: Date.tomorrow)
+      subject.reload
+
+      expect(subject.built?).to be false
+    end
+
+    it "is true when the aircraft has already been built" do
+      subject = Airplane.last
+
+      expect(subject.built?).to be true
     end
   end
 end

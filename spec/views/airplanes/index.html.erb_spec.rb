@@ -29,7 +29,7 @@ RSpec.describe "airplanes/index", type: :feature do
     model = AircraftModel.create!(
       name: "737-300",
       production_start_year: 1980,
-      floor_space: 1000,
+      floor_space: 100000,
       max_range: 100,
       speed: 500,
       num_pilots: 2,
@@ -124,7 +124,7 @@ RSpec.describe "airplanes/index", type: :feature do
       expect(page).to have_content "A Air"
       expect(page).to have_content "Based in AB, AB"
 
-      click_link "View airplanes"
+      click_link "View fleet"
       click_link "Return to game overview"
 
       expect(page).to have_content "Airline Game Home"
