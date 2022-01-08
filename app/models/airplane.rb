@@ -7,6 +7,7 @@ class Airplane < ApplicationRecord
   validates :end_of_useful_life, presence: true
   validates :premium_economy_seats, presence: true
   validates :premium_economy_seats, numericality: { greater_than_or_equal_to: 0 }
+  validates :lease_rate, numericality: { greater_than: 0 }
 
   validate :operator_changes_appropriately, unless: :new_record?
   validate :seats_fit_on_plane
