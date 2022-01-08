@@ -524,6 +524,7 @@ RSpec.describe Airplane do
         expect(subject.premium_economy_seats).to eq 4
         expect(subject.economy_seats).to eq 5
         expect(subject.lease_expiry).to eq subject.construction_date + 100.days
+        expect(subject.lease_rate).to be > 0
       end
 
       it "returns false if the number of seats requested requires too much square footage" do
@@ -573,6 +574,7 @@ RSpec.describe Airplane do
         expect(subject.premium_economy_seats).to eq 0
         expect(subject.economy_seats).to eq 0
         expect(subject.lease_expiry).to eq game.current_date + 100.days
+        expect(subject.lease_rate).to be > 0
       end
     end
   end
