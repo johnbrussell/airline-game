@@ -559,6 +559,7 @@ RSpec.describe Airplane do
         game = Game.last
 
         subject.update(construction_date: game.current_date)
+        subject.reload
         initial_cash_on_hand = buyer.cash_on_hand
 
         expect(subject.lease(airline = buyer, length_in_days = 100, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be true
@@ -667,7 +668,7 @@ RSpec.describe Airplane do
     end
   end
 
-  context "purchase_new" do
+  context "purchase" do
     purchase_price_new = 100000000
 
     before(:each) do
@@ -701,44 +702,6 @@ RSpec.describe Airplane do
       Airline.create!(cash_on_hand: purchase_price_new * 2, name: "J Air", base_id: 1)
     end
 
-    it "returns true, assigns the plane to the airline, installs the right number of seats, and deducts the purchase price from the airline's cash" do
-      subject = Airplane.last
-      buyer = Airline.last
-
-      initial_cash_on_hand = buyer.cash_on_hand
-
-      expect(subject.purchase_new(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be true
-
-      subject.reload
-      buyer.reload
-
-      expect(buyer.cash_on_hand).to eq initial_cash_on_hand - purchase_price_new / 2
-      expect(subject.operator_id).to eq buyer.id
-      expect(subject.business_seats).to eq 3
-      expect(subject.premium_economy_seats).to eq 4
-      expect(subject.economy_seats).to eq 5
-    end
-
-    it "returns false if the aircraft has already been built" do
-      subject = Airplane.last
-      buyer = Airline.last
-      game = Game.last
-
-      subject.update(construction_date: game.current_date)
-      initial_cash_on_hand = buyer.cash_on_hand
-
-      expect(subject.purchase_new(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
-
-      subject.reload
-      buyer.reload
-
-      expect(buyer.cash_on_hand).to eq initial_cash_on_hand
-      expect(subject.operator_id).to be nil
-      expect(subject.business_seats).to eq 0
-      expect(subject.premium_economy_seats).to eq 0
-      expect(subject.economy_seats).to eq 0
-    end
-
     it "returns false if the airline does not have enough money" do
       subject = Airplane.last
       buyer = Airline.last
@@ -746,30 +709,12 @@ RSpec.describe Airplane do
       buyer.update(cash_on_hand: 100)
       buyer.reload
 
-      expect(subject.purchase_new(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
+      expect(subject.purchase(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
 
       subject.reload
       buyer.reload
 
       expect(buyer.cash_on_hand).to eq 100
-      expect(subject.operator_id).to be nil
-      expect(subject.business_seats).to eq 0
-      expect(subject.premium_economy_seats).to eq 0
-      expect(subject.economy_seats).to eq 0
-    end
-
-    it "returns false if the number of seats requested requires too much square footage" do
-      subject = Airplane.last
-      buyer = Airline.last
-
-      initial_cash_on_hand = buyer.cash_on_hand
-
-      expect(subject.purchase_new(airline = buyer, business_seats = 1, premium_economy_seats = 1, economy_seats = subject.aircraft_model.floor_space / Airplane::ECONOMY_SEAT_SIZE + 1)).to be false
-
-      subject.reload
-      buyer.reload
-
-      expect(buyer.cash_on_hand).to eq initial_cash_on_hand
       expect(subject.operator_id).to be nil
       expect(subject.business_seats).to eq 0
       expect(subject.premium_economy_seats).to eq 0
@@ -785,7 +730,7 @@ RSpec.describe Airplane do
 
       initial_cash_on_hand = buyer.cash_on_hand
 
-      expect(subject.purchase_new(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
+      expect(subject.purchase(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
 
       subject.reload
       buyer.reload
@@ -806,7 +751,7 @@ RSpec.describe Airplane do
 
       initial_cash_on_hand = buyer.cash_on_hand
 
-      expect(subject.purchase_new(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
+      expect(subject.purchase(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
 
       subject.reload
       buyer.reload
@@ -816,6 +761,67 @@ RSpec.describe Airplane do
       expect(subject.business_seats).to eq 0
       expect(subject.premium_economy_seats).to eq 0
       expect(subject.economy_seats).to eq 0
+    end
+
+    context "new" do
+      it "returns true, assigns the plane to the airline, installs the right number of seats, and deducts the purchase price from the airline's cash" do
+        subject = Airplane.last
+        buyer = Airline.last
+
+        initial_cash_on_hand = buyer.cash_on_hand
+
+        expect(subject.purchase(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be true
+
+        subject.reload
+        buyer.reload
+
+        expect(buyer.cash_on_hand).to eq initial_cash_on_hand - purchase_price_new / 2
+        expect(subject.operator_id).to eq buyer.id
+        expect(subject.business_seats).to eq 3
+        expect(subject.premium_economy_seats).to eq 4
+        expect(subject.economy_seats).to eq 5
+      end
+
+      it "returns false if the number of seats requested requires too much square footage" do
+        subject = Airplane.last
+        buyer = Airline.last
+
+        initial_cash_on_hand = buyer.cash_on_hand
+
+        expect(subject.purchase(airline = buyer, business_seats = 1, premium_economy_seats = 1, economy_seats = subject.aircraft_model.floor_space / Airplane::ECONOMY_SEAT_SIZE + 1)).to be false
+
+        subject.reload
+        buyer.reload
+
+        expect(buyer.cash_on_hand).to eq initial_cash_on_hand
+        expect(subject.operator_id).to be nil
+        expect(subject.business_seats).to eq 0
+        expect(subject.premium_economy_seats).to eq 0
+        expect(subject.economy_seats).to eq 0
+      end
+    end
+
+    context "used" do
+      it "does not update the seating configuration" do
+        subject = Airplane.last
+        buyer = Airline.last
+        game = Game.last
+
+        subject.update(construction_date: game.current_date)
+        subject.reload
+        initial_cash_on_hand = buyer.cash_on_hand
+
+        expect(subject.purchase(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be true
+
+        subject.reload
+        buyer.reload
+
+        expect(buyer.cash_on_hand).to be < initial_cash_on_hand
+        expect(subject.operator_id).to eq buyer.id
+        expect(subject.business_seats).to eq 0
+        expect(subject.premium_economy_seats).to eq 0
+        expect(subject.economy_seats).to eq 0
+      end
     end
   end
 

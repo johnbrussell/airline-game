@@ -30,10 +30,10 @@ class AirplanesController < ApplicationController
   def purchase
     @game = Game.find(params[:game_id])
     @airplane = Airplane.find(params[:airplane_id])
-    business_seats = params[:airplane][:business_seats]
-    premium_economy_seats = params[:airplane][:premium_economy_seats]
-    economy_seats = params[:airplane][:economy_seats]
-    if @airplane.purchase_new(@game.user_airline, business_seats, premium_economy_seats, economy_seats)
+    business_seats = if @airplane.built? then nil else params[:airplane][:business_seats] end
+    premium_economy_seats = if @airplane.built? then nil else params[:airplane][:premium_economy_seats] end
+    economy_seats = if @airplane.built? then nil else params[:airplane][:economy_seats] end
+    if @airplane.purchase(@game.user_airline, business_seats, premium_economy_seats, economy_seats)
       redirect_to game_airline_airplanes_path(@game, @game.user_airline)
     else
       render :purchase_information
