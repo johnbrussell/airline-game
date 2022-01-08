@@ -174,8 +174,8 @@ RSpec.describe "airplanes/lease_information", type: :feature do
 
         visit game_airplane_lease_path(game.id, airplane.id)
 
-        expect(page).to have_content("Lease a new 737-300")
-        expect(page).to have_content(airplane.construction_date)
+        expect(page).to have_content("Lease a used 737-300")
+        expect(page).to have_content("#{airplane.construction_date} (1 day old)")
         expect(page).to have_content("A Air has $100000.00 on hand")
         expect(page).to have_content("1 year lease: ")
         expect(page).to have_content("5 year lease: ")
@@ -184,6 +184,59 @@ RSpec.describe "airplanes/lease_information", type: :feature do
         expect(page).to have_content(" with discounts for longer leases")
         expect(page).to have_content("This airplane currently has 0 business seats, 0 premium economy seats, and 0 economy seats.")
         expect(page).not_to have_content("737-300s have 100000 square inches of floor space")
+      end
+
+      it "redirects to the airline fleet page after leasing" do
+        game = Game.last
+        airplane = Airplane.last
+
+        visit game_airplane_lease_path(game.id, airplane.id)
+
+        fill_in :airplane_days, with: 1
+        click_button "Lease"
+
+        expect(page).to have_content "A Air fleet"
+        expect(page).to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
+        airplane.reload
+
+        expect(airplane.operator_id).to eq Airline.where(name: "A Air").last.id
+      end
+
+      it "does not show the airplane on the used airplane page again after leasing" do
+        game = Game.last
+        airplane = Airplane.last
+
+        visit game_used_airplanes_airplanes_path(game)
+
+        expect(page).to have_content "There is 1 used airplane available to buy or lease"
+        expect(page).to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
+
+        click_button "Lease"
+
+        fill_in :airplane_days, with: 1
+        click_button "Lease"
+
+        expect(page).to have_content "A Air fleet"
+        expect(page).to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
+
+        visit game_used_airplanes_airplanes_path(game)
+
+        expect(page).to have_content "There are 0 used airplanes available to buy or lease"
+        expect(page).not_to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
+      end
+
+      it "does not redirect to the airline fleet page when a validation error occurs" do
+        game = Game.last
+        airplane = Airplane.last
+        Airline.last.update!(cash_on_hand: 1)
+
+        visit game_airplane_lease_path(game.id, airplane.id)
+
+        fill_in :airplane_days, with: 1
+        click_button "Lease"
+
+        expect(page).to have_content "Buyer does not have enough cash on hand to lease"
+        expect(page).not_to have_content "A Air fleet"
       end
     end
   end

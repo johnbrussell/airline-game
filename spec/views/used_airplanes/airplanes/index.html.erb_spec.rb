@@ -19,6 +19,7 @@ RSpec.describe "used_airplanes/airplanes/index", type: :feature do
         premium_economy_seats: 9,
         business_seats: 8,
         purchase_price: 100000000,
+        id: 1,
       )
       used_airplane_2 = instance_double(
         Airplane,
@@ -28,6 +29,7 @@ RSpec.describe "used_airplanes/airplanes/index", type: :feature do
         premium_economy_seats: 90,
         business_seats: 80,
         purchase_price: 100,
+        id: 2,
       )
       used_aircraft = [used_airplane_1, used_airplane_2]
       expect(Airplane).to receive(:available_used).and_return(unsorted_aircraft)
