@@ -7,7 +7,7 @@ class Airplane < ApplicationRecord
   validates :end_of_useful_life, presence: true
   validates :premium_economy_seats, presence: true
   validates :premium_economy_seats, numericality: { greater_than_or_equal_to: 0 }
-  validates :lease_rate, numericality: { greater_than: 0 }
+  validates :lease_rate, numericality: { greater_than: 0 }, allow_nil: true
 
   validate :operator_changes_appropriately, unless: :new_record?
   validate :seats_fit_on_plane
@@ -47,28 +47,39 @@ class Airplane < ApplicationRecord
   end
 
   def lease(airline, length_in_days, business_seats, premium_economy_seats, economy_seats)
-    if !built?
+    lease_start_date = built? ? aircraft_manufacturing_queue.game.current_date : construction_date
+    if built?
+      assign_attributes(lease_rate: lease_rate_per_day(length_in_days.to_i), lease_expiry: lease_start_date + length_in_days.to_i.days)
+      airline.assign_attributes(cash_on_hand: airline.cash_on_hand - lease_rate_per_day(length_in_days.to_i))
+    else
       assign_attributes(
         business_seats: business_seats,
         premium_economy_seats: premium_economy_seats,
         economy_seats: economy_seats,
+        lease_expiry: lease_start_date + length_in_days.to_i.days,
+        lease_rate: lease_rate_per_day(length_in_days.to_i),
       )
     end
-    validate
 
+    validate
+    airline.validate
+
+    airline.errors.each do |error|
+      errors.add("airline_#{error.attribute.to_sym}", error.message)
+    end
     if operator_id.present?
       errors.add(:operator_id, "cannot be present before leasing an airplane")
+    else
+      assign_attributes(operator_id: airline.id)
     end
     if airline.cash_on_hand < lease_rate_per_day(length_in_days * MIN_PERCENT_OF_LEASE_NEEDED_AS_CASH_ON_HAND_TO_LEASE)
       errors.add(:buyer, "does not have enough cash on hand to lease")
     end
 
-    lease_start_date = built? ? aircraft_manufacturing_queue.game.current_date : construction_date
-
     errors.none? &&
+      airline.errors.none? &&
       save &&
-      update(operator_id: airline.id, lease_expiry: lease_start_date + length_in_days.to_i.days) && # airline can no longer operate plane on day lease expires
-      if built? then airline.update!(cash_on_hand: airline.cash_on_hand - lease_rate_per_day(length_in_days.to_i)) else true end
+      airline.save
   end
 
   def lease_rate_per_day(lease_in_days)
