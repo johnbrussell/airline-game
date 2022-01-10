@@ -5,8 +5,8 @@ RSpec.describe "airplanes/lease_information", type: :feature do
   before(:each) do
     game = Game.create!(
       start_date: Date.today,
-      end_date: Date.tomorrow,
-      current_date: Date.tomorrow,
+      end_date: Date.today + 1.day,
+      current_date: Date.today + 1.day,
     )
     market = Market.create!(
       name: "AB",
