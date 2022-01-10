@@ -3,6 +3,7 @@ class Airline < ApplicationRecord
   validates :cash_on_hand, presence: true
   validates :name, presence: true
   validates :is_user_airline, :inclusion => { :in => [true, false] }
+  validates :game_id, presence: true
   validate :only_one_user_airline_exists
 
   before_destroy :validate_a_user_airline_exists

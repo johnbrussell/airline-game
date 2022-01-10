@@ -438,7 +438,7 @@ RSpec.describe Airplane do
         operator_id: nil,
         aircraft_model_id: model.id,
       )
-      Airline.create!(cash_on_hand: purchase_price_new * 2, name: "J Air", base_id: 1)
+      Airline.create!(cash_on_hand: purchase_price_new * 2, name: "J Air", base_id: 1, game_id: game.id)
     end
 
     it "returns false if the airline does not have enough money" do
@@ -701,7 +701,7 @@ RSpec.describe Airplane do
         operator_id: nil,
         aircraft_model_id: model.id,
       )
-      Airline.create!(cash_on_hand: purchase_price_new * 2, name: "J Air", base_id: 1)
+      Airline.create!(cash_on_hand: purchase_price_new * 2, name: "J Air", base_id: 1, game_id: game.id)
     end
 
     it "returns false if the airline does not have enough money" do
