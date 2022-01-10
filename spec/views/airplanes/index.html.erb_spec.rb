@@ -4,9 +4,9 @@ require "capybara/rspec"
 RSpec.describe "airplanes/index", type: :feature do
   before(:each) do
     game = Game.create!(
-      start_date: Date.today,
+      start_date: "2000-01-01".to_date,
       end_date: Date.tomorrow,
-      current_date: Date.tomorrow,
+      current_date: "2021-12-31",
     )
     market = Market.create!(
       name: "AB",
@@ -47,72 +47,16 @@ RSpec.describe "airplanes/index", type: :feature do
       end_of_useful_life: Date.tomorrow,
       aircraft_model: model,
     )
+    Airplane.create!(
+      aircraft_manufacturing_queue: aircraft_manufacturing_queue,
+      operator_id: airline.id,
+      construction_date: game.current_date + 1.day,
+      end_of_useful_life: game.current_date + 2.days,
+      aircraft_model: model,
+    )
   end
 
   context "index" do
-    it "shows the name of the airline and a count of the fleet" do
-      game = Game.last
-      airline = Airline.last
-
-      visit game_airline_airplanes_path(game.id, airline.id)
-
-      expect(page).to have_content("A Air fleet")
-      expect(page).to have_content("A Air operates 1 airplane")
-    end
-
-    it "shows details about the fleet" do
-      game = Game.last
-      airline = Airline.last
-      Airplane.create!(
-        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
-        operator_id: airline.id,
-        construction_date: "2019-01-01".to_date,
-        end_of_useful_life: Date.tomorrow,
-        aircraft_model: AircraftModel.last,
-        economy_seats: 100,
-        premium_economy_seats: 10,
-        business_seats: 8,
-      )
-
-      visit game_airline_airplanes_path(game.id, airline.id)
-
-      expect(page).to have_content("A Air operates 2 airplanes")
-      expect(page).to have_content("Boeing 737-300 constructed 2020-01-01. 0 economy, 0 premium economy, 0 business.")
-      expect(page).to have_content("Boeing 737-300 constructed 2019-01-01. 100 economy, 10 premium economy, 8 business.")
-    end
-
-    it "correctly pluralizes as the fleet grows" do
-      game = Game.last
-      airline = Airline.last
-      Airplane.create!(
-        operator_id: airline.id,
-        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
-        construction_date: Date.yesterday,
-        end_of_useful_life: Date.tomorrow,
-        aircraft_model: AircraftModel.last,
-      )
-
-      visit game_airline_airplanes_path(game.id, airline.id)
-
-      expect(page).to have_content "A Air operates 2 airplanes"
-    end
-
-    it "excludes unconstructed airplanes" do
-      game = Game.last
-      airline = Airline.last
-      Airplane.create!(
-        operator_id: airline.id,
-        aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
-        construction_date: game.current_date + 1.day,
-        end_of_useful_life: game.current_date + 1.year,
-        aircraft_model: AircraftModel.last,
-      )
-
-      visit game_airline_airplanes_path(game.id, airline.id)
-
-      expect(page).to have_content "A Air operates 1 airplane"
-    end
-
     it "has links back to the airline page and game overview page" do
       game = Game.last
       airline = Airline.last
@@ -128,6 +72,65 @@ RSpec.describe "airplanes/index", type: :feature do
       click_link "Return to game overview"
 
       expect(page).to have_content "Airline Game Home"
+    end
+
+    context "built aircraft" do
+      it "shows details about the fleet" do
+        game = Game.last
+        airline = Airline.last
+        Airplane.create!(
+          aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+          operator_id: airline.id,
+          construction_date: "2019-01-01".to_date,
+          end_of_useful_life: Date.tomorrow,
+          aircraft_model: AircraftModel.last,
+          economy_seats: 100,
+          premium_economy_seats: 10,
+          business_seats: 8,
+        )
+
+        visit game_airline_airplanes_path(game.id, airline.id)
+
+        expect(page).to have_content("A Air operates 2 airplanes")
+        expect(page).to have_content("Boeing 737-300 constructed 2020-01-01. 0 economy, 0 premium economy, 0 business.")
+        expect(page).to have_content("Boeing 737-300 constructed 2019-01-01. 100 economy, 10 premium economy, 8 business.")
+      end
+
+      it "correctly singularizes" do
+        game = Game.last
+        airline = Airline.last
+
+        visit game_airline_airplanes_path(game.id, airline.id)
+
+        expect(page).to have_content "A Air operates 1 airplane"
+      end
+    end
+
+    context "unbuilt aircraft" do
+      it "shows details about upcoming deliveries" do
+        game = Game.last
+        airline = Airline.last
+
+        visit game_airline_airplanes_path(game.id, airline.id)
+
+        expect(page).to have_content "A Air operates 1 airplane"
+        expect(page).to have_content("Upcoming deliveries")
+        expect(page).to have_content("Boeing 737-300 to be delivered 2022-01-01. 0 economy, 0 premium economy, 0 business.")
+      end
+
+      it "does not display for non-user airlines" do
+        game = Game.last
+        airline = Airline.last
+
+        airline.update(is_user_airline: false)
+        airline.reload
+
+        visit game_airline_airplanes_path(game.id, airline.id)
+
+        expect(page).to have_content "A Air operates 1 airplane"
+        expect(page).not_to have_content "Upcoming deliveries"
+        expect(page).not_to have_content("Boeing 737-300 to be delivered 2021-01-01. 0 economy, 0 premium economy, 0 business.")
+      end
     end
   end
 end

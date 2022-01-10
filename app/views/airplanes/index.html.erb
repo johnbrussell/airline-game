@@ -4,13 +4,25 @@
 <a href=<%=game_airline_path(@game, @airline)%>>Return to airline page</a></p>
 
 <h2><%="#{@airline.name} fleet"%></h2>
-<h3><%="#{@airline.name} operates #{@airplanes.count} airplane".pluralize(@airplanes.count)%></h3>
+<h3><%="#{@airline.name} operates #{@built_airplanes.count} airplane".pluralize(@built_airplanes.count)%></h3>
 
 <ul>
-  <% @airplanes.each do |airplane| %>
+  <% @built_airplanes.each do |airplane| %>
     <li>
       <%= "#{airplane.aircraft_model.family.manufacturer} #{airplane.aircraft_model.name} constructed #{airplane.construction_date}.
            #{airplane.economy_seats} economy, #{airplane.premium_economy_seats} premium economy, #{airplane.business_seats} business." %>
     </li>
   <% end %>
 </ul>
+
+<% if @airline.is_user_airline %>
+  <h3>Upcoming deliveries</h3>
+  <ul>
+    <% @unbuilt_airplanes.each do |airplane| %>
+      <li>
+        <%= "#{airplane.aircraft_model.family.manufacturer} #{airplane.aircraft_model.name} to be delivered #{airplane.construction_date}.
+             #{airplane.economy_seats} economy, #{airplane.premium_economy_seats} premium economy, #{airplane.business_seats} business." %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
