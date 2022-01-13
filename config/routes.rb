@@ -21,6 +21,7 @@ Rails.application.routes.draw do
       resources :airplanes
     end
 
+    get "/select_airport", to: "airports#select_airport"
     resources :airports
   end
 end
