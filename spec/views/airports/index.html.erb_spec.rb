@@ -21,6 +21,7 @@ RSpec.describe "airplanes/index", type: :feature do
     visit game_airports_path(Game.last)
 
     expect(page).to have_content "Select an airport to view"
+    expect(page).to have_content "There are 0 airports to choose from"
 
     click_link "Return to game overview"
 
