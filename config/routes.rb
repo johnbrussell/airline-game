@@ -20,5 +20,7 @@ Rails.application.routes.draw do
     namespace :used_airplanes do
       resources :airplanes
     end
+
+    resources :airports
   end
 end
