@@ -1,0 +1,9 @@
+<h1>Airline Game</h1>
+<p><a href=<%=game_path(@game)%>>Return to game overview</a></p>
+<h2>Select an airport to view</h2>
+<p> There are <%= @airports.count %> airports to choose from </p>
+<%= form_with url: game_select_airport_path, method: :get do |form| %>
+  <%= form.hidden_field :game_id, value: @game.id %>
+  <%= form.select :id, @airports %>
+  <%= form.submit "Go" %>
+<% end %>

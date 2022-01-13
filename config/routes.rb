@@ -20,5 +20,8 @@ Rails.application.routes.draw do
     namespace :used_airplanes do
       resources :airplanes
     end
+
+    get "/select_airport", to: "airports#select_airport"
+    resources :airports
   end
 end
