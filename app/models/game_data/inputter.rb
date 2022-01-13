@@ -60,22 +60,34 @@ class GameData::Inputter < ApplicationRecord
     end
 
     def self.airports
-      Airport.all.delete_all
-
       data = CSV.parse(File.read("data/airports.csv"), headers: true)
       data.by_row.each do |data_point|
         market = Market.find_by!(name: data_point["metro_area"])
-        Airport.create!(
-          market: market,
-          iata: data_point["Airport"],
-          exclusive_catchment: data_point["Exclusive catchment"],
-          runway: data_point["Runway"],
-          elevation: data_point["Elevation"],
-          start_gates: data_point["Start gates"],
-          easy_gates: data_point["Easy build gates"],
-          latitude: data_point["Lat"],
-          longitude: data_point["Long"],
-        )
+        airport = Airport.find_by(iata: data_point["Airport"])
+        if airport.nil?
+          Airport.create!(
+            market: market,
+            iata: data_point["Airport"],
+            exclusive_catchment: data_point["Exclusive catchment"],
+            runway: data_point["Runway"],
+            elevation: data_point["Elevation"],
+            start_gates: data_point["Start gates"],
+            easy_gates: data_point["Easy build gates"],
+            latitude: data_point["Lat"],
+            longitude: data_point["Long"],
+          )
+        else
+          airport.update!(
+            market: market,
+            exclusive_catchment: data_point["Exclusive catchment"],
+            runway: data_point["Runway"],
+            elevation: data_point["Elevation"],
+            start_gates: data_point["Start gates"],
+            easy_gates: data_point["Easy build gates"],
+            latitude: data_point["Lat"],
+            longitude: data_point["Long"],
+          )
+        end
       end
     end
 
