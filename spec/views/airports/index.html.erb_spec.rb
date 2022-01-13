@@ -15,6 +15,12 @@ RSpec.describe "airplanes/index", type: :feature do
       base_id: 1,
       is_user_airline: true,
     )
+    Market.create!(
+      name: "Boston",
+      country: "United States",
+      country_group: "Nauru",
+      income: 100,
+    )
   end
 
   it "has a link back to the game homepage" do
@@ -26,5 +32,20 @@ RSpec.describe "airplanes/index", type: :feature do
     click_link "Return to game overview"
 
     expect(page).to have_content "Airline Game Home"
+  end
+
+  it "has a dropdown of airports and redirects to the selected airport" do
+    Airport.create!(iata: "BOS", market: Market.last, runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1)
+    Airport.create!(iata: "INU", market: Market.last, runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1)
+
+    visit game_airports_path(Game.last)
+
+    expect(page).to have_content "There are 2 airports to choose from"
+
+    select "INU - Boston, United States"
+
+    click_on "Go"
+
+    expect(page).to have_content "INU"
   end
 end
