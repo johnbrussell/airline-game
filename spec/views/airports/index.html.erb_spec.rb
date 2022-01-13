@@ -20,6 +20,8 @@ RSpec.describe "airplanes/index", type: :feature do
   it "has a link back to the game homepage" do
     visit game_airports_path(Game.last)
 
+    expect(page).to have_content "Select an airport to view"
+
     click_link "Return to game overview"
 
     expect(page).to have_content "Airline Game Home"
