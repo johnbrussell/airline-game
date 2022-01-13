@@ -21,6 +21,12 @@ class Airport < ApplicationRecord
 
   has_many :global_demands
 
+  def self.select_options
+    all.order(:iata).map do |airport|
+      ["#{airport.iata} - #{airport.market.name}, #{airport.market.country}", airport.id]
+    end
+  end
+
   def is_on_island?
     market.is_island
   end
