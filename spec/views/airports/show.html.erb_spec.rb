@@ -27,8 +27,21 @@ RSpec.describe "airports/show", type: :feature do
       country_group: "Nauru",
       income: 100,
     )
-    Airport.create!(iata: "BOS", market: boston, runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1)
+    Airport.create!(iata: "BOS", market: boston, runway: 10000, elevation: 2, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1)
     Airport.create!(iata: "INU", market: nauru, runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1)
+  end
+
+  it "shows information about the airport" do
+    visit game_airport_path(Game.last, Airport.find_by(iata: "INU"))
+
+    expect(page).to have_content "Runway: 10000 feet"
+    expect(page).to have_content "Elevation: 1 foot"
+  end
+
+  it "correctly pluralizes information about the airport" do
+    visit game_airport_path(Game.last, Airport.find_by(iata: "BOS"))
+
+    expect(page).to have_content "Elevation: 2 feet"
   end
 
   it "has a link back to the game homepage" do

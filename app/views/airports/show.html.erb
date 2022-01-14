@@ -10,3 +10,6 @@
     <% end %>
   </ul>
 <% end %>
+<h3>Airport information</h3>
+<p>Runway: <%= @airport.runway %> feet <br/>
+Elevation: <%= pluralize(@airport.elevation, "foot", plural: "feet") %> </p>
