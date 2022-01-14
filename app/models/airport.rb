@@ -30,4 +30,8 @@ class Airport < ApplicationRecord
   def is_on_island?
     market.is_island
   end
+
+  def other_market_airports
+    market.airports.reject{ |airport| airport.iata == iata }
+  end
 end
