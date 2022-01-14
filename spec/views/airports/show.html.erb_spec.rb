@@ -34,7 +34,7 @@ RSpec.describe "airports/show", type: :feature do
   it "has a link back to the game homepage" do
     visit game_airport_path(Game.last, Airport.find_by(iata: "INU"))
 
-    expect(page).to have_content "INU"
+    expect(page).to have_content "Nauru (INU)"
 
     click_link "Return to game overview"
 
@@ -44,7 +44,7 @@ RSpec.describe "airports/show", type: :feature do
   it "has a link back to airport selection" do
     visit game_airport_path(Game.last, Airport.find_by(iata: "INU"))
 
-    expect(page).to have_content "INU"
+    expect(page).to have_content "Nauru (INU)"
 
     click_link "View a different airport"
 
@@ -53,5 +53,45 @@ RSpec.describe "airports/show", type: :feature do
     click_on "Go"
 
     expect(page).to have_content "BOS"
+  end
+
+  it "does not have a link to other airports when there are no other airports" do
+    visit game_airport_path(Game.last, Airport.find_by(iata: "INU"))
+
+    expect(page).to have_content "Nauru (INU)"
+    expect(page).not_to have_content "View a different Nauru airport:"
+  end
+
+  it "has a link to other market airports" do
+    pvd = Airport.create!(iata: "PVD", market: Market.find_by(name: "Boston"), runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1)
+    visit game_airport_path(Game.last, pvd)
+
+    expect(page).to have_content "Boston (PVD)"
+    expect(page).to have_content "Other Boston airport:"
+
+    click_link "BOS"
+
+    expect(page).to have_content "Boston (BOS)"
+  end
+
+  it "the link to other market airports pluralizes correctly" do
+    pvd = Airport.create!(iata: "PVD", market: Market.find_by(name: "Boston"), runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1)
+    Airport.create!(iata: "MHT", market: Market.find_by(name: "Boston"), runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1)
+    visit game_airport_path(Game.last, pvd)
+
+    expect(page).to have_content "Boston (PVD)"
+    expect(page).to have_content "Other Boston airports:"
+
+    click_link "MHT"
+
+    expect(page).to have_content "Boston (MHT)"
+
+    click_link "BOS"
+
+    expect(page).to have_content "Boston (BOS)"
+
+    click_link "PVD"
+
+    expect(page).to have_content "Boston (PVD)"
   end
 end
