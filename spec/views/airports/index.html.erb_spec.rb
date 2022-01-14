@@ -1,7 +1,7 @@
 require "rails_helper"
 require "capybara/rspec"
 
-RSpec.describe "airplanes/index", type: :feature do
+RSpec.describe "airports/index", type: :feature do
   before(:each) do
     game = Game.create!(
       current_date: Date.today,
