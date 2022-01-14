@@ -1,4 +1,4 @@
 <h1>Airline Game</h1>
 <p><a href=<%=game_path(@game)%>>Return to game overview</a><br/>
 <a href=<%=game_airports_path(@game)%>>View a different airport</a></p>
-<h2><%= @airport.iata %></h2>
+<h2><%= @airport.market.name %> (<%= @airport.iata %>)</h2>
