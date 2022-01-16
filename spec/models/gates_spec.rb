@@ -158,7 +158,7 @@ RSpec.describe Gates do
     it "includes all available slots" do
       airport = Fabricate(:airport)
       game = Fabricate(:game)
-      subject = Gates.create!(airport: airport, game: game, current_gates: 3)
+      subject = Gates.create!(airport: airport, game: game, current_gates: airport.start_gates)
 
       expect(subject.num_slots).to eq 0
       expect(subject.num_available_slots).to eq 0
