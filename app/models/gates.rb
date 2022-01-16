@@ -17,7 +17,9 @@ class Gates < ApplicationRecord
     if find_by(airport: airport, game: game).present?
       find_by(airport: airport, game: game)
     else
-      create!(airport: airport, game: game, current_gates: airport.start_gates)
+      create!(airport: airport, game: game, current_gates: airport.start_gates).tap do |gates|
+        Slot.create_for_new_gates(gates.id, SLOTS_PER_GATE * airport.start_gates)
+      end
     end
   end
 
