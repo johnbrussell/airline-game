@@ -27,7 +27,7 @@ RSpec.describe "airports/show", type: :feature do
       country_group: "Nauru",
       income: 100,
     )
-    Airport.create!(iata: "BOS", market: boston, runway: 10000, elevation: 2, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1)
+    Airport.create!(iata: "BOS", market: boston, runway: 10000, elevation: 2, start_gates: 2, easy_gates: 100, latitude: 1, longitude: 1)
     Airport.create!(iata: "INU", market: nauru, runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1)
   end
 
@@ -36,12 +36,18 @@ RSpec.describe "airports/show", type: :feature do
 
     expect(page).to have_content "Runway: 10000 feet"
     expect(page).to have_content "Elevation: 1 foot"
+
+    expect(page).to have_content "1 gate"
+    expect(page).to have_content "#{Gates::SLOTS_PER_GATE} slots (#{Gates::SLOTS_PER_GATE} available)"
   end
 
   it "correctly pluralizes information about the airport" do
     visit game_airport_path(Game.last, Airport.find_by(iata: "BOS"))
 
     expect(page).to have_content "Elevation: 2 feet"
+
+    expect(page).to have_content "2 gates"
+    expect(page).to have_content "#{Gates::SLOTS_PER_GATE * 2} slots (#{Gates::SLOTS_PER_GATE * 2} available)"
   end
 
   it "has a link back to the game homepage" do
