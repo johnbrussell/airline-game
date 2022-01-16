@@ -36,6 +36,14 @@ class Gates < ApplicationRecord
     update!(current_gates: current_gates + 1)
   end
 
+  def num_slots
+    slots.count
+  end
+
+  def num_available_slots
+    slots.available.count
+  end
+
   private
 
     def current_gates_greater_than_start_gates

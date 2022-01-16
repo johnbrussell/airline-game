@@ -146,4 +146,25 @@ RSpec.describe Gates do
       expect subject.validate
     end
   end
+
+  context "num_available_slots" do
+    it "includes all available slots" do
+      airport = Fabricate(:airport)
+      game = Fabricate(:game)
+      subject = Gates.create!(airport: airport, game: game, current_gates: 3)
+
+      expect(subject.num_slots).to eq 0
+      expect(subject.num_available_slots).to eq 0
+
+      Slot.create!(gates_id: subject.id)
+
+      expect(subject.num_slots).to eq 1
+      expect(subject.num_available_slots).to eq 1
+
+      Slot.create!(gates_id: subject.id, lessee_id: 3)
+
+      expect(subject.num_slots).to eq 2
+      expect(subject.num_available_slots).to eq 1
+    end
+  end
 end
