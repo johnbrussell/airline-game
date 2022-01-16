@@ -11,5 +11,6 @@ class AirportsController < ApplicationController
   def show
     @game = Game.find(params[:game_id])
     @airport = Airport.find(params[:id])
+    @gates = Gates.at_airport(@airport, @game)
   end
 end

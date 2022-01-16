@@ -8,22 +8,29 @@ RSpec.describe Gates do
       game = Game.create!(current_date: Date.today, start_date: Date.today, end_date: Date.today)
       Gates.create!(airport: airport, game: game, current_gates: 1)
       expected_gate = Gates.last
+      expected_num_slots = Slot.count
 
       expect(Gates.at_airport(airport, game)).to eq expected_gate
+      expect(Slot.count).to eq expected_num_slots
     end
 
-    it "creates a gates when none exists" do
+    it "creates a gates and slots when none exists" do
       market = Market.create!(name: "Bar", country: "Baz", country_group: "BarBaz", income: 1)
       airport = Airport.create!(start_gates: 1, easy_gates: 1, latitude: 1, longitude: 1, runway: 1, elevation: 1, iata: "Foo", market: market)
       game = Game.create!(current_date: Date.today, start_date: Date.today, end_date: Date.today)
 
       old_gates_count = Gates.count
+      old_slots_count = Slot.count
+      expected_new_slots = airport.start_gates * Gates::SLOTS_PER_GATE
 
       gates = Gates.at_airport(airport, game)
 
       expect(Gates.count).to eq old_gates_count + 1
       expect(Gates.last.airport).to eq airport
       expect(Gates.last.game).to eq game
+
+      expect(Slot.count).to eq old_slots_count + expected_new_slots
+      expect(Slot.last.gates_id).to eq gates.id
     end
   end
 
@@ -144,6 +151,27 @@ RSpec.describe Gates do
       subject = Gates.new(airport: airport, game: game, current_gates: 3)
 
       expect subject.validate
+    end
+  end
+
+  context "num_available_slots" do
+    it "includes all available slots" do
+      airport = Fabricate(:airport)
+      game = Fabricate(:game)
+      subject = Gates.create!(airport: airport, game: game, current_gates: airport.start_gates)
+
+      expect(subject.num_slots).to eq 0
+      expect(subject.num_available_slots).to eq 0
+
+      Slot.create!(gates_id: subject.id)
+
+      expect(subject.num_slots).to eq 1
+      expect(subject.num_available_slots).to eq 1
+
+      Slot.create!(gates_id: subject.id, lessee_id: 3)
+
+      expect(subject.num_slots).to eq 2
+      expect(subject.num_available_slots).to eq 1
     end
   end
 end

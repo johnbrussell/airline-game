@@ -1,3 +1,19 @@
 <h1>Airline Game</h1>
-<p><a href=<%=game_path(@game)%>>Return to game overview</a></p>
-<h2><%= @airport.iata %></h2>
+<p><a href=<%=game_path(@game)%>>Return to game overview</a><br/>
+<a href=<%=game_airports_path(@game)%>>View a different airport</a></p>
+<h2><%= @airport.market.name %> (<%= @airport.iata %>)</h2>
+<% if @airport.other_market_airports.any? %>
+  <h3> Other <%= @airport.market.name %> <%= "airport".pluralize(@airport.other_market_airports.count) %>: </h3>
+  <ul>
+    <% @airport.other_market_airports.each do |airport| %>
+      <li> <a href=<%= game_airport_path(@game, airport) %>> <%= airport.iata %> </a> </li>
+    <% end %>
+  </ul>
+<% end %>
+<h3>Airport information</h3>
+<p>Runway: <%= @airport.runway %> feet <br/>
+Elevation: <%= pluralize(@airport.elevation, "foot", plural: "feet") %> </p>
+
+<h3>Slot information</h3>
+<p><%= @gates.current_gates %> <%= "gate".pluralize(@gates.current_gates) %> <br/>
+<%= @gates.num_slots %> slots (<%= @gates.num_available_slots %> available)</p>
