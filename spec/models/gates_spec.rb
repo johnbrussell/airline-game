@@ -122,6 +122,52 @@ RSpec.describe Gates do
       expect(slot.lease_expiry).to eq date + Gates::NEW_SLOT_LEASE_DURATION
       expect(slot.rent).to eq 150
     end
+
+    it "adds an error if the airline does not have enough cash on hand" do
+      Market.create!(
+        name: "Bar",
+        country: "Baz",
+        country_group: "Foobar",
+        income: 1,
+      )
+      airport = Airport.create!(
+        iata: "DCA",
+        exclusive_catchment: 0,
+        runway: 1000,
+        elevation: 10,
+        start_gates: 1,
+        easy_gates: 2,
+        latitude: 40,
+        longitude: -70,
+        market: Market.last,
+      )
+      airline = Airline.create!(
+        name: "Foo",
+        cash_on_hand: 0,
+        is_user_airline: false,
+        base_id: 1,
+        game_id: 6,
+      )
+      date = Date.today
+      game = Game.create!(current_date: date, start_date: date, end_date: date)
+      gates = Gates.create!(airport: airport, current_gates: 1, game: game)
+
+      old_slots = gates.slots.count
+      old_cash_on_hand = airline.cash_on_hand
+
+      gates.build_new_gate(airline, date)
+      gates.reload
+
+      expected_slots = old_slots
+
+      expect(expected_slots).to eq gates.slots.count
+
+      airline.reload
+
+      expect(airline.cash_on_hand).to eq old_cash_on_hand
+
+      expect(gates.errors.map { |g| "#{g.attribute} #{g.message}" }).to include "airline_cash_on_hand not sufficient to build"
+    end
   end
 
   context "lease_a_slot" do

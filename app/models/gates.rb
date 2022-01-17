@@ -28,18 +28,22 @@ class Gates < ApplicationRecord
   end
 
   def build_new_gate(airline, current_date)
-    Slot.insert_all!([
-      {
-        "gates_id": id,
-        "lessee_id": airline.id,
-        "lease_expiry": current_date + NEW_SLOT_LEASE_DURATION,
-        "rent": Calculation::SlotRent.calculate(airport, game),
-        "created_at": Time.now,
-        "updated_at": Time.now,
-      }
-    ] * SLOTS_PER_GATE)
-    airline.update!(cash_on_hand: airline.cash_on_hand - gate_cost)
-    update!(current_gates: current_gates + 1)
+    if airline.cash_on_hand >= gate_cost
+      Slot.insert_all!([
+        {
+          "gates_id": id,
+          "lessee_id": airline.id,
+          "lease_expiry": current_date + NEW_SLOT_LEASE_DURATION,
+          "rent": Calculation::SlotRent.calculate(airport, game),
+          "created_at": Time.now,
+          "updated_at": Time.now,
+        }
+      ] * SLOTS_PER_GATE)
+      airline.update!(cash_on_hand: airline.cash_on_hand - gate_cost)
+      update!(current_gates: current_gates + 1)
+    else
+      errors.add(:airline_cash_on_hand, "not sufficient to build")
+    end
   end
 
   def lease_a_slot(airline)
