@@ -42,6 +42,26 @@ class Gates < ApplicationRecord
     update!(current_gates: current_gates + 1)
   end
 
+  def lease_a_slot(airline)
+    if num_available_slots > 0
+      rent = Calculation::SlotRent.calculate(airport, game) / Slot::LEASE_TERM_DAYS
+      slot = slots.available.first
+      slot.assign_attributes(
+        lessee_id: airline.id,
+        lease_expiry: game.current_date + Slot::LEASE_TERM_DAYS.days,
+        rent: rent,
+      )
+      if airline.cash_on_hand >= rent
+        slot.save
+        airline.update!(cash_on_hand: airline.cash_on_hand - rent)
+      else
+        errors.add(:airline_cash_on_hand, "not sufficient to lease")
+      end
+    else
+      errors.add(:slots, "must be available to lease")
+    end
+  end
+
   def num_slots
     slots.count
   end

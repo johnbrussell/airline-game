@@ -124,6 +124,67 @@ RSpec.describe Gates do
     end
   end
 
+  context "lease_a_slot" do
+    it "assigns a slot to an airline, deducts one day's rent from the airline, and sets the lease expiry" do
+      game = Fabricate(:game)
+      airport = Fabricate(:airport)
+      original_cash_on_hand = 100000000.0
+      airline = Fabricate(:airline, game_id: game.id, base_id: airport.market.id, cash_on_hand: original_cash_on_hand)
+      subject = Gates.create!(airport: airport, current_gates: airport.start_gates, game: game)
+
+      slot = Slot.create!(gates_id: subject.id)
+      allow(Calculation::SlotRent).to receive(:calculate).with(airport, game).and_return original_cash_on_hand.to_f
+
+      subject.lease_a_slot(airline)
+      slot.reload
+      airline.reload
+
+      expect(slot.lessee_id).to eq airline.id
+      expect(slot.rent).to be > 0
+      expect(slot.lease_expiry).to eq game.current_date + Slot::LEASE_TERM_DAYS
+      expect(airline.cash_on_hand).to eq original_cash_on_hand - original_cash_on_hand / Slot::LEASE_TERM_DAYS
+    end
+
+    it "adds an error if the airline does not have enough cash on hand" do
+      game = Fabricate(:game)
+      airport = Fabricate(:airport)
+      original_cash_on_hand = 0.0
+      airline = Fabricate(:airline, game_id: game.id, base_id: airport.market.id, cash_on_hand: original_cash_on_hand)
+      subject = Gates.create!(airport: airport, current_gates: airport.start_gates, game: game)
+
+      slot = Slot.create!(gates_id: subject.id)
+      allow(Calculation::SlotRent).to receive(:calculate).with(airport, game).and_return 1.0
+
+      subject.lease_a_slot(airline)
+      subject.reload
+      slot.reload
+      airline.reload
+
+      expect(slot.lessee_id).to be nil
+      expect(slot.rent).to eq 0
+      expect(slot.lease_expiry).to eq nil
+      expect(subject.errors.map { |e| "#{e.attribute} #{e.message}" }).to include "airline_cash_on_hand not sufficient to lease"
+      expect(airline.cash_on_hand).to eq original_cash_on_hand
+    end
+
+    it "adds an error if there are no available slots" do
+      game = Fabricate(:game)
+      airport = Fabricate(:airport)
+      original_cash_on_hand = 1000000.0
+      airline = Fabricate(:airline, game_id: game.id, base_id: airport.market.id, cash_on_hand: original_cash_on_hand)
+      subject = Gates.create!(airport: airport, current_gates: airport.start_gates, game: game)
+
+      allow(Calculation::SlotRent).to receive(:calculate).with(airport, game).and_return original_cash_on_hand.to_f
+
+      subject.lease_a_slot(airline)
+      subject.reload
+
+      expect(subject.errors.map { |e| "#{e.attribute} #{e.message}" }).to include "slots must be available to lease"
+      expect(airline.cash_on_hand).to eq original_cash_on_hand
+      expect(Slot.where(lessee_id: airline.id).count).to eq 0
+    end
+  end
+
   context "validate current_gates_greater_than_start_gates" do
     before(:each) do
       market = Market.create!(
