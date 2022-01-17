@@ -23,6 +23,10 @@ class Gates < ApplicationRecord
     end
   end
 
+  def airline_slots(airline)
+    slots.where(lessee_id: airline.id)
+  end
+
   def build_new_gate(airline, current_date)
     Slot.insert_all!([
       {

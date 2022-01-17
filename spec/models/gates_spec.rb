@@ -34,6 +34,28 @@ RSpec.describe Gates do
     end
   end
 
+  context "airline_slots" do
+    it "returns the airline's slots" do
+      airport = Fabricate(:airport)
+      game = Fabricate(:game)
+      airline = Fabricate(:airline, game_id: game.id, base_id: airport.market_id)
+      subject = Gates.create!(airport: airport, game: game, current_gates: airport.start_gates)
+
+      expect(subject.num_slots).to eq 0
+      expect(subject.airline_slots(airline).count).to eq 0
+
+      Slot.create!(gates_id: subject.id, lessee_id: airline.id)
+
+      expect(subject.num_slots).to eq 1
+      expect(subject.airline_slots(airline).count).to eq 1
+
+      Slot.create!(gates_id: subject.id)
+
+      expect(subject.num_slots).to eq 2
+      expect(subject.airline_slots(airline).count).to eq 1
+    end
+  end
+
   context "build_new_gate" do
     it "creates new slots for the appropriate airline and updates the number of gates on the Airport and charges the airline" do
       Market.create!(
