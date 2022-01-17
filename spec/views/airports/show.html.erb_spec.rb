@@ -39,6 +39,7 @@ RSpec.describe "airports/show", type: :feature do
 
     expect(page).to have_content "1 gate"
     expect(page).to have_content "#{Gates::SLOTS_PER_GATE} slots (#{Gates::SLOTS_PER_GATE} available)"
+    expect(page).to have_content "A Air has 0 slots"
   end
 
   it "correctly pluralizes information about the airport" do
