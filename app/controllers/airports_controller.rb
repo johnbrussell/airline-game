@@ -1,4 +1,20 @@
 class AirportsController < ApplicationController
+  def build_gate
+    @game = Game.find(params[:game_id])
+    @airport = Airport.find(params[:airport_id])
+    @gates = Gates.at_airport(@airport, @game)
+    @gates.build_new_gate(@game.user_airline, @game.current_date)
+    render :show
+  end
+
+  def lease_slot
+    @game = Game.find(params[:game_id])
+    @airport = Airport.find(params[:airport_id])
+    @gates = Gates.at_airport(@airport, @game)
+    @gates.lease_a_slot(@game.user_airline)
+    render :show
+  end
+
   def index
     @game = Game.find(params[:game_id])
     @airports = Airport.select_options
@@ -10,7 +26,7 @@ class AirportsController < ApplicationController
 
   def show
     @game = Game.find(params[:game_id])
-    @airport = Airport.find(params[:id])
+    @airport = Airport.find(params[:id] || params[:airport_id])
     @gates = Gates.at_airport(@airport, @game)
   end
 end

@@ -23,19 +23,51 @@ class Gates < ApplicationRecord
     end
   end
 
+  def airline_slots(airline)
+    slots.where(lessee_id: airline.id)
+  end
+
   def build_new_gate(airline, current_date)
-    Slot.insert_all!([
-      {
-        "gates_id": id,
-        "lessee_id": airline.id,
-        "lease_expiry": current_date + NEW_SLOT_LEASE_DURATION,
-        "rent": Calculation::SlotRent.calculate(airport, game),
-        "created_at": Time.now,
-        "updated_at": Time.now,
-      }
-    ] * SLOTS_PER_GATE)
-    airline.update!(cash_on_hand: airline.cash_on_hand - gate_cost)
-    update!(current_gates: current_gates + 1)
+    if airline.cash_on_hand >= gate_cost
+      Slot.insert_all!([
+        {
+          "gates_id": id,
+          "lessee_id": airline.id,
+          "lease_expiry": current_date + NEW_SLOT_LEASE_DURATION,
+          "rent": Calculation::SlotRent.calculate(airport, game),
+          "created_at": Time.now,
+          "updated_at": Time.now,
+        }
+      ] * SLOTS_PER_GATE)
+      airline.update!(cash_on_hand: airline.cash_on_hand - gate_cost)
+      update!(current_gates: current_gates + 1)
+    else
+      errors.add(:airline_cash_on_hand, "not sufficient to build")
+    end
+  end
+
+  def gate_cost
+    current_gates < airport.easy_gates ? EASY_GATE_COST : DIFFICULT_GATE_COST
+  end
+
+  def lease_a_slot(airline)
+    if num_available_slots > 0
+      rent = Calculation::SlotRent.calculate(airport, game) / Slot::LEASE_TERM_DAYS
+      slot = slots.available.first
+      slot.assign_attributes(
+        lessee_id: airline.id,
+        lease_expiry: game.current_date + Slot::LEASE_TERM_DAYS.days,
+        rent: rent,
+      )
+      if airline.cash_on_hand >= rent
+        slot.save
+        airline.update!(cash_on_hand: airline.cash_on_hand - rent)
+      else
+        errors.add(:airline_cash_on_hand, "not sufficient to lease")
+      end
+    else
+      errors.add(:slots, "must be available to lease")
+    end
   end
 
   def num_slots
@@ -52,9 +84,5 @@ class Gates < ApplicationRecord
       if current_gates < airport.start_gates
         errors.add(:current_gates, "cannot be less than minimum gates at airport")
       end
-    end
-
-    def gate_cost
-      current_gates < airport.easy_gates ? EASY_GATE_COST : DIFFICULT_GATE_COST
     end
 end

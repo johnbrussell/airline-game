@@ -17,3 +17,21 @@ Elevation: <%= pluralize(@airport.elevation, "foot", plural: "feet") %> </p>
 <h3>Slot information</h3>
 <p><%= @gates.current_gates %> <%= "gate".pluralize(@gates.current_gates) %> <br/>
 <%= @gates.num_slots %> slots (<%= @gates.num_available_slots %> available)</p>
+<p><%= @game.user_airline.name %> has <%= @gates.airline_slots(@game.user_airline).count %> <%= "slot".pluralize(@gates.airline_slots(@game.user_airline).count) %>. </p>
+
+<p> The cost to lease a slot is $<%= number_with_precision(Calculation::SlotRent.calculate(@airport, @game), :precision => 2) %> per <%= Slot::LEASE_TERM_DAYS %> days. <br/>
+The cost to build a new gate is $<%= number_with_precision(@gates.gate_cost, :precision => 2) %>. </p>
+
+<% if @gates.errors.any? %>
+  <p>
+    <% @gates.errors.full_messages.each do |message| %>
+      <div class="error"><%= message %></div>
+    <% end %>
+  </p>
+<% end %>
+
+<% if @gates.num_available_slots > 0 %>
+  <%= button_to "Lease a slot", game_airport_lease_a_slot_path(@game, @airport), method: :patch %>
+<% end %>
+
+<%= button_to "Build a gate", game_airport_build_a_gate_path(@game, @airport), method: :patch %>
