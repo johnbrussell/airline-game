@@ -17,7 +17,7 @@ Elevation: <%= pluralize(@airport.elevation, "foot", plural: "feet") %> </p>
 <h3>Slot information</h3>
 <p><%= @gates.current_gates %> <%= "gate".pluralize(@gates.current_gates) %> <br/>
 <%= @gates.num_slots %> slots (<%= @gates.num_available_slots %> available)</p>
-<p><%= @game.user_airline.name %> has <%= @gates.airline_slots(@game.user_airline).count %> slots. </p>
+<p><%= @game.user_airline.name %> has <%= @gates.airline_slots(@game.user_airline).count %> <%= "slot".pluralize(@gates.airline_slots(@game.user_airline).count) %>. </p>
 
 <% if @gates.errors.any? %>
   <p>

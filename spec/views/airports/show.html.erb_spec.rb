@@ -158,7 +158,7 @@ RSpec.describe "airports/show", type: :feature do
       click_button "Lease a slot"
 
       expect(page).to have_content "#{Gates::SLOTS_PER_GATE} slots (#{Gates::SLOTS_PER_GATE - 1} available)"
-      expect(page).to have_content "A Air has 1 slots"
+      expect(page).to have_content "A Air has 1 slot"
     end
 
     it "shows an error when leasing a slot fails" do
