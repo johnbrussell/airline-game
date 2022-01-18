@@ -11,7 +11,7 @@ RSpec.describe "airports/show", type: :feature do
     Airline.create!(
       game_id: game.id,
       name: "A Air",
-      cash_on_hand: 100,
+      cash_on_hand: 10000000,
       base_id: 1,
       is_user_airline: true,
     )
@@ -29,6 +29,10 @@ RSpec.describe "airports/show", type: :feature do
     )
     Airport.create!(iata: "BOS", market: boston, runway: 10000, elevation: 2, start_gates: 2, easy_gates: 100, latitude: 1, longitude: 1)
     Airport.create!(iata: "INU", market: nauru, runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1)
+    Population.create!(population: 1000000, year: 2000, market_id: boston.id)
+    Population.create!(population: 10000, year: 2000, market_id: nauru.id)
+    Tourists.create!(volume: 100000, year: 2000, market_id: boston.id)
+    Tourists.create!(volume: 1000, year: 2000, market_id: nauru.id)
   end
 
   it "shows information about the airport" do
@@ -113,5 +117,63 @@ RSpec.describe "airports/show", type: :feature do
     click_link "PVD"
 
     expect(page).to have_content "Boston (PVD)"
+  end
+
+  context "building a gate" do
+    it "has a button to build a gate" do
+      visit game_airport_path(Game.last, Airport.find_by(iata: "BOS"))
+
+      expect(page).to have_content "2 gates"
+      expect(page).to have_content "A Air has 0 slots"
+
+      click_button "Build a gate"
+
+      expect(page).to have_content "3 gates"
+      expect(page).to have_content "A Air has #{Gates::SLOTS_PER_GATE} slots"
+    end
+
+    it "shows an error when building a gate fails" do
+      Airline.last.update(cash_on_hand: 0)
+
+      visit game_airport_path(Game.last, Airport.find_by(iata: "BOS"))
+
+      expect(page).to have_content "2 gates"
+      expect(page).to have_content "A Air has 0 slots"
+
+      click_button "Build a gate"
+
+      expect(page).to have_content "2 gates"
+      expect(page).to have_content "A Air has 0 slots"
+      expect(page).to have_content "Airline cash on hand not sufficient to build"
+    end
+  end
+
+  context "leasing a slot" do
+    it "has a button to lease a slot" do
+      visit game_airport_path(Game.last, Airport.find_by(iata: "INU"))
+
+      expect(page).to have_content "#{Gates::SLOTS_PER_GATE} slots (#{Gates::SLOTS_PER_GATE} available)"
+      expect(page).to have_content "A Air has 0 slots"
+
+      click_button "Lease a slot"
+
+      expect(page).to have_content "#{Gates::SLOTS_PER_GATE} slots (#{Gates::SLOTS_PER_GATE - 1} available)"
+      expect(page).to have_content "A Air has 1 slots"
+    end
+
+    it "shows an error when leasing a slot fails" do
+      Airline.last.update(cash_on_hand: 0)
+
+      visit game_airport_path(Game.last, Airport.find_by(iata: "INU"))
+
+      expect(page).to have_content "#{Gates::SLOTS_PER_GATE} slots (#{Gates::SLOTS_PER_GATE} available)"
+      expect(page).to have_content "A Air has 0 slots"
+
+      click_button "Lease a slot"
+
+      expect(page).to have_content "#{Gates::SLOTS_PER_GATE} slots (#{Gates::SLOTS_PER_GATE} available)"
+      expect(page).to have_content "A Air has 0 slots"
+      expect(page).to have_content "Airline cash on hand not sufficient to lease"
+    end
   end
 end

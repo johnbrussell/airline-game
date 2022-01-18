@@ -18,3 +18,17 @@ Elevation: <%= pluralize(@airport.elevation, "foot", plural: "feet") %> </p>
 <p><%= @gates.current_gates %> <%= "gate".pluralize(@gates.current_gates) %> <br/>
 <%= @gates.num_slots %> slots (<%= @gates.num_available_slots %> available)</p>
 <p><%= @game.user_airline.name %> has <%= @gates.airline_slots(@game.user_airline).count %> slots. </p>
+
+<% if @gates.errors.any? %>
+  <p>
+    <% @gates.errors.full_messages.each do |message| %>
+      <div class="error"><%= message %></div>
+    <% end %>
+  </p>
+<% end %>
+
+<% if @gates.num_available_slots > 0 %>
+  <%= button_to "Lease a slot", game_airport_lease_a_slot_path(@game, @airport), method: :patch %>
+<% end %>
+
+<%= button_to "Build a gate", game_airport_build_a_gate_path(@game, @airport), method: :patch %>
