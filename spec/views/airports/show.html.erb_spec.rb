@@ -11,7 +11,7 @@ RSpec.describe "airports/show", type: :feature do
     Airline.create!(
       game_id: game.id,
       name: "A Air",
-      cash_on_hand: 10000000,
+      cash_on_hand: 10000000.0,
       base_id: 1,
       is_user_airline: true,
     )
@@ -46,6 +46,7 @@ RSpec.describe "airports/show", type: :feature do
     expect(page).to have_content "A Air has 0 slots"
     expect(page).to have_content "The cost to lease a slot is $#{Calculation::SlotRent.calculate(Airport.find_by(iata: "INU"), Game.last).round(2)} per #{Slot::LEASE_TERM_DAYS} days."
     expect(page).to have_content "The cost to build a new gate is $#{Gates.last.gate_cost}."
+    expect(page).to have_content "A Air has $10000000.00 available."
   end
 
   it "correctly pluralizes information about the airport" do

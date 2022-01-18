@@ -1,6 +1,10 @@
 <h1>Airline Game Home</h1>
 <h2> <%= @game.user_airline.name %> </h2>
-<h3> Cash on hand: $<%= @game.user_airline.cash_on_hand %> </h3>
+<% if @game.user_airline.cash_on_hand < 0 %>
+  <h3> Cash on hand: $<div class="inline red"><%= number_with_precision(@game.user_airline.cash_on_hand, :precision => 0) %> </div> </h3>
+<% else %>
+  <h3> Cash on hand: $<div class="inline"><%= number_with_precision(@game.user_airline.cash_on_hand, :precision => 0) %> </div> </h3>
+<% end %>
 
 <p> <a href=<%= game_airlines_path(@game.id) %>> View airlines in game </a> <br/>
 <a href=<%= game_airline_path(@game.id, @game.user_airline.id) %>> View <%= @game.user_airline.name %> </a> </p>

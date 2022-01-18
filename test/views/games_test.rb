@@ -18,7 +18,7 @@ class IndexTest < ApplicationSystemTestCase
 
     visit game_path(game.id)
 
-    assert_selector "h3", text: "Cash on hand: $1234.56"
+    assert_selector "h3", text: "Cash on hand: $1235"
 
     assert_selector "a", text: "View airlines in game"
     click_link "View airlines in game"
