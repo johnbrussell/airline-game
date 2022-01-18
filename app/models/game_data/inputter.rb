@@ -114,6 +114,7 @@ class GameData::Inputter < ApplicationRecord
 
     def self.population
       Population.all.delete_all
+      GlobalDemand.all.delete_all
 
       data = CSV.parse(File.read("data/populations.csv"), headers: true)
       data.by_row.each do |data_point|
@@ -128,6 +129,7 @@ class GameData::Inputter < ApplicationRecord
 
     def self.tourists
       Tourists.all.delete_all
+      GlobalDemand.all.delete_all
 
       data = CSV.parse(File.read("data/tourists.csv"), headers: true)
       data.by_row.each do |data_point|
