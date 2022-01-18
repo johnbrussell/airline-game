@@ -22,6 +22,9 @@ Rails.application.routes.draw do
     end
 
     get "/select_airport", to: "airports#select_airport"
-    resources :airports
+    resources :airports do
+      patch "/build_a_gate", to: "airports#build_gate"
+      patch "/lease_a_slot", to: "airports#lease_slot"
+    end
   end
 end
