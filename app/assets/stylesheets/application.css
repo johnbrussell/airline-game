@@ -5,3 +5,11 @@
 .button_to {
   display: inline-block;
 }
+
+.inline {
+  display: inline-block;
+}
+
+.red {
+  color: #da0707;
+}
