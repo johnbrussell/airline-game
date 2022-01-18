@@ -46,6 +46,10 @@ class Gates < ApplicationRecord
     end
   end
 
+  def gate_cost
+    current_gates < airport.easy_gates ? EASY_GATE_COST : DIFFICULT_GATE_COST
+  end
+
   def lease_a_slot(airline)
     if num_available_slots > 0
       rent = Calculation::SlotRent.calculate(airport, game) / Slot::LEASE_TERM_DAYS
@@ -80,9 +84,5 @@ class Gates < ApplicationRecord
       if current_gates < airport.start_gates
         errors.add(:current_gates, "cannot be less than minimum gates at airport")
       end
-    end
-
-    def gate_cost
-      current_gates < airport.easy_gates ? EASY_GATE_COST : DIFFICULT_GATE_COST
     end
 end

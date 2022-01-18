@@ -28,9 +28,9 @@ RSpec.describe "airports/show", type: :feature do
       income: 100,
     )
     Airport.create!(iata: "BOS", market: boston, runway: 10000, elevation: 2, start_gates: 2, easy_gates: 100, latitude: 1, longitude: 1)
-    Airport.create!(iata: "INU", market: nauru, runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1)
+    Airport.create!(iata: "INU", market: nauru, runway: 10000, elevation: 1, start_gates: 1, easy_gates: 1, latitude: 1, longitude: 1)
     Population.create!(population: 1000000, year: 2000, market_id: boston.id)
-    Population.create!(population: 10000, year: 2000, market_id: nauru.id)
+    Population.create!(population: 100000, year: 2000, market_id: nauru.id)
     Tourists.create!(volume: 100000, year: 2000, market_id: boston.id)
     Tourists.create!(volume: 1000, year: 2000, market_id: nauru.id)
   end
@@ -44,6 +44,8 @@ RSpec.describe "airports/show", type: :feature do
     expect(page).to have_content "1 gate"
     expect(page).to have_content "#{Gates::SLOTS_PER_GATE} slots (#{Gates::SLOTS_PER_GATE} available)"
     expect(page).to have_content "A Air has 0 slots"
+    expect(page).to have_content "The cost to lease a slot is $#{Calculation::SlotRent.calculate(Airport.find_by(iata: "INU"), Game.last).round(2)} per #{Slot::LEASE_TERM_DAYS} days."
+    expect(page).to have_content "The cost to build a new gate is $#{Gates.last.gate_cost}."
   end
 
   it "correctly pluralizes information about the airport" do
