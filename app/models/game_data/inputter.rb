@@ -2,6 +2,7 @@ require 'csv'
 
 class GameData::Inputter < ApplicationRecord
   def self.run
+    self.remove_unused_markets
     data = CSV.parse(File.read("data/metro_areas.csv"), headers: true)
     data.by_row.each do |data_point|
       self.create_or_update_market(data_point)
@@ -113,8 +114,8 @@ class GameData::Inputter < ApplicationRecord
     end
 
     def self.population
-      Population.all.delete_all
-      GlobalDemand.all.delete_all
+      Population.all.destroy_all
+      GlobalDemand.all.destroy_all
 
       data = CSV.parse(File.read("data/populations.csv"), headers: true)
       data.by_row.each do |data_point|
@@ -127,9 +128,24 @@ class GameData::Inputter < ApplicationRecord
       end
     end
 
+    def self.remove_unused_markets
+      data = CSV.parse(File.read("data/metro_areas.csv"), headers: true)
+      Market.all.each do |market|
+        if data.by_row.none? { |d| d["Metro Area"] == market.name }
+          market.airports.each do |a|
+            a.global_demands.destroy_all
+          end
+          market.airports.destroy_all
+          market.populations.destroy_all
+          market.tourists.destroy_all
+          market.destroy
+        end
+      end
+    end
+
     def self.tourists
-      Tourists.all.delete_all
-      GlobalDemand.all.delete_all
+      Tourists.all.destroy_all
+      GlobalDemand.all.destroy_all
 
       data = CSV.parse(File.read("data/tourists.csv"), headers: true)
       data.by_row.each do |data_point|
