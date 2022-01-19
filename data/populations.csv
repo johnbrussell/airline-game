@@ -34,10 +34,10 @@ Keene,2019,121990,Cheshire County NH and Windham County VT
 Lebanon,2020,190785,"Sullivan and Grafton counties, NH; Windsor County VT"
 Rutland,2020,60572,Rutland County only
 Montpelier,2020,89086,Washington and Orange counties
-"Burlington, VT",2020,262925,"Chittenden, Grand Isle, Addison, and Franklin counties"
-"Manchester, NH",2020,796352,"½ Rockingham, Hillsborough, Merrimack, Belknap counties"
-"Portland, ME",2020,586374,"Cumberland, York, Sagadahoc, Lincoln counties"
-"Augusta, ME",2020,123642,Kennebec County only
+Burlington (VT),2020,262925,"Chittenden, Grand Isle, Addison, and Franklin counties"
+Manchester (NH),2020,796352,"½ Rockingham, Hillsborough, Merrimack, Belknap counties"
+Portland (ME),2020,586374,"Cumberland, York, Sagadahoc, Lincoln counties"
+Augusta (ME),2020,123642,Kennebec County only
 Rockland,2020,79487,Knox and Waldo counties
 Bangor,2020,168933,Piscataquis and Penobscot counties
 Bar Harbor,2020,54987,Hancock County
@@ -61,7 +61,7 @@ Roanoke,2020,373807,"Roanoke; Salem; Radford; Roanoke, Montgomery, and Botetourt
 Lynchburg,2020,260951,"Lynchburg; Amherst, Appomattox, Bedford, Campbell counties"
 Charlottesville,2020,205510,"Charlottesville; Albemarle, Greene, Fluvanna counties"
 Staunton,2020,258084,"Staunton, Waynesboro, Harrisonburg; Rockingham, Augusta counties"
-"Charleston, WV",2020,238185,Kanawha and Putnam counties
-"Charleston, WV",2010,248549,
+Charleston (WV),2020,238185,Kanawha and Putnam counties
+Charleston (WV),2010,248549,
 Morgantown,2020,278869,"Monongalia, Preston, Marion, Harrison, Taylor counties"
-"Bloomington, IN",2020,139718,Monroe County
+Bloomington (IN),2020,139718,Monroe County
