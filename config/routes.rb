@@ -28,5 +28,7 @@ Rails.application.routes.draw do
       get "/lease_a_slot", to: "airports#show"
       patch "/lease_a_slot", to: "airports#lease_slot"
     end
+
+    get "/select_route", to: "routes#select_route"
   end
 end
