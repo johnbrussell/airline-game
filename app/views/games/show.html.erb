@@ -13,7 +13,7 @@
 <a href=<%= game_used_airplanes_airplanes_path(@game) %>> View used airplanes for purchase or lease </a> <br/>
 <a href=<%= game_airline_airplanes_path(@game, @game.user_airline) %>> View <%= @game.user_airline.name %> fleet </a></p>
 
-<p> Open a new route <br/>
+<p> <a href=<%= game_select_route_path(@game) %>> Open a new route </a> <br/>
 View <%= @game.user_airline.name %> routes </p>
 
 <p> <a href=<%= game_airports_path(@game) %>> View an airport </a></p>

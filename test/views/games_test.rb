@@ -48,6 +48,11 @@ class IndexTest < ApplicationSystemTestCase
     assert_selector "h3", text: "Nauru Airlines operates 0 airplanes"
 
     visit game_path(game.id)
+    assert_selector "a", text: "Open a new route"
+    click_link "Open a new route"
+    assert_selector "h2", text: "Select a route to view"
+
+    visit game_path(game.id)
     assert_selector "a", text: "View an airport"
     click_link "View an airport"
     assert_selector "h2", text: "Select an airport to view"
