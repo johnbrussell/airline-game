@@ -5,7 +5,7 @@ Fabricator(:airport) do
   elevation 100
   start_gates { Random.rand(1..5) }
   easy_gates 5
-  latitude { Random.rand(-90..90) }
+  latitude { Random.rand(-89..90) }
   longitude { Random.rand(-180..179) }
   market
 end
