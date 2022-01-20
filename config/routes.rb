@@ -30,5 +30,6 @@ Rails.application.routes.draw do
     end
 
     get "/select_route", to: "routes#select_route"
+    get "/view_route", to: "routes#view_route"
   end
 end
