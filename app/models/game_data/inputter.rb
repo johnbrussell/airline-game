@@ -132,6 +132,9 @@ class GameData::Inputter < ApplicationRecord
       data = CSV.parse(File.read("data/metro_areas.csv"), headers: true)
       Market.all.each do |market|
         if data.by_row.none? { |d| d["Metro Area"] == market.name }
+          if Airline.any? { |a| a.base_id == market.id }
+            raise ArgumentError.new "Cannot delete market in use by an airline.  Must update in rails console"
+          end
           market.airports.each do |a|
             a.global_demands.destroy_all
           end
