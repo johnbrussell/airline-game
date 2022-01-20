@@ -25,7 +25,7 @@ RSpec.describe "routes/select_route", type: :feature do
     apw = Fabricate(:airport, market: apia, iata: "APW")
 
     game = Fabricate(:game)
-    Fabricate(:airline, is_user_airline: true, game_id: game.id)
+    Fabricate(:airline, is_user_airline: true, game_id: game.id, base_id: apia.id)
 
     visit game_select_route_path(game)
 
