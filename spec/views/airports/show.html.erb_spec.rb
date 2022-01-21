@@ -47,6 +47,10 @@ RSpec.describe "airports/show", type: :feature do
     expect(page).to have_content "The cost to lease a slot is $#{Calculation::SlotRent.calculate(Airport.find_by(iata: "INU"), Game.last).round(2)} per #{Slot::LEASE_TERM_DAYS} days."
     expect(page).to have_content "The cost to build a new gate is $#{Gates.last.gate_cost}."
     expect(page).to have_content "A Air has $10000000.00 available."
+
+    visit game_airport_path(Game.last, Airport.find_by(iata: "BOS"))
+
+    expect(page).to have_content "United States"
   end
 
   it "correctly pluralizes information about the airport" do
