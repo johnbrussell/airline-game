@@ -46,4 +46,17 @@ RSpec.describe "routes/view_route", type: :feature do
 
     expect(page).to have_content "FUN - INU"
   end
+
+  it "displays information about the route" do
+    inu = Airport.find_by(iata: "INU")
+    fun = Airport.find_by(iata: "FUN")
+
+    game = Fabricate(:game)
+
+    expect(Calculation::Distance).to receive(:between_airports).with(fun, inu).and_return(1000)
+
+    visit game_view_route_path(game, params: { origin_id: inu.id, destination_id: fun.id })
+
+    expect(page).to have_content "1000 miles"
+  end
 end
