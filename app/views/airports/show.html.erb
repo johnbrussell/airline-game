@@ -2,6 +2,7 @@
 <p><a href=<%=game_path(@game)%>>Return to game overview</a><br/>
 <a href=<%=game_airports_path(@game)%>>View a different airport</a></p>
 <h2><%= @airport.market.name %> (<%= @airport.iata %>)</h2>
+<p><%= @airport.market.country %></p>
 <% if @airport.other_market_airports.any? %>
   <h3> Other <%= @airport.market.name %> <%= "airport".pluralize(@airport.other_market_airports.count) %>: </h3>
   <ul>
