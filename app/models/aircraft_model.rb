@@ -24,10 +24,17 @@ class AircraftModel < ApplicationRecord
   belongs_to :family, class_name: "AircraftFamily", foreign_key: "aircraft_family_id"
 
   DAYS_PER_YEAR = 365.24
+  MIN_TAXI_TIME_MINS = 3
   PERCENT_VALUE_MAINTAINED_AT_END_OF_USEFUL_LIFE = 0.03
+  SLOW_DISTANCE_TIME_MINS = 30
+  SLOW_SPEED = 1/2.0
 
   def daily_value_retention
     PERCENT_VALUE_MAINTAINED_AT_END_OF_USEFUL_LIFE ** (1 / (DAYS_PER_YEAR * useful_life))
+  end
+
+  def flight_time_mins(distance)
+    flight_time_mins_exc_taxi(distance) + 2 * MIN_TAXI_TIME_MINS
   end
 
   def max_business_seats
@@ -41,4 +48,18 @@ class AircraftModel < ApplicationRecord
   def max_premium_economy_seats
     floor_space / Airplane::PREMIUM_ECONOMY_SEAT_SIZE
   end
+
+  private
+
+    def flight_time_mins_exc_taxi(distance)
+      if distance <= slow_distance
+        distance.to_f / speed * 60 * 2
+      else
+        (distance - slow_distance).to_f / speed * 60 + SLOW_DISTANCE_TIME_MINS
+      end
+    end
+
+    def slow_distance
+      speed * SLOW_SPEED * SLOW_DISTANCE_TIME_MINS / 60.0
+    end
 end
