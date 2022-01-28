@@ -42,6 +42,10 @@ class Airplane < ApplicationRecord
   MIN_PERCENT_OF_LEASE_NEEDED_AS_CASH_ON_HAND_TO_LEASE = 0.08
   PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE = 0.4
 
+  def built?
+    construction_date <= aircraft_manufacturing_queue.game.current_date
+  end
+
   def has_operator?
     operator_id.present?
   end
@@ -115,10 +119,6 @@ class Airplane < ApplicationRecord
 
   def purchase_price
     value
-  end
-
-  def built?
-    construction_date <= aircraft_manufacturing_queue.game.current_date
   end
 
   private
