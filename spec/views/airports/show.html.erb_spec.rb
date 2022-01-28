@@ -45,8 +45,8 @@ RSpec.describe "airports/show", type: :feature do
     expect(page).to have_content "#{Gates::SLOTS_PER_GATE} slots (#{Gates::SLOTS_PER_GATE} available)"
     expect(page).to have_content "A Air has 0 slots"
     expect(page).to have_content "The cost to lease a slot is $#{Calculation::SlotRent.calculate(Airport.find_by(iata: "INU"), Game.last).round(2)} per #{Slot::LEASE_TERM_DAYS} days."
-    expect(page).to have_content "The cost to build a new gate is $#{Gates.last.gate_cost}."
-    expect(page).to have_content "A Air has $10000000.00 available."
+    expect(page).to have_content "The cost to build a new gate is $100,000,000.00."
+    expect(page).to have_content "A Air has $10,000,000.00 available."
 
     visit game_airport_path(Game.last, Airport.find_by(iata: "BOS"))
 

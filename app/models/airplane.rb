@@ -16,6 +16,7 @@ class Airplane < ApplicationRecord
   belongs_to :aircraft_model
 
   delegate :game, :to => :aircraft_manufacturing_queue
+  delegate :max_economy_seats, :to => :aircraft_model
 
   scope :available_new, ->(game) {
     joins(:aircraft_manufacturing_queue).
@@ -38,9 +39,16 @@ class Airplane < ApplicationRecord
   ECONOMY_SEAT_SIZE = 28 * 17
   PREMIUM_ECONOMY_SEAT_SIZE = 36 * 17
   BUSINESS_SEAT_SIZE = 72 * 17
+  ELEVATION_FOR_TAKEOFF_MULTIPLIER = 2000
+  EMPTY_PLANE_RANGE_MULTIPLIER = 1.25
   MAX_LEASE_DAYS = 3652
   MIN_PERCENT_OF_LEASE_NEEDED_AS_CASH_ON_HAND_TO_LEASE = 0.08
   PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE = 0.4
+  TAKEOFF_ELEVATION_MULTIPLIER = 1.15
+
+  def built?
+    construction_date <= aircraft_manufacturing_queue.game.current_date
+  end
 
   def has_operator?
     operator_id.present?
@@ -117,8 +125,8 @@ class Airplane < ApplicationRecord
     value
   end
 
-  def built?
-    construction_date <= aircraft_manufacturing_queue.game.current_date
+  def range_from_airport(airport)
+    [range_with_unlimited_runway, range_with_runway_and_elevation(airport.runway, airport.elevation)].min
   end
 
   private
@@ -135,6 +143,10 @@ class Airplane < ApplicationRecord
       @model ||= AircraftModel.find_by(id: aircraft_model_id)
     end
 
+    def num_seats
+      economy_seats + premium_economy_seats + business_seats
+    end
+
     def operator_changes_appropriately
       copy = Airplane.find(id)
       if copy.operator_id != operator_id && copy.operator_id.present? && operator_id.present?
@@ -142,14 +154,38 @@ class Airplane < ApplicationRecord
       end
     end
 
+    def percent_of_max_seats_uninstalled
+      (max_economy_seats - num_seats) / max_economy_seats.to_f
+    end
+
     def purchase_payment
       built? ? purchase_price : new_plane_payment
+    end
+
+    def range_with_runway_and_elevation(runway_length, elevation)
+      [0, 2 * aircraft_model.max_range * Math.log(runway_length / seats_elevation_range_constant(elevation), 2)].max
+    end
+
+    def range_with_unlimited_runway
+      aircraft_model.max_range * (EMPTY_PLANE_RANGE_MULTIPLIER ** percent_of_max_seats_uninstalled)
+    end
+
+    def seats_elevation_range_constant(elevation)
+      takeoff_elevation_multiplier(elevation) * 0.5 * aircraft_model.takeoff_distance * takeoff_seats_component
     end
 
     def seats_fit_on_plane
       if ECONOMY_SEAT_SIZE * economy_seats + PREMIUM_ECONOMY_SEAT_SIZE * premium_economy_seats + BUSINESS_SEAT_SIZE * business_seats > aircraft_model.floor_space
         errors.add(:seats, "require more total floor space than available on airplane")
       end
+    end
+
+    def takeoff_elevation_multiplier(elevation)
+      [1, TAKEOFF_ELEVATION_MULTIPLIER ** (elevation.to_f / ELEVATION_FOR_TAKEOFF_MULTIPLIER)].max
+    end
+
+    def takeoff_seats_component
+      2 ** (num_seats / (2.0 * max_economy_seats))
     end
 
     def value

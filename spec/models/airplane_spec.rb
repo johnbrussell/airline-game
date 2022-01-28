@@ -827,6 +827,243 @@ RSpec.describe Airplane do
     end
   end
 
+  context "range_from_airport" do
+    context "num_seats" do
+      it "is equal to the number of seats on the airplane" do
+        family = Fabricate(:aircraft_family)
+        subject = Fabricate(:airplane, aircraft_family: family)
+
+        subject.update(economy_seats: 10, business_seats: 20, premium_economy_seats: 30)
+
+        expect(subject.send(:num_seats)).to eq 60
+      end
+    end
+
+    context "percent_of_max_seats_uninstalled" do
+      it "is 0 when the seats on the plane are maximized" do
+        family = Fabricate(:aircraft_family)
+        subject = Fabricate(:airplane, aircraft_family: family)
+
+        subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 10)
+        subject.update(economy_seats: 10)
+
+        expect(subject.send(:percent_of_max_seats_uninstalled)).to eq 0
+      end
+
+      it "is 1 when there are no seats on the plane" do
+        family = Fabricate(:aircraft_family)
+        subject = Fabricate(:airplane, aircraft_family: family)
+
+        subject.update(economy_seats: 0)
+
+        expect(subject.send(:percent_of_max_seats_uninstalled)).to eq 1
+      end
+
+      it "is between 0 and 1 otherwise and increases as seats are added" do
+        family = Fabricate(:aircraft_family)
+        subject = Fabricate(:airplane, aircraft_family: family)
+
+        subject.update(economy_seats: 5)
+
+        old_pct = subject.send(:percent_of_max_seats_uninstalled)
+        expect(old_pct).to be < 1
+
+        subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 10)
+        subject.update(economy_seats: 6)
+
+        new_pct = subject.send(:percent_of_max_seats_uninstalled)
+        expect(new_pct).to be < old_pct
+        expect(new_pct).to be > 0
+      end
+    end
+
+    context "range_with_unlimited_runway" do
+      it "is the plane's maximum range when seats are maximized" do
+        family = Fabricate(:aircraft_family)
+        subject = Fabricate(:airplane, aircraft_family: family)
+
+        subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 10)
+        subject.update(economy_seats: 10)
+
+        expect(subject.send(:range_with_unlimited_runway)).to eq subject.aircraft_model.max_range
+      end
+
+      it "is more than the plane's maximum range when there are no seats on the plane" do
+        family = Fabricate(:aircraft_family)
+        subject = Fabricate(:airplane, aircraft_family: family)
+
+        subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 10)
+        subject.update(economy_seats: 0)
+
+        expect(subject.send(:range_with_unlimited_runway)).to eq subject.aircraft_model.max_range * Airplane::EMPTY_PLANE_RANGE_MULTIPLIER
+        expect(subject.send(:range_with_unlimited_runway)).to be > subject.aircraft_model.max_range
+      end
+
+      it "is more than the plane's maximum range when seats are not maximized" do
+        family = Fabricate(:aircraft_family)
+        subject = Fabricate(:airplane, aircraft_family: family)
+
+        subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 10)
+        subject.update(economy_seats: 9)
+
+        expect(subject.send(:range_with_unlimited_runway)).to be < subject.aircraft_model.max_range * Airplane::EMPTY_PLANE_RANGE_MULTIPLIER
+        expect(subject.send(:range_with_unlimited_runway)).to be > subject.aircraft_model.max_range
+      end
+    end
+
+    context "seats_elevation_range_constant" do
+      it "calculates correctly" do
+        family = Fabricate(:aircraft_family)
+        subject = Fabricate(:airplane, aircraft_family: family)
+
+        subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 10, takeoff_distance: 2000)
+        subject.update(economy_seats: 10)
+
+        expected = 1000 * (2 ** (1/2.0)) * Airplane::TAKEOFF_ELEVATION_MULTIPLIER
+
+        assert_in_epsilon subject.send(:seats_elevation_range_constant, Airplane::ELEVATION_FOR_TAKEOFF_MULTIPLIER), expected, 0.00000001
+      end
+    end
+
+    context "takeoff_elevation_multiplier" do
+      it "is 1 below sea level" do
+        family = Fabricate(:aircraft_family)
+        subject = Fabricate(:airplane, aircraft_family: family)
+
+        expect(subject.send(:takeoff_elevation_multiplier, -10000)).to eq 1
+      end
+
+      it "is 1 at sea level" do
+        family = Fabricate(:aircraft_family)
+        subject = Fabricate(:airplane, aircraft_family: family)
+
+        expect(subject.send(:takeoff_elevation_multiplier, 0)).to eq 1
+      end
+
+      it "is between 1 and TAKEOFF_ELEVATION_MULTIPLIER between 0 and ELEVATION_FOR_TAKEOFF_MULTIPLIER feet of elevation" do
+        family = Fabricate(:aircraft_family)
+        subject = Fabricate(:airplane, aircraft_family: family)
+
+        expect(subject.send(:takeoff_elevation_multiplier, 1)).to be > 1
+        expect(subject.send(:takeoff_elevation_multiplier, Airplane::ELEVATION_FOR_TAKEOFF_MULTIPLIER - 1)).to be > 1
+        expect(subject.send(:takeoff_elevation_multiplier, 1)).to be < Airplane::TAKEOFF_ELEVATION_MULTIPLIER
+        expect(subject.send(:takeoff_elevation_multiplier, Airplane::ELEVATION_FOR_TAKEOFF_MULTIPLIER - 1)).to be < Airplane::TAKEOFF_ELEVATION_MULTIPLIER
+        expect(subject.send(:takeoff_elevation_multiplier, Airplane::ELEVATION_FOR_TAKEOFF_MULTIPLIER - 1)).to be > subject.send(:takeoff_elevation_multiplier, 1)
+      end
+
+      it "is TAKEOFF_ELEVATION_MULTIPLIER at ELEVATION_FOR_TAKEOFF_MULTIPLIER feet of elevation" do
+        family = Fabricate(:aircraft_family)
+        subject = Fabricate(:airplane, aircraft_family: family)
+
+        expect(subject.send(:takeoff_elevation_multiplier, Airplane::ELEVATION_FOR_TAKEOFF_MULTIPLIER)).to eq Airplane::TAKEOFF_ELEVATION_MULTIPLIER
+      end
+
+      it "is greater than TAKEOFF_ELEVATION_MULTIPLIER at more than ELEVATION_FOR_TAKEOFF_MULTIPLIER feet of elevation" do
+        family = Fabricate(:aircraft_family)
+        subject = Fabricate(:airplane, aircraft_family: family)
+
+        expect(subject.send(:takeoff_elevation_multiplier, Airplane::ELEVATION_FOR_TAKEOFF_MULTIPLIER) + 1).to be > subject.send(:takeoff_elevation_multiplier, Airplane::ELEVATION_FOR_TAKEOFF_MULTIPLIER)
+      end
+    end
+
+    context "takeoff_seats_component" do
+      root_2 = 2 ** (1/2.0)
+
+      it "is sqrt(2) when seats are maximized" do
+        family = Fabricate(:aircraft_family)
+        subject = Fabricate(:airplane, aircraft_family: family)
+
+        subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 10)
+        subject.update(economy_seats: 10)
+
+        expect(subject.send(:takeoff_seats_component)).to eq root_2
+      end
+
+      it "is 1 when there are no seats on the plane" do
+        family = Fabricate(:aircraft_family)
+        subject = Fabricate(:airplane, aircraft_family: family)
+
+        subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 10)
+        subject.update(economy_seats: 0)
+
+        expect(subject.send(:takeoff_seats_component)).to eq 1
+      end
+
+      it "is somewhere between 1 and sqrt(2) when seats are between 0 and the maximum" do
+        family = Fabricate(:aircraft_family)
+        subject = Fabricate(:airplane, aircraft_family: family)
+
+        subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 10)
+        subject.update(economy_seats: 5)
+
+        actual_1 = subject.send(:takeoff_seats_component)
+
+        expect(actual_1).to be > 1
+        expect(actual_1).to be < root_2
+
+        subject.update(economy_seats: 6)
+
+        expect(subject.send(:takeoff_seats_component)).to be > 1
+        expect(subject.send(:takeoff_seats_component)).to be < root_2
+        expect(subject.send(:takeoff_seats_component)).to be > actual_1
+      end
+    end
+
+    it "is equivalent to the plane's unlimited runway range at sea level with maximum seats on a runway equal to the stated maximum takeoff roll" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+      airport = Fabricate(:airport, runway: subject.aircraft_model.takeoff_distance, elevation: 0)
+
+      subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 10)
+      subject.update(economy_seats: 10)
+
+      assert_in_epsilon subject.range_from_airport(airport), subject.aircraft_model.max_range, 0.00000001
+    end
+
+    it "is greater than the plane's unlimited runway range when a seat is removed" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+      airport = Fabricate(:airport, runway: subject.aircraft_model.takeoff_distance, elevation: 0)
+
+      subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 10)
+      subject.update(economy_seats: 9)
+
+      expect(subject.range_from_airport(airport)).to be > subject.aircraft_model.max_range
+    end
+
+    it "is less than the plane's unlimited runway range when the runway is shorter than the stated maximum takeoff roll" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+      airport = Fabricate(:airport, runway: subject.aircraft_model.takeoff_distance - 1, elevation: 0)
+
+      subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 10)
+      subject.update(economy_seats: 10)
+
+      expect(subject.range_from_airport(airport)).to be < subject.aircraft_model.max_range
+    end
+
+    it "is less than the plane's unlimited runway range when the airport is at a greater elevation" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+      airport = Fabricate(:airport, runway: subject.aircraft_model.takeoff_distance, elevation: 1)
+
+      subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 10)
+      subject.update(economy_seats: 10)
+
+      expect(subject.range_from_airport(airport)).to be < subject.aircraft_model.max_range
+    end
+
+    it "is zero for unreasonable runways" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+      airport = Fabricate(:airport, runway: subject.aircraft_model.takeoff_distance / 2.5, elevation: 0)
+
+      subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 10)
+
+      expect(subject.range_from_airport(airport)).to eq 0
+    end
+  end
+
   context "seats_fit_on_plane" do
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
