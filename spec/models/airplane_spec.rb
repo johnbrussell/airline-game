@@ -189,7 +189,7 @@ RSpec.describe Airplane do
       expect(subject.block_time(0)).to eq Airplane::MIN_TURN_TIME_MINS + 2 * AircraftModel::MIN_TAXI_TIME_MINS
 
       subject.aircraft_model.update(speed: 108, floor_space: Airplane::ECONOMY_SEAT_SIZE * 180, num_aisles: 1)
-      subject.update(economy_seats: Airplane::TURN_TIME_MINS_PER_SEAT * 40)
+      subject.update(economy_seats: 40 / Airplane::TURN_TIME_MINS_PER_SEAT)
 
       expect(subject.block_time(69)).to eq 116
     end
@@ -1311,7 +1311,7 @@ RSpec.describe Airplane do
       subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
 
       subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 100)
-      subject.update(economy_seats: 20 * Airplane::TURN_TIME_MINS_PER_SEAT)
+      subject.update(economy_seats: 20 / Airplane::TURN_TIME_MINS_PER_SEAT)
 
       expect(subject.turn_time_mins).to eq Airplane::MIN_TURN_TIME_MINS + 20
     end
