@@ -181,6 +181,20 @@ RSpec.describe Airplane do
     end
   end
 
+  context "block_time" do
+    it "is calculated correctly" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+
+      expect(subject.block_time(0)).to eq Airplane::MIN_TURN_TIME_MINS + 2 * AircraftModel::MIN_TAXI_TIME_MINS
+
+      subject.aircraft_model.update(speed: 108, floor_space: Airplane::ECONOMY_SEAT_SIZE * 180, num_aisles: 1)
+      subject.update(economy_seats: 40 / Airplane::TURN_TIME_MINS_PER_SEAT)
+
+      expect(subject.block_time(69)).to eq 116
+    end
+  end
+
   context "has_operator?" do
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
@@ -1297,7 +1311,7 @@ RSpec.describe Airplane do
       subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
 
       subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 100)
-      subject.update(economy_seats: 20 * Airplane::TURN_TIME_MINS_PER_SEAT)
+      subject.update(economy_seats: 20 / Airplane::TURN_TIME_MINS_PER_SEAT)
 
       expect(subject.turn_time_mins).to eq Airplane::MIN_TURN_TIME_MINS + 20
     end

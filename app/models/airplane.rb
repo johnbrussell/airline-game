@@ -46,7 +46,12 @@ class Airplane < ApplicationRecord
   MIN_TURN_TIME_MINS = 10
   PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE = 0.4
   TAKEOFF_ELEVATION_MULTIPLIER = 1.15
-  TURN_TIME_MINS_PER_SEAT = 3.5
+  TURN_TIME_MINS_PER_SEAT = 1/3.5
+
+  def block_time(distance)
+    # Note this is for one way!  Need two block times for a plane to operate one frequency on a route
+    aircraft_model.flight_time_mins(distance) + turn_time_mins
+  end
 
   def built?
     construction_date <= aircraft_manufacturing_queue.game.current_date
@@ -136,7 +141,7 @@ class Airplane < ApplicationRecord
   end
 
   def turn_time_mins
-    MIN_TURN_TIME_MINS + num_seats.to_f / (aircraft_model.num_aisles ** 0.5) / TURN_TIME_MINS_PER_SEAT
+    MIN_TURN_TIME_MINS + num_seats.to_f / (aircraft_model.num_aisles ** 0.5) * TURN_TIME_MINS_PER_SEAT
   end
 
   private
