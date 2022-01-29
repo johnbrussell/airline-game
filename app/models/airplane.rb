@@ -136,6 +136,10 @@ class Airplane < ApplicationRecord
     [range_with_unlimited_runway, range_with_runway_and_elevation(airport.runway, airport.elevation)].min
   end
 
+  def round_trip_block_time(distance)
+    2 * block_time(distance)
+  end
+
   def takeoff_distance(elevation, flight_distance)
     takeoff_elevation_multiplier(elevation) * 0.5 * aircraft_model.takeoff_distance * takeoff_seats_component * takeoff_flight_distance_component(flight_distance)
   end

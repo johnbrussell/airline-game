@@ -1078,6 +1078,20 @@ RSpec.describe Airplane do
     end
   end
 
+  context "round_trip_block_time" do
+    it "is calculated correctly" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+
+      expect(subject.round_trip_block_time(0)).to eq 2 * (Airplane::MIN_TURN_TIME_MINS + 2 * AircraftModel::MIN_TAXI_TIME_MINS)
+
+      subject.aircraft_model.update(speed: 108, floor_space: Airplane::ECONOMY_SEAT_SIZE * 180, num_aisles: 1)
+      subject.update(economy_seats: 40 / Airplane::TURN_TIME_MINS_PER_SEAT)
+
+      expect(subject.round_trip_block_time(69)).to eq 232
+    end
+  end
+
   context "seats_fit_on_plane" do
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
