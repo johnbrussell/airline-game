@@ -48,4 +48,13 @@ RSpec.describe AircraftModel do
       expect(subject.flight_fuel_burn(7000) / 7000).to be > subject.flight_fuel_burn(6999) / 6999
     end
   end
+
+  context "maintenance_cost_per_day" do
+    it "is calculated correctly" do
+      subject = Fabricate(:aircraft_model, useful_life: 100, price: 3652400)
+
+      expect(subject.maintenance_cost_per_day(0)).to eq 300
+      expect(subject.maintenance_cost_per_day(36524)).to eq 1200
+    end
+  end
 end
