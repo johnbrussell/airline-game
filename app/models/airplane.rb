@@ -129,6 +129,10 @@ class Airplane < ApplicationRecord
     [range_with_unlimited_runway, range_with_runway_and_elevation(airport.runway, airport.elevation)].min
   end
 
+  def takeoff_distance(elevation, flight_distance)
+    takeoff_elevation_multiplier(elevation) * 0.5 * aircraft_model.takeoff_distance * takeoff_seats_component * takeoff_flight_distance_component(flight_distance)
+  end
+
   private
 
     def age_in_days
@@ -182,6 +186,10 @@ class Airplane < ApplicationRecord
 
     def takeoff_elevation_multiplier(elevation)
       [1, TAKEOFF_ELEVATION_MULTIPLIER ** (elevation.to_f / ELEVATION_FOR_TAKEOFF_MULTIPLIER)].max
+    end
+
+    def takeoff_flight_distance_component(flight_distance)
+      2 ** (flight_distance / (2.0 * aircraft_model.max_range))
     end
 
     def takeoff_seats_component

@@ -1210,6 +1210,60 @@ RSpec.describe Airplane do
     end
   end
 
+  context "takeoff_distance" do
+    it "is 1/2 the stated takeoff distance for a plane with no seats flying no distance taking off at sea level" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+
+      subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 10)
+      subject.update(economy_seats: 0)
+
+      expect(subject.takeoff_distance(0, 0)).to eq subject.aircraft_model.takeoff_distance / 2.0
+    end
+
+    it "is the maximum takeoff distance for a plane with the maximum seats and flying its maximum range taking off at sea level" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+
+      subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 10)
+      subject.update(economy_seats: 10)
+
+      assert_in_epsilon subject.takeoff_distance(0, subject.aircraft_model.max_range), subject.aircraft_model.takeoff_distance, 0.0000000001
+    end
+
+    it "increases at a higher elevation" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+
+      subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 10)
+      subject.update(economy_seats: 10)
+
+      expect(subject.takeoff_distance(1, subject.aircraft_model.max_range)).to be > subject.aircraft_model.takeoff_distance
+    end
+
+    it "decreases with fewer seats" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+
+      subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 10)
+      subject.update(economy_seats: 9)
+
+      expect(subject.takeoff_distance(0, subject.aircraft_model.max_range)).to be < subject.aircraft_model.takeoff_distance
+      expect(subject.takeoff_distance(0, subject.aircraft_model.max_range)).to be > subject.aircraft_model.takeoff_distance / 2.0
+    end
+
+    it "decreases for a shorter flight" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+
+      subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 10)
+      subject.update(economy_seats: 10)
+
+      expect(subject.takeoff_distance(0, subject.aircraft_model.max_range - 1)).to be < subject.aircraft_model.takeoff_distance
+      expect(subject.takeoff_distance(0, subject.aircraft_model.max_range - 1)).to be > subject.aircraft_model.takeoff_distance / 2.0
+    end
+  end
+
   context "built?" do
     purchase_price_new = 100000000
 
