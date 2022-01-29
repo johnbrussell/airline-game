@@ -10,6 +10,8 @@ class AircraftModel < ApplicationRecord
   validates :fuel_burn, numericality: { greater_than: 0 }
   validates :speed, presence: true
   validates :speed, numericality: { greater_than: 0 }
+  validates :num_aisles, presence: true
+  validates :num_aisles, numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 2 }
   validates :num_pilots, presence: true
   validates :num_pilots, numericality: { greater_than: 0 }
   validates :num_flight_attendants, presence: true
