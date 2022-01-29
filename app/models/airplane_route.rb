@@ -7,4 +7,7 @@ class AirplaneRoute < ApplicationRecord
   validates :flight_cost, numericality: { greater_than_or_equal_to: 0 }
   validates :frequencies, presence: true
   validates :frequencies, numericality: { greater_than_or_equal_to: 0 }
+
+  belongs_to :airplane
+  belongs_to :route, class_name: "AirlineRoute", foreign_key: :airline_route_id
 end

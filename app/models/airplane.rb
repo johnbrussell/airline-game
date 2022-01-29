@@ -15,6 +15,9 @@ class Airplane < ApplicationRecord
   belongs_to :aircraft_manufacturing_queue
   belongs_to :aircraft_model
 
+  has_many :airplane_routes
+  has_many :routes, class_name: "AirlineRoute", through: :airplane_routes
+
   delegate :game, :to => :aircraft_manufacturing_queue
   delegate :max_economy_seats, :to => :aircraft_model
 
