@@ -27,7 +27,9 @@ class AircraftModel < ApplicationRecord
   MIN_TAXI_TIME_MINS = 3
   PERCENT_VALUE_MAINTAINED_AT_END_OF_USEFUL_LIFE = 0.03
   SLOW_DISTANCE_TIME_MINS = 30
-  SLOW_SPEED = 1/2.0
+  SLOW_SPEED_MULTIPLE = 1/2.0
+  VERY_SLOW_DISTANCE_TIME_MINS = 10
+  VERY_SLOW_SPEED_MULTIPLE = 1/3.0
 
   def daily_value_retention
     PERCENT_VALUE_MAINTAINED_AT_END_OF_USEFUL_LIFE ** (1 / (DAYS_PER_YEAR * useful_life))
@@ -52,14 +54,20 @@ class AircraftModel < ApplicationRecord
   private
 
     def flight_time_mins_exc_taxi(distance)
-      if distance <= slow_distance
-        distance.to_f / speed * 60 * 2
+      if distance <= very_slow_distance
+        distance / speed.to_f / VERY_SLOW_SPEED_MULTIPLE * 60
+      elsif distance <= very_slow_distance + slow_distance
+        VERY_SLOW_DISTANCE_TIME_MINS + (distance - very_slow_distance) / speed.to_f / SLOW_SPEED_MULTIPLE * 60
       else
-        (distance - slow_distance).to_f / speed * 60 + SLOW_DISTANCE_TIME_MINS
+        VERY_SLOW_DISTANCE_TIME_MINS + SLOW_DISTANCE_TIME_MINS + (distance - very_slow_distance - slow_distance) / speed.to_f * 60
       end
     end
 
     def slow_distance
-      speed * SLOW_SPEED * SLOW_DISTANCE_TIME_MINS / 60.0
+      speed * SLOW_SPEED_MULTIPLE * SLOW_DISTANCE_TIME_MINS / 60.0
+    end
+
+    def very_slow_distance
+      speed * VERY_SLOW_SPEED_MULTIPLE * VERY_SLOW_DISTANCE_TIME_MINS / 60.0
     end
 end
