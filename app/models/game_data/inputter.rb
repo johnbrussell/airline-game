@@ -45,6 +45,7 @@ class GameData::Inputter < ApplicationRecord
           max_range: data_point["Range"],
           fuel_burn: data_point["Fuel burn per hour"],
           speed: data_point["Speed"],
+          num_aisles: data_point["Num aisles"],
           num_pilots: data_point["Num pilots"],
           num_flight_attendants: data_point["Num flight attendants"],
           price: data_point["Price"],

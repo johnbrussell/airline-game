@@ -1264,6 +1264,60 @@ RSpec.describe Airplane do
     end
   end
 
+  context "turn_time_mins" do
+    it "is minimal for an empty plane" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+
+      subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 10)
+      subject.update(economy_seats: 0)
+
+      expect(subject.turn_time_mins).to eq Airplane::MIN_TURN_TIME_MINS
+    end
+
+    it "is increases as the seats on the plane increase" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+
+      num_seats = (1..9).to_a.sample
+
+      subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 10)
+      subject.update(economy_seats: num_seats)
+
+      old_turn_time = subject.turn_time_mins
+      expect(subject.turn_time_mins).to be > Airplane::MIN_TURN_TIME_MINS
+
+      subject.update(economy_seats: num_seats + 1)
+      expect(subject.turn_time_mins).to be > old_turn_time
+    end
+
+    it "is calculated correctly" do
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, num_aisles: 1, family: family)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+
+      subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 100)
+      subject.update(economy_seats: 20 * Airplane::TURN_TIME_MINS_PER_SEAT)
+
+      expect(subject.turn_time_mins).to eq Airplane::MIN_TURN_TIME_MINS + 20
+    end
+
+    it "is lower for multi-aisle planes" do
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, num_aisles: 1, family: family)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+
+      subject.aircraft_model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 100)
+      subject.update(economy_seats: (1..100).to_a.sample)
+
+      single_aisle_turn_time = subject.turn_time_mins
+
+      subject.aircraft_model.update(num_aisles: 2)
+
+      expect(subject.turn_time_mins).to be < single_aisle_turn_time
+    end
+  end
+
   context "built?" do
     purchase_price_new = 100000000
 

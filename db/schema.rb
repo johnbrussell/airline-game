@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_01_18_170855) do
+ActiveRecord::Schema.define(version: 2022_01_29_083630) do
 
   create_table "aircraft_families", force: :cascade do |t|
     t.string "name", null: false
@@ -44,6 +44,7 @@ ActiveRecord::Schema.define(version: 2022_01_18_170855) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "aircraft_family_id"
+    t.integer "num_aisles", default: 1, null: false
     t.index ["aircraft_family_id"], name: "index_aircraft_models_on_aircraft_family_id"
   end
 

@@ -5,6 +5,7 @@ Fabricator(:aircraft_model) do
   max_range { 2500 }
   speed { 500 }
   fuel_burn { 1500 }
+  num_aisles { [1, 2].sample }
   num_pilots { 2 }
   num_flight_attendants { 3 }
   price { 100000000 }

@@ -43,8 +43,10 @@ class Airplane < ApplicationRecord
   EMPTY_PLANE_RANGE_MULTIPLIER = 1.25
   MAX_LEASE_DAYS = 3652
   MIN_PERCENT_OF_LEASE_NEEDED_AS_CASH_ON_HAND_TO_LEASE = 0.08
+  MIN_TURN_TIME_MINS = 10
   PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE = 0.4
   TAKEOFF_ELEVATION_MULTIPLIER = 1.15
+  TURN_TIME_MINS_PER_SEAT = 3.5
 
   def built?
     construction_date <= aircraft_manufacturing_queue.game.current_date
@@ -131,6 +133,10 @@ class Airplane < ApplicationRecord
 
   def takeoff_distance(elevation, flight_distance)
     takeoff_elevation_multiplier(elevation) * 0.5 * aircraft_model.takeoff_distance * takeoff_seats_component * takeoff_flight_distance_component(flight_distance)
+  end
+
+  def turn_time_mins
+    MIN_TURN_TIME_MINS + num_seats.to_f / (aircraft_model.num_aisles ** 0.5) / TURN_TIME_MINS_PER_SEAT
   end
 
   private
