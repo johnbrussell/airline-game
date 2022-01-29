@@ -48,6 +48,11 @@ class Airplane < ApplicationRecord
   TAKEOFF_ELEVATION_MULTIPLIER = 1.15
   TURN_TIME_MINS_PER_SEAT = 3.5
 
+  def block_time(distance)
+    # Note this is for one way!  Need two block times for a plane to operate one frequency on a route
+    aircraft_model.flight_time_mins(distance) + turn_time_mins
+  end
+
   def built?
     construction_date <= aircraft_manufacturing_queue.game.current_date
   end
