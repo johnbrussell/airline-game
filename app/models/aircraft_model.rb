@@ -28,6 +28,8 @@ class AircraftModel < ApplicationRecord
   DAYS_PER_YEAR = 365.24
   FUEL_BURN_MULTIPLE = 0.00025
   MIN_TAXI_TIME_MINS = 3
+  OLD_PLANE_MAINTENANCE_PREMIUM = 3
+  PERCENT_OF_NEW_VALUE_SPENT_ON_MAINTENANCE_PER_YEAR = 0.03
   PERCENT_VALUE_MAINTAINED_AT_END_OF_USEFUL_LIFE = 0.03
   SLOW_DISTANCE_TIME_MINS = 30
   SLOW_SPEED_MULTIPLE = 1/2.0
@@ -45,6 +47,10 @@ class AircraftModel < ApplicationRecord
 
   def flight_time_mins(distance)
     flight_time_mins_exc_taxi(distance) + 2 * MIN_TAXI_TIME_MINS
+  end
+
+  def maintenance_cost_per_day(age_in_days)
+    PERCENT_OF_NEW_VALUE_SPENT_ON_MAINTENANCE_PER_YEAR * maintenance_premium(age_in_days) * price / DAYS_PER_YEAR
   end
 
   def max_business_seats
@@ -71,8 +77,16 @@ class AircraftModel < ApplicationRecord
       end
     end
 
+    def maintenance_premium(age_in_days)
+      (1 + OLD_PLANE_MAINTENANCE_PREMIUM * age_in_days / useful_life_days)
+    end
+
     def slow_distance
       speed * SLOW_SPEED_MULTIPLE * SLOW_DISTANCE_TIME_MINS / 60.0
+    end
+
+    def useful_life_days
+      useful_life * DAYS_PER_YEAR
     end
 
     def very_slow_distance
