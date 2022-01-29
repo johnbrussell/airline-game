@@ -7,7 +7,16 @@ class AirlineRoute < ApplicationRecord
   validates :business_price, numericality: { greater_than: 0 }
   validates :origin_airport_id, presence: true
   validates :destination_airport_id, presence: true
+  validate :destination_airport_id, :airports_alphabetized
 
   has_many :airplane_routes
   has_many :airplanes, through: :airplane_routes
+
+  private
+
+    def airports_alphabetized
+      if Airport.find(destination_airport_id).iata <= Airport.find(origin_airport_id).iata
+        errors.add(:destination_airport_id, "must correspond to an airport with iata alphabetically after origin airport's iata")
+      end
+    end
 end
