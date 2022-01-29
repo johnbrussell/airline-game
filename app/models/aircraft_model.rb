@@ -24,6 +24,7 @@ class AircraftModel < ApplicationRecord
   belongs_to :family, class_name: "AircraftFamily", foreign_key: "aircraft_family_id"
 
   DAYS_PER_YEAR = 365.24
+  FUEL_BURN_MULTIPLE = 0.00025
   MIN_TAXI_TIME_MINS = 3
   PERCENT_VALUE_MAINTAINED_AT_END_OF_USEFUL_LIFE = 0.03
   SLOW_DISTANCE_TIME_MINS = 30
@@ -33,6 +34,11 @@ class AircraftModel < ApplicationRecord
 
   def daily_value_retention
     PERCENT_VALUE_MAINTAINED_AT_END_OF_USEFUL_LIFE ** (1 / (DAYS_PER_YEAR * useful_life))
+  end
+
+  def flight_fuel_burn(distance)
+    # fuel burn per minute, augmented for length of flight, times minutes of flight
+    fuel_burn / 60.0 * (1 + FUEL_BURN_MULTIPLE * flight_time_mins_exc_taxi(distance)) * flight_time_mins(distance)
   end
 
   def flight_time_mins(distance)
