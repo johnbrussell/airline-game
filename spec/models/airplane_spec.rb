@@ -1147,6 +1147,7 @@ RSpec.describe Airplane do
         airplane: subject,
         route: route,
       )
+      subject.reload
 
       expect(subject.routes_connected_with?("JFK", "LGA")).to be false
     end
@@ -1180,6 +1181,7 @@ RSpec.describe Airplane do
         airplane: subject,
         route: route,
       )
+      subject.reload
 
       expect(subject.routes_connected_without?("LGA", "JFK")).to be true
     end
@@ -1204,6 +1206,7 @@ RSpec.describe Airplane do
         airplane: subject,
         route: route,
       )
+      subject.reload
 
       expect(subject.routes_connected_without?("INU", "FUN")).to be true
       expect(subject.routes_connected_without?("FUN", "INU")).to be true
@@ -1245,6 +1248,7 @@ RSpec.describe Airplane do
         airplane: subject,
         route: route,
       )
+      subject.reload
 
       expect(subject.routes_connected_without?("INU", "FUN")).to be true
       expect(subject.routes_connected_without?("FUN", "INU")).to be true
@@ -1304,6 +1308,7 @@ RSpec.describe Airplane do
         airplane: subject,
         route: route,
       )
+      subject.reload
 
       expect(subject.routes_connected_without?("INU", "FUN")).to be false
       expect(subject.routes_connected_without?("FUN", "INU")).to be false
