@@ -1078,6 +1078,238 @@ RSpec.describe Airplane do
     end
   end
 
+  context "round_trip_block_time" do
+    it "is calculated correctly" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+
+      expect(subject.round_trip_block_time(0)).to eq 2 * (Airplane::MIN_TURN_TIME_MINS + 2 * AircraftModel::MIN_TAXI_TIME_MINS)
+
+      subject.aircraft_model.update(speed: 108, floor_space: Airplane::ECONOMY_SEAT_SIZE * 180, num_aisles: 1)
+      subject.update(economy_seats: 40 / Airplane::TURN_TIME_MINS_PER_SEAT)
+
+      expect(subject.round_trip_block_time(69)).to eq 232
+    end
+  end
+
+  context "routes_connected_with?" do
+    it "is true if the airplane has no routes" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+
+      expect(subject.routes_connected_with?("JFK", "LGA")).to be true
+    end
+
+    it "is true if the origin and destination provided connect to the airplane's existing routes" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      route = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: fun,
+        destination_airport: inu,
+        distance: 1,
+      )
+      AirplaneRoute.create!(
+        block_time_mins: 1,
+        frequencies: 1,
+        flight_cost: 1,
+        airplane: subject,
+        route: route,
+      )
+
+      expect(subject.routes_connected_with?("INU", "LGA")).to be true
+      expect(subject.routes_connected_with?("FUN", "LGA")).to be true
+      expect(subject.routes_connected_with?("JFK", "FUN")).to be true
+      expect(subject.routes_connected_with?("JFK", "INU")).to be true
+    end
+
+    it "is false if the origin and destination provided do not connect to the airplane's existing routes" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      route = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: fun,
+        destination_airport: inu,
+        distance: 1,
+      )
+      AirplaneRoute.create!(
+        block_time_mins: 1,
+        frequencies: 1,
+        flight_cost: 1,
+        airplane: subject,
+        route: route,
+      )
+
+      expect(subject.routes_connected_with?("JFK", "LGA")).to be false
+    end
+  end
+
+  context "routes_connected_without?" do
+    it "is true if the airplane has no routes" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+
+      expect(subject.routes_connected_without?("JFK", "LGA")).to be true
+    end
+
+    it "is true for a route the airplane doesn't fly" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      route = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: fun,
+        destination_airport: inu,
+        distance: 1,
+      )
+      AirplaneRoute.create!(
+        block_time_mins: 1,
+        frequencies: 1,
+        flight_cost: 1,
+        airplane: subject,
+        route: route,
+      )
+
+      expect(subject.routes_connected_without?("LGA", "JFK")).to be true
+    end
+
+    it "is true if the airplane's only route is the origin and destination supplied" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      route = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: fun,
+        destination_airport: inu,
+        distance: 1,
+      )
+      AirplaneRoute.create!(
+        block_time_mins: 1,
+        frequencies: 1,
+        flight_cost: 1,
+        airplane: subject,
+        route: route,
+      )
+
+      expect(subject.routes_connected_without?("INU", "FUN")).to be true
+      expect(subject.routes_connected_without?("FUN", "INU")).to be true
+    end
+
+    it "is true if the airplane's only routes are the origin and destination supplied and another connected route" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      trw = Fabricate(:airport, iata: "TRW", market: inu.market)
+      route = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: fun,
+        destination_airport: inu,
+        distance: 1,
+      )
+      AirplaneRoute.create!(
+        block_time_mins: 1,
+        frequencies: 1,
+        flight_cost: 1,
+        airplane: subject,
+        route: route,
+      )
+      route = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: fun,
+        destination_airport: trw,
+        distance: 1,
+      )
+      AirplaneRoute.create!(
+        block_time_mins: 1,
+        frequencies: 1,
+        flight_cost: 1,
+        airplane: subject,
+        route: route,
+      )
+
+      expect(subject.routes_connected_without?("INU", "FUN")).to be true
+      expect(subject.routes_connected_without?("FUN", "INU")).to be true
+      expect(subject.routes_connected_without?("FUN", "TRW")).to be true
+      expect(subject.routes_connected_without?("TRW", "FUN")).to be true
+    end
+
+    it "is false if the origin and destination supplied are a necessary link between the airplane's routes" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      trw = Fabricate(:airport, iata: "TRW", market: inu.market)
+      maj = Fabricate(:airport, iata: "MAJ", market: inu.market)
+      route = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: fun,
+        destination_airport: inu,
+        distance: 1,
+      )
+      AirplaneRoute.create!(
+        block_time_mins: 1,
+        frequencies: 1,
+        flight_cost: 1,
+        airplane: subject,
+        route: route,
+      )
+      route = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: fun,
+        destination_airport: trw,
+        distance: 1,
+      )
+      AirplaneRoute.create!(
+        block_time_mins: 1,
+        frequencies: 1,
+        flight_cost: 1,
+        airplane: subject,
+        route: route,
+      )
+      route = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: inu,
+        destination_airport: maj,
+        distance: 1,
+      )
+      AirplaneRoute.create!(
+        block_time_mins: 1,
+        frequencies: 1,
+        flight_cost: 1,
+        airplane: subject,
+        route: route,
+      )
+
+      expect(subject.routes_connected_without?("INU", "FUN")).to be false
+      expect(subject.routes_connected_without?("FUN", "INU")).to be false
+    end
+  end
+
   context "seats_fit_on_plane" do
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
