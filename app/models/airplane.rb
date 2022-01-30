@@ -9,6 +9,7 @@ class Airplane < ApplicationRecord
   validates :premium_economy_seats, numericality: { greater_than_or_equal_to: 0 }
   validates :lease_rate, numericality: { greater_than: 0 }, allow_nil: true
 
+  validate :block_time_feasible
   validate :operator_changes_appropriately, unless: :new_record?
   validate :seats_fit_on_plane
 
@@ -45,6 +46,7 @@ class Airplane < ApplicationRecord
   ELEVATION_FOR_TAKEOFF_MULTIPLIER = 2000
   EMPTY_PLANE_RANGE_MULTIPLIER = 1.25
   MAX_LEASE_DAYS = 3652
+  MAX_TOTAL_BLOCK_TIME_MINS = 20 * 7 * 60
   MIN_PERCENT_OF_LEASE_NEEDED_AS_CASH_ON_HAND_TO_LEASE = 0.08
   MIN_TURN_TIME_MINS = 10
   PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE = 0.4
@@ -163,6 +165,12 @@ class Airplane < ApplicationRecord
 
     def age_in_days
       [(game.current_date - construction_date).to_i, 0].max
+    end
+
+    def block_time_feasible
+      if airplane_routes.map(&:block_time_mins).sum > MAX_TOTAL_BLOCK_TIME_MINS
+        errors.add(:airplane_routes, "block time is too high")
+      end
     end
 
     def lease_premium
