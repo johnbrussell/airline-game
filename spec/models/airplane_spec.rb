@@ -195,6 +195,59 @@ RSpec.describe Airplane do
     end
   end
 
+  context "block_time_feasible" do
+    it "is true when the routes' block time is within reason" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      route = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: fun,
+        destination_airport: inu,
+        distance: 1,
+      )
+      AirplaneRoute.create!(
+        block_time_mins: Airplane::MAX_TOTAL_BLOCK_TIME_MINS,
+        frequencies: 1,
+        flight_cost: 1,
+        airplane: subject,
+        route: route,
+      )
+
+      subject.reload
+      expect(subject.valid?).to be true
+    end
+
+    it "is false when the routes' block time is too much" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      route = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: fun,
+        destination_airport: inu,
+        distance: 1,
+      )
+      AirplaneRoute.create!(
+        block_time_mins: Airplane::MAX_TOTAL_BLOCK_TIME_MINS + 1,
+        frequencies: 1,
+        flight_cost: 1,
+        airplane: subject,
+        route: route,
+      )
+
+      subject.reload
+      expect(subject.valid?).to be false
+      expect(subject.errors.full_messages).to include "Airplane routes block time is too high"
+    end
+  end
+
   context "has_operator?" do
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
