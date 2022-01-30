@@ -7,10 +7,12 @@ class AirlineRoute < ApplicationRecord
   validates :business_price, numericality: { greater_than: 0 }
   validates :origin_airport_id, presence: true
   validates :destination_airport_id, presence: true
-  validate :destination_airport_id, :airports_alphabetized
+  validate :airports_alphabetized
 
   has_many :airplane_routes
   has_many :airplanes, through: :airplane_routes
+  belongs_to :origin_airport, class_name: "Airport"
+  belongs_to :destination_airport, class_name: "Airport"
 
   private
 

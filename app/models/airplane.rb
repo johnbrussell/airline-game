@@ -143,6 +143,14 @@ class Airplane < ApplicationRecord
     2 * block_time(distance)
   end
 
+  def routes_connected_with?(origin_iata, destination_iata)
+    origin_destination_pairs_connected?(routes.map{ |r| [r.origin_airport.iata, r.destination_airport.iata] }.append([origin_iata, destination_iata]))
+  end
+
+  def routes_connected_without?(origin_iata, destination_iata)
+    origin_destination_pairs_connected?(routes.map { |r| [r.origin_airport.iata, r.destination_airport.iata] }.reject { |e| e.sort == [origin_iata, destination_iata].sort})
+  end
+
   def takeoff_distance(elevation, flight_distance)
     takeoff_elevation_multiplier(elevation) * 0.5 * aircraft_model.takeoff_distance * takeoff_seats_component * takeoff_flight_distance_component(flight_distance)
   end
@@ -180,8 +188,23 @@ class Airplane < ApplicationRecord
       (max_economy_seats - num_seats) / max_economy_seats.to_f
     end
 
+    def present_od_pairs_connected?(od_pairs)
+      seen_airports = Set.new(od_pairs.fetch(0))
+      new_airports = Set.new(od_pairs.fetch(0))
+      while new_airports.present?
+        new_airports = Set.new(od_pairs.select{ |o, d| seen_airports.include?(o) || seen_airports.include?(d) }.flatten)
+        new_airports = new_airports - seen_airports
+        seen_airports = new_airports | seen_airports
+      end
+      od_pairs.all?{ |o, d| seen_airports.include?(o) && seen_airports.include?(d) }
+    end
+
     def purchase_payment
       built? ? purchase_price : new_plane_payment
+    end
+
+    def origin_destination_pairs_connected?(od_pairs)
+      od_pairs.empty? ? true : present_od_pairs_connected?(od_pairs)
     end
 
     def range_with_runway_and_elevation(runway_length, elevation)
