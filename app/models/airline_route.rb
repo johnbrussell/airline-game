@@ -14,6 +14,9 @@ class AirlineRoute < ApplicationRecord
   belongs_to :origin_airport, class_name: "Airport"
   belongs_to :destination_airport, class_name: "Airport"
 
+  delegate :iata, to: :origin_airport, prefix: true
+  delegate :iata, to: :destination_airport, prefix: true
+
   private
 
     def airports_alphabetized
