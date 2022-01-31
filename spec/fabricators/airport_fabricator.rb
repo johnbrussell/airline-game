@@ -7,5 +7,6 @@ Fabricator(:airport) do
   easy_gates 5
   latitude { Random.rand(-89..89) }
   longitude { Random.rand(-179..179) }
+  municipality { [nil, "Gary"].sample }
   market
 end
