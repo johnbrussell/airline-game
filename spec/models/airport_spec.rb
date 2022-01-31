@@ -1,6 +1,21 @@
 require "rails_helper"
 
 RSpec.describe Airport do
+  context "display name" do
+    it "shows the municipality name if it is present" do
+      subject = Fabricate(:airport, municipality: "Somerville")
+
+      expect(subject.display_name).to eq "Somerville"
+    end
+
+    it "is the market name if it is not present" do
+      market = Fabricate(:market, name: "Somerville")
+      subject = Fabricate(:airport, municipality: nil, market: market)
+
+      expect(subject.display_name).to eq "Somerville"
+    end
+  end
+
   context "other_market_airports" do
     before(:each) do
       boston = Market.create!(

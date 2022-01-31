@@ -27,6 +27,10 @@ class Airport < ApplicationRecord
     end
   end
 
+  def display_name
+    municipality || market.name
+  end
+
   def is_on_island?
     market.is_island
   end
