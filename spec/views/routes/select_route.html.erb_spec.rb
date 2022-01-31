@@ -20,7 +20,7 @@ RSpec.describe "routes/select_route", type: :feature do
     nukualofa = Fabricate(:market, name: "Nukualofa", country: "Tonga")
     apia = Fabricate(:market, name: "Apia", country: "Samoa")
     inu = Fabricate(:airport, market: nauru, iata: "INU", municipality: "Yaren")
-    fun = Fabricate(:airport, market: funafuti, iata: "FUN")
+    fun = Fabricate(:airport, market: funafuti, iata: "FUN", municipality: nil)
     tbu = Fabricate(:airport, market: nukualofa, iata: "TBU")
     apw = Fabricate(:airport, market: apia, iata: "APW")
 
