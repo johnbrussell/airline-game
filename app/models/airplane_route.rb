@@ -8,6 +8,7 @@ class AirplaneRoute < ApplicationRecord
   validates :frequencies, presence: true
   validates :frequencies, numericality: { greater_than: 0 }
 
+  validate :airplane_time_is_logical
   validate :routes_connected
 
   before_destroy :validate_remaining_routes_connected
@@ -16,6 +17,16 @@ class AirplaneRoute < ApplicationRecord
   belongs_to :route, class_name: "AirlineRoute", foreign_key: :airline_route_id
 
   private
+
+    def airplane_time_is_logical
+      if other_airplane_routes.map(&:block_time_mins).sum + block_time_mins > Airplane::MAX_TOTAL_BLOCK_TIME_MINS
+        errors.add(:airplane, "has too much block time")
+      end
+    end
+
+    def other_airplane_routes
+      airplane.airplane_routes.reject { |r| r.id == id }
+    end
 
     def routes_connected
       if !airplane.routes_connected_with?(route.origin_airport_iata, route.destination_airport_iata)
