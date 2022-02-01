@@ -23,8 +23,12 @@ class Airport < ApplicationRecord
 
   def self.select_options
     all.order(:iata).map do |airport|
-      ["#{airport.iata} - #{airport.market.name}, #{airport.market.country}", airport.id]
+      ["#{airport.iata} - #{airport.display_name}, #{airport.market.country}", airport.id]
     end
+  end
+
+  def display_name
+    municipality || market.name
   end
 
   def is_on_island?

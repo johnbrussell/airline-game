@@ -77,6 +77,7 @@ class GameData::Inputter < ApplicationRecord
             easy_gates: data_point["Easy build gates"],
             latitude: data_point["Lat"],
             longitude: data_point["Long"],
+            municipality: data_point["municipality"],
           )
         else
           airport.update!(
@@ -88,6 +89,7 @@ class GameData::Inputter < ApplicationRecord
             easy_gates: data_point["Easy build gates"],
             latitude: data_point["Lat"],
             longitude: data_point["Long"],
+            municipality: data_point["municipality"],
           )
         end
       end

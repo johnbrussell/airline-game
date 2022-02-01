@@ -19,8 +19,8 @@ RSpec.describe "routes/select_route", type: :feature do
     funafuti = Fabricate(:market, name: "Funafuti", country: "Tuvalu")
     nukualofa = Fabricate(:market, name: "Nukualofa", country: "Tonga")
     apia = Fabricate(:market, name: "Apia", country: "Samoa")
-    inu = Fabricate(:airport, market: nauru, iata: "INU")
-    fun = Fabricate(:airport, market: funafuti, iata: "FUN")
+    inu = Fabricate(:airport, market: nauru, iata: "INU", municipality: "Yaren")
+    fun = Fabricate(:airport, market: funafuti, iata: "FUN", municipality: nil)
     tbu = Fabricate(:airport, market: nukualofa, iata: "TBU")
     apw = Fabricate(:airport, market: apia, iata: "APW")
 
@@ -31,7 +31,7 @@ RSpec.describe "routes/select_route", type: :feature do
 
     expect(page).to have_content "Select a route to view"
 
-    select("INU - Nauru, Nauru", from: "origin_id")
+    select("INU - Yaren, Nauru", from: "origin_id")
     select("FUN - Funafuti, Tuvalu", from: "destination_id")
 
     click_on "Go"

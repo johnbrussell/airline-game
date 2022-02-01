@@ -234,13 +234,13 @@ RSpec.describe Airplane do
         destination_airport: inu,
         distance: 1,
       )
-      AirplaneRoute.create!(
+      AirplaneRoute.new(
         block_time_mins: Airplane::MAX_TOTAL_BLOCK_TIME_MINS + 1,
         frequencies: 1,
         flight_cost: 1,
         airplane: subject,
         route: route,
-      )
+      ).save(validate: false)
 
       subject.reload
       expect(subject.valid?).to be false
