@@ -6,7 +6,7 @@ RSpec.describe Airplane do
 
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737", country_group: "United States")
       AircraftManufacturingQueue.create!(game: game, aircraft_family_id: family.id, production_rate: 1)
       AircraftModel.create!(
         name: "737-100",
@@ -70,7 +70,7 @@ RSpec.describe Airplane do
 
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737", country_group: "United States")
       AircraftManufacturingQueue.create!(game: game, aircraft_family_id: family.id, production_rate: 1)
       AircraftModel.create!(
         name: "737-100",
@@ -139,7 +139,7 @@ RSpec.describe Airplane do
   context "with_operator" do
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737", country_group: "United States")
       queue = AircraftManufacturingQueue.create!(game: game, aircraft_family_id: family.id, production_rate: 1)
       model = AircraftModel.create!(
         name: "737-100",
@@ -251,7 +251,7 @@ RSpec.describe Airplane do
   context "has_operator?" do
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-      family = AircraftFamily.create!(name: "737", manufacturer: "Boeing")
+      family = AircraftFamily.create!(name: "737", manufacturer: "Boeing", country_group: "United States")
       AircraftManufacturingQueue.create!(game: game, aircraft_family_id: family.id, production_rate: 1)
       AircraftModel.create!(
         name: "737-300",
@@ -357,7 +357,7 @@ RSpec.describe Airplane do
   context "operator_changes_appropriately" do
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737", country_group: "United States")
       queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
       model = AircraftModel.create!(
         name: "737-100",
@@ -423,7 +423,7 @@ RSpec.describe Airplane do
 
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737", country_group: "United States")
       queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
       model = AircraftModel.create!(
         name: "737-100",
@@ -485,7 +485,7 @@ RSpec.describe Airplane do
 
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737", country_group: "United States")
       queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
       model = AircraftModel.create!(
         name: "737-100",
@@ -561,7 +561,7 @@ RSpec.describe Airplane do
 
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737", country_group: "United States")
       queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
       model = AircraftModel.create!(
         name: "737-100",
@@ -733,7 +733,7 @@ RSpec.describe Airplane do
 
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737", country_group: "United States")
       queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
       model = AircraftModel.create!(
         name: "737-100",
@@ -824,7 +824,7 @@ RSpec.describe Airplane do
 
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737", country_group: "United States")
       queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
       model = AircraftModel.create!(
         name: "737-100",
@@ -1453,7 +1453,7 @@ RSpec.describe Airplane do
   context "seats_fit_on_plane" do
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737", country_group: "United States")
       AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
       AircraftModel.create!(
         name: "737-100",
@@ -1709,7 +1709,7 @@ RSpec.describe Airplane do
 
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737", country_group: "United States")
       queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
       model = AircraftModel.create!(
         name: "737-100",
