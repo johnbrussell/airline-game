@@ -10,13 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_01_31_183838) do
+ActiveRecord::Schema.define(version: 2022_02_04_132735) do
 
   create_table "aircraft_families", force: :cascade do |t|
     t.string "name", null: false
     t.string "manufacturer", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "country_group", null: false
   end
 
   create_table "aircraft_manufacturing_queues", force: :cascade do |t|
