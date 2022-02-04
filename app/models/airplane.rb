@@ -45,10 +45,12 @@ class Airplane < ApplicationRecord
   BUSINESS_SEAT_SIZE = 72 * 17
   ELEVATION_FOR_TAKEOFF_MULTIPLIER = 2000
   EMPTY_PLANE_RANGE_MULTIPLIER = 1.25
+  MIN_MAINTENANCE_RATE = 0.8
   MAX_LEASE_DAYS = 3652
   MAX_TOTAL_BLOCK_TIME_MINS = 20 * 7 * 60
   MIN_PERCENT_OF_LEASE_NEEDED_AS_CASH_ON_HAND_TO_LEASE = 0.08
   MIN_TURN_TIME_MINS = 10
+  NUM_IN_FAMILY_FOR_MIN_MAINTENANCE_RATE = 100.0
   PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE = 0.4
   TAKEOFF_ELEVATION_MULTIPLIER = 1.15
   TURN_TIME_MINS_PER_SEAT = 1/3.5
@@ -104,6 +106,10 @@ class Airplane < ApplicationRecord
 
   def lease_rate_per_day(lease_in_days)
     (value - value_at_age(age_in_days + lease_in_days)) * lease_premium / lease_in_days
+  end
+
+  def maintenance_cost_per_day
+    aircraft_model.maintenance_cost_per_day(age_in_days) * maintenance_rate
   end
 
   def new_plane_payment
@@ -175,6 +181,10 @@ class Airplane < ApplicationRecord
 
     def lease_premium
       model.price / (model.price - value_at_age(PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE * model.useful_life * AircraftModel::DAYS_PER_YEAR))
+    end
+
+    def maintenance_rate
+      [MIN_MAINTENANCE_RATE, MIN_MAINTENANCE_RATE + (1 - MIN_MAINTENANCE_RATE) * ((NUM_IN_FAMILY_FOR_MIN_MAINTENANCE_RATE - 1) - (num_in_family - 1)) / (NUM_IN_FAMILY_FOR_MIN_MAINTENANCE_RATE - 1)].max
     end
 
     def model
