@@ -1,6 +1,19 @@
 require "rails_helper"
 
 RSpec.describe RivalCountryGroup do
+  context "rivals?" do
+    it "calculates correctly" do
+      RivalCountryGroup.create!(country_one: "Nauru", country_two: "Tuvalu")
+
+      expect(RivalCountryGroup.rivals?("Nauru", "Tuvalu")).to be true
+      expect(RivalCountryGroup.rivals?("Tuvalu", "Nauru")).to be true
+      expect(RivalCountryGroup.rivals?("Tuvalu", "United States")).to be false
+      expect(RivalCountryGroup.rivals?("Nauru", "United States")).to be false
+      expect(RivalCountryGroup.rivals?("United States", "Nauru")).to be false
+      expect(RivalCountryGroup.rivals?("United States", "Tuvalu")).to be false
+    end
+  end
+
   context "valid?" do
     it "is true when the country groups are alphabetized" do
       subject = RivalCountryGroup.create(country_one: "Marshall Islands", country_two: "Micronesia")
