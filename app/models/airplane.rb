@@ -72,10 +72,11 @@ class Airplane < ApplicationRecord
   def lease(airline, length_in_days, business_seats, premium_economy_seats, economy_seats)
     lease_start_date = built? ? aircraft_manufacturing_queue.game.current_date : construction_date
     if built?
-      assign_attributes(lease_rate: lease_rate_per_day(length_in_days.to_i), lease_expiry: lease_start_date + length_in_days.to_i.days)
+      assign_attributes(base_country_group: airline.base.country_group, lease_rate: lease_rate_per_day(length_in_days.to_i), lease_expiry: lease_start_date + length_in_days.to_i.days)
       airline.assign_attributes(cash_on_hand: airline.cash_on_hand - lease_rate_per_day(length_in_days.to_i))
     else
       assign_attributes(
+        base_country_group: airline.base.country_group,
         business_seats: business_seats,
         premium_economy_seats: premium_economy_seats,
         economy_seats: economy_seats,
@@ -118,8 +119,11 @@ class Airplane < ApplicationRecord
   end
 
   def purchase(airline, business_seats, premium_economy_seats, economy_seats)
-    if !built?
+    if built?
+      assign_attributes(base_country_group: airline.base.country_group)
+    else
       assign_attributes(
+        base_country_group: airline.base.country_group,
         business_seats: business_seats,
         premium_economy_seats: premium_economy_seats,
         economy_seats: economy_seats,
