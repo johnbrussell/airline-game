@@ -42,6 +42,7 @@ class AircraftManufacturingQueue < ApplicationRecord
     def create_new_airplane(model, construction_date)
       Airplane.create!(
         aircraft_model_id: model.id,
+        base_country_group: model.family.country_group,
         business_seats: 0,
         premium_economy_seats: 0,
         economy_seats: (model.floor_space / Airplane::ECONOMY_SEAT_SIZE).floor(),

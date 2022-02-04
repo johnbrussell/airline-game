@@ -29,6 +29,7 @@ RSpec.describe AircraftManufacturingQueue do
       game = Game.last
       model = AircraftModel.last
       last_plane = Airplane.create!(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: 0,
         economy_seats: 1,
@@ -57,6 +58,7 @@ RSpec.describe AircraftManufacturingQueue do
       game = Game.last
       model = AircraftModel.last
       last_plane = Airplane.create!(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: 0,
         economy_seats: 1,
@@ -85,6 +87,7 @@ RSpec.describe AircraftManufacturingQueue do
       game = Game.last
       model = AircraftModel.last
       last_plane = Airplane.create!(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: 0,
         economy_seats: 1,
@@ -216,6 +219,7 @@ RSpec.describe AircraftManufacturingQueue do
 
         Airplane.create!(
           aircraft_model_id: model_1.id,
+          base_country_group: "United States",
           business_seats: 0,
           premium_economy_seats: 0,
           economy_seats: 1,
@@ -259,6 +263,7 @@ RSpec.describe AircraftManufacturingQueue do
         queue = AircraftManufacturingQueue.last
         game = queue.game
         Airplane.create!(
+          base_country_group: "United States",
           business_seats: 0,
           premium_economy_seats: 0,
           economy_seats: 1,
@@ -281,6 +286,7 @@ RSpec.describe AircraftManufacturingQueue do
         queue.update!(production_rate: min_rate)
         game = queue.game
         Airplane.create!(
+          base_country_group: "United States",
           business_seats: 0,
           premium_economy_seats: 0,
           economy_seats: 1,
@@ -303,6 +309,7 @@ RSpec.describe AircraftManufacturingQueue do
         queue.update!(production_rate: max_rate)
         game = queue.game
         Airplane.create!(
+          base_country_group: "United States",
           business_seats: 0,
           premium_economy_seats: 0,
           economy_seats: 1,
@@ -325,6 +332,7 @@ RSpec.describe AircraftManufacturingQueue do
         queue.update!(production_rate: initial_rate)
         game = queue.game
         Airplane.create!(
+          base_country_group: "United States",
           business_seats: 0,
           premium_economy_seats: 0,
           economy_seats: 1,
@@ -349,6 +357,7 @@ RSpec.describe AircraftManufacturingQueue do
         queue.update!(production_rate: initial_rate)
         game = queue.game
         Airplane.create!(
+          base_country_group: "United States",
           business_seats: 0,
           premium_economy_seats: 0,
           economy_seats: 1,
@@ -371,6 +380,7 @@ RSpec.describe AircraftManufacturingQueue do
         queue.update!(production_rate: initial_rate)
         game = queue.game
         Airplane.create!(
+          base_country_group: "United States",
           business_seats: 0,
           premium_economy_seats: 0,
           economy_seats: 1,
@@ -393,6 +403,7 @@ RSpec.describe AircraftManufacturingQueue do
         queue.update!(production_rate: initial_rate)
         game = queue.game
         Airplane.create!(
+          base_country_group: "United States",
           business_seats: 0,
           premium_economy_seats: 0,
           economy_seats: 1,
@@ -415,6 +426,7 @@ RSpec.describe AircraftManufacturingQueue do
         queue.update!(production_rate: initial_rate)
         game = queue.game
         Airplane.create!(
+          base_country_group: "United States",
           business_seats: 0,
           premium_economy_seats: 0,
           economy_seats: 1,

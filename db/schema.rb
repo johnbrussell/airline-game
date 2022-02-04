@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_04_132735) do
+ActiveRecord::Schema.define(version: 2022_02_24_154707) do
 
   create_table "aircraft_families", force: :cascade do |t|
     t.string "name", null: false
@@ -94,10 +94,10 @@ ActiveRecord::Schema.define(version: 2022_02_04_132735) do
     t.integer "aircraft_manufacturing_queue_id"
     t.integer "operator_id"
     t.integer "owner_id"
-    t.integer "lessee_id"
     t.date "lease_expiry"
     t.date "end_of_useful_life", null: false
     t.float "lease_rate"
+    t.string "base_country_group", null: false
     t.index ["aircraft_manufacturing_queue_id"], name: "index_airplanes_on_aircraft_manufacturing_queue_id"
     t.index ["aircraft_model_id"], name: "index_airplanes_on_aircraft_model_id"
   end

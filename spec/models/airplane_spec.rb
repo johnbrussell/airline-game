@@ -30,6 +30,7 @@ RSpec.describe Airplane do
       other_queue = AircraftManufacturingQueue.create!(game: other_game, aircraft_family_id: 1, production_rate: 1)
 
       valid_airplane = Airplane.create!(
+        base_country_group: "United States",
         construction_date: game.current_date + 1.day,
         end_of_useful_life: game.current_date + useful_life_years.years,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
@@ -37,6 +38,7 @@ RSpec.describe Airplane do
         aircraft_model: AircraftModel.last,
       )
       Airplane.create!(
+        base_country_group: "United States",
         construction_date: game.current_date + 1.day,
         end_of_useful_life: game.current_date + useful_life_years.years,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
@@ -44,6 +46,7 @@ RSpec.describe Airplane do
         aircraft_model: AircraftModel.last,
       )
       Airplane.create!(
+        base_country_group: "United States",
         construction_date: game.current_date,
         end_of_useful_life: game.current_date + useful_life_years.years,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
@@ -51,6 +54,7 @@ RSpec.describe Airplane do
         aircraft_model: AircraftModel.last,
       )
       Airplane.create!(
+        base_country_group: "United States",
         construction_date: game.current_date + 1.day,
         end_of_useful_life: game.current_date + useful_life_years.years,
         aircraft_manufacturing_queue: other_queue,
@@ -94,6 +98,7 @@ RSpec.describe Airplane do
       other_queue = AircraftManufacturingQueue.create!(game: other_game, aircraft_family_id: 1, production_rate: 1)
 
       valid_airplane = Airplane.create!(
+        base_country_group: "United States",
         construction_date: game.current_date,
         end_of_useful_life: game.current_date + useful_life_years.years,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
@@ -101,6 +106,7 @@ RSpec.describe Airplane do
         aircraft_model: AircraftModel.last,
       )
       Airplane.create!(
+        base_country_group: "United States",
         construction_date: game.current_date,
         end_of_useful_life: game.current_date + useful_life_years.years,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
@@ -108,6 +114,7 @@ RSpec.describe Airplane do
         aircraft_model: AircraftModel.last,
       )
       Airplane.create!(
+        base_country_group: "United States",
         construction_date: game.current_date + 1.day,
         end_of_useful_life: game.current_date + useful_life_years.years + 1.day,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
@@ -115,6 +122,7 @@ RSpec.describe Airplane do
         aircraft_model: AircraftModel.last,
       )
       Airplane.create!(
+        base_country_group: "United States",
         construction_date: game.current_date - useful_life_years.years - 1.day,
         end_of_useful_life: game.current_date - 1.day,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
@@ -122,6 +130,7 @@ RSpec.describe Airplane do
         aircraft_model: AircraftModel.last,
       )
       Airplane.create!(
+        base_country_group: "United States",
         construction_date: game.current_date,
         end_of_useful_life: game.current_date + useful_life_years.years,
         aircraft_manufacturing_queue: other_queue,
@@ -155,13 +164,13 @@ RSpec.describe Airplane do
         useful_life: 30,
         family: family,
       )
-      Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, operator_id: 2, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
+      Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, base_country_group: "United States", operator_id: 2, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
     end
 
     it "only includes planes with the specified operator" do
       model = AircraftModel.last
       queue = AircraftManufacturingQueue.last
-      airplane = Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, operator_id: 1, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
+      airplane = Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, base_country_group: "United States", operator_id: 1, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
       expected = [airplane]
 
       actual = Airplane.with_operator(1)
@@ -172,7 +181,7 @@ RSpec.describe Airplane do
     it "works for nil" do
       model = AircraftModel.last
       queue = AircraftManufacturingQueue.last
-      airplane = Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, operator_id: nil, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
+      airplane = Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, base_country_group: "United States", operator_id: nil, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
       expected = [airplane]
 
       actual = Airplane.with_operator(nil)
@@ -271,6 +280,7 @@ RSpec.describe Airplane do
 
     it "is true when the airplane is owned" do
       subject = Airplane.create!(
+        base_country_group: "United States",
         operator_id: 1,
         construction_date: Date.today,
         end_of_useful_life: Date.tomorrow,
@@ -283,6 +293,7 @@ RSpec.describe Airplane do
 
     it "is false when the airplane is not owned" do
       subject = Airplane.create!(
+        base_country_group: "United States",
         operator_id: nil,
         construction_date: Date.today,
         end_of_useful_life: Date.tomorrow,
@@ -374,6 +385,7 @@ RSpec.describe Airplane do
         family: family,
       )
       Airplane.create!(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: 0,
         economy_seats: 1,
@@ -440,6 +452,7 @@ RSpec.describe Airplane do
         family: family,
       )
       Airplane.create!(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: 0,
         economy_seats: 1,
@@ -502,6 +515,7 @@ RSpec.describe Airplane do
         family: family,
       )
       Airplane.create!(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: 0,
         economy_seats: 1,
@@ -559,43 +573,10 @@ RSpec.describe Airplane do
   context "lease" do
     purchase_price_new = 100000000
 
-    before(:each) do
-      game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737", country_group: "United States")
-      queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
-      model = AircraftModel.create!(
-        name: "737-100",
-        production_start_year: 1969,
-        floor_space: 1000000,
-        max_range: 1200,
-        speed: 500,
-        fuel_burn: 1500,
-        num_pilots: 2,
-        num_flight_attendants: 3,
-        price: purchase_price_new,
-        takeoff_distance: 5000,
-        useful_life: 30,
-        family: family,
-      )
-      Airplane.create!(
-        business_seats: 0,
-        premium_economy_seats: 0,
-        economy_seats: 0,
-        construction_date: game.current_date + 1.day,
-        end_of_useful_life: game.current_date + 1.year,
-        aircraft_manufacturing_queue: queue,
-        operator_id: nil,
-        aircraft_model_id: model.id,
-      )
-      Airline.create!(cash_on_hand: purchase_price_new * 2, name: "J Air", base_id: 1, game_id: game.id)
-    end
-
     it "returns false if the airline does not have enough money" do
-      subject = Airplane.last
-      buyer = Airline.last
-
-      buyer.update(cash_on_hand: 100)
-      buyer.reload
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+      buyer = Fabricate(:airline, cash_on_hand: 100)
 
       expect(subject.lease(airline = buyer, length_in_days = 100, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
 
@@ -611,11 +592,9 @@ RSpec.describe Airplane do
     end
 
     it "returns false if the plane is already owned by the buyer" do
-      subject = Airplane.last
-      buyer = Airline.last
-
-      subject.update(operator_id: buyer.id)
-      subject.reload
+      family = Fabricate(:aircraft_family)
+      buyer = Fabricate(:airline, cash_on_hand: 100000000)
+      subject = Fabricate(:airplane, aircraft_family: family, operator_id: buyer.id)
 
       initial_cash_on_hand = buyer.cash_on_hand
 
@@ -633,11 +612,11 @@ RSpec.describe Airplane do
     end
 
     it "returns false if the plane is already owned by another airline" do
-      subject = Airplane.last
-      buyer = Airline.last
-
-      subject.update(operator_id: buyer.id + 1)
-      subject.reload
+      family = Fabricate(:aircraft_family)
+      base = Fabricate(:market)
+      buyer = Fabricate(:airline, name: "A Air", base_id: base.id, cash_on_hand: 100000000)
+      other_airline = Fabricate(:airline, name: "B Air", base_id: base.id)
+      subject = Fabricate(:airplane, aircraft_family: family, operator_id: other_airline.id)
 
       initial_cash_on_hand = buyer.cash_on_hand
 
@@ -656,9 +635,14 @@ RSpec.describe Airplane do
 
     context "new plane" do
       it "returns true, assigns the plane to the airline, and installs the right number of seats" do
-        subject = Airplane.last
-        buyer = Airline.last
-        game = Game.last
+        family = Fabricate(:aircraft_family)
+        market = Fabricate(:market, country_group: "Nauru")
+        buyer = Fabricate(:airline, cash_on_hand: 100000000, base_id: market.id)
+        subject = Fabricate(:airplane, aircraft_family: family)
+        game = subject.game
+
+        subject.update(construction_date: game.current_date + 1.day)
+        subject.reload
 
         initial_cash_on_hand = buyer.cash_on_hand
 
@@ -674,11 +658,16 @@ RSpec.describe Airplane do
         expect(subject.economy_seats).to eq 5
         expect(subject.lease_expiry).to eq subject.construction_date + 100.days
         expect(subject.lease_rate).to be > 0
+        expect(subject.base_country_group).to eq "Nauru"
       end
 
       it "returns false if the number of seats requested requires too much square footage" do
-        subject = Airplane.last
-        buyer = Airline.last
+        family = Fabricate(:aircraft_family)
+        subject = Fabricate(:airplane, aircraft_family: family)
+        buyer = Fabricate(:airline, cash_on_hand: 100000000)
+
+        subject.update(construction_date: subject.game.current_date + 1.day)
+        subject.reload
 
         initial_cash_on_hand = buyer.cash_on_hand
 
@@ -704,9 +693,11 @@ RSpec.describe Airplane do
 
     context "used plane" do
       it "does not update the seating configuration" do
-        subject = Airplane.last
-        buyer = Airline.last
-        game = Game.last
+        family = Fabricate(:aircraft_family)
+        market = Fabricate(:market, country_group: "Nauru")
+        buyer = Fabricate(:airline, cash_on_hand: 100000000, base_id: market.id)
+        subject = Fabricate(:airplane, aircraft_family: family)
+        game = subject.game
 
         subject.update(construction_date: game.current_date)
         subject.reload
@@ -724,6 +715,7 @@ RSpec.describe Airplane do
         expect(subject.economy_seats).to eq 0
         expect(subject.lease_expiry).to eq game.current_date + 100.days
         expect(subject.lease_rate).to be > 0
+        expect(subject.base_country_group).to eq "Nauru"
       end
     end
   end
@@ -750,6 +742,7 @@ RSpec.describe Airplane do
         family: family,
       )
       Airplane.create!(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: 0,
         economy_seats: 1,
@@ -822,43 +815,10 @@ RSpec.describe Airplane do
   context "purchase" do
     purchase_price_new = 100000000
 
-    before(:each) do
-      game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-      family = AircraftFamily.create!(manufacturer: "Boeing", name: "737", country_group: "United States")
-      queue = AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
-      model = AircraftModel.create!(
-        name: "737-100",
-        production_start_year: 1969,
-        floor_space: 1000000,
-        max_range: 1200,
-        speed: 500,
-        fuel_burn: 1500,
-        num_pilots: 2,
-        num_flight_attendants: 3,
-        price: purchase_price_new,
-        takeoff_distance: 5000,
-        useful_life: 30,
-        family: family,
-      )
-      Airplane.create!(
-        business_seats: 0,
-        premium_economy_seats: 0,
-        economy_seats: 0,
-        construction_date: game.current_date + 1.day,
-        end_of_useful_life: game.current_date + 1.year,
-        aircraft_manufacturing_queue: queue,
-        operator_id: nil,
-        aircraft_model_id: model.id,
-      )
-      Airline.create!(cash_on_hand: purchase_price_new * 2, name: "J Air", base_id: 1, game_id: game.id)
-    end
-
     it "returns false if the airline does not have enough money" do
-      subject = Airplane.last
-      buyer = Airline.last
-
-      buyer.update(cash_on_hand: 100)
-      buyer.reload
+      family = Fabricate(:aircraft_family)
+      buyer = Fabricate(:airline, cash_on_hand: 100)
+      subject = Fabricate(:airplane, aircraft_family: family)
 
       expect(subject.purchase(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
 
@@ -873,11 +833,9 @@ RSpec.describe Airplane do
     end
 
     it "returns false if the plane is already owned by the buyer" do
-      subject = Airplane.last
-      buyer = Airline.last
-
-      subject.update(operator_id: buyer.id)
-      subject.reload
+      family = Fabricate(:aircraft_family)
+      buyer = Fabricate(:airline, cash_on_hand: 100000000)
+      subject = Fabricate(:airplane, aircraft_family: family, operator_id: buyer.id)
 
       initial_cash_on_hand = buyer.cash_on_hand
 
@@ -894,11 +852,11 @@ RSpec.describe Airplane do
     end
 
     it "returns false if the plane is already owned by another airline" do
-      subject = Airplane.last
-      buyer = Airline.last
-
-      subject.update(operator_id: buyer.id + 1)
-      subject.reload
+      family = Fabricate(:aircraft_family)
+      base = Fabricate(:market)
+      buyer = Fabricate(:airline, name: "A Air", base_id: base.id, cash_on_hand: 100000000)
+      other_airline = Fabricate(:airline, name: "B Air", base_id: base.id)
+      subject = Fabricate(:airplane, aircraft_family: family, operator_id: other_airline.id)
 
       initial_cash_on_hand = buyer.cash_on_hand
 
@@ -916,8 +874,13 @@ RSpec.describe Airplane do
 
     context "new" do
       it "returns true, assigns the plane to the airline, installs the right number of seats, and deducts the purchase price from the airline's cash" do
-        subject = Airplane.last
-        buyer = Airline.last
+        family = Fabricate(:aircraft_family)
+        market = Fabricate(:market, country_group: "Nauru")
+        buyer = Fabricate(:airline, cash_on_hand: 100000000, base_id: market.id)
+        subject = Fabricate(:airplane, aircraft_family: family)
+
+        subject.update(construction_date: subject.game.current_date + 1.day)
+        subject.reload
 
         initial_cash_on_hand = buyer.cash_on_hand
 
@@ -931,11 +894,16 @@ RSpec.describe Airplane do
         expect(subject.business_seats).to eq 3
         expect(subject.premium_economy_seats).to eq 4
         expect(subject.economy_seats).to eq 5
+        expect(subject.base_country_group).to eq "Nauru"
       end
 
       it "returns false if the number of seats requested requires too much square footage" do
-        subject = Airplane.last
-        buyer = Airline.last
+        family = Fabricate(:aircraft_family)
+        buyer = Fabricate(:airline, cash_on_hand: 100000000)
+        subject = Fabricate(:airplane, aircraft_family: family)
+
+        subject.update(construction_date: subject.game.current_date + 1.day)
+        subject.reload
 
         initial_cash_on_hand = buyer.cash_on_hand
 
@@ -954,11 +922,12 @@ RSpec.describe Airplane do
 
     context "used" do
       it "does not update the seating configuration" do
-        subject = Airplane.last
-        buyer = Airline.last
-        game = Game.last
+        family = Fabricate(:aircraft_family)
+        market = Fabricate(:market, country_group: "Nauru")
+        buyer = Fabricate(:airline, cash_on_hand: 100000000, base_id: market.id)
+        subject = Fabricate(:airplane, aircraft_family: family)
 
-        subject.update(construction_date: game.current_date)
+        subject.update(construction_date: subject.game.current_date)
         subject.reload
         initial_cash_on_hand = buyer.cash_on_hand
 
@@ -972,6 +941,7 @@ RSpec.describe Airplane do
         expect(subject.business_seats).to eq 0
         expect(subject.premium_economy_seats).to eq 0
         expect(subject.economy_seats).to eq 0
+        expect(subject.base_country_group).to eq "Nauru"
       end
     end
   end
@@ -1473,6 +1443,7 @@ RSpec.describe Airplane do
 
     it "is true when the economy seats fit on the plane" do
       subject = Airplane.new(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: 0,
         economy_seats: Airplane::BUSINESS_SEAT_SIZE * 2 / Airplane::ECONOMY_SEAT_SIZE,
@@ -1488,6 +1459,7 @@ RSpec.describe Airplane do
 
     it "is true when the premium economy seats fit on the plane" do
       subject = Airplane.new(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: Airplane::BUSINESS_SEAT_SIZE * 2 / Airplane::PREMIUM_ECONOMY_SEAT_SIZE,
         economy_seats: 0,
@@ -1503,6 +1475,7 @@ RSpec.describe Airplane do
 
     it "is true when the business seats fit on the plane" do
       subject = Airplane.new(
+        base_country_group: "United States",
         business_seats: 2,
         premium_economy_seats: 0,
         economy_seats: 0,
@@ -1518,6 +1491,7 @@ RSpec.describe Airplane do
 
     it "is true when the seats fit on the plane" do
       subject = Airplane.new(
+        base_country_group: "United States",
         business_seats: 1,
         premium_economy_seats: 1,
         economy_seats: (Airplane::BUSINESS_SEAT_SIZE - Airplane::PREMIUM_ECONOMY_SEAT_SIZE) / Airplane::ECONOMY_SEAT_SIZE,
@@ -1533,6 +1507,7 @@ RSpec.describe Airplane do
 
     it "is false when there are too many economy seats" do
       subject = Airplane.new(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: 0,
         economy_seats: Airplane::BUSINESS_SEAT_SIZE * 2 / Airplane::ECONOMY_SEAT_SIZE + 1,
@@ -1549,6 +1524,7 @@ RSpec.describe Airplane do
 
     it "is false when there are too many premium economy seats" do
       subject = Airplane.new(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: Airplane::BUSINESS_SEAT_SIZE * 2 / Airplane::PREMIUM_ECONOMY_SEAT_SIZE + 1,
         economy_seats: 0,
@@ -1565,6 +1541,7 @@ RSpec.describe Airplane do
 
     it "is false when there are too many business seats" do
       subject = Airplane.new(
+        base_country_group: "United States",
         business_seats: 3,
         premium_economy_seats: 0,
         economy_seats: 0,
@@ -1581,6 +1558,7 @@ RSpec.describe Airplane do
 
     it "is false when the seats do not fit on the plane" do
       subject = Airplane.new(
+        base_country_group: "United States",
         business_seats: 1,
         premium_economy_seats: 1,
         economy_seats: (Airplane::BUSINESS_SEAT_SIZE - Airplane::PREMIUM_ECONOMY_SEAT_SIZE) / Airplane::ECONOMY_SEAT_SIZE + 1,
@@ -1726,6 +1704,7 @@ RSpec.describe Airplane do
         family: family,
       )
       Airplane.create!(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: 0,
         economy_seats: 1,
