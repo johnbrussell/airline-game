@@ -30,6 +30,7 @@ RSpec.describe Airplane do
       other_queue = AircraftManufacturingQueue.create!(game: other_game, aircraft_family_id: 1, production_rate: 1)
 
       valid_airplane = Airplane.create!(
+        base_country_group: "United States",
         construction_date: game.current_date + 1.day,
         end_of_useful_life: game.current_date + useful_life_years.years,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
@@ -37,6 +38,7 @@ RSpec.describe Airplane do
         aircraft_model: AircraftModel.last,
       )
       Airplane.create!(
+        base_country_group: "United States",
         construction_date: game.current_date + 1.day,
         end_of_useful_life: game.current_date + useful_life_years.years,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
@@ -44,6 +46,7 @@ RSpec.describe Airplane do
         aircraft_model: AircraftModel.last,
       )
       Airplane.create!(
+        base_country_group: "United States",
         construction_date: game.current_date,
         end_of_useful_life: game.current_date + useful_life_years.years,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
@@ -51,6 +54,7 @@ RSpec.describe Airplane do
         aircraft_model: AircraftModel.last,
       )
       Airplane.create!(
+        base_country_group: "United States",
         construction_date: game.current_date + 1.day,
         end_of_useful_life: game.current_date + useful_life_years.years,
         aircraft_manufacturing_queue: other_queue,
@@ -94,6 +98,7 @@ RSpec.describe Airplane do
       other_queue = AircraftManufacturingQueue.create!(game: other_game, aircraft_family_id: 1, production_rate: 1)
 
       valid_airplane = Airplane.create!(
+        base_country_group: "United States",
         construction_date: game.current_date,
         end_of_useful_life: game.current_date + useful_life_years.years,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
@@ -101,6 +106,7 @@ RSpec.describe Airplane do
         aircraft_model: AircraftModel.last,
       )
       Airplane.create!(
+        base_country_group: "United States",
         construction_date: game.current_date,
         end_of_useful_life: game.current_date + useful_life_years.years,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
@@ -108,6 +114,7 @@ RSpec.describe Airplane do
         aircraft_model: AircraftModel.last,
       )
       Airplane.create!(
+        base_country_group: "United States",
         construction_date: game.current_date + 1.day,
         end_of_useful_life: game.current_date + useful_life_years.years + 1.day,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
@@ -115,6 +122,7 @@ RSpec.describe Airplane do
         aircraft_model: AircraftModel.last,
       )
       Airplane.create!(
+        base_country_group: "United States",
         construction_date: game.current_date - useful_life_years.years - 1.day,
         end_of_useful_life: game.current_date - 1.day,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
@@ -122,6 +130,7 @@ RSpec.describe Airplane do
         aircraft_model: AircraftModel.last,
       )
       Airplane.create!(
+        base_country_group: "United States",
         construction_date: game.current_date,
         end_of_useful_life: game.current_date + useful_life_years.years,
         aircraft_manufacturing_queue: other_queue,
@@ -155,13 +164,13 @@ RSpec.describe Airplane do
         useful_life: 30,
         family: family,
       )
-      Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, operator_id: 2, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
+      Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, base_country_group: "United States", operator_id: 2, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
     end
 
     it "only includes planes with the specified operator" do
       model = AircraftModel.last
       queue = AircraftManufacturingQueue.last
-      airplane = Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, operator_id: 1, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
+      airplane = Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, base_country_group: "United States", operator_id: 1, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
       expected = [airplane]
 
       actual = Airplane.with_operator(1)
@@ -172,7 +181,7 @@ RSpec.describe Airplane do
     it "works for nil" do
       model = AircraftModel.last
       queue = AircraftManufacturingQueue.last
-      airplane = Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, operator_id: nil, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
+      airplane = Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, base_country_group: "United States", operator_id: nil, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
       expected = [airplane]
 
       actual = Airplane.with_operator(nil)
@@ -271,6 +280,7 @@ RSpec.describe Airplane do
 
     it "is true when the airplane is owned" do
       subject = Airplane.create!(
+        base_country_group: "United States",
         operator_id: 1,
         construction_date: Date.today,
         end_of_useful_life: Date.tomorrow,
@@ -283,6 +293,7 @@ RSpec.describe Airplane do
 
     it "is false when the airplane is not owned" do
       subject = Airplane.create!(
+        base_country_group: "United States",
         operator_id: nil,
         construction_date: Date.today,
         end_of_useful_life: Date.tomorrow,
@@ -374,6 +385,7 @@ RSpec.describe Airplane do
         family: family,
       )
       Airplane.create!(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: 0,
         economy_seats: 1,
@@ -440,6 +452,7 @@ RSpec.describe Airplane do
         family: family,
       )
       Airplane.create!(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: 0,
         economy_seats: 1,
@@ -502,6 +515,7 @@ RSpec.describe Airplane do
         family: family,
       )
       Airplane.create!(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: 0,
         economy_seats: 1,
@@ -578,6 +592,7 @@ RSpec.describe Airplane do
         family: family,
       )
       Airplane.create!(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: 0,
         economy_seats: 0,
@@ -750,6 +765,7 @@ RSpec.describe Airplane do
         family: family,
       )
       Airplane.create!(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: 0,
         economy_seats: 1,
@@ -841,6 +857,7 @@ RSpec.describe Airplane do
         family: family,
       )
       Airplane.create!(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: 0,
         economy_seats: 0,
@@ -1473,6 +1490,7 @@ RSpec.describe Airplane do
 
     it "is true when the economy seats fit on the plane" do
       subject = Airplane.new(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: 0,
         economy_seats: Airplane::BUSINESS_SEAT_SIZE * 2 / Airplane::ECONOMY_SEAT_SIZE,
@@ -1488,6 +1506,7 @@ RSpec.describe Airplane do
 
     it "is true when the premium economy seats fit on the plane" do
       subject = Airplane.new(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: Airplane::BUSINESS_SEAT_SIZE * 2 / Airplane::PREMIUM_ECONOMY_SEAT_SIZE,
         economy_seats: 0,
@@ -1503,6 +1522,7 @@ RSpec.describe Airplane do
 
     it "is true when the business seats fit on the plane" do
       subject = Airplane.new(
+        base_country_group: "United States",
         business_seats: 2,
         premium_economy_seats: 0,
         economy_seats: 0,
@@ -1518,6 +1538,7 @@ RSpec.describe Airplane do
 
     it "is true when the seats fit on the plane" do
       subject = Airplane.new(
+        base_country_group: "United States",
         business_seats: 1,
         premium_economy_seats: 1,
         economy_seats: (Airplane::BUSINESS_SEAT_SIZE - Airplane::PREMIUM_ECONOMY_SEAT_SIZE) / Airplane::ECONOMY_SEAT_SIZE,
@@ -1533,6 +1554,7 @@ RSpec.describe Airplane do
 
     it "is false when there are too many economy seats" do
       subject = Airplane.new(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: 0,
         economy_seats: Airplane::BUSINESS_SEAT_SIZE * 2 / Airplane::ECONOMY_SEAT_SIZE + 1,
@@ -1549,6 +1571,7 @@ RSpec.describe Airplane do
 
     it "is false when there are too many premium economy seats" do
       subject = Airplane.new(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: Airplane::BUSINESS_SEAT_SIZE * 2 / Airplane::PREMIUM_ECONOMY_SEAT_SIZE + 1,
         economy_seats: 0,
@@ -1565,6 +1588,7 @@ RSpec.describe Airplane do
 
     it "is false when there are too many business seats" do
       subject = Airplane.new(
+        base_country_group: "United States",
         business_seats: 3,
         premium_economy_seats: 0,
         economy_seats: 0,
@@ -1581,6 +1605,7 @@ RSpec.describe Airplane do
 
     it "is false when the seats do not fit on the plane" do
       subject = Airplane.new(
+        base_country_group: "United States",
         business_seats: 1,
         premium_economy_seats: 1,
         economy_seats: (Airplane::BUSINESS_SEAT_SIZE - Airplane::PREMIUM_ECONOMY_SEAT_SIZE) / Airplane::ECONOMY_SEAT_SIZE + 1,
@@ -1726,6 +1751,7 @@ RSpec.describe Airplane do
         family: family,
       )
       Airplane.create!(
+        base_country_group: "United States",
         business_seats: 0,
         premium_economy_seats: 0,
         economy_seats: 1,

@@ -48,6 +48,7 @@ RSpec.describe "airplanes/purchase_information", type: :feature do
       before(:each) do
         Airplane.create!(
           aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+          base_country_group: "United States",
           operator_id: nil,
           construction_date: Date.tomorrow + 1.day,
           end_of_useful_life: Date.tomorrow + 1.year,
@@ -150,6 +151,7 @@ RSpec.describe "airplanes/purchase_information", type: :feature do
       before(:each) do
         Airplane.create!(
           aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+          base_country_group: "United States",
           operator_id: nil,
           construction_date: Game.last.current_date,
           end_of_useful_life: Date.tomorrow + 1.year,

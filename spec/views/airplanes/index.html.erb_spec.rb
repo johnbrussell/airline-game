@@ -43,6 +43,7 @@ RSpec.describe "airplanes/index", type: :feature do
     )
     Airplane.create!(
       aircraft_manufacturing_queue: aircraft_manufacturing_queue,
+      base_country_group: "United States",
       operator_id: airline.id,
       construction_date: "2020-01-01".to_date,
       end_of_useful_life: Date.tomorrow,
@@ -50,6 +51,7 @@ RSpec.describe "airplanes/index", type: :feature do
     )
     Airplane.create!(
       aircraft_manufacturing_queue: aircraft_manufacturing_queue,
+      base_country_group: "United States",
       operator_id: airline.id,
       construction_date: game.current_date + 1.day,
       end_of_useful_life: game.current_date + 2.days,
@@ -81,6 +83,7 @@ RSpec.describe "airplanes/index", type: :feature do
         airline = Airline.last
         Airplane.create!(
           aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
+          base_country_group: "United States",
           operator_id: airline.id,
           construction_date: "2019-01-01".to_date,
           end_of_useful_life: Date.tomorrow,
