@@ -294,6 +294,66 @@ RSpec.describe Airplane do
     end
   end
 
+  context "maintenance_cost_per_day" do
+    it "is the aircraft model's maintenance rate when the airplane is unique in its family" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+      subject.update(construction_date: subject.game.current_date)
+
+      expect(subject.maintenance_cost_per_day).to eq subject.aircraft_model.maintenance_cost_per_day(0)
+    end
+
+    it "decreases when another family member is added" do
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, family: family)
+      other_model = Fabricate(:aircraft_model, family: family)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+      subject.update(construction_date: subject.game.current_date)
+
+      expect(subject.maintenance_cost_per_day).to eq subject.aircraft_model.maintenance_cost_per_day(0)
+
+      Fabricate(:airplane, aircraft_family: family, aircraft_model: other_model)
+      subject.reload
+
+      expect(subject.maintenance_cost_per_day).to be < subject.aircraft_model.maintenance_cost_per_day(0)
+    end
+
+    it "hits the maximum discount when there are NUM_IN_FAMILY_FOR_MIN_MAINTENANCE_RATE planes in the family" do
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, family: family)
+      other_model = Fabricate(:aircraft_model, family: family)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+      subject.update(construction_date: subject.game.current_date)
+
+      expect(subject.maintenance_cost_per_day).to eq subject.aircraft_model.maintenance_cost_per_day(0)
+
+      (1..(Airplane::NUM_IN_FAMILY_FOR_MIN_MAINTENANCE_RATE - 1)).each do
+        Fabricate(:airplane, aircraft_family: family, aircraft_model: other_model)
+      end
+      subject.reload
+
+      expect(subject.send(:num_in_family)).to eq Airplane::NUM_IN_FAMILY_FOR_MIN_MAINTENANCE_RATE
+      expect(subject.maintenance_cost_per_day).to eq subject.aircraft_model.maintenance_cost_per_day(0) * Airplane::MIN_MAINTENANCE_RATE
+    end
+
+    it "does not exceed the the maximum discount" do
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, family: family)
+      other_model = Fabricate(:aircraft_model, family: family)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+      subject.update(construction_date: subject.game.current_date)
+
+      expect(subject.maintenance_cost_per_day).to eq subject.aircraft_model.maintenance_cost_per_day(0)
+
+      (0..(Airplane::NUM_IN_FAMILY_FOR_MIN_MAINTENANCE_RATE + 1)).each do
+        Fabricate(:airplane, aircraft_family: family, aircraft_model: other_model)
+      end
+      subject.reload
+
+      expect(subject.maintenance_cost_per_day).to eq subject.aircraft_model.maintenance_cost_per_day(0) * Airplane::MIN_MAINTENANCE_RATE
+    end
+  end
+
   context "operator_changes_appropriately" do
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
@@ -395,6 +455,28 @@ RSpec.describe Airplane do
       subject = Airplane.last
 
       expect(subject.new_plane_payment).to eq 50000000
+    end
+  end
+
+  context "num_in_family" do
+    it "includes the subject" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+
+      expect(subject.send(:num_in_family)).to eq 1
+    end
+
+    it "includes the other planes in the family" do
+      family = Fabricate(:aircraft_family)
+      other_family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, family: family)
+      other_model = Fabricate(:aircraft_model, family: family)
+      Fabricate(:airplane, aircraft_family: other_family)
+      Fabricate(:airplane, aircraft_family: family, aircraft_model: other_model)
+      Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+
+      expect(subject.send(:num_in_family)).to eq 3
     end
   end
 
