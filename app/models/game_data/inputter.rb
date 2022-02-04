@@ -22,6 +22,7 @@ class GameData::Inputter < ApplicationRecord
         data_map = {
           manufacturer: data_point["Manufacturer"],
           name: data_point["Family"],
+          country_group: data_point["Country group"],
         }
         if AircraftFamily.exists?(manufacturer: data_point["Manufacturer"], name: data_point["Family"])
           AircraftFamily.find_by!(manufacturer: data_point["Manufacturer"], name: data_point["Family"]).update!(**data_map)
