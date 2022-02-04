@@ -24,6 +24,7 @@ RSpec.describe "airplanes/lease_information", type: :feature do
     family = AircraftFamily.create!(
       name: "737",
       manufacturer: "Boeing",
+      country_group: "United States",
     )
     AircraftManufacturingQueue.create!(game: game, production_rate: 0.1, aircraft_family_id: family.id)
     AircraftModel.create!(

@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe AircraftManufacturingQueue do
   before(:each) do
     game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
-    family = AircraftFamily.create!(manufacturer: "Boeing", name: "737")
+    family = AircraftFamily.create!(manufacturer: "Boeing", name: "737", country_group: "United States")
     AircraftManufacturingQueue.create!(game: game, production_rate: 0, aircraft_family_id: family.id)
     AircraftModel.create!(
       name: "737-100",
