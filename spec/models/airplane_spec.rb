@@ -398,6 +398,28 @@ RSpec.describe Airplane do
     end
   end
 
+  context "num_in_family" do
+    it "includes the subject" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+
+      expect(subject.send(:num_in_family)).to eq 1
+    end
+
+    it "includes the other planes in the family" do
+      family = Fabricate(:aircraft_family)
+      other_family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, family: family)
+      other_model = Fabricate(:aircraft_model, family: family)
+      Fabricate(:airplane, aircraft_family: other_family)
+      Fabricate(:airplane, aircraft_family: family, aircraft_model: other_model)
+      Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+
+      expect(subject.send(:num_in_family)).to eq 3
+    end
+  end
+
   context "purchase_price" do
     purchase_price_new = 100000000
 

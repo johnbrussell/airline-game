@@ -181,6 +181,15 @@ class Airplane < ApplicationRecord
       @model ||= AircraftModel.find_by(id: aircraft_model_id)
     end
 
+    def num_in_family
+      Airplane.
+        joins(aircraft_model: :family).
+        where(operator_id: operator_id).
+        where("construction_date <= ?", game.current_date).
+        where("aircraft_families.id == ?", aircraft_model.family.id).
+        count
+    end
+
     def num_seats
       economy_seats + premium_economy_seats + business_seats
     end
