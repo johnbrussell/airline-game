@@ -53,6 +53,20 @@ RSpec.describe Airline do
     end
   end
 
+  context "rival_country_groups" do
+    it "lists the airline's rival country groups" do
+      subject = Fabricate(:airline)
+      home_country_group = subject.base.country_group
+
+      expect(subject.rival_country_groups).to eq []
+
+      RivalCountryGroup.create!(country_one: home_country_group, country_two: "Zanzibar")
+      subject.reload
+
+      expect(subject.rival_country_groups).to eq ["Zanzibar"]
+    end
+  end
+
   context "validate_a_user_airline_exists" do
     it "is false for a user airline" do
       airline = Airline.create!(cash_on_hand: 1, name: "foo", is_user_airline: true, base_id: 1, game_id: 1)
