@@ -228,7 +228,9 @@ RSpec.describe "airplanes/purchase_information", type: :feature do
       it "does not redirect to the airline fleet page when a validation error occurs" do
         game = Game.last
         airplane = Airplane.last
-        airplane.update(operator_id: 100)
+        base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+        other_airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
+        airplane.update(operator_id: other_airline.id)
 
         visit game_airplane_purchase_path(game.id, airplane.id)
 

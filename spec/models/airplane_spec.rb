@@ -28,6 +28,8 @@ RSpec.describe Airplane do
       game = Game.first
       other_game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
       other_queue = AircraftManufacturingQueue.create!(game: other_game, aircraft_family_id: 1, production_rate: 1)
+      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
 
       valid_airplane = Airplane.create!(
         base_country_group: "United States",
@@ -42,7 +44,7 @@ RSpec.describe Airplane do
         construction_date: game.current_date + 1.day,
         end_of_useful_life: game.current_date + useful_life_years.years,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
-        operator_id: 1,
+        operator_id: airline.id,
         aircraft_model: AircraftModel.last,
       )
       Airplane.create!(
@@ -96,6 +98,8 @@ RSpec.describe Airplane do
       game = Game.first
       other_game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
       other_queue = AircraftManufacturingQueue.create!(game: other_game, aircraft_family_id: 1, production_rate: 1)
+      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
 
       valid_airplane = Airplane.create!(
         base_country_group: "United States",
@@ -110,7 +114,7 @@ RSpec.describe Airplane do
         construction_date: game.current_date,
         end_of_useful_life: game.current_date + useful_life_years.years,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
-        operator_id: 1,
+        operator_id: airline.id,
         aircraft_model: AircraftModel.last,
       )
       Airplane.create!(
@@ -164,16 +168,20 @@ RSpec.describe Airplane do
         useful_life: 30,
         family: family,
       )
-      Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, base_country_group: "United States", operator_id: 2, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
+      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      airline_1 = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
+      airline_2 = Airline.create!(base_id: base.id, name: "American Aviators", game_id: game.id, cash_on_hand: 100)
+      Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, base_country_group: "United States", operator_id: airline_2.id, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
     end
 
     it "only includes planes with the specified operator" do
       model = AircraftModel.last
       queue = AircraftManufacturingQueue.last
-      airplane = Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, base_country_group: "United States", operator_id: 1, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
+      airline_1 = Airline.find_by(name: "American Aviation")
+      airplane = Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, base_country_group: "United States", operator_id: airline_1.id, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
       expected = [airplane]
 
-      actual = Airplane.with_operator(1)
+      actual = Airplane.with_operator(airline_1.id)
 
       expect(actual).to eq expected
     end
@@ -207,6 +215,34 @@ RSpec.describe Airplane do
       expect(subject.valid?).to be true
       expect(subject.update(base_country_group: "Nauru")).to be false
       expect(subject.errors.full_messages).to include "Base country group cannot be changed between rival countries"
+    end
+  end
+
+  context "based_in_right_country" do
+    it "is true when the base matches the operator's" do
+      market = Fabricate(:market, country_group: "Tuvalu")
+      operator = Fabricate(:airline, base_id: market.id)
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family, base_country_group: "Tuvalu", operator_id: operator.id)
+
+      expect(subject.valid?).to be true
+    end
+
+    it "is true when there is no operator" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family, base_country_group: "Tuvalu", operator_id: nil)
+
+      expect(subject.valid?).to be true
+    end
+
+    it "is false when the base does not match the operator's" do
+      market = Fabricate(:market, country_group: "Nauru")
+      operator = Fabricate(:airline, base_id: market.id)
+      model = Fabricate(:aircraft_model)
+      subject = Airplane.new(base_country_group: "Tuvalu", operator_id: operator.id, aircraft_model_id: model.id)
+
+      expect(subject.valid?).to be false
+      expect(subject.errors.full_messages).to include "Base country group different from operator's base"
     end
   end
 
@@ -299,9 +335,12 @@ RSpec.describe Airplane do
     end
 
     it "is true when the airplane is owned" do
+      game = Game.last
+      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
       subject = Airplane.create!(
         base_country_group: "United States",
-        operator_id: 1,
+        operator_id: airline.id,
         construction_date: Date.today,
         end_of_useful_life: Date.tomorrow,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
@@ -418,13 +457,19 @@ RSpec.describe Airplane do
     end
 
     it "is true when buying an airplane" do
+      game = Game.last
+      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
       subject = Airplane.last
-      expect(subject.update(operator_id: 1)).to be true
+      expect(subject.update(operator_id: airline.id)).to be true
     end
 
     it "is true when selling an airplane" do
+      game = Game.last
+      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
       subject = Airplane.last
-      subject.update(operator_id: 1)
+      subject.update(operator_id: airline.id)
 
       expect(subject.update(operator_id: nil)).to be true
     end
@@ -435,17 +480,24 @@ RSpec.describe Airplane do
     end
 
     it "is true when updating an owned airplane" do
+      game = Game.last
+      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
       subject = Airplane.last
-      subject.update(operator_id: 1)
+      subject.update(operator_id: airline.id)
 
       expect(subject.update(economy_seats: 2)).to be true
     end
 
     it "is false when selling an airplane from one airline to another" do
+      game = Game.last
+      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
+      other_airline = Airline.create!(base_id: base.id, name: "American Aviators", game_id: game.id, cash_on_hand: 100)
       subject = Airplane.last
-      subject.update(operator_id: 1)
+      subject.update(operator_id: airline.id)
 
-      expect(subject.update(operator_id: 2)).to be false
+      expect(subject.update(operator_id: other_airline.id)).to be false
       expect(subject.errors.map{ |error| "#{error.attribute} #{error.message}" }).to include "operator_id cannot be changed from one airline directly to another; must be put on the market first"
     end
   end
@@ -616,7 +668,7 @@ RSpec.describe Airplane do
     it "returns false if the plane is already owned by the buyer" do
       family = Fabricate(:aircraft_family)
       buyer = Fabricate(:airline, cash_on_hand: 100000000)
-      subject = Fabricate(:airplane, aircraft_family: family, operator_id: buyer.id)
+      subject = Fabricate(:airplane, aircraft_family: family, operator_id: buyer.id, base_country_group: buyer.base.country_group)
 
       initial_cash_on_hand = buyer.cash_on_hand
 
@@ -638,7 +690,7 @@ RSpec.describe Airplane do
       base = Fabricate(:market)
       buyer = Fabricate(:airline, name: "A Air", base_id: base.id, cash_on_hand: 100000000)
       other_airline = Fabricate(:airline, name: "B Air", base_id: base.id)
-      subject = Fabricate(:airplane, aircraft_family: family, operator_id: other_airline.id)
+      subject = Fabricate(:airplane, aircraft_family: family, operator_id: other_airline.id, base_country_group: buyer.base.country_group)
 
       initial_cash_on_hand = buyer.cash_on_hand
 
@@ -861,7 +913,7 @@ RSpec.describe Airplane do
     it "returns false if the plane is already owned by the buyer" do
       family = Fabricate(:aircraft_family)
       buyer = Fabricate(:airline, cash_on_hand: 100000000)
-      subject = Fabricate(:airplane, aircraft_family: family, operator_id: buyer.id)
+      subject = Fabricate(:airplane, aircraft_family: family, operator_id: buyer.id, base_country_group: buyer.base.country_group)
 
       initial_cash_on_hand = buyer.cash_on_hand
 
@@ -882,7 +934,7 @@ RSpec.describe Airplane do
       base = Fabricate(:market)
       buyer = Fabricate(:airline, name: "A Air", base_id: base.id, cash_on_hand: 100000000)
       other_airline = Fabricate(:airline, name: "B Air", base_id: base.id)
-      subject = Fabricate(:airplane, aircraft_family: family, operator_id: other_airline.id)
+      subject = Fabricate(:airplane, aircraft_family: family, operator_id: other_airline.id, base_country_group: other_airline.base.country_group)
 
       initial_cash_on_hand = buyer.cash_on_hand
 

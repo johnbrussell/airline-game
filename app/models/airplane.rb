@@ -11,6 +11,7 @@ class Airplane < ApplicationRecord
   validates :lease_rate, numericality: { greater_than: 0 }, allow_nil: true
 
   validate :base_changes_appropriately, unless: :new_record?
+  validate :based_in_right_country
   validate :block_time_feasible
   validate :operator_changes_appropriately, unless: :new_record?
   validate :seats_fit_on_plane
@@ -183,6 +184,12 @@ class Airplane < ApplicationRecord
       copy = Airplane.find(id)
       if RivalCountryGroup.rivals?(copy.base_country_group, base_country_group)
         errors.add(:base_country_group, "cannot be changed between rival countries")
+      end
+    end
+
+    def based_in_right_country
+      if operator_id.present? && Airline.find(operator_id).base.country_group != base_country_group
+        errors.add(:base_country_group, "different from operator's base")
       end
     end
 
