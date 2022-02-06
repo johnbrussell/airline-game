@@ -263,7 +263,8 @@ RSpec.describe Airplane do
   context "block_time_feasible" do
     it "is true when the routes' block time is within reason" do
       family = Fabricate(:aircraft_family)
-      subject = Fabricate(:airplane, aircraft_family: family)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 100, max_range: 100000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       route = AirlineRoute.create!(
@@ -387,6 +388,54 @@ RSpec.describe Airplane do
 
       expect(subject.can_fly_between?(airport_1, airport_2)).to be false
       expect(subject.can_fly_between?(airport_2, airport_1)).to be false
+    end
+  end
+
+  context "can_fly_routes" do
+    it "is true when the airplane can fly all of its routes" do
+      market = Fabricate(:market, name: "Pacific")
+      airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
+      airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: market)
+      family = Fabricate(:aircraft_family)
+      distance = Calculation::Distance.between_airports(airport_1, airport_2)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411)
+      AirplaneRoute.create!(route: airline_route, airplane: subject, block_time_mins: 100, flight_cost: 1, frequencies: 1)
+      subject.reload
+
+      expect(subject.valid?).to be true
+    end
+
+    it "is true when the airplane has no routes" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+
+      expect(subject.routes.empty?).to be true
+      expect(subject.valid?).to be true
+    end
+
+    it "is false when the airplane cannot fly at least one of its routes" do
+      market = Fabricate(:market, name: "Pacific")
+      airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
+      airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9996, elevation: 0, market: market)
+      airport_3 = Fabricate(:airport, iata: "TRW", latitude: 10, longitude: 12, runway: 11000, elevation: 0, market: market)
+      family = Fabricate(:aircraft_family)
+      distance = Calculation::Distance.between_airports(airport_1, airport_2)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
+      subject = Fabricate(:airplane, aircraft_family: family, economy_seats: 1, aircraft_model: model)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_3.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: distance - 1)
+      AirplaneRoute.create!(route: airline_route, airplane: subject, block_time_mins: 100, flight_cost: 1, frequencies: 1)
+      subject.reload
+
+      expect(subject.valid?).to be true
+
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: distance)
+      AirplaneRoute.create!(route: airline_route, airplane: subject, block_time_mins: 100, flight_cost: 1, frequencies: 1)
+      subject.reload
+
+      expect(subject.valid?).to be false
+      expect(subject.errors.full_messages).to include "Routes are not all able to be flown by the aircraft"
     end
   end
 

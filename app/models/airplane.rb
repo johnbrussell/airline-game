@@ -13,6 +13,7 @@ class Airplane < ApplicationRecord
   validate :base_changes_appropriately, unless: :new_record?
   validate :based_in_right_country
   validate :block_time_feasible
+  validate :can_fly_routes
   validate :operator_changes_appropriately, unless: :new_record?
   validate :seats_fit_on_plane
 
@@ -206,6 +207,12 @@ class Airplane < ApplicationRecord
     def block_time_feasible
       if total_block_time > MAX_TOTAL_BLOCK_TIME_MINS
         errors.add(:airplane_routes, "block time is too high")
+      end
+    end
+
+    def can_fly_routes
+      if !routes.all?{ |r| can_fly_between?(r.origin_airport, r.destination_airport) }
+        errors.add(:routes, "are not all able to be flown by the aircraft")
       end
     end
 
