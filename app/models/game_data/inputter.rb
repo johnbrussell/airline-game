@@ -102,6 +102,7 @@ class GameData::Inputter < ApplicationRecord
         Market.find_by(name: data_point["Metro Area"]).update!(
           country: data_point["Country"],
           country_group: data_point["Country group"],
+          territory_of: data_point["Territory"],
           income: data_point["Income"],
           is_national_capital: data_point["isNationalCapital"].downcase == "yes",
           is_island: data_point["isIsland"].downcase == "yes",
@@ -110,6 +111,7 @@ class GameData::Inputter < ApplicationRecord
         Market.new(
           name: data_point["Metro Area"],
           country: data_point["Country"],
+          territory_of: data_point["Territory"],
           country_group: data_point["Country group"],
           income: data_point["Income"],
           is_national_capital: data_point["isNationalCapital"].downcase == "yes",
