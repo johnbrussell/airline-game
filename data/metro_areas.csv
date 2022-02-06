@@ -1,75 +1,75 @@
-Metro Area,Income,Country,Country group,isNationalCapital,isIsland
-Los Angeles,75629,United States,United States,No,No
-New York City,78039,United States,United States,No,No
-Chicago,70009,United States,United States,No,No
-Boston,118453,United States,United States,No,No
-Provincetown,212306,United States,United States,No,Yes
-Portsmouth,82210,United States,United States,No,No
-Hyannis,148042,United States,United States,No,No
-Nauru,19000,Nauru,Nauru,Yes,Yes
-Funafuti,30495,Tuvalu,Tuvalu,Yes,Yes
-Majuro,12011,Marshall Islands,United States,Yes,Yes
-Pohnpei,18736,Federated States of Micronesia,United States,Yes,Yes
-Kwajalien,14956,Marshall Islands,United States,No,Yes
-Kosrae,24025,Federated States of Micronesia,United States,No,Yes
-Chuuk,15613,Federated States of Micronesia,United States,No,Yes
-Yap,20789,Federated States of Micronesia,United States,No,Yes
-Danbury,74420,United States,United States,No,No
-Bridgeport,109317,United States,United States,No,No
-Waterbury,63082,United States,United States,No,No
-New Haven,80496,United States,United States,No,No
-Hartford,73487,United States,United States,No,No
-Providence,65715,United States,United States,No,No
-New London,82886,United States,United States,No,No
-Newport,82477,United States,United States,No,No
-Block Island,143457,United States,United States,No,Yes
-Nantucket,168864,United States,United States,No,Yes
-Martha’s Vineyard,177071,United States,United States,No,Yes
-New Bedford,70161,United States,United States,No,No
-Pittsfield,64783,United States,United States,No,No
-Worcester,79121,United States,United States,No,No
-Keene,63256,United States,United States,No,No
-Lebanon,64415,United States,United States,No,No
-Rutland,58790,United States,United States,No,No
-Montpelier,65076,United States,United States,No,No
-Burlington (VT),74887,United States,United States,No,No
-Manchester (NH),83116,United States,United States,No,No
-Portland (ME),67994,United States,United States,No,No
-Augusta (ME),56853,United States,United States,No,No
-Rockland,53028,United States,United States,No,No
-Bangor,53233,United States,United States,No,No
-Bar Harbor,60092,United States,United States,No,No
-Auburn/Lewiston,55045,United States,United States,No,No
-Presque Isle,47114,United States,United States,No,No
-Stowe,55421,United States,United States,No,No
-Pittsburgh,88000,United States,United States,No,No
-Erie,66226,United States,United States,No,No
-Cumberland,53419,United States,United States,No,No
-Hagerstown,72092,United States,United States,No,No
-Frederick,95036,United States,United States,No,No
-Salisbury,60306,United States,United States,No,No
-Baltimore/Washington,107456,United States,United States,Yes,No
-Richmond,93770,United States,United States,No,No
-Norfolk,81751,United States,United States,No,No
-Pyongyang,960,North Korea,North Korea,Yes,No
-Chongjin,480,North Korea,North Korea,No,No
-Havana,502,Cuba,Cuba,Yes,Yes
-Roanoke,79166,United States,United States,No,No
-Lynchburg,71416,United States,United States,No,No
-Charlottesville,85135,United States,United States,No,No
-Staunton,69357,United States,United States,No,No
-Charleston (WV),56479,United States,United States,No,No
-Morgantown,53314,United States,United States,No,No
-Bloomington (IN),60845,United States,United States,No,No
-South Bend,55881,United States,United States,No,No
-Fort Wayne,60228,United States,United States,No,No
-Terre Haute,50903,United States,United States,No,No
-Lafayette (IN),60367,United States,United States,No,No
-Indianapolis,67505,United States,United States,No,No
-Huntington,50978,United States,United States,No,No
-Lewisburg/Beckley,45641,United States,United States,No,No
-Wheeling,49264,United States,United States,No,No
-Parkersburg,52053,United States,United States,No,No
-Evansville/Owensboro,55786,United States,United States,No,No
-Bluefield,47310,United States,United States,No,No
-Islip,84767,United States,United States,No,No
+Metro Area,Income,Country,Territory,Country group,isNationalCapital,isIsland
+Los Angeles,75629,United States,,United States,No,No
+New York City,78039,United States,,United States,No,No
+Chicago,70009,United States,,United States,No,No
+Boston,118453,United States,,United States,No,No
+Provincetown,212306,United States,,United States,No,Yes
+Portsmouth,82210,United States,,United States,No,No
+Hyannis,148042,United States,,United States,No,No
+Nauru,19000,Nauru,,Nauru,Yes,Yes
+Funafuti,30495,Tuvalu,,Tuvalu,Yes,Yes
+Majuro,12011,Marshall Islands,,United States,Yes,Yes
+Pohnpei,18736,Federated States of Micronesia,,United States,Yes,Yes
+Kwajalien,14956,Marshall Islands,,United States,No,Yes
+Kosrae,24025,Federated States of Micronesia,,United States,No,Yes
+Chuuk,15613,Federated States of Micronesia,,United States,No,Yes
+Yap,20789,Federated States of Micronesia,,United States,No,Yes
+Danbury,74420,United States,,United States,No,No
+Bridgeport,109317,United States,,United States,No,No
+Waterbury,63082,United States,,United States,No,No
+New Haven,80496,United States,,United States,No,No
+Hartford,73487,United States,,United States,No,No
+Providence,65715,United States,,United States,No,No
+New London,82886,United States,,United States,No,No
+Newport,82477,United States,,United States,No,No
+Block Island,143457,United States,,United States,No,Yes
+Nantucket,168864,United States,,United States,No,Yes
+Martha’s Vineyard,177071,United States,,United States,No,Yes
+New Bedford,70161,United States,,United States,No,No
+Pittsfield,64783,United States,,United States,No,No
+Worcester,79121,United States,,United States,No,No
+Keene,63256,United States,,United States,No,No
+Lebanon,64415,United States,,United States,No,No
+Rutland,58790,United States,,United States,No,No
+Montpelier,65076,United States,,United States,No,No
+Burlington (VT),74887,United States,,United States,No,No
+Manchester (NH),83116,United States,,United States,No,No
+Portland (ME),67994,United States,,United States,No,No
+Augusta (ME),56853,United States,,United States,No,No
+Rockland,53028,United States,,United States,No,No
+Bangor,53233,United States,,United States,No,No
+Bar Harbor,60092,United States,,United States,No,No
+Auburn/Lewiston,55045,United States,,United States,No,No
+Presque Isle,47114,United States,,United States,No,No
+Stowe,55421,United States,,United States,No,No
+Pittsburgh,88000,United States,,United States,No,No
+Erie,66226,United States,,United States,No,No
+Cumberland,53419,United States,,United States,No,No
+Hagerstown,72092,United States,,United States,No,No
+Frederick,95036,United States,,United States,No,No
+Salisbury,60306,United States,,United States,No,No
+Baltimore/Washington,107456,United States,,United States,Yes,No
+Richmond,93770,United States,,United States,No,No
+Norfolk,81751,United States,,United States,No,No
+Pyongyang,960,North Korea,,North Korea,Yes,No
+Chongjin,480,North Korea,,North Korea,No,No
+Havana,502,Cuba,,Cuba,Yes,Yes
+Roanoke,79166,United States,,United States,No,No
+Lynchburg,71416,United States,,United States,No,No
+Charlottesville,85135,United States,,United States,No,No
+Staunton,69357,United States,,United States,No,No
+Charleston (WV),56479,United States,,United States,No,No
+Morgantown,53314,United States,,United States,No,No
+Bloomington (IN),60845,United States,,United States,No,No
+South Bend,55881,United States,,United States,No,No
+Fort Wayne,60228,United States,,United States,No,No
+Terre Haute,50903,United States,,United States,No,No
+Lafayette (IN),60367,United States,,United States,No,No
+Indianapolis,67505,United States,,United States,No,No
+Huntington,50978,United States,,United States,No,No
+Lewisburg/Beckley,45641,United States,,United States,No,No
+Wheeling,49264,United States,,United States,No,No
+Parkersburg,52053,United States,,United States,No,No
+Evansville/Owensboro,55786,United States,,United States,No,No
+Bluefield,47310,United States,,United States,No,No
+Islip,84767,United States,,United States,No,No
