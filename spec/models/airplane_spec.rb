@@ -418,7 +418,7 @@ RSpec.describe Airplane do
     it "is false when the airplane cannot fly at least one of its routes" do
       market = Fabricate(:market, name: "Pacific")
       airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
-      airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9996, elevation: 0, market: market)
+      airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: market)
       airport_3 = Fabricate(:airport, iata: "TRW", latitude: 10, longitude: 12, runway: 11000, elevation: 0, market: market)
       family = Fabricate(:aircraft_family)
       distance = Calculation::Distance.between_airports(airport_1, airport_2)
@@ -432,6 +432,7 @@ RSpec.describe Airplane do
 
       airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: distance)
       AirplaneRoute.create!(route: airline_route, airplane: subject, block_time_mins: 100, flight_cost: 1, frequencies: 1)
+      airport_2.update!(runway: 9996)
       subject.reload
 
       expect(subject.valid?).to be false
@@ -1413,7 +1414,8 @@ RSpec.describe Airplane do
 
     it "is true if the origin and destination provided connect to the airplane's existing routes" do
       family = Fabricate(:aircraft_family)
-      subject = Fabricate(:airplane, aircraft_family: family)
+      model = Fabricate(:aircraft_model, takeoff_distance: 1, max_range: 10000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       route = AirlineRoute.create!(
@@ -1440,7 +1442,8 @@ RSpec.describe Airplane do
 
     it "is false if the origin and destination provided do not connect to the airplane's existing routes" do
       family = Fabricate(:aircraft_family)
-      subject = Fabricate(:airplane, aircraft_family: family)
+      model = Fabricate(:aircraft_model, takeoff_distance: 1, max_range: 10000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       route = AirlineRoute.create!(
@@ -1474,7 +1477,8 @@ RSpec.describe Airplane do
 
     it "is true for a route the airplane doesn't fly" do
       family = Fabricate(:aircraft_family)
-      subject = Fabricate(:airplane, aircraft_family: family)
+      model = Fabricate(:aircraft_model, takeoff_distance: 1, max_range: 10000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       route = AirlineRoute.create!(
@@ -1499,7 +1503,8 @@ RSpec.describe Airplane do
 
     it "is true if the airplane's only route is the origin and destination supplied" do
       family = Fabricate(:aircraft_family)
-      subject = Fabricate(:airplane, aircraft_family: family)
+      model = Fabricate(:aircraft_model, takeoff_distance: 1, max_range: 10000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       route = AirlineRoute.create!(
@@ -1525,7 +1530,8 @@ RSpec.describe Airplane do
 
     it "is true if the airplane's only routes are the origin and destination supplied and another connected route" do
       family = Fabricate(:aircraft_family)
-      subject = Fabricate(:airplane, aircraft_family: family)
+      model = Fabricate(:aircraft_model, takeoff_distance: 1, max_range: 10000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       trw = Fabricate(:airport, iata: "TRW", market: inu.market)
@@ -1569,7 +1575,8 @@ RSpec.describe Airplane do
 
     it "is false if the origin and destination supplied are a necessary link between the airplane's routes" do
       family = Fabricate(:aircraft_family)
-      subject = Fabricate(:airplane, aircraft_family: family)
+      model = Fabricate(:aircraft_model, takeoff_distance: 1, max_range: 10000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       trw = Fabricate(:airport, iata: "TRW", market: inu.market)
