@@ -63,6 +63,7 @@ RSpec.describe "airplanes/lease_information", type: :feature do
         visit game_airplane_lease_path(game.id, airplane.id)
 
         expect(page).to have_content("Lease a new 737-300")
+        expect(page).to have_content("Constructed in United States")
         expect(page).to have_content(airplane.construction_date)
         expect(page).to have_content("A Air has $100000.00 on hand")
         expect(page).to have_content("1 year lease: ")
@@ -101,7 +102,7 @@ RSpec.describe "airplanes/lease_information", type: :feature do
         visit game_new_airplanes_airplanes_path(game)
 
         expect(page).to have_content "There is 1 new airplane available to buy or lease"
-        expect(page).to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
+        expect(page).to have_content "Boeing 737-300 to be delivered #{airplane.construction_date}"
 
         click_button "Lease"
 
@@ -116,7 +117,7 @@ RSpec.describe "airplanes/lease_information", type: :feature do
         visit game_new_airplanes_airplanes_path(game)
 
         expect(page).to have_content "There are 0 new airplanes available to buy or lease"
-        expect(page).not_to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
+        expect(page).not_to have_content "Boeing 737-300 to be delivered #{airplane.construction_date}"
       end
 
       it "does not redirect to the airline fleet page when a validation error occurs" do
@@ -131,6 +132,8 @@ RSpec.describe "airplanes/lease_information", type: :feature do
         fill_in :airplane_economy_seats, with: 100
         click_button "Lease"
 
+        expect(page).to have_content "Lease a new 737-300"
+        expect(page).to have_content "Constructed in United States"
         expect(page).to have_content "Seats require more total floor space than available on airplane"
         expect(page).not_to have_content "A Air fleet"
       end
@@ -142,14 +145,14 @@ RSpec.describe "airplanes/lease_information", type: :feature do
         visit game_new_airplanes_airplanes_path(game)
 
         expect(page).to have_content "There is 1 new airplane available to buy or lease"
-        expect(page).to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
+        expect(page).to have_content "Boeing 737-300 to be delivered #{airplane.construction_date}"
 
         click_button "Lease"
 
         click_button "Cancel"
 
         expect(page).to have_content "There is 1 new airplane available to buy or lease"
-        expect(page).to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
+        expect(page).to have_content "Boeing 737-300 to be delivered #{airplane.construction_date}"
       end
     end
 
@@ -172,6 +175,7 @@ RSpec.describe "airplanes/lease_information", type: :feature do
         visit game_airplane_lease_path(game.id, airplane.id)
 
         expect(page).to have_content("Lease a used 737-300")
+        expect(page).to have_content("Based in United States")
         expect(page).to have_content("#{airplane.construction_date} (1 day old)")
         expect(page).to have_content("A Air has $100000.00 on hand")
         expect(page).to have_content("1 year lease: ")
@@ -232,6 +236,8 @@ RSpec.describe "airplanes/lease_information", type: :feature do
         fill_in :airplane_days, with: 1
         click_button "Lease"
 
+        expect(page).to have_content "Lease a used 737-300"
+        expect(page).to have_content "Based in United States"
         expect(page).to have_content "Buyer does not have enough cash on hand to lease"
         expect(page).not_to have_content "A Air fleet"
       end

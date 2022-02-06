@@ -190,6 +190,26 @@ RSpec.describe Airplane do
     end
   end
 
+  context "base_changes_appropriately" do
+    it "is true when the base changes appropriately" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family, base_country_group: "Tuvalu")
+
+      expect(subject.valid?).to be true
+      expect(subject.update(base_country_group: "Nauru")).to be true
+    end
+
+    it "is false when the base changes inappropriately" do
+      RivalCountryGroup.create!(country_one: "Nauru", country_two: "Tuvalu")
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family, base_country_group: "Tuvalu")
+
+      expect(subject.valid?).to be true
+      expect(subject.update(base_country_group: "Nauru")).to be false
+      expect(subject.errors.full_messages).to include "Base country group cannot be changed between rival countries"
+    end
+  end
+
   context "block_time" do
     it "is calculated correctly" do
       family = Fabricate(:aircraft_family)
@@ -574,9 +594,10 @@ RSpec.describe Airplane do
     purchase_price_new = 100000000
 
     it "returns false if the airline does not have enough money" do
-      family = Fabricate(:aircraft_family)
+      family = Fabricate(:aircraft_family, country_group: "St. Pierre and Miquelon")
+      market = Fabricate(:market, country_group: "Canada")
       subject = Fabricate(:airplane, aircraft_family: family)
-      buyer = Fabricate(:airline, cash_on_hand: 100)
+      buyer = Fabricate(:airline, cash_on_hand: 100, base_id: market.id)
 
       expect(subject.lease(airline = buyer, length_in_days = 100, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
 
@@ -589,6 +610,7 @@ RSpec.describe Airplane do
       expect(subject.premium_economy_seats).to eq 0
       expect(subject.economy_seats).to eq 0
       expect(subject.lease_expiry).to be nil
+      expect(subject.base_country_group).to eq "St. Pierre and Miquelon"
     end
 
     it "returns false if the plane is already owned by the buyer" do
@@ -635,7 +657,7 @@ RSpec.describe Airplane do
 
     context "new plane" do
       it "returns true, assigns the plane to the airline, and installs the right number of seats" do
-        family = Fabricate(:aircraft_family)
+        family = Fabricate(:aircraft_family, country_group: "United States")
         market = Fabricate(:market, country_group: "Nauru")
         buyer = Fabricate(:airline, cash_on_hand: 100000000, base_id: market.id)
         subject = Fabricate(:airplane, aircraft_family: family)
@@ -662,9 +684,10 @@ RSpec.describe Airplane do
       end
 
       it "returns false if the number of seats requested requires too much square footage" do
-        family = Fabricate(:aircraft_family)
+        family = Fabricate(:aircraft_family, country_group: "Nauru")
+        market = Fabricate(:market, country_group: "Tuvalu")
         subject = Fabricate(:airplane, aircraft_family: family)
-        buyer = Fabricate(:airline, cash_on_hand: 100000000)
+        buyer = Fabricate(:airline, cash_on_hand: 100000000, base_id: market.id)
 
         subject.update(construction_date: subject.game.current_date + 1.day)
         subject.reload
@@ -688,12 +711,13 @@ RSpec.describe Airplane do
         expect(subject.premium_economy_seats).to eq 0
         expect(subject.economy_seats).to eq 0
         expect(subject.lease_expiry).to be nil
+        expect(subject.base_country_group).to eq "Nauru"
       end
     end
 
     context "used plane" do
       it "does not update the seating configuration" do
-        family = Fabricate(:aircraft_family)
+        family = Fabricate(:aircraft_family, country_group: "United States")
         market = Fabricate(:market, country_group: "Nauru")
         buyer = Fabricate(:airline, cash_on_hand: 100000000, base_id: market.id)
         subject = Fabricate(:airplane, aircraft_family: family)
@@ -816,8 +840,9 @@ RSpec.describe Airplane do
     purchase_price_new = 100000000
 
     it "returns false if the airline does not have enough money" do
-      family = Fabricate(:aircraft_family)
-      buyer = Fabricate(:airline, cash_on_hand: 100)
+      family = Fabricate(:aircraft_family, country_group: "United States")
+      base = Fabricate(:market, country_group: "Europe")
+      buyer = Fabricate(:airline, cash_on_hand: 100, base_id: base.id)
       subject = Fabricate(:airplane, aircraft_family: family)
 
       expect(subject.purchase(airline = buyer, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
@@ -830,6 +855,7 @@ RSpec.describe Airplane do
       expect(subject.business_seats).to eq 0
       expect(subject.premium_economy_seats).to eq 0
       expect(subject.economy_seats).to eq 0
+      expect(subject.base_country_group).to eq "United States"
     end
 
     it "returns false if the plane is already owned by the buyer" do
@@ -874,7 +900,7 @@ RSpec.describe Airplane do
 
     context "new" do
       it "returns true, assigns the plane to the airline, installs the right number of seats, and deducts the purchase price from the airline's cash" do
-        family = Fabricate(:aircraft_family)
+        family = Fabricate(:aircraft_family, country_group: "Tuvalu")
         market = Fabricate(:market, country_group: "Nauru")
         buyer = Fabricate(:airline, cash_on_hand: 100000000, base_id: market.id)
         subject = Fabricate(:airplane, aircraft_family: family)
@@ -898,8 +924,9 @@ RSpec.describe Airplane do
       end
 
       it "returns false if the number of seats requested requires too much square footage" do
-        family = Fabricate(:aircraft_family)
-        buyer = Fabricate(:airline, cash_on_hand: 100000000)
+        family = Fabricate(:aircraft_family, country_group: "Tuvalu")
+        market = Fabricate(:market, country_group: "Nauru")
+        buyer = Fabricate(:airline, cash_on_hand: 100000000, base_id: market.id)
         subject = Fabricate(:airplane, aircraft_family: family)
 
         subject.update(construction_date: subject.game.current_date + 1.day)
@@ -917,12 +944,13 @@ RSpec.describe Airplane do
         expect(subject.business_seats).to eq 0
         expect(subject.premium_economy_seats).to eq 0
         expect(subject.economy_seats).to eq 0
+        expect(subject.base_country_group).to eq "Tuvalu"
       end
     end
 
     context "used" do
       it "does not update the seating configuration" do
-        family = Fabricate(:aircraft_family)
+        family = Fabricate(:aircraft_family, country_group: "Kiribati")
         market = Fabricate(:market, country_group: "Nauru")
         buyer = Fabricate(:airline, cash_on_hand: 100000000, base_id: market.id)
         subject = Fabricate(:airplane, aircraft_family: family)

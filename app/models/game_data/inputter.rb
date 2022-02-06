@@ -12,6 +12,7 @@ class GameData::Inputter < ApplicationRecord
     self.population
     self.tourists
     self.aircraft_models
+    self.rival_country_groups
   end
 
   private
@@ -147,6 +148,18 @@ class GameData::Inputter < ApplicationRecord
           market.tourists.destroy_all
           market.destroy
         end
+      end
+    end
+
+    def self.rival_country_groups
+      RivalCountryGroup.destroy_all
+
+      data = CSV.parse(File.read("data/geopolitical_foe_country_groups.csv"), headers: true)
+      data.by_row.each do |data_point|
+        RivalCountryGroup.create!(
+          country_one: [data_point["Group 1"], data_point["Group 2"]].min,
+          country_two: [data_point["Group 1"], data_point["Group 2"]].max,
+        )
       end
     end
 

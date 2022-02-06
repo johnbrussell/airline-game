@@ -10,6 +10,7 @@ class Airplane < ApplicationRecord
   validates :premium_economy_seats, numericality: { greater_than_or_equal_to: 0 }
   validates :lease_rate, numericality: { greater_than: 0 }, allow_nil: true
 
+  validate :base_changes_appropriately, unless: :new_record?
   validate :block_time_feasible
   validate :operator_changes_appropriately, unless: :new_record?
   validate :seats_fit_on_plane
@@ -176,6 +177,13 @@ class Airplane < ApplicationRecord
 
     def age_in_days
       [(game.current_date - construction_date).to_i, 0].max
+    end
+
+    def base_changes_appropriately
+      copy = Airplane.find(id)
+      if RivalCountryGroup.rivals?(copy.base_country_group, base_country_group)
+        errors.add(:base_country_group, "cannot be changed between rival countries")
+      end
     end
 
     def block_time_feasible

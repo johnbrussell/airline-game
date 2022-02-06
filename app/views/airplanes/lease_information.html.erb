@@ -1,6 +1,8 @@
 <h1>Airline Game</h1>
 <h2>Lease a <%= @airplane.built? ? "used" : "new" %> <%= @airplane.aircraft_model.name%> </h2>
 
+<p><%= @airplane.built? ? "Based" : "Constructed" %> in <%= @airplane.base_country_group %></p>
+
 <h3><%= @airplane.built? ? "Construction" : "Delivery" %> date</h3>
 <ul>
   <li><%= @airplane.construction_date %> <%= @airplane.built? ? "(#{(@game.current_date - @airplane.construction_date).to_i} #{"day".pluralize((@game.current_date - @airplane.construction_date).to_i)} old)" : "" %></li>

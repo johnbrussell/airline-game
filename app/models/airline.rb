@@ -9,7 +9,16 @@ class Airline < ApplicationRecord
   before_destroy :validate_a_user_airline_exists
 
   def base
-    Market.find(base_id)
+    @base ||= Market.find(base_id)
+  end
+
+  def rival_country_groups
+    RivalCountryGroup
+      .all
+      .select { |g| g.country_one == base.country_group || g.country_two == base.country_group }
+      .map { |g| [g.country_one, g.country_two].reject { |c| c == base.country_group } }
+      .flatten
+      .uniq
   end
 
   private
