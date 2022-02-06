@@ -190,6 +190,26 @@ RSpec.describe Airplane do
     end
   end
 
+  context "base_changes_appropriately" do
+    it "is true when the base changes appropriately" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family, base_country_group: "Tuvalu")
+
+      expect(subject.valid?).to be true
+      expect(subject.update(base_country_group: "Nauru")).to be true
+    end
+
+    it "is false when the base changes inappropriately" do
+      RivalCountryGroup.create!(country_one: "Nauru", country_two: "Tuvalu")
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family, base_country_group: "Tuvalu")
+
+      expect(subject.valid?).to be true
+      expect(subject.update(base_country_group: "Nauru")).to be false
+      expect(subject.errors.full_messages).to include "Base country group cannot be changed between rival countries"
+    end
+  end
+
   context "block_time" do
     it "is calculated correctly" do
       family = Fabricate(:aircraft_family)
