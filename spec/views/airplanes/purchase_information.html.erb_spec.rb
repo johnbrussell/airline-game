@@ -63,6 +63,7 @@ RSpec.describe "airplanes/purchase_information", type: :feature do
         visit game_airplane_purchase_path(game.id, airplane.id)
 
         expect(page).to have_content("Order a new 737-300")
+        expect(page).to have_content("Constructed in United States")
         expect(page).to have_content(airplane.construction_date)
         expect(page).to have_content("Due now: $50000000.00")
         expect(page).to have_content("Due on #{airplane.construction_date}: $50000000.00")
@@ -142,6 +143,8 @@ RSpec.describe "airplanes/purchase_information", type: :feature do
         fill_in :airplane_economy_seats, with: 100
         click_button "Purchase"
 
+        expect(page).to have_content "Order a new 737-300"
+        expect(page).to have_content("Constructed in United States")
         expect(page).to have_content "Seats require more total floor space than available on airplane"
         expect(page).not_to have_content "A Air fleet"
       end
@@ -167,6 +170,7 @@ RSpec.describe "airplanes/purchase_information", type: :feature do
         visit game_airplane_purchase_path(game.id, airplane.id)
 
         expect(page).to have_content("Buy a used 737-300")
+        expect(page).to have_content("Based in United States")
         expect(page).to have_content("#{airplane.construction_date} (0 days old)")
         expect(page).to have_content("Due now: $100000000.00")
         expect(page).to have_content("A Air has $100000000.00 available")
@@ -230,6 +234,8 @@ RSpec.describe "airplanes/purchase_information", type: :feature do
 
         click_button "Purchase"
 
+        expect(page).to have_content "Buy a used 737-300"
+        expect(page).to have_content("Based in United States")
         expect(page).to have_content "Operator cannot be present before buying an airplane"
         expect(page).not_to have_content "A Air fleet"
       end
