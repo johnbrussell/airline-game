@@ -97,14 +97,14 @@ RSpec.describe "airplanes/purchase_information", type: :feature do
         visit game_new_airplanes_airplanes_path(game)
 
         expect(page).to have_content "There is 1 new airplane available to buy or lease"
-        expect(page).to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
+        expect(page).to have_content "Boeing 737-300 to be delivered #{airplane.construction_date}"
 
         click_button "Buy"
 
         click_button "Cancel"
 
         expect(page).to have_content "There is 1 new airplane available to buy or lease"
-        expect(page).to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
+        expect(page).to have_content "Boeing 737-300 to be delivered #{airplane.construction_date}"
       end
 
       it "does not show the airplane on the new airplane page again after buying" do
@@ -114,7 +114,7 @@ RSpec.describe "airplanes/purchase_information", type: :feature do
         visit game_new_airplanes_airplanes_path(game)
 
         expect(page).to have_content "There is 1 new airplane available to buy or lease"
-        expect(page).to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
+        expect(page).to have_content "Boeing 737-300 to be delivered #{airplane.construction_date}"
 
         click_button "Buy"
 
@@ -128,7 +128,7 @@ RSpec.describe "airplanes/purchase_information", type: :feature do
         visit game_new_airplanes_airplanes_path(game)
 
         expect(page).to have_content "There are 0 new airplanes available to buy or lease"
-        expect(page).not_to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
+        expect(page).not_to have_content "Boeing 737-300 to be delivered #{airplane.construction_date}"
       end
 
       it "does not redirect to the airline fleet page when a validation error occurs" do

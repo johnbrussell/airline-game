@@ -28,7 +28,7 @@ RSpec.describe "new_airplanes/airplanes/index", type: :feature do
       expect(page).to have_content "There is 1 new airplane available to buy or lease"
       expect(page).to have_link "Return to game overview"
       expect(page).to have_link "View used airplanes for purchase or lease"
-      expect(page).to have_content "Z 200 constructed 1915-01-01. 10 economy, 9 premium economy, 8 business."
+      expect(page).to have_content "Z 200 to be delivered 1915-01-01. 10 economy, 9 premium economy, 8 business."
       expect(page).to have_content "$100,000 value."
     end
   end
