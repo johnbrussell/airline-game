@@ -28,6 +28,8 @@ RSpec.describe Airplane do
       game = Game.first
       other_game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
       other_queue = AircraftManufacturingQueue.create!(game: other_game, aircraft_family_id: 1, production_rate: 1)
+      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
 
       valid_airplane = Airplane.create!(
         base_country_group: "United States",
@@ -42,7 +44,7 @@ RSpec.describe Airplane do
         construction_date: game.current_date + 1.day,
         end_of_useful_life: game.current_date + useful_life_years.years,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
-        operator_id: 1,
+        operator_id: airline.id,
         aircraft_model: AircraftModel.last,
       )
       Airplane.create!(
@@ -96,6 +98,8 @@ RSpec.describe Airplane do
       game = Game.first
       other_game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
       other_queue = AircraftManufacturingQueue.create!(game: other_game, aircraft_family_id: 1, production_rate: 1)
+      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
 
       valid_airplane = Airplane.create!(
         base_country_group: "United States",
@@ -110,7 +114,7 @@ RSpec.describe Airplane do
         construction_date: game.current_date,
         end_of_useful_life: game.current_date + useful_life_years.years,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
-        operator_id: 1,
+        operator_id: airline.id,
         aircraft_model: AircraftModel.last,
       )
       Airplane.create!(
@@ -164,16 +168,20 @@ RSpec.describe Airplane do
         useful_life: 30,
         family: family,
       )
-      Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, base_country_group: "United States", operator_id: 2, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
+      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      airline_1 = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
+      airline_2 = Airline.create!(base_id: base.id, name: "American Aviators", game_id: game.id, cash_on_hand: 100)
+      Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, base_country_group: "United States", operator_id: airline_2.id, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
     end
 
     it "only includes planes with the specified operator" do
       model = AircraftModel.last
       queue = AircraftManufacturingQueue.last
-      airplane = Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, base_country_group: "United States", operator_id: 1, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
+      airline_1 = Airline.find_by(name: "American Aviation")
+      airplane = Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, base_country_group: "United States", operator_id: airline_1.id, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
       expected = [airplane]
 
-      actual = Airplane.with_operator(1)
+      actual = Airplane.with_operator(airline_1.id)
 
       expect(actual).to eq expected
     end
@@ -210,6 +218,34 @@ RSpec.describe Airplane do
     end
   end
 
+  context "based_in_right_country" do
+    it "is true when the base matches the operator's" do
+      market = Fabricate(:market, country_group: "Tuvalu")
+      operator = Fabricate(:airline, base_id: market.id)
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family, base_country_group: "Tuvalu", operator_id: operator.id)
+
+      expect(subject.valid?).to be true
+    end
+
+    it "is true when there is no operator" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family, base_country_group: "Tuvalu", operator_id: nil)
+
+      expect(subject.valid?).to be true
+    end
+
+    it "is false when the base does not match the operator's" do
+      market = Fabricate(:market, country_group: "Nauru")
+      operator = Fabricate(:airline, base_id: market.id)
+      model = Fabricate(:aircraft_model)
+      subject = Airplane.new(base_country_group: "Tuvalu", operator_id: operator.id, aircraft_model_id: model.id)
+
+      expect(subject.valid?).to be false
+      expect(subject.errors.full_messages).to include "Base country group different from operator's base"
+    end
+  end
+
   context "block_time" do
     it "is calculated correctly" do
       family = Fabricate(:aircraft_family)
@@ -227,7 +263,8 @@ RSpec.describe Airplane do
   context "block_time_feasible" do
     it "is true when the routes' block time is within reason" do
       family = Fabricate(:aircraft_family)
-      subject = Fabricate(:airplane, aircraft_family: family)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 100, max_range: 100000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       route = AirlineRoute.create!(
@@ -277,6 +314,132 @@ RSpec.describe Airplane do
     end
   end
 
+  context "can_fly_between?" do
+    it "is true when the flight is within the operating specifications of the aircraft" do
+      market = Fabricate(:market, name: "Pacific")
+      airport_1 = Fabricate(:airport, iata: "INU", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
+      airport_2 = Fabricate(:airport, iata: "FUN", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: market)
+      distance = Calculation::Distance.between_airports(airport_1, airport_2)
+
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1) # note this wiggle room in distance means that the takeoff distance is slightly less than 10000
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1)
+
+      expect(subject.can_fly_between?(airport_1, airport_2)).to be true
+      expect(subject.can_fly_between?(airport_2, airport_1)).to be true
+    end
+
+    it "is false when the runway is too short" do
+      market = Fabricate(:market, name: "Pacific")
+      airport_1 = Fabricate(:airport, iata: "INU", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
+      airport_2 = Fabricate(:airport, iata: "FUN", latitude: 11, longitude: 14, runway: 9996, elevation: 0, market: market)
+      distance = Calculation::Distance.between_airports(airport_1, airport_2)
+
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1)
+
+      expect(subject.can_fly_between?(airport_1, airport_2)).to be false
+      expect(subject.can_fly_between?(airport_2, airport_1)).to be false
+    end
+
+    it "is false when the airport is too high" do
+      market = Fabricate(:market, name: "Pacific")
+      airport_1 = Fabricate(:airport, iata: "INU", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
+      airport_2 = Fabricate(:airport, iata: "FUN", latitude: 11, longitude: 14, runway: 9997, elevation: 1, market: market)
+      distance = Calculation::Distance.between_airports(airport_1, airport_2)
+
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1)
+
+      expect(subject.can_fly_between?(airport_1, airport_2)).to be false
+      expect(subject.can_fly_between?(airport_2, airport_1)).to be false
+    end
+
+    it "is false when the distance is too great" do
+      market = Fabricate(:market, name: "Pacific")
+      airport_1 = Fabricate(:airport, iata: "INU", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
+      airport_2 = Fabricate(:airport, iata: "FUN", latitude: 11, longitude: 14, runway: 10000, elevation: 0, market: market)
+      distance = Calculation::Distance.between_airports(airport_1, airport_2)
+
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance - 1)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1)
+
+      expect(subject.can_fly_between?(airport_1, airport_2)).to be false
+      expect(subject.can_fly_between?(airport_2, airport_1)).to be false
+    end
+
+    it "is false when the route is disconnected from the airplane's other routes" do
+      market = Fabricate(:market, name: "Pacific")
+      airport_1 = Fabricate(:airport, iata: "INU", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
+      airport_2 = Fabricate(:airport, iata: "FUN", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: market)
+      airport_3 = Fabricate(:airport, iata: "MAJ", latitude: 12, longitude: 14, runway: 9997, elevation: 0, market: market)
+      airport_4 = Fabricate(:airport, iata: "TRW", latitude: 13, longitude: 14, runway: 9997, elevation: 0, market: market)
+      distance = Calculation::Distance.between_airports(airport_1, airport_2)
+
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1) # note this wiggle room in distance means that the takeoff distance is slightly less than 10000
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_3.id, destination_airport_id: airport_4.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411)
+      AirplaneRoute.create!(route: airline_route, airplane: subject, block_time_mins: 100, flight_cost: 1, frequencies: 1)
+      subject.reload
+
+      expect(subject.can_fly_between?(airport_1, airport_2)).to be false
+      expect(subject.can_fly_between?(airport_2, airport_1)).to be false
+    end
+  end
+
+  context "can_fly_routes" do
+    it "is true when the airplane can fly all of its routes" do
+      market = Fabricate(:market, name: "Pacific")
+      airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
+      airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: market)
+      family = Fabricate(:aircraft_family)
+      distance = Calculation::Distance.between_airports(airport_1, airport_2)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411)
+      AirplaneRoute.create!(route: airline_route, airplane: subject, block_time_mins: 100, flight_cost: 1, frequencies: 1)
+      subject.reload
+
+      expect(subject.valid?).to be true
+    end
+
+    it "is true when the airplane has no routes" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+
+      expect(subject.routes.empty?).to be true
+      expect(subject.valid?).to be true
+    end
+
+    it "is false when the airplane cannot fly at least one of its routes" do
+      market = Fabricate(:market, name: "Pacific")
+      airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
+      airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: market)
+      airport_3 = Fabricate(:airport, iata: "TRW", latitude: 10, longitude: 12, runway: 11000, elevation: 0, market: market)
+      family = Fabricate(:aircraft_family)
+      distance = Calculation::Distance.between_airports(airport_1, airport_2)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
+      subject = Fabricate(:airplane, aircraft_family: family, economy_seats: 1, aircraft_model: model)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_3.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: distance - 1)
+      AirplaneRoute.create!(route: airline_route, airplane: subject, block_time_mins: 100, flight_cost: 1, frequencies: 1)
+      subject.reload
+
+      expect(subject.valid?).to be true
+
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: distance)
+      AirplaneRoute.create!(route: airline_route, airplane: subject, block_time_mins: 100, flight_cost: 1, frequencies: 1)
+      airport_2.update!(runway: 9996)
+      subject.reload
+
+      expect(subject.valid?).to be false
+      expect(subject.errors.full_messages).to include "Routes are not all able to be flown by the aircraft"
+    end
+  end
+
   context "has_operator?" do
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
@@ -299,9 +462,12 @@ RSpec.describe Airplane do
     end
 
     it "is true when the airplane is owned" do
+      game = Game.last
+      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
       subject = Airplane.create!(
         base_country_group: "United States",
-        operator_id: 1,
+        operator_id: airline.id,
         construction_date: Date.today,
         end_of_useful_life: Date.tomorrow,
         aircraft_manufacturing_queue: AircraftManufacturingQueue.last,
@@ -418,13 +584,19 @@ RSpec.describe Airplane do
     end
 
     it "is true when buying an airplane" do
+      game = Game.last
+      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
       subject = Airplane.last
-      expect(subject.update(operator_id: 1)).to be true
+      expect(subject.update(operator_id: airline.id)).to be true
     end
 
     it "is true when selling an airplane" do
+      game = Game.last
+      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
       subject = Airplane.last
-      subject.update(operator_id: 1)
+      subject.update(operator_id: airline.id)
 
       expect(subject.update(operator_id: nil)).to be true
     end
@@ -435,17 +607,24 @@ RSpec.describe Airplane do
     end
 
     it "is true when updating an owned airplane" do
+      game = Game.last
+      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
       subject = Airplane.last
-      subject.update(operator_id: 1)
+      subject.update(operator_id: airline.id)
 
       expect(subject.update(economy_seats: 2)).to be true
     end
 
     it "is false when selling an airplane from one airline to another" do
+      game = Game.last
+      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
+      other_airline = Airline.create!(base_id: base.id, name: "American Aviators", game_id: game.id, cash_on_hand: 100)
       subject = Airplane.last
-      subject.update(operator_id: 1)
+      subject.update(operator_id: airline.id)
 
-      expect(subject.update(operator_id: 2)).to be false
+      expect(subject.update(operator_id: other_airline.id)).to be false
       expect(subject.errors.map{ |error| "#{error.attribute} #{error.message}" }).to include "operator_id cannot be changed from one airline directly to another; must be put on the market first"
     end
   end
@@ -616,7 +795,7 @@ RSpec.describe Airplane do
     it "returns false if the plane is already owned by the buyer" do
       family = Fabricate(:aircraft_family)
       buyer = Fabricate(:airline, cash_on_hand: 100000000)
-      subject = Fabricate(:airplane, aircraft_family: family, operator_id: buyer.id)
+      subject = Fabricate(:airplane, aircraft_family: family, operator_id: buyer.id, base_country_group: buyer.base.country_group)
 
       initial_cash_on_hand = buyer.cash_on_hand
 
@@ -638,7 +817,7 @@ RSpec.describe Airplane do
       base = Fabricate(:market)
       buyer = Fabricate(:airline, name: "A Air", base_id: base.id, cash_on_hand: 100000000)
       other_airline = Fabricate(:airline, name: "B Air", base_id: base.id)
-      subject = Fabricate(:airplane, aircraft_family: family, operator_id: other_airline.id)
+      subject = Fabricate(:airplane, aircraft_family: family, operator_id: other_airline.id, base_country_group: buyer.base.country_group)
 
       initial_cash_on_hand = buyer.cash_on_hand
 
@@ -861,7 +1040,7 @@ RSpec.describe Airplane do
     it "returns false if the plane is already owned by the buyer" do
       family = Fabricate(:aircraft_family)
       buyer = Fabricate(:airline, cash_on_hand: 100000000)
-      subject = Fabricate(:airplane, aircraft_family: family, operator_id: buyer.id)
+      subject = Fabricate(:airplane, aircraft_family: family, operator_id: buyer.id, base_country_group: buyer.base.country_group)
 
       initial_cash_on_hand = buyer.cash_on_hand
 
@@ -882,7 +1061,7 @@ RSpec.describe Airplane do
       base = Fabricate(:market)
       buyer = Fabricate(:airline, name: "A Air", base_id: base.id, cash_on_hand: 100000000)
       other_airline = Fabricate(:airline, name: "B Air", base_id: base.id)
-      subject = Fabricate(:airplane, aircraft_family: family, operator_id: other_airline.id)
+      subject = Fabricate(:airplane, aircraft_family: family, operator_id: other_airline.id, base_country_group: other_airline.base.country_group)
 
       initial_cash_on_hand = buyer.cash_on_hand
 
@@ -1235,7 +1414,8 @@ RSpec.describe Airplane do
 
     it "is true if the origin and destination provided connect to the airplane's existing routes" do
       family = Fabricate(:aircraft_family)
-      subject = Fabricate(:airplane, aircraft_family: family)
+      model = Fabricate(:aircraft_model, takeoff_distance: 1, max_range: 10000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       route = AirlineRoute.create!(
@@ -1262,7 +1442,8 @@ RSpec.describe Airplane do
 
     it "is false if the origin and destination provided do not connect to the airplane's existing routes" do
       family = Fabricate(:aircraft_family)
-      subject = Fabricate(:airplane, aircraft_family: family)
+      model = Fabricate(:aircraft_model, takeoff_distance: 1, max_range: 10000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       route = AirlineRoute.create!(
@@ -1296,7 +1477,8 @@ RSpec.describe Airplane do
 
     it "is true for a route the airplane doesn't fly" do
       family = Fabricate(:aircraft_family)
-      subject = Fabricate(:airplane, aircraft_family: family)
+      model = Fabricate(:aircraft_model, takeoff_distance: 1, max_range: 10000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       route = AirlineRoute.create!(
@@ -1321,7 +1503,8 @@ RSpec.describe Airplane do
 
     it "is true if the airplane's only route is the origin and destination supplied" do
       family = Fabricate(:aircraft_family)
-      subject = Fabricate(:airplane, aircraft_family: family)
+      model = Fabricate(:aircraft_model, takeoff_distance: 1, max_range: 10000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       route = AirlineRoute.create!(
@@ -1347,7 +1530,8 @@ RSpec.describe Airplane do
 
     it "is true if the airplane's only routes are the origin and destination supplied and another connected route" do
       family = Fabricate(:aircraft_family)
-      subject = Fabricate(:airplane, aircraft_family: family)
+      model = Fabricate(:aircraft_model, takeoff_distance: 1, max_range: 10000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       trw = Fabricate(:airport, iata: "TRW", market: inu.market)
@@ -1391,7 +1575,8 @@ RSpec.describe Airplane do
 
     it "is false if the origin and destination supplied are a necessary link between the airplane's routes" do
       family = Fabricate(:aircraft_family)
-      subject = Fabricate(:airplane, aircraft_family: family)
+      model = Fabricate(:aircraft_model, takeoff_distance: 1, max_range: 10000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       trw = Fabricate(:airport, iata: "TRW", market: inu.market)

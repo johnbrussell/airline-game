@@ -8,6 +8,7 @@ class AirplaneRoute < ApplicationRecord
   validates :frequencies, presence: true
   validates :frequencies, numericality: { greater_than: 0 }
 
+  validate :airplane_can_fly_route
   validate :airplane_time_is_logical
   validate :routes_connected
 
@@ -17,6 +18,12 @@ class AirplaneRoute < ApplicationRecord
   belongs_to :route, class_name: "AirlineRoute", foreign_key: :airline_route_id
 
   private
+
+    def airplane_can_fly_route
+      if !airplane.can_fly_between?(route.origin_airport, route.destination_airport)
+        errors.add(:airplane, "cannot fly this route")
+      end
+    end
 
     def airplane_time_is_logical
       if other_airplane_routes.map(&:block_time_mins).sum + block_time_mins > Airplane::MAX_TOTAL_BLOCK_TIME_MINS

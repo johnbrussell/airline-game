@@ -262,6 +262,8 @@ RSpec.describe AircraftManufacturingQueue do
       it "does not increase when the production rate is 0" do
         queue = AircraftManufacturingQueue.last
         game = queue.game
+        base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+        airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
         Airplane.create!(
           base_country_group: "United States",
           business_seats: 0,
@@ -270,7 +272,7 @@ RSpec.describe AircraftManufacturingQueue do
           construction_date: game.current_date + 180.days,
           end_of_useful_life: game.current_date + 10.years,
           aircraft_manufacturing_queue_id: queue.id,
-          operator_id: 1,
+          operator_id: airline.id,
           aircraft_model: AircraftModel.last,
         )
 
@@ -285,6 +287,8 @@ RSpec.describe AircraftManufacturingQueue do
         min_rate = AircraftManufacturingQueue::LOW_PRODUCTION_RATES.min
         queue.update!(production_rate: min_rate)
         game = queue.game
+        base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+        airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
         Airplane.create!(
           base_country_group: "United States",
           business_seats: 0,
@@ -293,7 +297,7 @@ RSpec.describe AircraftManufacturingQueue do
           construction_date: game.current_date + 180.days,
           end_of_useful_life: game.current_date + 10.years,
           aircraft_manufacturing_queue_id: queue.id,
-          operator_id: 1,
+          operator_id: airline.id,
           aircraft_model: AircraftModel.last,
         )
 
@@ -308,6 +312,8 @@ RSpec.describe AircraftManufacturingQueue do
         max_rate = AircraftManufacturingQueue::LOW_PRODUCTION_RATES.max
         queue.update!(production_rate: max_rate)
         game = queue.game
+        base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+        airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
         Airplane.create!(
           base_country_group: "United States",
           business_seats: 0,
@@ -316,7 +322,7 @@ RSpec.describe AircraftManufacturingQueue do
           construction_date: game.current_date + 180.days,
           end_of_useful_life: game.current_date + 10.years,
           aircraft_manufacturing_queue_id: queue.id,
-          operator_id: 1,
+          operator_id: airline.id,
           aircraft_model: AircraftModel.last,
         )
 
@@ -331,6 +337,8 @@ RSpec.describe AircraftManufacturingQueue do
         initial_rate = 345.432745
         queue.update!(production_rate: initial_rate)
         game = queue.game
+        base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+        airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
         Airplane.create!(
           base_country_group: "United States",
           business_seats: 0,
@@ -339,7 +347,7 @@ RSpec.describe AircraftManufacturingQueue do
           construction_date: game.current_date + 180.days,
           end_of_useful_life: game.current_date + 10.years,
           aircraft_manufacturing_queue_id: queue.id,
-          operator_id: 1,
+          operator_id: airline.id,
           aircraft_model: AircraftModel.last,
         )
 
