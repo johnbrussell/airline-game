@@ -99,6 +99,108 @@ RSpec.describe Airline do
       expect(subject.can_fly_between?(origin, destination)).to be false
       expect(subject.can_fly_between?(destination, origin)).to be false
     end
+
+    it "is true flying within a foreign country in the presence of a general exception" do
+      CabotageException.create!(country: "Nauru and Tuvalu")
+      origin = Market.create!(name: "Nauru", income: 1, country: "Nauru and Tuvalu", country_group: "Nauru and Tuvalu")
+      destination = Market.create!(name: "Funafuti", income: 1, country: "Nauru and Tuvalu", country_group: "Nauru and Tuvalu")
+      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+
+      subject = Fabricate(:airline, base_id: base.id)
+
+      expect(subject.can_fly_between?(origin, destination)).to be true
+      expect(subject.can_fly_between?(destination, origin)).to be true
+    end
+
+    it "is true flying within a foreign country in the presence of a specific exception" do
+      CabotageException.create!(country: "Nauru and Tuvalu", excepted_country_group: "Kiribati")
+      origin = Market.create!(name: "Nauru", income: 1, country: "Nauru and Tuvalu", country_group: "Nauru and Tuvalu")
+      destination = Market.create!(name: "Funafuti", income: 1, country: "Nauru and Tuvalu", country_group: "Nauru and Tuvalu")
+      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+
+      subject = Fabricate(:airline, base_id: base.id)
+
+      expect(subject.can_fly_between?(origin, destination)).to be true
+      expect(subject.can_fly_between?(destination, origin)).to be true
+    end
+
+    it "is true flying from a foreign country to one of its territories in the presence of a general exception" do
+      CabotageException.create!(country: "United States")
+      origin = Market.create!(name: "Ponce", income: 1, country: "Puerto Rico", country_group: "USA", territory_of: "United States")
+      destination = Market.create!(name: "Adak", income: 1, country: "United States", country_group: "USA")
+      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+
+      subject = Fabricate(:airline, base_id: base.id)
+
+      expect(subject.can_fly_between?(origin, destination)).to be true
+      expect(subject.can_fly_between?(destination, origin)).to be true
+    end
+
+    it "is true flying from a foreign country to one of its territories in the presence of a specific exception" do
+      CabotageException.create!(country: "United States", excepted_country_group: "Kiribati")
+      origin = Market.create!(name: "Ponce", income: 1, country: "Puerto Rico", country_group: "USA", territory_of: "United States")
+      destination = Market.create!(name: "Adak", income: 1, country: "United States", country_group: "USA")
+      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+
+      subject = Fabricate(:airline, base_id: base.id)
+
+      expect(subject.can_fly_between?(origin, destination)).to be true
+      expect(subject.can_fly_between?(destination, origin)).to be true
+    end
+
+    it "is true flying between territories of a foreign country in the presence of a general exception" do
+      CabotageException.create!(country: "United States")
+      origin = Market.create!(name: "Ponce", income: 1, country: "Puerto Rico", country_group: "USA", territory_of: "United States")
+      destination = Market.create!(name: "Pago Pago", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States")
+      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+
+      subject = Fabricate(:airline, base_id: base.id)
+
+      expect(subject.can_fly_between?(origin, destination)).to be true
+      expect(subject.can_fly_between?(destination, origin)).to be true
+    end
+
+    it "is true flying between territories of a foreign country in the presence of a specific exception" do
+      CabotageException.create!(country: "United States", excepted_country_group: "Kiribati")
+      origin = Market.create!(name: "Ponce", income: 1, country: "Puerto Rico", country_group: "USA", territory_of: "United States")
+      destination = Market.create!(name: "Pago Pago", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States")
+      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+
+      subject = Fabricate(:airline, base_id: base.id)
+
+      expect(subject.can_fly_between?(origin, destination)).to be true
+      expect(subject.can_fly_between?(destination, origin)).to be true
+    end
+
+    it "is true flying within the territory of a foreign country but false flying within the foreign country in the presence of a general exception" do
+      CabotageException.create!(country: "American Samoa")
+      origin = Market.create!(name: "Fitiuta", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States")
+      destination = Market.create!(name: "Pago Pago", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States")
+      other_destination = Market.create!(name: "Guam", income: 1, country: "Guam", country_group: "USA", territory_of: "United States")
+      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+
+      subject = Fabricate(:airline, base_id: base.id)
+
+      expect(subject.can_fly_between?(origin, destination)).to be true
+      expect(subject.can_fly_between?(destination, origin)).to be true
+      expect(subject.can_fly_between?(origin, other_destination)).to be false
+      expect(subject.can_fly_between?(other_destination, origin)).to be false
+    end
+
+    it "is true flying within the territory of a foreign country but false flying within the foreign country in the presence of a specific exception" do
+      CabotageException.create!(country: "American Samoa", excepted_country_group: "Kiribati")
+      origin = Market.create!(name: "Fitiuta", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States")
+      destination = Market.create!(name: "Pago Pago", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States")
+      other_destination = Market.create!(name: "Guam", income: 1, country: "Guam", country_group: "USA", territory_of: "United States")
+      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+
+      subject = Fabricate(:airline, base_id: base.id)
+
+      expect(subject.can_fly_between?(origin, destination)).to be true
+      expect(subject.can_fly_between?(destination, origin)).to be true
+      expect(subject.can_fly_between?(origin, other_destination)).to be false
+      expect(subject.can_fly_between?(other_destination, origin)).to be false
+    end
   end
 
   context "only_one_user_airline_exists" do
