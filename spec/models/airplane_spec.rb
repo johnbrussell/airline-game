@@ -313,6 +313,83 @@ RSpec.describe Airplane do
     end
   end
 
+  context "can_fly_between?" do
+    it "is true when the flight is within the operating specifications of the aircraft" do
+      market = Fabricate(:market, name: "Pacific")
+      airport_1 = Fabricate(:airport, iata: "INU", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
+      airport_2 = Fabricate(:airport, iata: "FUN", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: market)
+      distance = Calculation::Distance.between_airports(airport_1, airport_2)
+
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1) # note this wiggle room in distance means that the takeoff distance is slightly less than 10000
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1)
+
+      expect(subject.can_fly_between?(airport_1, airport_2)).to be true
+      expect(subject.can_fly_between?(airport_2, airport_1)).to be true
+    end
+
+    it "is false when the runway is too short" do
+      market = Fabricate(:market, name: "Pacific")
+      airport_1 = Fabricate(:airport, iata: "INU", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
+      airport_2 = Fabricate(:airport, iata: "FUN", latitude: 11, longitude: 14, runway: 9996, elevation: 0, market: market)
+      distance = Calculation::Distance.between_airports(airport_1, airport_2)
+
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1)
+
+      expect(subject.can_fly_between?(airport_1, airport_2)).to be false
+      expect(subject.can_fly_between?(airport_2, airport_1)).to be false
+    end
+
+    it "is false when the airport is too high" do
+      market = Fabricate(:market, name: "Pacific")
+      airport_1 = Fabricate(:airport, iata: "INU", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
+      airport_2 = Fabricate(:airport, iata: "FUN", latitude: 11, longitude: 14, runway: 9997, elevation: 1, market: market)
+      distance = Calculation::Distance.between_airports(airport_1, airport_2)
+
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1)
+
+      expect(subject.can_fly_between?(airport_1, airport_2)).to be false
+      expect(subject.can_fly_between?(airport_2, airport_1)).to be false
+    end
+
+    it "is false when the distance is too great" do
+      market = Fabricate(:market, name: "Pacific")
+      airport_1 = Fabricate(:airport, iata: "INU", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
+      airport_2 = Fabricate(:airport, iata: "FUN", latitude: 11, longitude: 14, runway: 10000, elevation: 0, market: market)
+      distance = Calculation::Distance.between_airports(airport_1, airport_2)
+
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance - 1)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1)
+
+      expect(subject.can_fly_between?(airport_1, airport_2)).to be false
+      expect(subject.can_fly_between?(airport_2, airport_1)).to be false
+    end
+
+    it "is false when the route is disconnected from the airplane's other routes" do
+      market = Fabricate(:market, name: "Pacific")
+      airport_1 = Fabricate(:airport, iata: "INU", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
+      airport_2 = Fabricate(:airport, iata: "FUN", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: market)
+      airport_3 = Fabricate(:airport, iata: "MAJ", latitude: 12, longitude: 14, runway: 9997, elevation: 0, market: market)
+      airport_4 = Fabricate(:airport, iata: "TRW", latitude: 13, longitude: 14, runway: 9997, elevation: 0, market: market)
+      distance = Calculation::Distance.between_airports(airport_1, airport_2)
+
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1) # note this wiggle room in distance means that the takeoff distance is slightly less than 10000
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_3.id, destination_airport_id: airport_4.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411)
+      AirplaneRoute.create!(route: airline_route, airplane: subject, block_time_mins: 100, flight_cost: 1, frequencies: 1)
+      subject.reload
+
+      expect(subject.can_fly_between?(airport_1, airport_2)).to be false
+      expect(subject.can_fly_between?(airport_2, airport_1)).to be false
+    end
+  end
+
   context "has_operator?" do
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)

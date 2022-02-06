@@ -67,6 +67,16 @@ class Airplane < ApplicationRecord
     construction_date <= aircraft_manufacturing_queue.game.current_date
   end
 
+  def can_fly_between?(airport_1, airport_2)
+    distance = Calculation::Distance.between_airports(airport_1, airport_2)
+
+    distance <= range_from_airport(airport_1) &&
+      distance <= range_from_airport(airport_2) &&
+      takeoff_distance(airport_1.elevation, distance) <= airport_1.runway &&
+      takeoff_distance(airport_2.elevation, distance) <= airport_2.runway &&
+      routes_connected_with?(airport_1.iata, airport_2.iata)
+  end
+
   def has_operator?
     operator_id.present?
   end
@@ -194,7 +204,7 @@ class Airplane < ApplicationRecord
     end
 
     def block_time_feasible
-      if airplane_routes.map(&:block_time_mins).sum > MAX_TOTAL_BLOCK_TIME_MINS
+      if total_block_time > MAX_TOTAL_BLOCK_TIME_MINS
         errors.add(:airplane_routes, "block time is too high")
       end
     end
@@ -282,6 +292,10 @@ class Airplane < ApplicationRecord
 
     def takeoff_seats_component
       2 ** (num_seats / (2.0 * max_economy_seats))
+    end
+
+    def total_block_time
+      airplane_routes.map(&:block_time_mins).sum
     end
 
     def value
