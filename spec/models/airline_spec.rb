@@ -1,6 +1,106 @@
 require "rails_helper"
 
 RSpec.describe Airline do
+  context "can_fly_between?" do
+    it "is true when flying a route within its home country group" do
+      origins = [
+        Market.create!(name: "New York", income: 1, country: "United States", country_group: "USA"),
+        Market.create!(name: "Pohnpei", income: 1, country: "Micronesia", country_group: "USA"),
+        Market.create!(name: "Pago Pago", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States"),
+      ]
+      destinations = [
+        Market.create!(name: "Boston", income: 1, country: "United States", country_group: "USA"),
+        Market.create!(name: "Majuro", income: 1, country: "Marshall Islands", country_group: "USA"),
+        Market.create!(name: "Yap", income: 1, country: "Micronesia", country_group: "USA"),
+        Market.create!(name: "Saipan", income: 1, country: "Northern Mariana Islands", country_group: "USA", territory_of: "United States"),
+        Market.create!(name: "Fitiuta", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States"),
+      ]
+
+      subject = Fabricate(:airline, base_id: (origins + destinations).sample.id)
+
+      expect(subject.can_fly_between?(origins.sample, destinations.sample)).to be true
+    end
+
+    it "is true when flying between country groups" do
+      origin = Market.create!(name: "Nauru", income: 1, country: "Nauru", country_group: "Nauru")
+      destination = Market.create!(name: "Funafuti", income: 1, country: "Tuvalu", country_group: "Tuvalu")
+      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+
+      subject = Fabricate(:airline, base_id: base.id)
+
+      expect(subject.can_fly_between?(origin, destination)).to be true
+      expect(subject.can_fly_between?(destination, origin)).to be true
+    end
+
+    it "is true when flying between countries within another country group" do
+      origin = Market.create!(name: "Nauru", income: 1, country: "Nauru", country_group: "Nauru and Tuvalu")
+      destination = Market.create!(name: "Funafuti", income: 1, country: "Tuvalu", country_group: "Nauru and Tuvalu")
+      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+
+      subject = Fabricate(:airline, base_id: base.id)
+
+      expect(subject.can_fly_between?(origin, destination)).to be true
+      expect(subject.can_fly_between?(destination, origin)).to be true
+    end
+
+    it "is false when flying between rival countries" do
+      origin = Market.create!(name: "Nauru", income: 1, country: "Nauru", country_group: "Nauru")
+      destination = Market.create!(name: "Funafuti", income: 1, country: "Tuvalu", country_group: "Tuvalu")
+      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+      RivalCountryGroup.create!(country_one: "Nauru", country_two: "Tuvalu")
+
+      subject = Fabricate(:airline, base_id: base.id)
+
+      expect(subject.can_fly_between?(origin, destination)).to be false
+      expect(subject.can_fly_between?(destination, origin)).to be false
+    end
+
+    it "is false when flying to a country that is rivals with the airline's home country" do
+      origin = Market.create!(name: "Nauru", income: 1, country: "Nauru", country_group: "Nauru")
+      destination = Market.create!(name: "Funafuti", income: 1, country: "Tuvalu", country_group: "Tuvalu")
+      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+      RivalCountryGroup.create!(country_one: "Kiribati", country_two: "Nauru")
+
+      subject = Fabricate(:airline, base_id: base.id)
+
+      expect(subject.can_fly_between?(origin, destination)).to be false
+      expect(subject.can_fly_between?(destination, origin)).to be false
+    end
+
+    it "is false flying within a foreign country" do
+      origin = Market.create!(name: "Nauru", income: 1, country: "Nauru and Tuvalu", country_group: "Nauru and Tuvalu")
+      destination = Market.create!(name: "Funafuti", income: 1, country: "Nauru and Tuvalu", country_group: "Nauru and Tuvalu")
+      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+
+      subject = Fabricate(:airline, base_id: base.id)
+
+      expect(subject.can_fly_between?(origin, destination)).to be false
+      expect(subject.can_fly_between?(destination, origin)).to be false
+    end
+
+    it "is false flying from a foreign country to one of its territories" do
+      origin = Market.create!(name: "Ponce", income: 1, country: "Puerto Rico", country_group: "USA", territory_of: "United States")
+      destination = Market.create!(name: "Adak", income: 1, country: "United States", country_group: "USA")
+      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+
+      subject = Fabricate(:airline, base_id: base.id)
+
+      expect(subject.can_fly_between?(origin, destination)).to be false
+      expect(subject.can_fly_between?(destination, origin)).to be false
+    end
+
+    it "is false flying between territories of a foreign country" do
+      origin = Market.create!(name: "Ponce", income: 1, country: "Puerto Rico", country_group: "USA", territory_of: "United States")
+      destination = Market.create!(name: "Pago Pago", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States")
+      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+
+      subject = Fabricate(:airline, base_id: base.id)
+
+      expect(subject.can_fly_between?(origin, destination)).to be false
+      expect(subject.can_fly_between?(destination, origin)).to be false
+    end
+  end
+
   context "only_one_user_airline_exists" do
     it "is true when creating a non-user airline and no user airline exists" do
       Airline.create!(cash_on_hand: 1, name: "foo", is_user_airline: false, base_id: 1, game_id: 1)
