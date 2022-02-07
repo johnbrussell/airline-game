@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_04_175005) do
+ActiveRecord::Schema.define(version: 2022_02_06_181605) do
 
   create_table "aircraft_families", force: :cascade do |t|
     t.string "name", null: false
@@ -119,6 +119,13 @@ ActiveRecord::Schema.define(version: 2022_02_04_175005) do
     t.index ["market_id"], name: "index_airports_on_market_id"
   end
 
+  create_table "cabotage_exceptions", force: :cascade do |t|
+    t.string "country", null: false
+    t.string "excepted_country_group"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "frequency_tiers", force: :cascade do |t|
     t.integer "airline_route_id"
     t.integer "seats", null: false
@@ -169,6 +176,7 @@ ActiveRecord::Schema.define(version: 2022_02_04_175005) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "country_group", null: false
+    t.string "territory_of"
     t.index ["name"], name: "index_markets_on_name", unique: true
   end
 
