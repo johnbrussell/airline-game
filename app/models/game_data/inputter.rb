@@ -12,6 +12,7 @@ class GameData::Inputter < ApplicationRecord
     self.population
     self.tourists
     self.aircraft_models
+    self.cabotage_exceptions
     self.rival_country_groups
   end
 
@@ -94,6 +95,18 @@ class GameData::Inputter < ApplicationRecord
             municipality: data_point["municipality"],
           )
         end
+      end
+    end
+
+    def self.cabotage_exceptions
+      CabotageException.destroy_all
+
+      data = CSV.parse(File.read("data/cabotage_exceptions.csv"), headers: true)
+      data.by_row.each do |data_point|
+        CabotageException.create!(
+          country: data_point["Country"],
+          excepted_country_group: data_point["Excepted country group"],
+        )
       end
     end
 
