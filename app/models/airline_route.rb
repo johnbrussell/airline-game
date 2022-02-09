@@ -17,6 +17,10 @@ class AirlineRoute < ApplicationRecord
   delegate :iata, to: :origin_airport, prefix: true
   delegate :iata, to: :destination_airport, prefix: true
 
+  def distance
+    @distance ||= Calculation::Distance.between_airports(origin_airport, destination_airport)
+  end
+
   private
 
     def airports_alphabetized

@@ -1897,6 +1897,84 @@ RSpec.describe Airplane do
     end
   end
 
+  context "update_downstream_block_times" do
+    it "updates AirplaneRoute block times" do
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 100, max_range: 100000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      route = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: fun,
+        destination_airport: inu,
+        distance: 1,
+      )
+      airplane_route = AirplaneRoute.create!(
+        block_time_mins: Airplane::MAX_TOTAL_BLOCK_TIME_MINS,
+        frequencies: 1,
+        flight_cost: 1,
+        airplane: subject,
+        route: route,
+      )
+
+      subject.reload
+      expect(subject.update(lease_rate: 100)).to be true
+      airplane_route.reload
+      expect(airplane_route.block_time_mins).to be < Airplane::MAX_TOTAL_BLOCK_TIME_MINS
+    end
+
+    it "is does not update AirplaneRoute block times if the change is invalid" do
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 100, max_range: 100000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      maj = Fabricate(:airport, iata: "MAJ", market: inu.market)
+      route_1_frequency = [1, 10000].sample
+      route_2_frequency = [1, 10000].reject { |f| f == route_1_frequency }.first
+      route_1 = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: fun,
+        destination_airport: inu,
+        distance: 1,
+      )
+      airplane_route_1 = AirplaneRoute.create!(
+        block_time_mins: Airplane::MAX_TOTAL_BLOCK_TIME_MINS / 2 - 1,
+        frequencies: route_1_frequency,
+        flight_cost: 1,
+        airplane: subject,
+        route: route_1,
+      )
+      route_2 = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: fun,
+        destination_airport: maj,
+        distance: 1,
+      )
+      airplane_route_2 = AirplaneRoute.create!(
+        block_time_mins: Airplane::MAX_TOTAL_BLOCK_TIME_MINS / 2 - 1,
+        frequencies: route_2_frequency,
+        flight_cost: 1,
+        airplane: subject,
+        route: route_2,
+      )
+
+      subject.reload
+      expect(subject.update(lease_rate: 100)).to be false
+      airplane_route_1.reload
+      airplane_route_2.reload
+      expect(airplane_route_1.block_time_mins).to eq Airplane::MAX_TOTAL_BLOCK_TIME_MINS / 2 - 1
+      expect(airplane_route_2.block_time_mins).to eq Airplane::MAX_TOTAL_BLOCK_TIME_MINS / 2 - 1
+    end
+  end
+
   context "built?" do
     purchase_price_new = 100000000
 
