@@ -275,13 +275,13 @@ RSpec.describe Airplane do
         destination_airport: inu,
         distance: 1,
       )
-      AirplaneRoute.create!(
+      AirplaneRoute.new(
         block_time_mins: Airplane::MAX_TOTAL_BLOCK_TIME_MINS,
         frequencies: 1,
         flight_cost: 1,
         airplane: subject,
         route: route,
-      )
+      ).save(validate: false)
 
       subject.reload
       expect(subject.valid?).to be true
@@ -307,6 +307,8 @@ RSpec.describe Airplane do
         airplane: subject,
         route: route,
       ).save(validate: false)
+
+      allow(Calculation::Distance).to receive(:between_airports).with(fun, inu).and_return(100000)
 
       subject.reload
       expect(subject.valid?).to be false
@@ -383,7 +385,7 @@ RSpec.describe Airplane do
       model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1) # note this wiggle room in distance means that the takeoff distance is slightly less than 10000
       subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1)
       airline_route = AirlineRoute.create!(origin_airport_id: airport_3.id, destination_airport_id: airport_4.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411)
-      AirplaneRoute.create!(route: airline_route, airplane: subject, block_time_mins: 100, flight_cost: 1, frequencies: 1)
+      AirplaneRoute.new(route: airline_route, airplane: subject, block_time_mins: 100, flight_cost: 1, frequencies: 1).save(validate: false)
       subject.reload
 
       expect(subject.can_fly_between?(airport_1, airport_2)).to be false
@@ -401,7 +403,7 @@ RSpec.describe Airplane do
       model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
       subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1)
       airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411)
-      AirplaneRoute.create!(route: airline_route, airplane: subject, block_time_mins: 100, flight_cost: 1, frequencies: 1)
+      AirplaneRoute.new(route: airline_route, airplane: subject, block_time_mins: 100, flight_cost: 1, frequencies: 1).save(validate: false)
       subject.reload
 
       expect(subject.valid?).to be true
@@ -425,13 +427,13 @@ RSpec.describe Airplane do
       model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
       subject = Fabricate(:airplane, aircraft_family: family, economy_seats: 1, aircraft_model: model)
       airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_3.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: distance - 1)
-      AirplaneRoute.create!(route: airline_route, airplane: subject, block_time_mins: 100, flight_cost: 1, frequencies: 1)
+      AirplaneRoute.new(route: airline_route, airplane: subject, block_time_mins: 100, flight_cost: 1, frequencies: 1).save(validate: false)
       subject.reload
 
       expect(subject.valid?).to be true
 
       airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: distance)
-      AirplaneRoute.create!(route: airline_route, airplane: subject, block_time_mins: 100, flight_cost: 1, frequencies: 1)
+      AirplaneRoute.new(route: airline_route, airplane: subject, block_time_mins: 100, flight_cost: 1, frequencies: 1).save(validate: false)
       airport_2.update!(runway: 9996)
       subject.reload
 
@@ -1426,13 +1428,13 @@ RSpec.describe Airplane do
         destination_airport: inu,
         distance: 1,
       )
-      AirplaneRoute.create!(
+      AirplaneRoute.new(
         block_time_mins: 1,
         frequencies: 1,
         flight_cost: 1,
         airplane: subject,
         route: route,
-      )
+      ).save(validate: false)
 
       expect(subject.routes_connected_with?("INU", "LGA")).to be true
       expect(subject.routes_connected_with?("FUN", "LGA")).to be true
@@ -1454,13 +1456,13 @@ RSpec.describe Airplane do
         destination_airport: inu,
         distance: 1,
       )
-      AirplaneRoute.create!(
+      AirplaneRoute.new(
         block_time_mins: 1,
         frequencies: 1,
         flight_cost: 1,
         airplane: subject,
         route: route,
-      )
+      ).save(validate: false)
       subject.reload
 
       expect(subject.routes_connected_with?("JFK", "LGA")).to be false
@@ -1489,13 +1491,13 @@ RSpec.describe Airplane do
         destination_airport: inu,
         distance: 1,
       )
-      AirplaneRoute.create!(
+      AirplaneRoute.new(
         block_time_mins: 1,
         frequencies: 1,
         flight_cost: 1,
         airplane: subject,
         route: route,
-      )
+      ).save(validate: false)
       subject.reload
 
       expect(subject.routes_connected_without?("LGA", "JFK")).to be true
@@ -1515,13 +1517,13 @@ RSpec.describe Airplane do
         destination_airport: inu,
         distance: 1,
       )
-      AirplaneRoute.create!(
+      AirplaneRoute.new(
         block_time_mins: 1,
         frequencies: 1,
         flight_cost: 1,
         airplane: subject,
         route: route,
-      )
+      ).save(validate: false)
       subject.reload
 
       expect(subject.routes_connected_without?("INU", "FUN")).to be true
@@ -1543,13 +1545,13 @@ RSpec.describe Airplane do
         destination_airport: inu,
         distance: 1,
       )
-      AirplaneRoute.create!(
+      AirplaneRoute.new(
         block_time_mins: 1,
         frequencies: 1,
         flight_cost: 1,
         airplane: subject,
         route: route,
-      )
+      ).save(validate: false)
       route = AirlineRoute.create!(
         economy_price: 1,
         business_price: 2,
@@ -1558,13 +1560,13 @@ RSpec.describe Airplane do
         destination_airport: trw,
         distance: 1,
       )
-      AirplaneRoute.create!(
+      AirplaneRoute.new(
         block_time_mins: 1,
         frequencies: 1,
         flight_cost: 1,
         airplane: subject,
         route: route,
-      )
+      ).save(validate: false)
       subject.reload
 
       expect(subject.routes_connected_without?("INU", "FUN")).to be true
@@ -1589,13 +1591,13 @@ RSpec.describe Airplane do
         destination_airport: inu,
         distance: 1,
       )
-      AirplaneRoute.create!(
+      AirplaneRoute.new(
         block_time_mins: 1,
         frequencies: 1,
         flight_cost: 1,
         airplane: subject,
         route: route,
-      )
+      ).save(validate: false)
       route = AirlineRoute.create!(
         economy_price: 1,
         business_price: 2,
@@ -1604,13 +1606,13 @@ RSpec.describe Airplane do
         destination_airport: trw,
         distance: 1,
       )
-      AirplaneRoute.create!(
+      AirplaneRoute.new(
         block_time_mins: 1,
         frequencies: 1,
         flight_cost: 1,
         airplane: subject,
         route: route,
-      )
+      ).save(validate: false)
       route = AirlineRoute.create!(
         economy_price: 1,
         business_price: 2,
@@ -1619,13 +1621,13 @@ RSpec.describe Airplane do
         destination_airport: maj,
         distance: 1,
       )
-      AirplaneRoute.create!(
+      AirplaneRoute.new(
         block_time_mins: 1,
         frequencies: 1,
         flight_cost: 1,
         airplane: subject,
         route: route,
-      )
+      ).save(validate: false)
       subject.reload
 
       expect(subject.routes_connected_without?("INU", "FUN")).to be false
@@ -1892,6 +1894,87 @@ RSpec.describe Airplane do
       subject.aircraft_model.update(num_aisles: 2)
 
       expect(subject.turn_time_mins).to be < single_aisle_turn_time
+    end
+  end
+
+  context "update_downstream_block_times" do
+    it "updates AirplaneRoute block times" do
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 100, max_range: 100000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      route = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: fun,
+        destination_airport: inu,
+        distance: 1,
+      )
+      AirplaneRoute.new(
+        block_time_mins: Airplane::MAX_TOTAL_BLOCK_TIME_MINS,
+        frequencies: 1,
+        flight_cost: 1,
+        airplane: subject,
+        route: route,
+      ).save(validate: false)
+      airplane_route = AirplaneRoute.last
+
+      subject.reload
+      expect(subject.update(lease_rate: 100)).to be true
+      airplane_route.reload
+      expect(airplane_route.block_time_mins).to be < Airplane::MAX_TOTAL_BLOCK_TIME_MINS
+    end
+
+    it "is does not update AirplaneRoute block times if the change is invalid" do
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 100, max_range: 100000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      maj = Fabricate(:airport, iata: "MAJ", market: inu.market)
+      route_1_frequency = [1, 10000].sample
+      route_2_frequency = [1, 10000].reject { |f| f == route_1_frequency }.first
+      route_1 = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: fun,
+        destination_airport: inu,
+        distance: 1,
+      )
+      AirplaneRoute.new(
+        block_time_mins: Airplane::MAX_TOTAL_BLOCK_TIME_MINS / 2 - 1,
+        frequencies: route_1_frequency,
+        flight_cost: 1,
+        airplane: subject,
+        route: route_1,
+      ).save(validate: false)
+      airplane_route_1 = AirplaneRoute.last
+      route_2 = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: fun,
+        destination_airport: maj,
+        distance: 1,
+      )
+      AirplaneRoute.new(
+        block_time_mins: Airplane::MAX_TOTAL_BLOCK_TIME_MINS / 2 - 1,
+        frequencies: route_2_frequency,
+        flight_cost: 1,
+        airplane: subject,
+        route: route_2,
+      ).save(validate: false)
+      airplane_route_2 = AirplaneRoute.last
+
+      subject.reload
+      expect(subject.update(lease_rate: 100)).to be false
+      airplane_route_1.reload
+      airplane_route_2.reload
+      expect(airplane_route_1.block_time_mins).to eq Airplane::MAX_TOTAL_BLOCK_TIME_MINS / 2 - 1
+      expect(airplane_route_2.block_time_mins).to eq Airplane::MAX_TOTAL_BLOCK_TIME_MINS / 2 - 1
     end
   end
 
