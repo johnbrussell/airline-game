@@ -308,6 +308,8 @@ RSpec.describe Airplane do
         route: route,
       ).save(validate: false)
 
+      allow(Calculation::Distance).to receive(:between_airports).with(fun, inu).and_return(100000)
+
       subject.reload
       expect(subject.valid?).to be false
       expect(subject.errors.full_messages).to include "Airplane routes block time is too high"

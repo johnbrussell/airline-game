@@ -302,7 +302,7 @@ class Airplane < ApplicationRecord
     end
 
     def total_block_time
-      airplane_routes.map(&:block_time_mins).sum
+      airplane_routes.map{ |r| r.frequencies * round_trip_block_time(r.route.distance) }.sum
     end
 
     def value
