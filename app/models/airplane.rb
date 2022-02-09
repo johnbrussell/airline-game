@@ -309,7 +309,7 @@ class Airplane < ApplicationRecord
 
     def update_downstream_block_times
       airplane_routes.each do |route|
-        route.update(block_time_mins: route.frequencies * round_trip_block_time(route.route.distance))
+        route.update(block_time_mins: (route.frequencies * round_trip_block_time(route.route.distance)).round)
       end
     end
 
