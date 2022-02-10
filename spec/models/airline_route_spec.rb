@@ -93,4 +93,35 @@ RSpec.describe AirlineRoute do
       expect(subject.errors.full_messages).to include "Destination airport must correspond to an airport with iata alphabetically after origin airport's iata"
     end
   end
+
+  context "total_frequencies" do
+    it "calculates correctly" do
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+
+      airline_a = Fabricate(:airline, base_id: inu.market.id, name: "A")
+      family = Fabricate(:aircraft_family)
+      super_model = Fabricate(:aircraft_model, takeoff_distance: 100, max_range: 13000)
+      airplane_1 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model)
+      airplane_2 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model)
+
+      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_a)
+      airplane_route_1 = AirplaneRoute.new(airplane: airplane_1, route: subject, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
+      airplane_route_2 = AirplaneRoute.new(airplane: airplane_2, route: subject, block_time_mins: 1, frequencies: 2, flight_cost: 1).save(validate: false)
+      subject.reload
+
+      expect(subject.total_frequencies).to eq 3
+    end
+
+    it "is zero when there are no frequencies" do
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+
+      airline_a = Fabricate(:airline, base_id: inu.market.id, name: "A")
+
+      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_a)
+
+      expect(subject.total_frequencies).to eq 0
+    end
+  end
 end

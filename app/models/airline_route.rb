@@ -38,6 +38,10 @@ class AirlineRoute < ApplicationRecord
     @distance ||= Calculation::Distance.between_airports(origin_airport, destination_airport)
   end
 
+  def total_frequencies
+    airplane_routes.sum(&:frequencies)
+  end
+
   private
 
     def airports_alphabetized
