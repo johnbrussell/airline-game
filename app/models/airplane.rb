@@ -84,6 +84,10 @@ class Airplane < ApplicationRecord
     operator_id.present?
   end
 
+  def has_time_to_fly?(distance)
+    round_trip_block_time(distance) + total_block_time <= MAX_TOTAL_BLOCK_TIME_MINS
+  end
+
   def lease(airline, length_in_days, business_seats, premium_economy_seats, economy_seats)
     lease_start_date = built? ? aircraft_manufacturing_queue.game.current_date : construction_date
     if built?

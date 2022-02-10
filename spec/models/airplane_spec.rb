@@ -502,6 +502,76 @@ RSpec.describe Airplane do
     end
   end
 
+  context "has_time_to_fly?" do
+    it "is true when the airplane has time to fly the requested distance" do
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, speed: 1000, takeoff_distance: 100, max_range: 1000000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+
+      allow(Calculation::Distance).to receive(:between_airports).with(fun, inu).and_return 100
+
+      round_trip_block_time = subject.round_trip_block_time(100)
+      max_frequencies = (Airplane::MAX_TOTAL_BLOCK_TIME_MINS / round_trip_block_time).floor
+
+      route = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: fun,
+        destination_airport: inu,
+        distance: 100,
+        airline: Airline.last,
+      )
+      frequencies = max_frequencies - 1
+      AirplaneRoute.create!(
+        block_time_mins: (round_trip_block_time * frequencies).round,
+        frequencies: frequencies,
+        flight_cost: 1,
+        airplane: subject,
+        route: route,
+      )
+      subject.reload
+
+      expect(subject.has_time_to_fly?(100)).to be true
+    end
+
+    it "is false when the airplane does not have time to fly the requested distance" do
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, speed: 1000, takeoff_distance: 100, max_range: 1000000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+
+      allow(Calculation::Distance).to receive(:between_airports).with(fun, inu).and_return 100
+
+      round_trip_block_time = subject.round_trip_block_time(100)
+      max_frequencies = (Airplane::MAX_TOTAL_BLOCK_TIME_MINS / round_trip_block_time).floor
+
+      route = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: fun,
+        destination_airport: inu,
+        distance: 100,
+        airline: Airline.last,
+      )
+      frequencies = max_frequencies
+      AirplaneRoute.create!(
+        block_time_mins: round_trip_block_time * frequencies,
+        frequencies: frequencies,
+        flight_cost: 1,
+        airplane: subject,
+        route: route,
+      )
+      subject.reload
+
+      expect(subject.has_time_to_fly?(100)).to be false
+    end
+  end
+
   context "maintenance_cost_per_day" do
     it "is the aircraft model's maintenance rate when the airplane is unique in its family" do
       family = Fabricate(:aircraft_family)
