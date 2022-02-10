@@ -11,6 +11,7 @@ class AirlineRoute < ApplicationRecord
 
   has_many :airplane_routes
   has_many :airplanes, through: :airplane_routes
+  belongs_to :airline
   belongs_to :origin_airport, class_name: "Airport"
   belongs_to :destination_airport, class_name: "Airport"
 

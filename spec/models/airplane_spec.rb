@@ -1,6 +1,11 @@
 require "rails_helper"
 
 RSpec.describe Airplane do
+  before(:each) do
+    base = Fabricate(:market, name: "Default market")
+    Fabricate(:airline, base_id: base.id)
+  end
+
   context "available_new" do
     useful_life_years = 30
 
@@ -25,7 +30,8 @@ RSpec.describe Airplane do
     end
 
     it "includes only airplanes in the current game that don't currently have operators and have not already been produced" do
-      game = Game.first
+      game = Game.last
+      queue = AircraftManufacturingQueue.last
       other_game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
       other_queue = AircraftManufacturingQueue.create!(game: other_game, aircraft_family_id: 1, production_rate: 1)
       base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
@@ -35,7 +41,7 @@ RSpec.describe Airplane do
         base_country_group: "United States",
         construction_date: game.current_date + 1.day,
         end_of_useful_life: game.current_date + useful_life_years.years,
-        aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
+        aircraft_manufacturing_queue: queue,
         operator_id: nil,
         aircraft_model: AircraftModel.last,
       )
@@ -43,7 +49,7 @@ RSpec.describe Airplane do
         base_country_group: "United States",
         construction_date: game.current_date + 1.day,
         end_of_useful_life: game.current_date + useful_life_years.years,
-        aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
+        aircraft_manufacturing_queue: queue,
         operator_id: airline.id,
         aircraft_model: AircraftModel.last,
       )
@@ -51,7 +57,7 @@ RSpec.describe Airplane do
         base_country_group: "United States",
         construction_date: game.current_date,
         end_of_useful_life: game.current_date + useful_life_years.years,
-        aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
+        aircraft_manufacturing_queue: queue,
         operator_id: nil,
         aircraft_model: AircraftModel.last,
       )
@@ -95,7 +101,8 @@ RSpec.describe Airplane do
     end
 
     it "includes only airplanes in the current game that don't currently have operators, have already been produced, and are within their useful life" do
-      game = Game.first
+      game = Game.last
+      queue = AircraftManufacturingQueue.last
       other_game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
       other_queue = AircraftManufacturingQueue.create!(game: other_game, aircraft_family_id: 1, production_rate: 1)
       base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
@@ -105,7 +112,7 @@ RSpec.describe Airplane do
         base_country_group: "United States",
         construction_date: game.current_date,
         end_of_useful_life: game.current_date + useful_life_years.years,
-        aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
+        aircraft_manufacturing_queue: queue,
         operator_id: nil,
         aircraft_model: AircraftModel.last,
       )
@@ -113,7 +120,7 @@ RSpec.describe Airplane do
         base_country_group: "United States",
         construction_date: game.current_date,
         end_of_useful_life: game.current_date + useful_life_years.years,
-        aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
+        aircraft_manufacturing_queue: queue,
         operator_id: airline.id,
         aircraft_model: AircraftModel.last,
       )
@@ -121,7 +128,7 @@ RSpec.describe Airplane do
         base_country_group: "United States",
         construction_date: game.current_date + 1.day,
         end_of_useful_life: game.current_date + useful_life_years.years + 1.day,
-        aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
+        aircraft_manufacturing_queue: queue,
         operator_id: nil,
         aircraft_model: AircraftModel.last,
       )
@@ -129,7 +136,7 @@ RSpec.describe Airplane do
         base_country_group: "United States",
         construction_date: game.current_date - useful_life_years.years - 1.day,
         end_of_useful_life: game.current_date - 1.day,
-        aircraft_manufacturing_queue: AircraftManufacturingQueue.first,
+        aircraft_manufacturing_queue: queue,
         operator_id: nil,
         aircraft_model: AircraftModel.last,
       )
@@ -274,6 +281,7 @@ RSpec.describe Airplane do
         origin_airport: fun,
         destination_airport: inu,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.new(
         block_time_mins: Airplane::MAX_TOTAL_BLOCK_TIME_MINS,
@@ -299,6 +307,7 @@ RSpec.describe Airplane do
         origin_airport: fun,
         destination_airport: inu,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.new(
         block_time_mins: Airplane::MAX_TOTAL_BLOCK_TIME_MINS + 1,
@@ -384,7 +393,7 @@ RSpec.describe Airplane do
       family = Fabricate(:aircraft_family)
       model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1) # note this wiggle room in distance means that the takeoff distance is slightly less than 10000
       subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1)
-      airline_route = AirlineRoute.create!(origin_airport_id: airport_3.id, destination_airport_id: airport_4.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_3.id, destination_airport_id: airport_4.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411, airline: Airline.last)
       AirplaneRoute.new(route: airline_route, airplane: subject, block_time_mins: 100, flight_cost: 1, frequencies: 1).save(validate: false)
       subject.reload
 
@@ -402,7 +411,7 @@ RSpec.describe Airplane do
       distance = Calculation::Distance.between_airports(airport_1, airport_2)
       model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
       subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1)
-      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411, airline: Airline.last)
       AirplaneRoute.new(route: airline_route, airplane: subject, block_time_mins: 100, flight_cost: 1, frequencies: 1).save(validate: false)
       subject.reload
 
@@ -426,13 +435,13 @@ RSpec.describe Airplane do
       distance = Calculation::Distance.between_airports(airport_1, airport_2)
       model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
       subject = Fabricate(:airplane, aircraft_family: family, economy_seats: 1, aircraft_model: model)
-      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_3.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: distance - 1)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_3.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: distance - 1, airline: Airline.last)
       AirplaneRoute.new(route: airline_route, airplane: subject, block_time_mins: 100, flight_cost: 1, frequencies: 1).save(validate: false)
       subject.reload
 
       expect(subject.valid?).to be true
 
-      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: distance)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: distance, airline: Airline.last)
       AirplaneRoute.new(route: airline_route, airplane: subject, block_time_mins: 100, flight_cost: 1, frequencies: 1).save(validate: false)
       airport_2.update!(runway: 9996)
       subject.reload
@@ -1427,6 +1436,7 @@ RSpec.describe Airplane do
         origin_airport: fun,
         destination_airport: inu,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.new(
         block_time_mins: 1,
@@ -1455,6 +1465,7 @@ RSpec.describe Airplane do
         origin_airport: fun,
         destination_airport: inu,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.new(
         block_time_mins: 1,
@@ -1490,6 +1501,7 @@ RSpec.describe Airplane do
         origin_airport: fun,
         destination_airport: inu,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.new(
         block_time_mins: 1,
@@ -1516,6 +1528,7 @@ RSpec.describe Airplane do
         origin_airport: fun,
         destination_airport: inu,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.new(
         block_time_mins: 1,
@@ -1544,6 +1557,7 @@ RSpec.describe Airplane do
         origin_airport: fun,
         destination_airport: inu,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.new(
         block_time_mins: 1,
@@ -1559,6 +1573,7 @@ RSpec.describe Airplane do
         origin_airport: fun,
         destination_airport: trw,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.new(
         block_time_mins: 1,
@@ -1590,6 +1605,7 @@ RSpec.describe Airplane do
         origin_airport: fun,
         destination_airport: inu,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.new(
         block_time_mins: 1,
@@ -1605,6 +1621,7 @@ RSpec.describe Airplane do
         origin_airport: fun,
         destination_airport: trw,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.new(
         block_time_mins: 1,
@@ -1620,6 +1637,7 @@ RSpec.describe Airplane do
         origin_airport: inu,
         destination_airport: maj,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.new(
         block_time_mins: 1,
@@ -1901,7 +1919,7 @@ RSpec.describe Airplane do
     it "updates AirplaneRoute block times" do
       family = Fabricate(:aircraft_family)
       model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 100, max_range: 100000)
-      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       route = AirlineRoute.create!(
@@ -1911,6 +1929,7 @@ RSpec.describe Airplane do
         origin_airport: fun,
         destination_airport: inu,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.new(
         block_time_mins: Airplane::MAX_TOTAL_BLOCK_TIME_MINS,
@@ -1943,6 +1962,7 @@ RSpec.describe Airplane do
         origin_airport: fun,
         destination_airport: inu,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.new(
         block_time_mins: Airplane::MAX_TOTAL_BLOCK_TIME_MINS / 2 - 1,
@@ -1959,6 +1979,7 @@ RSpec.describe Airplane do
         origin_airport: fun,
         destination_airport: maj,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.new(
         block_time_mins: Airplane::MAX_TOTAL_BLOCK_TIME_MINS / 2 - 1,

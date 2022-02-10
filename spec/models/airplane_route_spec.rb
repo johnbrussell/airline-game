@@ -1,6 +1,11 @@
 require "rails_helper"
 
 RSpec.describe AirplaneRoute do
+  before(:each) do
+    base = Fabricate(:market, name: "Default")
+    Fabricate(:airline, base_id: base.id)
+  end
+
   context "airplane_can_fly_route" do
     it "is true when the airplane can fly the route" do
       market = Fabricate(:market, name: "Pacific")
@@ -9,8 +14,8 @@ RSpec.describe AirplaneRoute do
       family = Fabricate(:aircraft_family)
       distance = Calculation::Distance.between_airports(airport_1, airport_2)
       model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
-      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1)
-      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411)
+      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411, airline: Airline.last)
       block_time = airplane.round_trip_block_time(airline_route.distance).round
       subject = AirplaneRoute.new(route: airline_route, airplane: airplane, block_time_mins: block_time, flight_cost: 1, frequencies: 1)
 
@@ -25,20 +30,54 @@ RSpec.describe AirplaneRoute do
       family = Fabricate(:aircraft_family)
       distance = Calculation::Distance.between_airports(airport_1, airport_2)
       model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
-      airplane = Fabricate(:airplane, aircraft_family: family, economy_seats: 1, aircraft_model: model)
-      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_3.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: distance - 1)
+      airplane = Fabricate(:airplane, aircraft_family: family, economy_seats: 1, aircraft_model: model, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_3.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: distance - 1, airline: Airline.last)
       block_time = airplane.round_trip_block_time(airline_route.distance).round
       subject = AirplaneRoute.new(route: airline_route, airplane: airplane, block_time_mins: block_time, flight_cost: 1, frequencies: 1)
 
       expect(subject.valid?).to be true
       subject.save
 
-      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: distance)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: distance, airline: Airline.last)
       block_time = airplane.round_trip_block_time(airline_route.distance).round
       subject = AirplaneRoute.new(route: airline_route, airplane: airplane, block_time_mins: block_time, flight_cost: 1, frequencies: 1)
 
       expect(subject.valid?).to be false
       expect(subject.errors.full_messages).to include "Airplane cannot fly this route"
+    end
+  end
+
+  context "airplane_operated_by_airline" do
+    it "is true when the airline matches the operator of the airplane" do
+      market = Fabricate(:market, name: "Pacific")
+      airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
+      airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: market)
+      family = Fabricate(:aircraft_family)
+      distance = Calculation::Distance.between_airports(airport_1, airport_2)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
+      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411, airline: Airline.last)
+      block_time = airplane.round_trip_block_time(airline_route.distance).round
+      subject = AirplaneRoute.new(route: airline_route, airplane: airplane, block_time_mins: block_time, flight_cost: 1, frequencies: 1)
+
+      expect(subject.valid?).to be true
+    end
+
+    it "is false when the airline and the airplane operator do not match" do
+      market = Fabricate(:market, name: "Pacific")
+      airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
+      airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: market)
+      family = Fabricate(:aircraft_family)
+      distance = Calculation::Distance.between_airports(airport_1, airport_2)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
+      other_airline = Fabricate(:airline)
+      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1, operator_id: other_airline, base_country_group: other_airline.base.country_group)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411, airline: Airline.last)
+      block_time = airplane.round_trip_block_time(airline_route.distance).round
+      subject = AirplaneRoute.new(route: airline_route, airplane: airplane, block_time_mins: block_time, flight_cost: 1, frequencies: 1)
+
+      expect(subject.valid?).to be false
+      expect(subject.errors.full_messages).to include "Operator of airplane does not match airline_route"
     end
   end
 
@@ -48,13 +87,11 @@ RSpec.describe AirplaneRoute do
       airport_1 = Fabricate(:airport, iata: "FUN", market: market)
       airport_2 = Fabricate(:airport, iata: "INU", market: market)
       family = Fabricate(:aircraft_family)
-      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 100, max_range: 13000)
-      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1)
-      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 100, max_range: 13000, speed: 1000)
+      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411, airline: Airline.last)
       block_time = (3 * airplane.round_trip_block_time(airline_route.distance)).round
       subject = AirplaneRoute.new(route: airline_route, airplane: airplane, block_time_mins: block_time, flight_cost: 1, frequencies: 3)
-
-      subject.validate!
 
       expect(subject.valid?).to be true
     end
@@ -64,8 +101,8 @@ RSpec.describe AirplaneRoute do
       airport_1 = Fabricate(:airport, iata: "FUN", market: market)
       airport_2 = Fabricate(:airport, iata: "INU", market: market)
       family = Fabricate(:aircraft_family)
-      airplane = Fabricate(:airplane, aircraft_family: family, economy_seats: 1)
-      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411)
+      airplane = Fabricate(:airplane, aircraft_family: family, economy_seats: 1, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411, airline: Airline.last)
       subject = AirplaneRoute.new(route: airline_route, airplane: airplane, block_time_mins: 1, flight_cost: 1, frequencies: 3)
 
       expect(subject.valid?).to be false
@@ -77,7 +114,7 @@ RSpec.describe AirplaneRoute do
     it "is correct if the route is the only route for the airplane" do
       family = Fabricate(:aircraft_family)
       model = Fabricate(:aircraft_model, takeoff_distance: 1, max_range: 10000)
-      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       route = AirlineRoute.create!(
@@ -87,6 +124,7 @@ RSpec.describe AirplaneRoute do
         origin_airport: fun,
         destination_airport: inu,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.new(
         block_time_mins: Airplane::MAX_TOTAL_BLOCK_TIME_MINS,
@@ -107,7 +145,7 @@ RSpec.describe AirplaneRoute do
     it "is correct if the airplane has other routes" do
       family = Fabricate(:aircraft_family)
       model = Fabricate(:aircraft_model, takeoff_distance: 1, max_range: 10000)
-      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       trw = Fabricate(:airport, iata: "TRW", market: inu.market)
@@ -118,6 +156,7 @@ RSpec.describe AirplaneRoute do
         origin_airport: fun,
         destination_airport: inu,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.new(
         block_time_mins: Airplane::MAX_TOTAL_BLOCK_TIME_MINS / 2,
@@ -134,6 +173,7 @@ RSpec.describe AirplaneRoute do
         origin_airport: fun,
         destination_airport: trw,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.new(
         block_time_mins: Airplane::MAX_TOTAL_BLOCK_TIME_MINS / 2,
@@ -162,7 +202,7 @@ RSpec.describe AirplaneRoute do
     it "is true if the airplane has no other routes" do
       family = Fabricate(:aircraft_family)
       model = Fabricate(:aircraft_model, takeoff_distance: 1, max_range: 10000)
-      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       route = AirlineRoute.create!(
@@ -172,6 +212,7 @@ RSpec.describe AirplaneRoute do
         origin_airport: fun,
         destination_airport: inu,
         distance: 1,
+        airline: Airline.last,
       )
       subject = AirplaneRoute.new(
         block_time_mins: airplane.round_trip_block_time(route.distance).round,
@@ -187,7 +228,7 @@ RSpec.describe AirplaneRoute do
     it "is true if the airplane flies an adjacent route" do
       family = Fabricate(:aircraft_family)
       model = Fabricate(:aircraft_model, takeoff_distance: 1, max_range: 10000)
-      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       trw = Fabricate(:airport, iata: "TRW", market: inu.market)
@@ -198,6 +239,7 @@ RSpec.describe AirplaneRoute do
         origin_airport: fun,
         destination_airport: inu,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.create!(
         block_time_mins: airplane.round_trip_block_time(route.distance).round,
@@ -214,6 +256,7 @@ RSpec.describe AirplaneRoute do
         origin_airport: fun,
         destination_airport: trw,
         distance: 1,
+        airline: Airline.last,
       )
       subject = AirplaneRoute.new(
         block_time_mins: airplane.round_trip_block_time(route.distance).round,
@@ -229,7 +272,7 @@ RSpec.describe AirplaneRoute do
     it "is false if the airplane flies routes but no adjacent route" do
       family = Fabricate(:aircraft_family)
       model = Fabricate(:aircraft_model, takeoff_distance: 1, max_range: 10000)
-      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       trw = Fabricate(:airport, iata: "TRW", market: inu.market)
@@ -241,6 +284,7 @@ RSpec.describe AirplaneRoute do
         origin_airport: fun,
         destination_airport: inu,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.create!(
         block_time_mins: airplane.round_trip_block_time(route.distance).round,
@@ -257,6 +301,7 @@ RSpec.describe AirplaneRoute do
         origin_airport: maj,
         destination_airport: trw,
         distance: 1,
+        airline: Airline.last,
       )
       subject = AirplaneRoute.new(
         block_time_mins: airplane.round_trip_block_time(route.distance).round,
@@ -275,7 +320,7 @@ RSpec.describe AirplaneRoute do
     it "is true if the airplane has no other routes" do
       family = Fabricate(:aircraft_family)
       model = Fabricate(:aircraft_model, takeoff_distance: 1, max_range: 10000)
-      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       route = AirlineRoute.create!(
@@ -285,6 +330,7 @@ RSpec.describe AirplaneRoute do
         origin_airport: fun,
         destination_airport: inu,
         distance: 1,
+        airline: Airline.last,
       )
       subject = AirplaneRoute.create(
         block_time_mins: airplane.round_trip_block_time(route.distance).round,
@@ -302,7 +348,7 @@ RSpec.describe AirplaneRoute do
     it "is true if the airplane's network remains intact" do
       family = Fabricate(:aircraft_family)
       model = Fabricate(:aircraft_model, takeoff_distance: 1, max_range: 10000)
-      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       trw = Fabricate(:airport, iata: "TRW", market: inu.market)
@@ -313,6 +359,7 @@ RSpec.describe AirplaneRoute do
         origin_airport: fun,
         destination_airport: inu,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.create!(
         block_time_mins: airplane.round_trip_block_time(route.distance).round,
@@ -328,6 +375,7 @@ RSpec.describe AirplaneRoute do
         origin_airport: fun,
         destination_airport: trw,
         distance: 1,
+        airline: Airline.last,
       )
       subject = AirplaneRoute.create(
         block_time_mins: airplane.round_trip_block_time(route.distance).round,
@@ -345,7 +393,7 @@ RSpec.describe AirplaneRoute do
     it "is false if the airplane's network would be split" do
       family = Fabricate(:aircraft_family)
       model = Fabricate(:aircraft_model, takeoff_distance: 1, max_range: 10000)
-      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       trw = Fabricate(:airport, iata: "TRW", market: inu.market)
@@ -357,6 +405,7 @@ RSpec.describe AirplaneRoute do
         origin_airport: fun,
         destination_airport: inu,
         distance: 1,
+        airline: Airline.last,
       )
       subject = AirplaneRoute.create(
         block_time_mins: airplane.round_trip_block_time(route.distance).round,
@@ -372,6 +421,7 @@ RSpec.describe AirplaneRoute do
         origin_airport: fun,
         destination_airport: trw,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.create!(
         block_time_mins: airplane.round_trip_block_time(route.distance).round,
@@ -387,6 +437,7 @@ RSpec.describe AirplaneRoute do
         origin_airport: inu,
         destination_airport: maj,
         distance: 1,
+        airline: Airline.last,
       )
       AirplaneRoute.create!(
         block_time_mins: airplane.round_trip_block_time(route.distance).round,

@@ -5,8 +5,9 @@ RSpec.describe AirlineRoute do
     it "is true when the airports are alphabetized" do
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      airline = Fabricate(:airline, base_id: inu.market.id)
 
-      subject = AirlineRoute.create(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4)
+      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline)
 
       expect(subject.validate).to be true
     end
@@ -23,10 +24,11 @@ RSpec.describe AirlineRoute do
     it "is false when the airports are not alphabetized" do
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      airline = Fabricate(:airline, base_id: inu.market.id)
 
-      subject = AirlineRoute.create(origin_airport_id: inu.id, destination_airport_id: fun.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4)
+      subject = AirlineRoute.new(origin_airport_id: inu.id, destination_airport_id: fun.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline)
 
-      expect(subject.validate).to be false
+      expect(subject.valid?).to be false
       expect(subject.errors.full_messages).to include "Destination airport must correspond to an airport with iata alphabetically after origin airport's iata"
     end
   end
