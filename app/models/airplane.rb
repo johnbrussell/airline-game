@@ -193,6 +193,11 @@ class Airplane < ApplicationRecord
       [(game.current_date - construction_date).to_i, 0].max
     end
 
+    def airline_to_airline_transfer?
+      copy = Airplane.find(id)
+      copy.operator_id != operator_id && copy.operator_id.present? && operator_id.present?
+    end
+
     def base_changes_appropriately
       copy = Airplane.find(id)
       if RivalCountryGroup.rivals?(copy.base_country_group, base_country_group)
@@ -216,6 +221,11 @@ class Airplane < ApplicationRecord
       if !routes.all?{ |r| can_fly_between?(r.origin_airport, r.destination_airport) }
         errors.add(:routes, "are not all able to be flown by the aircraft")
       end
+    end
+
+    def is_transfer_while_utilized?
+      copy = Airplane.find(id)
+      copy.operator_id != operator_id && airplane_routes.any?
     end
 
     def lease_premium
@@ -244,8 +254,9 @@ class Airplane < ApplicationRecord
     end
 
     def operator_changes_appropriately
-      copy = Airplane.find(id)
-      if copy.operator_id != operator_id && copy.operator_id.present? && operator_id.present?
+      if is_transfer_while_utilized?
+        errors.add(:operator_id, "cannot be changed while airplane is utilized")
+      elsif airline_to_airline_transfer?
         errors.add(:operator_id, "cannot be changed from one airline directly to another; must be put on the market first")
       end
     end
