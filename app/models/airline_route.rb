@@ -18,6 +18,14 @@ class AirlineRoute < ApplicationRecord
   delegate :iata, to: :origin_airport, prefix: true
   delegate :iata, to: :destination_airport, prefix: true
 
+  def airplanes_available_to_add_service
+    Airplane
+      .where(operator_id: airline.id)
+      .neatly_sorted
+      .select { |a| a.can_fly_between?(origin_airport, destination_airport) }
+      .select { |a| a.has_time_to_fly?(distance) }
+  end
+
   def distance
     @distance ||= Calculation::Distance.between_airports(origin_airport, destination_airport)
   end
