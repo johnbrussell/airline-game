@@ -18,6 +18,14 @@ class AirlineRoute < ApplicationRecord
   delegate :iata, to: :origin_airport, prefix: true
   delegate :iata, to: :destination_airport, prefix: true
 
+  def self.operators_of_route(origin, destination)
+    AirlineRoute
+      .joins(:airplane_routes)
+      .joins(:airline)
+      .where(origin_airport_id: origin.id, destination_airport_id: destination.id)
+      .order("airlines.name")
+  end
+
   def airplanes_available_to_add_service
     Airplane
       .where(operator_id: airline.id)
@@ -28,6 +36,10 @@ class AirlineRoute < ApplicationRecord
 
   def distance
     @distance ||= Calculation::Distance.between_airports(origin_airport, destination_airport)
+  end
+
+  def total_frequencies
+    airplane_routes.sum(&:frequencies)
   end
 
   private
