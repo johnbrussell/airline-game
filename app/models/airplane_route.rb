@@ -9,6 +9,7 @@ class AirplaneRoute < ApplicationRecord
   validates :frequencies, numericality: { greater_than: 0 }
 
   validate :airplane_can_fly_route
+  validate :airplane_operated_by_airline
   validate :airplane_time_is_logical
   validate :airplane_time_is_possible
   validate :routes_connected
@@ -23,6 +24,12 @@ class AirplaneRoute < ApplicationRecord
     def airplane_can_fly_route
       if !airplane.can_fly_between?(route.origin_airport, route.destination_airport)
         errors.add(:airplane, "cannot fly this route")
+      end
+    end
+
+    def airplane_operated_by_airline
+      if airplane.operator_id != route.airline.id
+        errors.add(:operator, "of airplane does not match airline_route")
       end
     end
 

@@ -1919,7 +1919,7 @@ RSpec.describe Airplane do
     it "updates AirplaneRoute block times" do
       family = Fabricate(:aircraft_family)
       model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 100, max_range: 100000)
-      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       route = AirlineRoute.create!(
