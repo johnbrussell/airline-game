@@ -638,6 +638,37 @@ RSpec.describe Airplane do
       expect(subject.update(operator_id: other_airline.id)).to be false
       expect(subject.errors.map{ |error| "#{error.attribute} #{error.message}" }).to include "operator_id cannot be changed from one airline directly to another; must be put on the market first"
     end
+
+    it "is false when selling an airplane that has routes" do
+      game = Game.last
+      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
+      subject = Airplane.last
+      subject.update(operator_id: airline.id)
+
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      route = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: fun,
+        destination_airport: inu,
+        distance: 1,
+        airline: Airline.last,
+      )
+      AirplaneRoute.new(
+        block_time_mins: 1,
+        frequencies: 1,
+        flight_cost: 1,
+        airplane: subject,
+        route: route,
+      ).save(validate: false)
+      subject.reload
+
+      expect(subject.update(operator_id: nil)).to be false
+      expect(subject.errors.full_messages).to include "Operator cannot be changed while airplane is utilized"
+    end
   end
 
   context "new_plane_payment" do
