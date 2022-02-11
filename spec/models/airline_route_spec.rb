@@ -62,6 +62,35 @@ RSpec.describe AirlineRoute do
     end
   end
 
+  context "airline_can_fly_route" do
+    it "is true when the airline can fly the route" do
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      airline = Fabricate(:airline, base_id: inu.market.id)
+
+      subject = AirlineRoute.new(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline)
+
+      expect(airline).to receive(:can_fly_between?).with(inu.market, inu.market).and_return(true)
+
+      expect(subject.valid?).to be true
+    end
+
+    it "is false when the airline cannot fly the route" do
+      inu_market = Fabricate(:market, name: "Nauru", country: "Nauru", country_group: "Nauru")
+      inu = Fabricate(:airport, iata: "INU", market: inu_market)
+      airline = Fabricate(:airline, base_id: inu_market.id)
+      fun_market = Fabricate(:market, name: "Funafuti", country: "Tuvalu", country_group: "Tuvalu")
+      fun = Fabricate(:airport, iata: "FUN", market: fun_market)
+      RivalCountryGroup.create!(country_one: "Nauru", country_two: "Tuvalu")
+
+      subject = AirlineRoute.new(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline)
+
+      expect(airline).to receive(:can_fly_between?).with(fun_market, inu_market).and_return(false)
+
+      expect(subject.valid?).to be false
+    end
+  end
+
   context "airports_alphabetized" do
     it "is true when the airports are alphabetized" do
       inu = Fabricate(:airport, iata: "INU")
@@ -75,8 +104,9 @@ RSpec.describe AirlineRoute do
 
     it "is false when the airports are equal" do
       inu = Fabricate(:airport, iata: "INU")
+      airline = Fabricate(:airline, base_id: inu.market.id)
 
-      subject = AirlineRoute.create(origin_airport_id: inu.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4)
+      subject = AirlineRoute.create(origin_airport_id: inu.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline)
 
       expect(subject.validate).to be false
       expect(subject.errors.full_messages).to include "Destination airport must correspond to an airport with iata alphabetically after origin airport's iata"
