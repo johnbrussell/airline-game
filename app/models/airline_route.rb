@@ -7,6 +7,7 @@ class AirlineRoute < ApplicationRecord
   validates :business_price, numericality: { greater_than: 0 }
   validates :origin_airport_id, presence: true
   validates :destination_airport_id, presence: true
+  validate :airline_can_fly_route
   validate :airports_alphabetized
 
   has_many :airplane_routes
@@ -43,6 +44,12 @@ class AirlineRoute < ApplicationRecord
   end
 
   private
+
+    def airline_can_fly_route
+      if !airline.can_fly_between?(origin_airport.market, destination_airport.market)
+        errors.add(:airline, "cannot fly between these airports due to political restrictions")
+      end
+    end
 
     def airports_alphabetized
       if Airport.find(destination_airport_id).iata <= Airport.find(origin_airport_id).iata

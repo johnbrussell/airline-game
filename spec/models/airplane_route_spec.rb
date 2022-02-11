@@ -11,6 +11,7 @@ RSpec.describe AirplaneRoute do
       market = Fabricate(:market, name: "Pacific")
       airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
       airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: market)
+      CabotageException.create!(country: market.country)
       family = Fabricate(:aircraft_family)
       distance = Calculation::Distance.between_airports(airport_1, airport_2)
       model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
@@ -27,6 +28,7 @@ RSpec.describe AirplaneRoute do
       airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
       airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9996, elevation: 0, market: market)
       airport_3 = Fabricate(:airport, iata: "TRW", latitude: 10, longitude: 12, runway: 11000, elevation: 0, market: market)
+      CabotageException.create!(country: market.country)
       family = Fabricate(:aircraft_family)
       distance = Calculation::Distance.between_airports(airport_1, airport_2)
       model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
@@ -52,6 +54,7 @@ RSpec.describe AirplaneRoute do
       market = Fabricate(:market, name: "Pacific")
       airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
       airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: market)
+      CabotageException.create!(country: market.country)
       family = Fabricate(:aircraft_family)
       distance = Calculation::Distance.between_airports(airport_1, airport_2)
       model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
@@ -67,6 +70,7 @@ RSpec.describe AirplaneRoute do
       market = Fabricate(:market, name: "Pacific")
       airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
       airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: market)
+      CabotageException.create!(country: market.country)
       family = Fabricate(:aircraft_family)
       distance = Calculation::Distance.between_airports(airport_1, airport_2)
       model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
@@ -86,6 +90,7 @@ RSpec.describe AirplaneRoute do
       market = Fabricate(:market, name: "Pacific")
       airport_1 = Fabricate(:airport, iata: "FUN", market: market)
       airport_2 = Fabricate(:airport, iata: "INU", market: market)
+      CabotageException.create!(country: market.country)
       family = Fabricate(:aircraft_family)
       model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 100, max_range: 13000, speed: 1000)
       airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
@@ -100,6 +105,7 @@ RSpec.describe AirplaneRoute do
       market = Fabricate(:market, name: "Pacific")
       airport_1 = Fabricate(:airport, iata: "FUN", market: market)
       airport_2 = Fabricate(:airport, iata: "INU", market: market)
+      CabotageException.create!(country: market.country)
       family = Fabricate(:aircraft_family)
       airplane = Fabricate(:airplane, aircraft_family: family, economy_seats: 1, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
       airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411, airline: Airline.last)
@@ -117,6 +123,7 @@ RSpec.describe AirplaneRoute do
       airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      CabotageException.create!(country: inu.market.country)
       route = AirlineRoute.create!(
         economy_price: 1,
         business_price: 2,
@@ -149,6 +156,7 @@ RSpec.describe AirplaneRoute do
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       trw = Fabricate(:airport, iata: "TRW", market: inu.market)
+      CabotageException.create!(country: inu.market.country)
       other_route = AirlineRoute.create!(
         economy_price: 1,
         business_price: 2,
@@ -205,6 +213,7 @@ RSpec.describe AirplaneRoute do
       airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      CabotageException.create!(country: inu.market.country)
       route = AirlineRoute.create!(
         economy_price: 1,
         business_price: 2,
@@ -232,6 +241,7 @@ RSpec.describe AirplaneRoute do
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       trw = Fabricate(:airport, iata: "TRW", market: inu.market)
+      CabotageException.create!(country: inu.market.country)
       route = AirlineRoute.create!(
         economy_price: 1,
         business_price: 2,
@@ -277,6 +287,7 @@ RSpec.describe AirplaneRoute do
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       trw = Fabricate(:airport, iata: "TRW", market: inu.market)
       maj = Fabricate(:airport, iata: "MAJ", market: inu.market)
+      CabotageException.create!(country: inu.market.country)
       route = AirlineRoute.create!(
         economy_price: 1,
         business_price: 2,
@@ -323,6 +334,7 @@ RSpec.describe AirplaneRoute do
       airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      CabotageException.create!(country: inu.market.country)
       route = AirlineRoute.create!(
         economy_price: 1,
         business_price: 2,
@@ -352,6 +364,7 @@ RSpec.describe AirplaneRoute do
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       trw = Fabricate(:airport, iata: "TRW", market: inu.market)
+      CabotageException.create!(country: inu.market.country)
       route = AirlineRoute.create!(
         economy_price: 1,
         business_price: 2,
@@ -398,6 +411,7 @@ RSpec.describe AirplaneRoute do
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       trw = Fabricate(:airport, iata: "TRW", market: inu.market)
       maj = Fabricate(:airport, iata: "MAJ", market: inu.market)
+      CabotageException.create!(country: inu.market.country)
       route = AirlineRoute.create!(
         economy_price: 1,
         business_price: 2,
