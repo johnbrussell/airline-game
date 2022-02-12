@@ -1,6 +1,8 @@
 class Slot < ApplicationRecord
   validates :gates_id, presence: true
 
+  belongs_to :gates
+
   LEASE_TERM_DAYS = 30
 
   scope :available, -> { where(lessee_id: nil) }

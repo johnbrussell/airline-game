@@ -531,13 +531,13 @@ RSpec.describe Airplane do
         airline: Airline.last,
       )
       frequencies = max_frequencies - 1
-      AirplaneRoute.create!(
+      AirplaneRoute.new(
         block_time_mins: (round_trip_block_time * frequencies).round,
         frequencies: frequencies,
         flight_cost: 1,
         airplane: subject,
         route: route,
-      )
+      ).save(validate: false)
       subject.reload
 
       expect(subject.has_time_to_fly?(100)).to be true
@@ -566,13 +566,13 @@ RSpec.describe Airplane do
         airline: Airline.last,
       )
       frequencies = max_frequencies
-      AirplaneRoute.create!(
+      AirplaneRoute.new(
         block_time_mins: round_trip_block_time * frequencies,
         frequencies: frequencies,
         flight_cost: 1,
         airplane: subject,
         route: route,
-      )
+      ).save(validate: false)
       subject.reload
 
       expect(subject.has_time_to_fly?(100)).to be false
@@ -2037,6 +2037,10 @@ RSpec.describe Airplane do
       subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      gates_inu = Gates.create!(airport: inu, game: subject.game, current_gates: 100)
+      Slot.create!(gates: gates_inu, lessee_id: Airline.last.id)
+      gates_fun = Gates.create!(airport: fun, game: subject.game, current_gates: 100)
+      Slot.create!(gates: gates_fun, lessee_id: Airline.last.id)
       CabotageException.create!(country: inu.market.country)
       route = AirlineRoute.create!(
         economy_price: 1,

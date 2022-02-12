@@ -13,6 +13,7 @@ class AirplaneRoute < ApplicationRecord
   validate :airplane_time_is_logical
   validate :airplane_time_is_possible
   validate :routes_connected
+  validate :slots_sufficient
 
   before_destroy :validate_remaining_routes_connected
 
@@ -53,6 +54,46 @@ class AirplaneRoute < ApplicationRecord
       if !airplane.routes_connected_with?(route.origin_airport_iata, route.destination_airport_iata)
         errors.add(:route, "does not connect to airplane's route network")
       end
+    end
+
+    def slots_leased_at(airport)
+      Slot
+        .where(lessee_id: route.airline.id)
+        .joins(:gates)
+        .where("gates.airport_id == ?", airport.id)
+        .count
+    end
+
+    def slots_leased_at_destination
+      slots_leased_at(route.destination_airport)
+    end
+
+    def slots_leased_at_origin
+      slots_leased_at(route.origin_airport)
+    end
+
+    def slots_sufficient
+      if slots_used_at_origin + frequencies > slots_leased_at_origin || slots_used_at_destination + frequencies > slots_leased_at_destination
+        errors.add(:slots, "not leased in sufficient quantity")
+      end
+    end
+
+    def slots_used_at(airport)
+      AirlineRoute
+        .where("airline_id == ?", route.airline.id)
+        .where("origin_airport_id == ?", airport.id)
+        .or(AirlineRoute.where("destination_airport_id == ?", airport.id))
+        .joins(:airplane_routes)
+        .where("airplane_routes.id IS NOT ?", id)
+        .sum("airplane_routes.frequencies")
+    end
+
+    def slots_used_at_destination
+      slots_used_at(route.destination_airport)
+    end
+
+    def slots_used_at_origin
+      slots_used_at(route.origin_airport)
     end
 
     def validate_remaining_routes_connected
