@@ -9,5 +9,6 @@ class RoutesController < ApplicationController
     airports = [Airport.find(params[:origin_id]), Airport.find(params[:destination_id])]
     @origin = airports.min_by { |a| a.iata }
     @destination = airports.max_by { |a| a.iata }
+    @revenue = Calculation::MaximumRevenuePotential.new(@origin, @destination, @game.current_date)
   end
 end

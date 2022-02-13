@@ -7,6 +7,10 @@ RSpec.describe "routes/view_route", type: :feature do
     funafuti = Fabricate(:market, name: "Funafuti", country: "Tuvalu")
     Fabricate(:airport, market: nauru, iata: "INU", municipality: nil)
     Fabricate(:airport, market: funafuti, iata: "FUN", municipality: nil)
+    Population.create!(market_id: funafuti.id, year: 2020, population: 10000)
+    Population.create!(market_id: nauru.id, year: 2000, population: 14000)
+    Tourists.create!(market_id: nauru.id, year: 1999, volume: 100)
+    Tourists.create!(market_id: funafuti.id, year: 2020, volume: 2700)
   end
 
   it "has a link back to the game homepage" do
@@ -56,11 +60,22 @@ RSpec.describe "routes/view_route", type: :feature do
     game = Fabricate(:game)
     Fabricate(:airline, is_user_airline: true, game_id: game.id, name: "TIA", base_id: inu.market.id)
 
-    expect(Calculation::Distance).to receive(:between_airports).with(fun, inu).and_return(1000)
+    revenue_calculator = instance_double(
+      Calculation::MaximumRevenuePotential,
+      max_business_class_revenue_per_week: 100,
+      max_premium_economy_class_revenue_per_week: 200,
+      max_economy_class_revenue_per_week: 400,
+    )
+    allow(Calculation::Distance).to receive(:between_airports).and_return(1000)
+    allow(Calculation::MaximumRevenuePotential).to receive(:new).and_return(revenue_calculator)
 
     visit game_view_route_path(game, params: { origin_id: inu.id, destination_id: fun.id })
 
     expect(page).to have_content "1000 miles"
+    expect(page).to have_content "At current demand levels, this route can support up to:"
+    expect(page).to have_content "$400.00 per week in economy class revenue"
+    expect(page).to have_content "$200.00 per week in premium economy class revenue"
+    expect(page).to have_content "$100.00 per week in business class revenue"
   end
 
   it "displays the number of available slots the airline has at the origin and destination" do
@@ -84,10 +99,6 @@ RSpec.describe "routes/view_route", type: :feature do
   it "links to the origin and destination" do
     game = Fabricate(:game)
     Fabricate(:airline, is_user_airline: true, game_id: game.id, base_id: Market.last.id)
-    Population.create!(year: 2000, population: 10000, market_id: Market.find_by(name: "Funafuti").id)
-    Population.create!(year: 2000, population: 10000, market_id: Market.find_by(name: "Nauru").id)
-    Tourists.create!(year: 2000, volume: 10000, market_id: Market.find_by(name: "Funafuti").id)
-    Tourists.create!(year: 2000, volume: 10000, market_id: Market.find_by(name: "Nauru").id)
     visit game_view_route_path(game, params: { origin_id: Airport.find_by(iata: "FUN"), destination_id: Airport.find_by(iata: "INU")})
 
     expect(page).to have_content "FUN - INU"
