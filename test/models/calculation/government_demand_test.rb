@@ -113,6 +113,18 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
     assert_in_epsilon actual, expected, 0.000001
   end
 
+  test "business demand is equivalent to the normal demand curve when between islands, domestic, and the demand-maximizing distance when an island exception exists" do
+    pohnpei = Market.find_by!(name: "Pohnpei")
+    kosrae = Market.find_by!(name: "Kosrae")
+
+    IslandException.create!(market_one: "Pohnpei", market_two: "Kosrae")
+
+    actual = Calculation::GovernmentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).demand
+    expected = Calculation::DemandCurve.new(:business).relative_demand(Calculation::Distance.between_airports(pohnpei.airports.first, kosrae.airports.first)) / 100.0 * kosrae.populations.first.population / 2.0
+
+    assert_in_epsilon actual, expected, 0.000001
+  end
+
   test "business demand is halved when the destination is not an island" do
     Market.find_by!(name: "Kosrae").update!(is_island: false)
 
@@ -186,6 +198,21 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
     actual = subject.demand
 
     assert actual > kosrae.populations.first.population
+  end
+
+  test "demand uses the normal demand curve when the origin is an island and the destination has an IslandException" do
+    Market.find_by!(name: "Micronesia").update!(is_national_capital: true)
+
+    micronesia = Market.find_by!(name: "Micronesia")
+    kosrae = Market.find_by!(name: "Kosrae")
+
+    IslandException.create!(market_one: "Micronesia", market_two: "Kosrae")
+
+    subject = Calculation::GovernmentDemand.new(micronesia.airports.last, kosrae.airports.first, Date.today)
+
+    actual = subject.demand
+
+    assert actual < kosrae.populations.first.population
   end
 
   test "demand uses the mainland demand curve when the origin is not an island" do

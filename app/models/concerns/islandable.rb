@@ -10,6 +10,6 @@ module Islandable
     end
 
     def island_to_island?
-      origin_market.is_island && destination_market.is_island
+      origin_market.is_island && destination_market.is_island && !IslandException.excepted?(origin_market, destination_market)
     end
 end

@@ -26,7 +26,7 @@ class Calculation::TouristDemand
     end
 
     def distance_demand
-      if origin_market.is_island
+      if origin_market.is_island  && !IslandException.excepted?(origin_market, destination_market)
         demand_curve.relative_demand_island(distance)
       else
         demand_curve.relative_demand(distance)
