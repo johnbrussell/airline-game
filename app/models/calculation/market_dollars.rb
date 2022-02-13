@@ -11,11 +11,19 @@ class Calculation::MarketDollars
   end
 
   def business
-    government_dollars + income_spent_on_business_travel
+    income_spent_on_business_travel
+  end
+
+  def government
+    government_dollars
   end
 
   def leisure
-    tourist_dollars + income_spent_on_leisure_travel
+    income_spent_on_leisure_travel
+  end
+
+  def tourist
+    tourist_dollars
   end
 
   private

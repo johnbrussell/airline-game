@@ -139,6 +139,21 @@ class Calculation::TouristDemandTest < ActiveSupport::TestCase
     assert actual > kosrae.populations.first.population
   end
 
+  test "demand uses the normal demand curve when the origin is an island and an island exception exists" do
+    Market.find_by!(name: "Micronesia").update!(is_island: true)
+
+    micronesia = Market.find_by!(name: "Micronesia")
+    kosrae = Market.find_by!(name: "Kosrae")
+
+    IslandException.create!(market_one: "Micronesia", market_two: "Kosrae")
+
+    subject = Calculation::TouristDemand.new(micronesia.airports.last, kosrae.airports.first, Date.today)
+
+    actual = subject.demand
+
+    assert actual < kosrae.populations.first.population
+  end
+
   test "demand uses the mainland demand curve when the origin is not an island" do
     Market.find_by!(name: "Kosrae").update!(is_island: true)
 

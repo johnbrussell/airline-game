@@ -104,12 +104,36 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     assert_in_epsilon actual, expected, 0.000001
   end
 
+  test "business demand is equivalent to the normal demand curve when between islands, domestic, and the demand-maximizing distance and an island exception exists" do
+    pohnpei = Market.find_by!(name: "Pohnpei")
+    kosrae = Market.find_by!(name: "Kosrae")
+
+    IslandException.create!(market_one: "Pohnpei", market_two: "Kosrae")
+
+    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).business_demand
+    expected = Calculation::DemandCurve.new(:business).relative_demand(Calculation::Distance.between_airports(pohnpei.airports.first, kosrae.airports.first)) / 100.0 * kosrae.populations.first.population / 2.0
+
+    assert_in_epsilon actual, expected, 0.000001
+  end
+
   test "leisure demand is equivalent to the island demand curve when between islands, domestic, and the demand-maximizing distance" do
     pohnpei = Market.find_by!(name: "Pohnpei")
     micronesia = Market.find_by!(name: "Micronesia")
 
     actual = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
     expected = Calculation::DemandCurve.new(:leisure).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, micronesia.airports.last)) / 100.0 * micronesia.populations.first.population
+
+    assert_in_epsilon actual, expected, 0.000001
+  end
+
+  test "leisure demand is equivalent to the normal demand curve when between islands, domestic, and the demand-maximizing distance and an island exception exists" do
+    pohnpei = Market.find_by!(name: "Pohnpei")
+    micronesia = Market.find_by!(name: "Micronesia")
+
+    IslandException.create!(market_one: "Pohnpei", market_two: "Micronesia")
+
+    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
+    expected = Calculation::DemandCurve.new(:leisure).relative_demand(Calculation::Distance.between_airports(pohnpei.airports.first, micronesia.airports.last)) / 100.0 * micronesia.populations.first.population / 2.0
 
     assert_in_epsilon actual, expected, 0.000001
   end

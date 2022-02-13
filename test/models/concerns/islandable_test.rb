@@ -30,6 +30,13 @@ class IslandableTest < ActiveSupport::TestCase
 
     assert subject.send(:island_to_island?)
   end
+
+  test "island_to_island? returns false if origin and destination are both islands but an island exception exists" do
+    IslandException.create!(market_one: island, market_two: island)
+    subject = TestClass.new(island_airport, island_airport, Date.today)
+
+    assert subject.send(:island_to_island?)
+  end
 end
 
 class TestClass

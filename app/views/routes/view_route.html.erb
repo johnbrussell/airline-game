@@ -6,4 +6,11 @@
 <h2><%= "#{@origin.iata} - #{@destination.iata}" %></h2>
 <p><%= "#{Calculation::Distance.between_airports(@origin, @destination).round} miles" %></p>
 <p><%= "#{@game.user_airline.name} has #{@origin.leased_unused_slots(@game.user_airline)} available #{"slot".pluralize(@origin.leased_unused_slots(@game.user_airline))} at #{@origin.iata}" %> <br/>
-<%= "#{@game.user_airline.name} has #{@destination.leased_unused_slots(@game.user_airline)} available #{"slot".pluralize(@destination.leased_unused_slots(@game.user_airline))} at #{@destination.iata}" %>
+<%= "#{@game.user_airline.name} has #{@destination.leased_unused_slots(@game.user_airline)} available #{"slot".pluralize(@destination.leased_unused_slots(@game.user_airline))} at #{@destination.iata}" %></p>
+<p>At current demand levels, this route can support up to:
+  <ul>
+    <li>$<%= number_with_precision(@revenue.max_economy_class_revenue_per_week, :precision => 2) %> per week in economy class revenue</li>
+    <li>$<%= number_with_precision(@revenue.max_premium_economy_class_revenue_per_week, :precision => 2) %> per week in premium economy class revenue</li>
+    <li>$<%= number_with_precision(@revenue.max_business_class_revenue_per_week, :precision => 2) %> per week in business class revenue</li>
+  </ul>
+</p>

@@ -14,6 +14,7 @@ class GameData::Inputter < ApplicationRecord
     self.aircraft_models
     self.cabotage_exceptions
     self.rival_country_groups
+    self.island_exceptions
   end
 
   private
@@ -130,6 +131,18 @@ class GameData::Inputter < ApplicationRecord
           is_national_capital: data_point["isNationalCapital"].downcase == "yes",
           is_island: data_point["isIsland"].downcase == "yes",
         ).save!
+      end
+    end
+
+    def self.island_exceptions
+      IslandException.all.destroy_all
+
+      data = CSV.parse(File.read("data/island_exceptions.csv"), headers: true)
+      data.by_row.each do |data_point|
+        IslandException.create!(
+          market_one: data_point["Island"],
+          market_two: data_point["Exception"],
+        )
       end
     end
 

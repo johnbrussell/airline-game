@@ -10,7 +10,7 @@ class Calculation::SlotRent
 
     def self.dollars_in_market(gates)
       market_dollar_calculator = Calculation::MarketDollars.new(gates.airport, gates.game.current_date)
-      market_dollar_calculator.business + market_dollar_calculator.leisure
+      market_dollar_calculator.business + market_dollar_calculator.government + market_dollar_calculator.leisure + market_dollar_calculator.tourist
     end
 
     def self.gates_in_market(gates)

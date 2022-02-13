@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_09_205749) do
+ActiveRecord::Schema.define(version: 2022_02_13_140037) do
 
   create_table "aircraft_families", force: :cascade do |t|
     t.string "name", null: false
@@ -168,6 +168,13 @@ ActiveRecord::Schema.define(version: 2022_02_09_205749) do
     t.index ["airport_id"], name: "index_global_demands_on_airport_id"
   end
 
+  create_table "island_exceptions", force: :cascade do |t|
+    t.string "market_one"
+    t.string "market_two"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "markets", force: :cascade do |t|
     t.string "name", null: false
     t.string "country", null: false
@@ -195,6 +202,18 @@ ActiveRecord::Schema.define(version: 2022_02_09_205749) do
     t.string "country_two", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "route_demands", force: :cascade do |t|
+    t.date "date", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.float "business", null: false
+    t.string "destination_iata", null: false
+    t.float "government", null: false
+    t.float "leisure", null: false
+    t.string "origin_iata", null: false
+    t.float "tourist", null: false
   end
 
   create_table "slots", force: :cascade do |t|
