@@ -28,18 +28,34 @@ class Calculation::RouteDollars
   private
 
     def directional_business_dollars(origin, destination)
-      RouteDemand.calculate(@date, origin, destination).business.to_f / GlobalDemand.calculate(@date, origin).business * Calculation::MarketDollars.new(origin, @date).business
+      if GlobalDemand.calculate(@date, origin).business == 0
+        0
+      else
+        RouteDemand.calculate(@date, origin, destination).business.to_f / GlobalDemand.calculate(@date, origin).business * Calculation::MarketDollars.new(origin, @date).business
+      end
     end
 
     def directional_government_dollars(origin, destination)
-      RouteDemand.calculate(@date, origin, destination).government.to_f / GlobalDemand.calculate(@date, origin).government * Calculation::MarketDollars.new(origin, @date).government
+      if GlobalDemand.calculate(@date, origin).government == 0
+        0
+      else
+        RouteDemand.calculate(@date, origin, destination).government.to_f / GlobalDemand.calculate(@date, origin).government * Calculation::MarketDollars.new(origin, @date).government
+      end
     end
 
     def directional_leisure_dollars(origin, destination)
-      RouteDemand.calculate(@date, origin, destination).leisure.to_f / GlobalDemand.calculate(@date, origin).leisure * Calculation::MarketDollars.new(origin, @date).leisure
+      if GlobalDemand.calculate(@date, origin).leisure == 0
+        0
+      else
+        RouteDemand.calculate(@date, origin, destination).leisure.to_f / GlobalDemand.calculate(@date, origin).leisure * Calculation::MarketDollars.new(origin, @date).leisure
+      end
     end
 
     def directional_tourist_dollars(origin, destination)
-      RouteDemand.calculate(@date, origin, destination).tourist.to_f / GlobalDemand.calculate(@date, origin).tourist * Calculation::MarketDollars.new(origin, @date).tourist
+      if GlobalDemand.calculate(@date, origin).tourist == 0
+        0
+      else
+        RouteDemand.calculate(@date, origin, destination).tourist.to_f / GlobalDemand.calculate(@date, origin).tourist * Calculation::MarketDollars.new(origin, @date).tourist
+      end
     end
 end
