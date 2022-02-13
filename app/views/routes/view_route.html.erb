@@ -3,3 +3,5 @@
 <a href=<%= game_select_route_path(@game) %>> View a different route </a></p>
 <h2><%= "#{@origin.iata} - #{@destination.iata}" %></h2>
 <p><%= "#{Calculation::Distance.between_airports(@origin, @destination).round} miles" %></p>
+<p><%= "#{@game.user_airline.name} has #{@origin.leased_unused_slots(@game.user_airline)} available #{"slot".pluralize(@origin.leased_unused_slots(@game.user_airline))} at #{@origin.iata}" %> <br/>
+<%= "#{@game.user_airline.name} has #{@destination.leased_unused_slots(@game.user_airline)} available #{"slot".pluralize(@destination.leased_unused_slots(@game.user_airline))} at #{@destination.iata}" %>
