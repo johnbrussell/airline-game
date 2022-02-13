@@ -37,9 +37,11 @@ class Airplane < ApplicationRecord
   scope :available_used, ->(game) {
     joins(:aircraft_manufacturing_queue).
     where(operator_id: nil).
-    where("construction_date <= ?", game.current_date).where("end_of_useful_life > ?", game.current_date).
+    built(game).
+    where("end_of_useful_life > ?", game.current_date).
     where(aircraft_manufacturing_queue: { game: game } )
   }
+  scope :built, ->(game) { where("construction_date <= ?", game.current_date) }
   scope :neatly_sorted, -> {
     joins(aircraft_model: :family).
     order("aircraft_families.manufacturer", "aircraft_families.name", "aircraft_models.name", "construction_date DESC")

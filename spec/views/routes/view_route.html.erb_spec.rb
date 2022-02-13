@@ -5,8 +5,8 @@ RSpec.describe "routes/view_route", type: :feature do
   before(:each) do
     nauru = Fabricate(:market, name: "Nauru", country: "Nauru")
     funafuti = Fabricate(:market, name: "Funafuti", country: "Tuvalu")
-    Fabricate(:airport, market: nauru, iata: "INU")
-    Fabricate(:airport, market: funafuti, iata: "FUN")
+    Fabricate(:airport, market: nauru, iata: "INU", municipality: nil)
+    Fabricate(:airport, market: funafuti, iata: "FUN", municipality: nil)
   end
 
   it "has a link back to the game homepage" do
@@ -23,6 +23,7 @@ RSpec.describe "routes/view_route", type: :feature do
 
   it "has a link to view a different route" do
     game = Fabricate(:game)
+    Fabricate(:airline, is_user_airline: true, game_id: game.id, name: "TIA", base_id: Market.last.id)
     visit game_view_route_path(game, params: { origin_id: Airport.find_by(iata: "FUN"), destination_id: Airport.find_by(iata: "FUN")})
 
     expect(page).to have_content "View a different route"
@@ -37,6 +38,7 @@ RSpec.describe "routes/view_route", type: :feature do
     fun = Airport.find_by(iata: "FUN")
 
     game = Fabricate(:game)
+    Fabricate(:airline, is_user_airline: true, game_id: game.id, name: "TIA", base_id: inu.market.id)
 
     visit game_view_route_path(game, params: { origin_id: inu.id, destination_id: fun.id })
 
@@ -52,11 +54,54 @@ RSpec.describe "routes/view_route", type: :feature do
     fun = Airport.find_by(iata: "FUN")
 
     game = Fabricate(:game)
+    Fabricate(:airline, is_user_airline: true, game_id: game.id, name: "TIA", base_id: inu.market.id)
 
     expect(Calculation::Distance).to receive(:between_airports).with(fun, inu).and_return(1000)
 
     visit game_view_route_path(game, params: { origin_id: inu.id, destination_id: fun.id })
 
     expect(page).to have_content "1000 miles"
+  end
+
+  it "displays the number of available slots the airline has at the origin and destination" do
+    inu = Airport.find_by(iata: "INU")
+    fun = Airport.find_by(iata: "FUN")
+
+    game = Fabricate(:game)
+    Fabricate(:airline, is_user_airline: true, game_id: game.id, name: "TIA", base_id: inu.market.id)
+
+    expect(Slot).to receive(:num_leased).twice.with(game.user_airline, inu).and_return(5)
+    expect(Slot).to receive(:num_leased).twice.with(game.user_airline, fun).and_return(6)
+    expect(Slot).to receive(:num_used).twice.with(game.user_airline, inu).and_return(4)
+    expect(Slot).to receive(:num_used).twice.with(game.user_airline, fun).and_return(2)
+
+    visit game_view_route_path(game, params: { origin_id: inu.id, destination_id: fun.id })
+
+    expect(page).to have_content "TIA has 1 available slot at INU"
+    expect(page).to have_content "TIA has 4 available slots at FUN"
+  end
+
+  it "links to the origin and destination" do
+    game = Fabricate(:game)
+    Fabricate(:airline, is_user_airline: true, game_id: game.id, base_id: Market.last.id)
+    Population.create!(year: 2000, population: 10000, market_id: Market.find_by(name: "Funafuti").id)
+    Population.create!(year: 2000, population: 10000, market_id: Market.find_by(name: "Nauru").id)
+    Tourists.create!(year: 2000, volume: 10000, market_id: Market.find_by(name: "Funafuti").id)
+    Tourists.create!(year: 2000, volume: 10000, market_id: Market.find_by(name: "Nauru").id)
+    visit game_view_route_path(game, params: { origin_id: Airport.find_by(iata: "FUN"), destination_id: Airport.find_by(iata: "INU")})
+
+    expect(page).to have_content "FUN - INU"
+
+    expect(page).to have_content "View FUN"
+    click_link "View FUN"
+
+    expect(page).to have_content "Funafuti (FUN)"
+
+    visit game_view_route_path(game, params: { origin_id: Airport.find_by(iata: "FUN"), destination_id: Airport.find_by(iata: "INU")})
+
+    expect(page).to have_content "View INU"
+    click_link "View INU"
+
+    expect(page).to have_content "Nauru (INU)"
   end
 end

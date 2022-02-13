@@ -35,6 +35,10 @@ class Airport < ApplicationRecord
     market.is_island
   end
 
+  def leased_unused_slots(airline)
+    Slot.num_leased(airline, self) - Slot.num_used(airline, self)
+  end
+
   def other_market_airports
     market.airports.reject{ |airport| airport.iata == iata }
   end
