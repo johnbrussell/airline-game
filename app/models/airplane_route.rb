@@ -57,11 +57,7 @@ class AirplaneRoute < ApplicationRecord
     end
 
     def slots_leased_at(airport)
-      Slot
-        .where(lessee_id: route.airline.id)
-        .joins(:gates)
-        .where("gates.airport_id == ?", airport.id)
-        .count
+      Slot.num_leased(route.airline, airport)
     end
 
     def slots_leased_at_destination
@@ -79,13 +75,9 @@ class AirplaneRoute < ApplicationRecord
     end
 
     def slots_used_at(airport)
-      AirlineRoute
-        .where("airline_id == ?", route.airline.id)
-        .where("origin_airport_id == ?", airport.id)
-        .or(AirlineRoute.where("destination_airport_id == ?", airport.id))
-        .joins(:airplane_routes)
-        .where("airplane_routes.id IS NOT ?", id)
-        .sum("airplane_routes.frequencies")
+      frequencies = new_record? ? 0 : AirplaneRoute.find(id).frequencies
+
+      Slot.num_used(route.airline, airport) - frequencies
     end
 
     def slots_used_at_destination

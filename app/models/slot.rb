@@ -10,4 +10,22 @@ class Slot < ApplicationRecord
   def self.create_for_new_gates(gates_id, num)
     insert_all!([{ "gates_id": gates_id, created_at: Time.now, updated_at: Time.now }] * num)
   end
+
+  def self.num_leased(airline, airport)
+    Slot
+      .where(lessee_id: airline.id)
+      .joins(:gates)
+      .where("gates.airport_id == ?", airport.id)
+      .count
+  end
+
+  def self.num_used(airline, airport)
+    # Nothing on Slot indicates usage; calculate by counting frequencies on all routes to/from airport
+    AirlineRoute
+      .where("airline_id == ?", airline.id)
+      .where("origin_airport_id == ?", airport.id)
+      .or(AirlineRoute.where("destination_airport_id == ?", airport.id))
+      .joins(:airplane_routes)
+      .sum("airplane_routes.frequencies")
+  end
 end

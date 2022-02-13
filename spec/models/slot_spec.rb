@@ -1,13 +1,14 @@
 require "rails_helper"
 
 RSpec.describe Slot do
-  context "create_for_new_gates" do
-    before(:each) do
-      game = Fabricate(:game)
-      airport = Fabricate(:airport)
-      Gates.create!(game: game, airport: airport, current_gates: airport.start_gates)
-    end
+  before(:each) do
+    game = Fabricate(:game)
+    market = Fabricate(:market, name: "Default")
+    airport = Fabricate(:airport, iata: "BOS", market: market)
+    Gates.create!(game: game, airport: airport, current_gates: airport.start_gates)
+  end
 
+  context "create_for_new_gates" do
     it "creates new slots creates the requested number of slots" do
       num_slots = Slot.count
       slots_to_create = 3
@@ -19,6 +20,52 @@ RSpec.describe Slot do
 
       expect(new_num_slots).to eq num_slots + slots_to_create
       expect(Slot.last.gates_id).to eq gates.id
+    end
+  end
+
+  context "num_leased" do
+    it "is zero when no slots are leased at the airport" do
+      airline = Fabricate(:airline, game_id: Game.last.id, base_id: Airport.last.market.id)
+
+      expect(Slot.num_leased(airline, Airport.last)).to eq 0
+    end
+
+    it "accurately counts the number of slots leased" do
+      airline = Fabricate(:airline, game_id: Game.last.id, base_id: Airport.last.market.id)
+
+      Slot.create!(gates_id: Gates.last.id, lessee_id: airline.id)
+
+      expect(Slot.num_leased(airline, Airport.last)).to eq 1
+    end
+  end
+
+  context "num_used" do
+    it "is zero when no slots are used at the airport" do
+      airline = Fabricate(:airline, game_id: Game.last.id, base_id: Airport.last.market.id)
+
+      expect(Slot.num_used(airline, Airport.last)).to eq 0
+    end
+
+    it "accurately counts the number of slots used" do
+      airline = Fabricate(:airline, game_id: Game.last.id, base_id: Airport.last.market.id)
+
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, market: inu.market, iata: "FUN")
+      maj = Fabricate(:airport, market: inu.market, iata: "MAJ")
+
+      family = Fabricate(:aircraft_family)
+      airplane = Fabricate(:airplane, aircraft_family: family)
+
+      AirlineRoute.new(airline: airline, origin_airport: fun, destination_airport: inu, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 1).save(validate: false)
+      fun_inu = AirlineRoute.last
+      AirlineRoute.new(airline: airline, origin_airport: inu, destination_airport: maj, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 1).save(validate: false)
+      inu_maj = AirlineRoute.last
+      AirplaneRoute.new(airplane: airplane, route: fun_inu, frequencies: 3, block_time_mins: 1, flight_cost: 3).save(validate: false)
+      AirplaneRoute.new(airplane: airplane, route: inu_maj, frequencies: 1, block_time_mins: 1, flight_cost: 3).save(validate: false)
+
+      expect(Slot.num_used(airline, inu)).to eq 4
+      expect(Slot.num_used(airline, fun)).to eq 3
+      expect(Slot.num_used(airline, maj)).to eq 1
     end
   end
 end
