@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_13_124137) do
+ActiveRecord::Schema.define(version: 2022_02_13_140037) do
 
   create_table "aircraft_families", force: :cascade do |t|
     t.string "name", null: false
@@ -205,11 +205,15 @@ ActiveRecord::Schema.define(version: 2022_02_13_124137) do
   end
 
   create_table "route_demands", force: :cascade do |t|
-    t.float "business_dollars", null: false
-    t.float "leisure_dollars", null: false
     t.date "date", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.float "business", null: false
+    t.string "destination_iata", null: false
+    t.float "government", null: false
+    t.float "leisure", null: false
+    t.string "origin_iata", null: false
+    t.float "tourist", null: false
   end
 
   create_table "slots", force: :cascade do |t|
