@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_09_205749) do
+ActiveRecord::Schema.define(version: 2022_02_13_123512) do
 
   create_table "aircraft_families", force: :cascade do |t|
     t.string "name", null: false
@@ -193,6 +193,14 @@ ActiveRecord::Schema.define(version: 2022_02_09_205749) do
   create_table "rival_country_groups", force: :cascade do |t|
     t.string "country_one", null: false
     t.string "country_two", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "route_demands", force: :cascade do |t|
+    t.float "business_dollars", null: false
+    t.float "leisure_dollars", null: false
+    t.date "date", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
