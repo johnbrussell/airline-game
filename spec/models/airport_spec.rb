@@ -16,6 +16,18 @@ RSpec.describe Airport do
     end
   end
 
+  context "leased_unused_slots" do
+    it "calculates correctly" do
+      airline = Fabricate(:airline)
+      subject = Fabricate(:airport, market: airline.base)
+
+      expect(Slot).to receive(:num_leased).with(airline, subject).and_return(5)
+      expect(Slot).to receive(:num_used).with(airline, subject).and_return(1)
+
+      expect(subject.leased_unused_slots(airline)).to eq 4
+    end
+  end
+
   context "other_market_airports" do
     before(:each) do
       boston = Market.create!(
