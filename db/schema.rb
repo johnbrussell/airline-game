@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_13_140037) do
+ActiveRecord::Schema.define(version: 2022_02_13_212900) do
 
   create_table "aircraft_families", force: :cascade do |t|
     t.string "name", null: false
@@ -195,6 +195,7 @@ ActiveRecord::Schema.define(version: 2022_02_13_140037) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["market_id"], name: "index_populations_on_market_id"
+    t.index ["year"], name: "index_populations_on_year"
   end
 
   create_table "rival_country_groups", force: :cascade do |t|
@@ -233,6 +234,7 @@ ActiveRecord::Schema.define(version: 2022_02_13_140037) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["market_id"], name: "index_tourists_on_market_id"
+    t.index ["year"], name: "index_tourists_on_year"
   end
 
 end
