@@ -6,6 +6,10 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
       year: 2020,
       population: 2000,
     )
+    tourists_1 = Tourists.new(
+      year: 1999,
+      volume: 1999,
+    )
     airport_1 = Airport.new(
       latitude: 6.9851,
       longitude: 158.209,
@@ -25,10 +29,15 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
       income: 100,
       airports: [airport_1],
       populations: [population_1],
+      tourists: [tourists_1],
     ).save!
     population_2 = Population.new(
       year: 2020,
       population: 1000,
+    )
+    tourists_2 = Tourists.new(
+      year: 1999,
+      volume: 1999,
     )
     airport_2 = Airport.new(
       latitude: 5.35698,
@@ -48,10 +57,15 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
       income: 100,
       airports: [airport_2],
       populations: [population_2],
+      tourists: [tourists_2],
     ).save!
     population_3 = Population.new(
       year: 2020,
       population: 3000,
+    )
+    tourists_3 = Tourists.new(
+      year: 1999,
+      volume: 1999,
     )
     airport_3a = Airport.new(
       latitude: 5.35698,
@@ -81,6 +95,7 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
       income: 100,
       airports: [airport_3a, airport_3b],
       populations: [population_3],
+      tourists: [tourists_3],
     ).save!
   end
 

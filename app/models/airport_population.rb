@@ -12,7 +12,7 @@ class AirportPopulation < ApplicationRecord
   def self.calculate(airport, date)
     airport_population = find_by(airport: airport, year: date.year)
     if airport_population.nil?
-      calculator = Calculation::AirportPopulation.new(airport, date.year)
+      calculator = Calculation::AirportPopulation.new(airport, date)
       create!(
         airport: airport,
         year: date.year,
