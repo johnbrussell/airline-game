@@ -2,10 +2,12 @@ require "rails_helper"
 
 RSpec.describe Calculation::RouteDollars do
   before(:each) do
+    airport = instance_double(Airport)
+
     route_demand = instance_double(RouteDemand, business: 100, government: 10, leisure: 2000, tourist: 200)
     allow(RouteDemand).to receive(:calculate).and_return(route_demand)
 
-    global_demand = instance_double(GlobalDemand, business: 1000, government: 1000, leisure: 100000, tourist: 40000)
+    global_demand = instance_double(GlobalDemand, business: 1000, government: 1000, leisure: 100000, tourist: 40000, airport: airport)
     allow(GlobalDemand).to receive(:calculate).and_return(global_demand)
 
     market_dollars = instance_double(Calculation::MarketDollars, business: 5000, government: 10000, leisure: 50000, tourist: 1000)
