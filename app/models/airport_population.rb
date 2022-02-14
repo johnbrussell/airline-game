@@ -7,14 +7,12 @@ class AirportPopulation < ApplicationRecord
   validates :tourists, presence: true
   validates :tourists, numericality: { greater_than: 0 }
 
-  belongs_to :airport
-
   def self.calculate(airport, date)
-    airport_population = find_by(airport: airport, year: date.year)
+    airport_population = find_by(airport_id: airport.id, year: date.year)
     if airport_population.nil?
       calculator = Calculation::AirportPopulation.new(airport, date)
       create!(
-        airport: airport,
+        airport_id: airport.id,
         year: date.year,
         government: calculator.government_workers,
         population: calculator.population,
