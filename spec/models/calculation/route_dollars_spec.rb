@@ -60,13 +60,14 @@ RSpec.describe Calculation::RouteDollars do
 
   context "divide by zero errors" do
     it "do not occur" do
-      zero_global_demand = instance_double(GlobalDemand, business: 0, government: 0, leisure: 0, tourist: 0)
-      allow(GlobalDemand).to receive(:calculate).and_return(zero_global_demand)
 
       date = Date.today
       origin = Fabricate(:airport, iata: "XWA")
       destination = Fabricate(:airport, market: origin.market, iata: "DIK")
       subject = Calculation::RouteDollars.new(date, origin, destination)
+
+      zero_global_demand = instance_double(GlobalDemand, business: 0, government: 0, leisure: 0, tourist: 0, airport: origin)
+      allow(GlobalDemand).to receive(:calculate).and_return(zero_global_demand)
 
       expect(subject.business).to eq 0
       expect(subject.government).to eq 0

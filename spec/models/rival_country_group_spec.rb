@@ -1,6 +1,22 @@
 require "rails_helper"
 
 RSpec.describe RivalCountryGroup do
+  context "all_rivals" do
+    it "returns an empty list when there are no rivals" do
+      expect(RivalCountryGroup.all_rivals("New country")).to eq []
+    end
+
+    it "returns a list of all rivals" do
+      RivalCountryGroup.create!(country_one: "Nauru", country_two: "Tuvalu")
+      RivalCountryGroup.create!(country_one: "Tuvalu", country_two: "Vanuatu")
+
+      expect(RivalCountryGroup.all_rivals("Tuvalu")).to eq ["Nauru", "Vanuatu"]
+      expect(RivalCountryGroup.all_rivals("Nauru")).to eq ["Tuvalu"]
+      expect(RivalCountryGroup.all_rivals("Vanuatu")).to eq ["Tuvalu"]
+      expect(RivalCountryGroup.all_rivals("Tonga")).to eq []
+    end
+  end
+
   context "rivals?" do
     it "calculates correctly" do
       RivalCountryGroup.create!(country_one: "Nauru", country_two: "Tuvalu")

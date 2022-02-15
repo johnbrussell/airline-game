@@ -1,16 +1,15 @@
 require "rails_helper"
 
 RSpec.describe GlobalDemand do
-  market_1 = Market.new
-  market_2 = Market.new
-  market_3 = Market.new
   date = Date.today
 
   context "calculate" do
     it "correctly calls Calculation::TotalMarketDemand for each type of demand and adds the result" do
-      origin_airport = Fabricate(:airport)
+      market_1 = Fabricate(:market, name: "Tonga", country: "Tonga", country_group: "Tonga")
+      market_2 = Fabricate(:market, name: "Tuvalu", country: "Tuvalu", country_group: "Tuvalu")
+      market_3 = Fabricate(:market, name: "Nauru", country: "Nauru", country_group: "Nauru")
 
-      expect(Market).to receive(:all).exactly(4).times.and_return [market_1, market_2, market_3]
+      origin_airport = Fabricate(:airport, market: market_3)
 
       expect(Calculation::TotalMarketDemand).to receive(:business).with(origin_airport, market_1, date).and_return 200
       expect(Calculation::TotalMarketDemand).to receive(:business).with(origin_airport, market_2, date).and_return 400
@@ -49,7 +48,7 @@ RSpec.describe GlobalDemand do
 
       GlobalDemand.create!(airport_id: 3, date: date, business: 1, government: 2, leisure: 3, tourist: 4, airport: origin_airport)
 
-      expect(Market).not_to receive(:all)
+      expect(RivalCountryGroup).not_to receive(:all_rivals)
       expect(Calculation::TotalMarketDemand).not_to receive(:business)
       expect(Calculation::TotalMarketDemand).not_to receive(:government)
       expect(Calculation::TotalMarketDemand).not_to receive(:leisure)
