@@ -11,10 +11,10 @@ class RouteDemand < ApplicationRecord
   validates :tourist, presence: true
 
   def self.calculate(date, origin_airport, destination_airport)
-    route_demand = find_by(origin_iata: origin_airport.iata, destination_iata: destination_airport.iata, date: date)
+    route_demand = find_by(origin_iata: origin_airport.iata, destination_iata: destination_airport.iata, year: date.year)
     if route_demand.nil?
       create!(
-        date: date,
+        year: date.year,
         origin_iata: origin_airport.iata,
         destination_iata: destination_airport.iata,
         business: business_demand(origin_airport, destination_airport, date),
