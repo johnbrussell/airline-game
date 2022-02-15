@@ -107,6 +107,18 @@ class Calculation::TouristDemandTest < ActiveSupport::TestCase
     assert actual == expected
   end
 
+  test "demand is zero when the origin and destination markets are rivals" do
+    micronesia = Market.find_by!(name: "Micronesia")
+    kosrae = Market.find_by!(name: "Kosrae")
+    kosrae.update!(country_group: "Federated States of Micronesia")
+    RivalCountryGroup.create!(country_one: kosrae.country_group, country_two: micronesia.country_group)
+
+    actual = Calculation::TouristDemand.new(micronesia.airports.first, kosrae.airports.last, Date.today).demand
+    expected = 0
+
+    assert actual == expected
+  end
+
   test "demand is equivalent to the destination population when domestic and the demand-maximizing distance" do
     pohnpei = Market.find_by!(name: "Pohnpei")
     micronesia = Market.find_by!(name: "Micronesia")
