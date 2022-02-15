@@ -29,26 +29,30 @@ class GlobalDemand < ApplicationRecord
   private
 
     def self.market_business_demands(origin_airport, date)
-      Market.all.map do |market|
+      valid_destination_markets(origin_airport).map do |market|
         Calculation::TotalMarketDemand.business(origin_airport, market, date)
       end
     end
 
     def self.market_government_demands(origin_airport, date)
-      Market.all.map do |market|
+      valid_destination_markets(origin_airport).map do |market|
         Calculation::TotalMarketDemand.government(origin_airport, market, date)
       end
     end
 
     def self.market_leisure_demands(origin_airport, date)
-      Market.all.map do |market|
+      valid_destination_markets(origin_airport).map do |market|
         Calculation::TotalMarketDemand.leisure(origin_airport, market, date)
       end
     end
 
     def self.market_tourist_demands(origin_airport, date)
-      Market.all.map do |market|
+      valid_destination_markets(origin_airport).map do |market|
         Calculation::TotalMarketDemand.tourist(origin_airport, market, date)
       end
+    end
+
+    def self.valid_destination_markets(origin_airport)
+      Market.where("country_group NOT IN (?)", RivalCountryGroup.all_rivals(origin_airport.market.country_group).join(","))
     end
 end
