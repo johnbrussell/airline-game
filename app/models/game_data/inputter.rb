@@ -149,6 +149,8 @@ class GameData::Inputter < ApplicationRecord
     def self.population
       Population.all.destroy_all
       GlobalDemand.all.destroy_all
+      RouteDemand.all.destroy_all
+      AirportPopulation.all.destroy_all
 
       data = CSV.parse(File.read("data/populations.csv"), headers: true)
       data.by_row.each do |data_point|
