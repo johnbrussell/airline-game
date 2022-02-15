@@ -4,11 +4,12 @@ RSpec.describe GlobalDemand do
   market_1 = Market.new
   market_2 = Market.new
   market_3 = Market.new
-  origin_airport = Airport.new(iata: "TVC", id: 3)
   date = Date.today
 
   context "calculate" do
     it "correctly calls Calculation::TotalMarketDemand for each type of demand and adds the result" do
+      origin_airport = Fabricate(:airport)
+
       expect(Market).to receive(:all).exactly(4).times.and_return [market_1, market_2, market_3]
 
       expect(Calculation::TotalMarketDemand).to receive(:business).with(origin_airport, market_1, date).and_return 200
@@ -36,7 +37,7 @@ RSpec.describe GlobalDemand do
       last = GlobalDemand.last
       assert actual.id == last.id
       assert actual.date == date
-      assert actual.airport_id == 3
+      assert actual.airport_id == origin_airport.id
       assert actual.business == 700
       assert actual.government == 0
       assert actual.leisure == 7000
@@ -44,7 +45,9 @@ RSpec.describe GlobalDemand do
     end
 
     it "returns the known GlobalDemand when it has already been calculated" do
-      GlobalDemand.create!(airport_id: 3, date: date, business: 1, government: 2, leisure: 3, tourist: 4)
+      origin_airport = Fabricate(:airport)
+
+      GlobalDemand.create!(airport_id: 3, date: date, business: 1, government: 2, leisure: 3, tourist: 4, airport: origin_airport)
 
       expect(Market).not_to receive(:all)
       expect(Calculation::TotalMarketDemand).not_to receive(:business)
@@ -58,7 +61,7 @@ RSpec.describe GlobalDemand do
 
       assert global_demand_count == GlobalDemand.count
       assert actual.date == date
-      assert actual.airport_id == 3
+      assert actual.airport_id == origin_airport.id
       assert actual.business == 1
       assert actual.government == 2
       assert actual.leisure == 3

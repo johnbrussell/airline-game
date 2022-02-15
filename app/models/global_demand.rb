@@ -8,6 +8,8 @@ class GlobalDemand < ApplicationRecord
   validates :tourist, numericality: { greater_than_or_equal_to: 0 }
   validates :tourist, presence: true
 
+  belongs_to :airport
+
   def self.calculate(date, origin_airport)
     global_demand = find_by(airport_id: origin_airport.id, date: date)
     if global_demand.nil?
