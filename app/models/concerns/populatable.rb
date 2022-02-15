@@ -6,6 +6,6 @@ module Populatable
   private
 
     def airport_population
-      Calculation::AirportPopulation.new(@destination, @current_date).population
+      @airport_population ||= AirportPopulation.calculate(@destination, @current_date).population
     end
 end

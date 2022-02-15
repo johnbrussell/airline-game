@@ -29,7 +29,13 @@ class PopulatableTest < ActiveSupport::TestCase
           year: 2010,
           population: 10000,
         )
-      ]
+      ],
+      tourists: [
+        Tourists.new(
+          year: 1920,
+          volume: 25,
+        )
+      ],
     ).save!
   end
 

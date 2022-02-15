@@ -27,20 +27,20 @@ class Calculation::MarketDollars
   end
 
   private
-    def airport_population_calculator
-      @airport_population_calculator ||= Calculation::AirportPopulation.new(@airport, @current_date)
+    def airport_population
+      @airport_population ||= AirportPopulation.calculate(@airport, @current_date)
     end
 
     def government_dollars
-      airport_population_calculator.government_workers * DOLLARS_PER_GOVERNMENT_WORKER
+      airport_population.government * DOLLARS_PER_GOVERNMENT_WORKER
     end
 
     def income_spent_on_business_travel
-      market.income * percent_of_income_spent_on_business_travel * airport_population_calculator.population
+      market.income * percent_of_income_spent_on_business_travel * airport_population.population
     end
 
     def income_spent_on_leisure_travel
-      market.income * percent_of_income_spent_on_leisure_travel * airport_population_calculator.population
+      market.income * percent_of_income_spent_on_leisure_travel * airport_population.population
     end
 
     def market
@@ -64,6 +64,6 @@ class Calculation::MarketDollars
     end
 
     def tourist_dollars
-      airport_population_calculator.tourists * DOLLARS_PER_TOURIST
+      airport_population.tourists * DOLLARS_PER_TOURIST
     end
 end

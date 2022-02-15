@@ -6,6 +6,10 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
       year: 2020,
       population: 2000,
     )
+    tourists_1 = Tourists.new(
+      year: 2020,
+      volume: 100,
+    )
     airport_1 = Airport.new(
       latitude: 6.9851,
       longitude: 158.209,
@@ -24,10 +28,15 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
       income: 100,
       airports: [airport_1],
       populations: [population_1],
+      tourists: [tourists_1],
     ).save!
     population_2 = Population.new(
       year: 2020,
       population: 1000,
+    )
+    tourists_2 = Tourists.new(
+      year: 2020,
+      volume: 200,
     )
     airport_2 = Airport.new(
       latitude: 5.35698,
@@ -47,10 +56,15 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
       income: 100,
       airports: [airport_2],
       populations: [population_2],
+      tourists: [tourists_2],
     ).save!
     population_3 = Population.new(
       year: 2020,
       population: 3000,
+    )
+    tourists_3 = Tourists.new(
+      year: 2020,
+      volume: 300,
     )
     airport_3a = Airport.new(
       latitude: 5.35698,
@@ -80,6 +94,7 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
       income: 100,
       airports: [airport_3a, airport_3b],
       populations: [population_3],
+      tourists: [tourists_3],
     ).save!
   end
 
@@ -88,6 +103,20 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
 
     actual_business = Calculation::ResidentDemand.new(micronesia.airports.first, micronesia.airports.last, Date.today).business_demand
     actual_leisure = Calculation::ResidentDemand.new(micronesia.airports.first, micronesia.airports.last, Date.today).leisure_demand
+    expected = 0
+
+    assert actual_business == expected
+    assert actual_leisure == expected
+  end
+
+  test "demand is zero when the origin and destination markets are rivals" do
+    micronesia = Market.find_by!(name: "Micronesia")
+    kosrae = Market.find_by!(name: "Kosrae")
+    kosrae.update!(country_group: "Federated States of Micronesia")
+    RivalCountryGroup.create!(country_one: kosrae.country_group, country_two: micronesia.country_group)
+
+    actual_business = Calculation::ResidentDemand.new(micronesia.airports.first, kosrae.airports.last, Date.today).business_demand
+    actual_leisure = Calculation::ResidentDemand.new(micronesia.airports.first, kosrae.airports.last, Date.today).leisure_demand
     expected = 0
 
     assert actual_business == expected

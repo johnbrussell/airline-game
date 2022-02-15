@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_13_140037) do
+ActiveRecord::Schema.define(version: 2022_02_14_172143) do
 
   create_table "aircraft_families", force: :cascade do |t|
     t.string "name", null: false
@@ -101,6 +101,17 @@ ActiveRecord::Schema.define(version: 2022_02_13_140037) do
     t.string "base_country_group", null: false
     t.index ["aircraft_manufacturing_queue_id"], name: "index_airplanes_on_aircraft_manufacturing_queue_id"
     t.index ["aircraft_model_id"], name: "index_airplanes_on_aircraft_model_id"
+  end
+
+  create_table "airport_populations", force: :cascade do |t|
+    t.integer "airport_id"
+    t.integer "year", null: false
+    t.float "government", null: false
+    t.float "population", null: false
+    t.float "tourists", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["airport_id"], name: "index_airport_populations_on_airport_id"
   end
 
   create_table "airports", force: :cascade do |t|
@@ -195,6 +206,7 @@ ActiveRecord::Schema.define(version: 2022_02_13_140037) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["market_id"], name: "index_populations_on_market_id"
+    t.index ["year"], name: "index_populations_on_year"
   end
 
   create_table "rival_country_groups", force: :cascade do |t|
@@ -233,6 +245,7 @@ ActiveRecord::Schema.define(version: 2022_02_13_140037) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["market_id"], name: "index_tourists_on_market_id"
+    t.index ["year"], name: "index_tourists_on_year"
   end
 
 end
