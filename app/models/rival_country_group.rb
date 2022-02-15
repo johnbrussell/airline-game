@@ -4,6 +4,12 @@ class RivalCountryGroup < ApplicationRecord
 
   validate :countries_alphabetized
 
+  def self.all_rivals(country_group)
+    RivalCountryGroup.where(country_one: country_group).or(where(country_two: country_group)).map do |r|
+      [r.country_one, r.country_two].reject { |cg| cg == country_group }
+    end.flatten
+  end
+
   def self.rivals?(country_group_1, country_group_2)
     if country_group_1 == country_group_2
       false
