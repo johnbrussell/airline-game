@@ -27,7 +27,7 @@ RSpec.describe RouteDemand do
       expect(RouteDemand.count).to eq route_demand_count + 1
       expect(route_demand.origin_iata).to eq airport_1.iata
       expect(route_demand.destination_iata).to eq airport_2.iata
-      expect(route_demand.date).to eq date
+      expect(route_demand.year).to eq date.year
       expect(route_demand.business).to eq 4
       expect(route_demand.government).to eq 1
       expect(route_demand.leisure).to eq 10
@@ -41,7 +41,7 @@ RSpec.describe RouteDemand do
       RouteDemand.create!(
         origin_iata: airport_1.iata,
         destination_iata: airport_2.iata,
-        date: Date.today,
+        year: Date.today.year,
         business: 8,
         government: 2,
         leisure: 20,
@@ -59,7 +59,7 @@ RSpec.describe RouteDemand do
       expect(RouteDemand.count).to eq route_demand_count
       expect(route_demand.origin_iata).to eq airport_1.iata
       expect(route_demand.destination_iata).to eq airport_2.iata
-      expect(route_demand.date).to eq Date.today
+      expect(route_demand.year).to eq Date.today.year
       expect(route_demand.business).to eq 8
       expect(route_demand.government).to eq 2
       expect(route_demand.leisure).to eq 20

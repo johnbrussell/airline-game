@@ -7,15 +7,16 @@ class GlobalDemand < ApplicationRecord
   validates :leisure, presence: true
   validates :tourist, numericality: { greater_than_or_equal_to: 0 }
   validates :tourist, presence: true
+  validates :year, presence: true
 
   belongs_to :airport
 
   def self.calculate(date, origin_airport)
-    global_demand = find_by(airport_id: origin_airport.id, date: date)
+    global_demand = find_by(airport_id: origin_airport.id, year: date.year)
     if global_demand.nil?
       create!(
         airport_id: origin_airport.id,
-        date: date,
+        year: date.year,
         business: market_business_demands(origin_airport, date).sum,
         government: market_government_demands(origin_airport, date).sum,
         leisure: market_leisure_demands(origin_airport, date).sum,

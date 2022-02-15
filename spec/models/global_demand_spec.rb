@@ -35,7 +35,7 @@ RSpec.describe GlobalDemand do
 
       last = GlobalDemand.last
       assert actual.id == last.id
-      assert actual.date == date
+      assert actual.year == date.year
       assert actual.airport_id == origin_airport.id
       assert actual.business == 700
       assert actual.government == 0
@@ -46,7 +46,7 @@ RSpec.describe GlobalDemand do
     it "returns the known GlobalDemand when it has already been calculated" do
       origin_airport = Fabricate(:airport)
 
-      GlobalDemand.create!(airport_id: 3, date: date, business: 1, government: 2, leisure: 3, tourist: 4, airport: origin_airport)
+      GlobalDemand.create!(airport_id: 3, year: date.year, business: 1, government: 2, leisure: 3, tourist: 4, airport: origin_airport)
 
       expect(RivalCountryGroup).not_to receive(:all_rivals)
       expect(Calculation::TotalMarketDemand).not_to receive(:business)
@@ -59,7 +59,7 @@ RSpec.describe GlobalDemand do
       actual = GlobalDemand.calculate(date, origin_airport)
 
       assert global_demand_count == GlobalDemand.count
-      assert actual.date == date
+      assert actual.year == date.year
       assert actual.airport_id == origin_airport.id
       assert actual.business == 1
       assert actual.government == 2

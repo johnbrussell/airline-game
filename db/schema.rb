@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_14_172143) do
+ActiveRecord::Schema.define(version: 2022_02_15_181421) do
 
   create_table "aircraft_families", force: :cascade do |t|
     t.string "name", null: false
@@ -168,7 +168,6 @@ ActiveRecord::Schema.define(version: 2022_02_14_172143) do
   end
 
   create_table "global_demands", force: :cascade do |t|
-    t.date "date", null: false
     t.integer "business", limit: 8, null: false
     t.integer "leisure", limit: 8, null: false
     t.datetime "created_at", precision: 6, null: false
@@ -176,6 +175,7 @@ ActiveRecord::Schema.define(version: 2022_02_14_172143) do
     t.integer "tourist", limit: 8, null: false
     t.integer "government", limit: 8, null: false
     t.integer "airport_id"
+    t.integer "year", null: false
     t.index ["airport_id"], name: "index_global_demands_on_airport_id"
   end
 
@@ -217,7 +217,6 @@ ActiveRecord::Schema.define(version: 2022_02_14_172143) do
   end
 
   create_table "route_demands", force: :cascade do |t|
-    t.date "date", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.float "business", null: false
@@ -226,6 +225,7 @@ ActiveRecord::Schema.define(version: 2022_02_14_172143) do
     t.float "leisure", null: false
     t.string "origin_iata", null: false
     t.float "tourist", null: false
+    t.integer "year", null: false
   end
 
   create_table "slots", force: :cascade do |t|
