@@ -109,6 +109,20 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     assert actual_leisure == expected
   end
 
+  test "demand is zero when the origin and destination markets are rivals" do
+    micronesia = Market.find_by!(name: "Micronesia")
+    kosrae = Market.find_by!(name: "Kosrae")
+    kosrae.update!(country_group: "Federated States of Micronesia")
+    RivalCountryGroup.create!(country_one: kosrae.country_group, country_two: micronesia.country_group)
+
+    actual_business = Calculation::ResidentDemand.new(micronesia.airports.first, kosrae.airports.last, Date.today).business_demand
+    actual_leisure = Calculation::ResidentDemand.new(micronesia.airports.first, kosrae.airports.last, Date.today).leisure_demand
+    expected = 0
+
+    assert actual_business == expected
+    assert actual_leisure == expected
+  end
+
   test "business demand is equivalent to the island demand curve when between islands, domestic, and the demand-maximizing distance" do
     pohnpei = Market.find_by!(name: "Pohnpei")
     kosrae = Market.find_by!(name: "Kosrae")

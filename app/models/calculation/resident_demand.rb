@@ -65,7 +65,7 @@ class Calculation::ResidentDemand
     end
 
     def raw_demand(type)
-      if origin_market == destination_market
+      if origin_market == destination_market || RivalCountryGroup.rivals?(origin_market.country_group, destination_market.country_group)
         0
       else
         airport_population / 100.0 * distance_demand(type) * border_multiplier * island_multipler
