@@ -118,6 +118,18 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
     assert actual == expected
   end
 
+  test "demand is zero when the origin and destination markets are rivals" do
+    micronesia = Market.find_by!(name: "Micronesia")
+    kosrae = Market.find_by!(name: "Kosrae")
+    kosrae.update!(country_group: "Federated States of Micronesia", is_national_capital: true)
+    RivalCountryGroup.create!(country_one: kosrae.country_group, country_two: micronesia.country_group)
+
+    actual = Calculation::GovernmentDemand.new(kosrae.airports.first, micronesia.airports.last, Date.today).demand
+    expected = 0
+
+    assert actual == expected
+  end
+
   test "business demand is equivalent to the island demand curve when between islands, domestic, and the demand-maximizing distance" do
     pohnpei = Market.find_by!(name: "Pohnpei")
     kosrae = Market.find_by!(name: "Kosrae")
