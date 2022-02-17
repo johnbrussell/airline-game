@@ -3,8 +3,8 @@ require "capybara/rspec"
 
 RSpec.describe "routes/view_route", type: :feature do
   before(:each) do
-    nauru = Fabricate(:market, name: "Nauru", country: "Nauru")
-    funafuti = Fabricate(:market, name: "Funafuti", country: "Tuvalu")
+    nauru = Fabricate(:market, name: "Nauru", country: "Nauru", country_group: "Nauru")
+    funafuti = Fabricate(:market, name: "Funafuti", country: "Tuvalu", country_group: "Tuvalu")
     Fabricate(:airport, market: nauru, iata: "INU", municipality: nil)
     Fabricate(:airport, market: funafuti, iata: "FUN", municipality: nil)
     Population.create!(market_id: funafuti.id, year: 2020, population: 10000)
@@ -58,7 +58,7 @@ RSpec.describe "routes/view_route", type: :feature do
     fun = Airport.find_by(iata: "FUN")
 
     game = Fabricate(:game)
-    Fabricate(:airline, is_user_airline: true, game_id: game.id, name: "TIA", base_id: inu.market.id)
+    airline = Fabricate(:airline, is_user_airline: true, game_id: game.id, name: "TIA", base_id: inu.market.id)
 
     revenue_calculator = instance_double(
       Calculation::MaximumRevenuePotential,
@@ -76,6 +76,8 @@ RSpec.describe "routes/view_route", type: :feature do
     expect(page).to have_content "$400.00 per week in economy class revenue"
     expect(page).to have_content "$200.00 per week in premium economy class revenue"
     expect(page).to have_content "$100.00 per week in business class revenue"
+    expect(page).to have_button "Add or reduce flights on route"
+    expect(page).not_to have_content "#{airline.name} cannot fly this route due to political restrictions"
   end
 
   it "displays the number of available slots the airline has at the origin and destination" do
@@ -114,5 +116,19 @@ RSpec.describe "routes/view_route", type: :feature do
     click_link "View INU"
 
     expect(page).to have_content "Nauru (INU)"
+  end
+
+  it "has no button to add or remove service if the airline cannot fly the route" do
+    inu = Airport.find_by(iata: "INU")
+    fun = Airport.find_by(iata: "FUN")
+    RivalCountryGroup.create!(country_one: inu.market.country_group, country_two: fun.market.country_group)
+
+    game = Fabricate(:game)
+    airline = Fabricate(:airline, is_user_airline: true, game_id: game.id, name: "TIA", base_id: inu.market.id)
+
+    visit game_view_route_path(game, params: { origin_id: inu.id, destination_id: fun.id })
+
+    expect(page).not_to have_button "Add or reduce flights on route"
+    expect(page).to have_content "#{airline.name} cannot fly this route due to political restrictions"
   end
 end

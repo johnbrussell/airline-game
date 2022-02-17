@@ -14,3 +14,8 @@
     <li>$<%= number_with_precision(@revenue.max_business_class_revenue_per_week, :precision => 2) %> per week in business class revenue</li>
   </ul>
 </p>
+<% if @game.user_airline.can_fly_between?(@origin.market, @destination.market) %>
+  <%= button_to "Add or reduce flights on route", game_add_flights_path(@game), method: :get %>
+<% else %>
+  <p><%= @game.user_airline.name %> cannot fly this route due to political restrictions </p>
+<% end %>
