@@ -1,5 +1,9 @@
 class RoutesController < ApplicationController
   def add_flights
+    @game = Game.find(params[:game_id])
+    airports = [Airport.find(params[:origin_id]), Airport.find(params[:destination_id])]
+    @origin = airports.min_by { |a| a.iata }
+    @destination = airports.max_by { |a| a.iata }
   end
 
   def select_route
