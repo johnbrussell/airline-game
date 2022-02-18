@@ -197,6 +197,10 @@ class Airplane < ApplicationRecord
     MIN_TURN_TIME_MINS + num_seats.to_f / (aircraft_model.num_aisles ** 0.5) * TURN_TIME_MINS_PER_SEAT
   end
 
+  def utilization
+    total_block_time / 60.0 / 7.0
+  end
+
   private
 
     def age_in_days
