@@ -22,6 +22,10 @@ class Airplane < ApplicationRecord
   belongs_to :aircraft_manufacturing_queue
   belongs_to :aircraft_model
 
+  alias :model :aircraft_model
+
+  delegate :family, to: :aircraft_model
+
   has_many :airplane_routes
   has_many :routes, class_name: "AirlineRoute", through: :airplane_routes
 
@@ -240,10 +244,6 @@ class Airplane < ApplicationRecord
 
     def maintenance_rate
       [MIN_MAINTENANCE_RATE, MIN_MAINTENANCE_RATE + (1 - MIN_MAINTENANCE_RATE) * ((NUM_IN_FAMILY_FOR_MIN_MAINTENANCE_RATE - 1) - (num_in_family - 1)) / (NUM_IN_FAMILY_FOR_MIN_MAINTENANCE_RATE - 1)].max
-    end
-
-    def model
-      @model ||= AircraftModel.find_by(id: aircraft_model_id)
     end
 
     def num_in_family
