@@ -48,7 +48,7 @@ RSpec.describe AirlineRoute do
       super_model = Fabricate(:aircraft_model, takeoff_distance: 100, max_range: 13000)
       incapable_model = Fabricate(:aircraft_model, takeoff_distance: 100000, max_range: 1)
       airplane = Fabricate(:airplane, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, aircraft_model: super_model)
-      other_airline_airplane = Fabricate(:airplane, aircraft_family: family, operator_id: other_airline.id, base_country_group: airline.base.country_group, aircraft_model: super_model)
+      other_airline_airplane = Fabricate(:airplane, aircraft_family: family, operator_id: other_airline.id, base_country_group: other_airline.base.country_group, aircraft_model: super_model)
       too_much_time_airplane = Fabricate(:airplane, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, aircraft_model: super_model)
       too_much_time_but_operates_route_airplane = Fabricate(:airplane, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, aircraft_model: super_model)
       disconnected_network_airplane = Fabricate(:airplane, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, aircraft_model: super_model)
