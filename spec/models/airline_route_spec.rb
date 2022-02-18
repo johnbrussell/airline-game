@@ -130,7 +130,7 @@ RSpec.describe AirlineRoute do
     end
   end
 
-  context "find_or_create_by" do
+  context "find_or_create_by_airline_and_route" do
     it "returns the record if it already exists" do
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
@@ -139,7 +139,7 @@ RSpec.describe AirlineRoute do
 
       original_record_count = AirlineRoute.count
 
-      expect(AirlineRoute.find_or_create_by(airline: Airline.last, origin_airport: fun, destination_airport: inu)).to eq airline_route
+      expect(AirlineRoute.find_or_create_by_airline_and_route(airline, fun, inu)).to eq airline_route
       expect(AirlineRoute.count).to eq original_record_count
     end
 
@@ -149,7 +149,7 @@ RSpec.describe AirlineRoute do
       airline = Fabricate(:airline, base_id: inu.market.id, name: "A")
       original_record_count = AirlineRoute.count
 
-      actual = AirlineRoute.find_or_create_by(airline: airline, origin_airport: fun, destination_airport: inu)
+      actual = AirlineRoute.find_or_create_by_airline_and_route(airline, fun, inu)
 
       expect(actual.present?).to be true
       expect(AirlineRoute.count).to eq original_record_count + 1
