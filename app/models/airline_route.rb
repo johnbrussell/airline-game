@@ -45,6 +45,20 @@ class AirlineRoute < ApplicationRecord
     airplane_routes.select { |ar| ar.airplane == airplane }.sum(&:frequencies)
   end
 
+  def self.find_or_create_by(**kwargs)
+    record = super
+    if record.new_record?
+      record.assign_attributes(
+        economy_price: record.distance,
+        premium_economy_price: record.distance * 2,
+        business_price: record.distance * 3,
+        distance: record.distance,
+      )
+      record.save!
+    end
+    record
+  end
+
   def total_frequencies
     airplane_routes.sum(&:frequencies)
   end
