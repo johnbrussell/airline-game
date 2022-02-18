@@ -54,6 +54,6 @@ class GlobalDemand < ApplicationRecord
     end
 
     def self.valid_destination_markets(origin_airport)
-      Market.where("country_group NOT IN (?)", RivalCountryGroup.all_rivals(origin_airport.market.country_group).join(","))
+      Market.where("country_group NOT IN (?)", (RivalCountryGroup.all_rivals(origin_airport.market.country_group) + ["default value because empty lists cause where not in commands to always return []"]).join(","))
     end
 end
