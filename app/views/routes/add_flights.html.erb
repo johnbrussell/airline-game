@@ -1,3 +1,4 @@
 <h1>Airline Game</h1>
 <p><a href=<%= game_view_route_path(@game, origin_id: @route.origin_airport.id, destination_id: @route.destination_airport.id) %>> Return to route overview </a></p>
 <h2>Adjust service on <%= @route.origin_airport_iata %> - <%= @route.destination_airport_iata %></h2>
+<p><%= @game.user_airline.name %> has <%= @airplanes.count %> <%= "airplane".pluralize(@airplanes.count) %> able to serve <%= @route.origin_airport_iata %> - <%= @route.destination_airport_iata %> </p>
