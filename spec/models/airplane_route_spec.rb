@@ -409,6 +409,9 @@ RSpec.describe AirplaneRoute do
       expect(subject.new_record?).to be false
       expect(subject.block_time_mins).to eq block_time
       expect(subject.frequencies).to eq 1
+
+      subject.set_frequency(0)
+      expect(AirplaneRoute.count).to eq airplane_route_count
     end
 
     it "is false when the airplane cannot add the requested service" do
