@@ -82,6 +82,7 @@ RSpec.describe "routes/view_route", type: :feature do
     click_button "Add or reduce flights on route"
 
     expect(page).to have_link "Return to route overview"
+    expect(page).to have_content "Adjust service on FUN - INU"
 
     click_link "Return to route overview"
 

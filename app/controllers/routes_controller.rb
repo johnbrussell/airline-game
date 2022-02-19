@@ -1,10 +1,22 @@
 class RoutesController < ApplicationController
+  def add_airplane_flights
+    @route = AirlineRoute.find(params[:route_id])
+    @airplane_route = AirplaneRoute.find_or_initialize_by(airplane_id: params[:airplane_id], route: @route)
+
+    @airplane_route.set_frequency(params[:frequencies].to_i)
+
+    @game = Game.find(params[:game_id])
+    @airplanes = @route.airplanes_available_to_add_service
+    render :add_flights
+  end
+
   def add_flights
     @game = Game.find(params[:game_id])
     airports = [Airport.find(params[:origin_id]), Airport.find(params[:destination_id])]
     origin = airports.min_by { |a| a.iata }
     destination = airports.max_by { |a| a.iata }
-    @route = AirlineRoute.find_or_create_by(airline: @game.user_airline, origin_airport: origin, destination_airport: destination)
+    @route = AirlineRoute.find_or_create_by_airline_and_route(@game.user_airline, origin, destination)
+    @airplanes = @route.airplanes_available_to_add_service
   end
 
   def select_route

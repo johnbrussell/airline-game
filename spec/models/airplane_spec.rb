@@ -2120,6 +2120,44 @@ RSpec.describe Airplane do
     end
   end
 
+  context "utilization" do
+    it "is calculated correctly" do
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 100, max_range: 100000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      gates_inu = Gates.create!(airport: inu, game: subject.game, current_gates: 100)
+      Slot.create!(gates: gates_inu, lessee_id: Airline.last.id)
+      gates_fun = Gates.create!(airport: fun, game: subject.game, current_gates: 100)
+      Slot.create!(gates: gates_fun, lessee_id: Airline.last.id)
+      CabotageException.create!(country: inu.market.country)
+      route = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: fun,
+        destination_airport: inu,
+        distance: 1,
+        airline: Airline.last,
+      )
+      AirplaneRoute.new(
+        block_time_mins: Airplane::MAX_TOTAL_BLOCK_TIME_MINS,
+        frequencies: 1,
+        flight_cost: 1,
+        airplane: subject,
+        route: route,
+      ).save(validate: false)
+      airplane_route = AirplaneRoute.last
+
+      subject.reload
+      expect(subject.update(lease_rate: 100)).to be true
+      subject.reload
+
+      assert_in_epsilon subject.utilization, subject.round_trip_block_time(Calculation::Distance.between_airports(inu, fun)) / 420.0, 0.000001
+    end
+  end
+
   context "built?" do
     purchase_price_new = 100000000
 

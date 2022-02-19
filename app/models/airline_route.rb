@@ -28,15 +28,35 @@ class AirlineRoute < ApplicationRecord
   end
 
   def airplanes_available_to_add_service
-    Airplane
-      .where(operator_id: airline.id)
-      .neatly_sorted
-      .select { |a| a.can_fly_between?(origin_airport, destination_airport) }
-      .select { |a| a.has_time_to_fly?(distance) }
+    airplanes +
+      Airplane
+        .where(operator_id: airline.id)
+        .where("airplanes.id NOT IN (?)", airplanes.map(&:id) + ["default value because empty lists cause where not in commands to always return []"])
+        .neatly_sorted
+        .select { |a| a.can_fly_between?(origin_airport, destination_airport) }
+        .select { |a| a.has_time_to_fly?(distance) }
   end
 
   def distance
     @distance ||= Calculation::Distance.between_airports(origin_airport, destination_airport)
+  end
+
+  def frequencies_on_airplane(airplane)
+    airplane_routes.select { |ar| ar.airplane == airplane }.sum(&:frequencies)
+  end
+
+  def self.find_or_create_by_airline_and_route(airline, origin_airport, destination_airport)
+    record = find_or_create_by(airline: airline, origin_airport: origin_airport, destination_airport: destination_airport)
+    if record.new_record?
+      record.assign_attributes(
+        economy_price: record.distance,
+        premium_economy_price: record.distance * 2,
+        business_price: record.distance * 3,
+        distance: record.distance,
+      )
+      record.save!
+    end
+    record
   end
 
   def total_frequencies
