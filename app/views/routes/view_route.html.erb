@@ -27,8 +27,7 @@
   <% end %>
 
   <% @route.airplanes.each do |airplane| %>
-    <%= form_with url: game_add_flights_path, method: :patch do |form| %>
-      <%= form.hidden_field :route_id, value: @route.id %>
+    <%= form_with url: game_airline_route_add_flights_path(@game, @route), method: :patch do |form| %>
       <%= form.hidden_field :airplane_id, value: airplane.id %>
       <%= form.label :frequencies, "#{airplane.family.manufacturer} #{airplane.model.name} currently utilized #{number_with_precision(airplane.utilization, :precision => 1)} hours per day.
                                     Seating #{airplane.economy_seats} economy, #{airplane.premium_economy_seats} premium economy, #{airplane.business_seats} business.
@@ -45,8 +44,7 @@
   <h3><%= "Add service on #{@route.name}" %></h3>
   <p><%= @game.user_airline.name %> has <%= @route.airplanes_available_to_add_service.count %> <%= "airplane".pluralize(@route.airplanes_available_to_add_service.count) %> able to add flights on <%= @route.name %> </p>
   <% @route.airplanes_available_to_add_service.each do |airplane| %>
-    <%= form_with url: game_add_flights_path, method: :patch do |form| %>
-      <%= form.hidden_field :route_id, value: @route.id %>
+    <%= form_with url: game_airline_route_add_flights_path(@game, @route), method: :patch do |form| %>
       <%= form.hidden_field :airplane_id, value: airplane.id %>
       <%= form.label :frequencies, "#{airplane.family.manufacturer} #{airplane.model.name} currently utilized #{number_with_precision(airplane.utilization, :precision => 1)} hours per day.
                                     Seating #{airplane.economy_seats} economy, #{airplane.premium_economy_seats} premium economy, #{airplane.business_seats} business" %>
