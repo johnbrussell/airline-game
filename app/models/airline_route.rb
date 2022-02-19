@@ -58,6 +58,10 @@ class AirlineRoute < ApplicationRecord
     record
   end
 
+  def name
+    "#{origin_airport_iata} - #{destination_airport_iata}"
+  end
+
   def total_frequencies
     airplane_routes.sum(&:frequencies)
   end

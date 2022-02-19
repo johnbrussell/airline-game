@@ -175,6 +175,16 @@ RSpec.describe AirlineRoute do
     end
   end
 
+  context "name" do
+    it "is the IATA codes separated by a dash" do
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+
+      subject = AirlineRoute.new(origin_airport: fun, destination_airport: inu)
+      expect(subject.name).to eq "FUN - INU"
+    end
+  end
+
   context "total_frequencies" do
     it "calculates correctly" do
       inu = Fabricate(:airport, iata: "INU")
