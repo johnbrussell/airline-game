@@ -16,9 +16,9 @@ RSpec.describe "routes/view_route", type: :feature do
   it "has a link back to the game homepage" do
     game = Fabricate(:game)
     Fabricate(:airline, is_user_airline: true, game_id: game.id, base_id: Market.last.id)
-    visit game_view_route_path(game, params: { origin_id: Airport.find_by(iata: "FUN"), destination_id: Airport.find_by(iata: "FUN")})
+    visit game_view_route_path(game, params: { origin_id: Airport.find_by(iata: "FUN"), destination_id: Airport.find_by(iata: "INU")})
 
-    expect(page).to have_content "FUN - FUN"
+    expect(page).to have_content "FUN - INU"
 
     click_link "Return to game overview"
 
@@ -28,7 +28,7 @@ RSpec.describe "routes/view_route", type: :feature do
   it "has a link to view a different route" do
     game = Fabricate(:game)
     Fabricate(:airline, is_user_airline: true, game_id: game.id, name: "TIA", base_id: Market.last.id)
-    visit game_view_route_path(game, params: { origin_id: Airport.find_by(iata: "FUN"), destination_id: Airport.find_by(iata: "FUN")})
+    visit game_view_route_path(game, params: { origin_id: Airport.find_by(iata: "FUN"), destination_id: Airport.find_by(iata: "INU")})
 
     expect(page).to have_content "View a different route"
 

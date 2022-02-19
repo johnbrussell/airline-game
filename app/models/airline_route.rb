@@ -54,7 +54,7 @@ class AirlineRoute < ApplicationRecord
         business_price: record.distance * 3,
         distance: record.distance,
       )
-      record.save!
+      record.save
     end
     record
   end
