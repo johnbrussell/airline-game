@@ -414,7 +414,7 @@ RSpec.describe AirplaneRoute do
     it "is false when the airplane cannot add the requested service" do
       market = Fabricate(:market, name: "Pacific")
       airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
-      airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9996, elevation: 0, market: market)
+      airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: market)
       CabotageException.create!(country: market.country)
       family = Fabricate(:aircraft_family)
       distance = Calculation::Distance.between_airports(airport_1, airport_2)
@@ -431,7 +431,7 @@ RSpec.describe AirplaneRoute do
       airplane_route_count = AirplaneRoute.count
 
       expect(subject.new_record?).to be true
-      expect(subject.set_frequency(1)).to be false
+      expect(subject.set_frequency(10000)).to be false
       expect(AirplaneRoute.count).to eq airplane_route_count
     end
   end
