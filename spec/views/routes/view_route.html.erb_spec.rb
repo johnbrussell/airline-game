@@ -204,6 +204,7 @@ RSpec.describe "routes/view_route", type: :feature do
 
     click_on "Set frequencies"
 
+    expect(page).to have_content "#{airline.name} flights on FUN - INU"
     expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized #{block_time} hours per day. Seating 0 economy, 0 premium economy, 0 business. Currently flies #{frequencies} weekly flight"
     expect(AirplaneRoute.count).to eq airplane_route_count + 1
 
