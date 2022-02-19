@@ -28,13 +28,12 @@ class AirlineRoute < ApplicationRecord
   end
 
   def airplanes_available_to_add_service
-    airplanes +
-      Airplane
-        .where(operator_id: airline.id)
-        .where("airplanes.id NOT IN (?)", airplanes.map(&:id) + ["default value because empty lists cause where not in commands to always return []"])
-        .neatly_sorted
-        .select { |a| a.can_fly_between?(origin_airport, destination_airport) }
-        .select { |a| a.has_time_to_fly?(distance) }
+    Airplane
+      .where(operator_id: airline.id)
+      .where("airplanes.id NOT IN (?)", airplanes.map(&:id) + ["default value because empty lists cause where not in commands to always return []"])
+      .neatly_sorted
+      .select { |a| a.can_fly_between?(origin_airport, destination_airport) }
+      .select { |a| a.has_time_to_fly?(distance) }
   end
 
   def distance
