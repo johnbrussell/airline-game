@@ -4,7 +4,7 @@ class RoutesController < ApplicationController
     airports = [Airport.find(params[:origin_id]), Airport.find(params[:destination_id])]
     origin = airports.min_by { |a| a.iata }
     destination = airports.max_by { |a| a.iata }
-    @route = AirlineRoute.find_or_create_by(airline: @game.user_airline, origin_airport: origin, destination_airport: destination)
+    @route = AirlineRoute.find_or_create_by_airline_and_route(@game.user_airline, origin, destination)
     @airplanes = @route.airplanes_available_to_add_service
   end
 
