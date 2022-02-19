@@ -76,18 +76,7 @@ RSpec.describe "routes/view_route", type: :feature do
     expect(page).to have_content "$400.00 per week in economy class revenue"
     expect(page).to have_content "$200.00 per week in premium economy class revenue"
     expect(page).to have_content "$100.00 per week in business class revenue"
-    expect(page).to have_button "Add or reduce flights on route"
     expect(page).not_to have_content "#{airline.name} cannot fly this route due to political restrictions"
-
-    click_button "Add or reduce flights on route"
-
-    expect(page).to have_link "Return to route overview"
-    expect(page).to have_content "Adjust service on FUN - INU"
-
-    click_link "Return to route overview"
-
-    expect(page).to have_content "FUN - INU"
-    expect(page).to have_content "1000 miles"
   end
 
   it "displays the number of available slots the airline has at the origin and destination" do

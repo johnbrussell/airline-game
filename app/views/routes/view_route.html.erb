@@ -35,7 +35,6 @@
       <%= form.submit "Set frequencies" %>
     <% end %>
   <% end %>
-  <%= button_to "Add or reduce flights on route", game_add_flights_path(@game), method: :get, params: { origin_id: @route.origin_airport.id, destination_id: @route.destination_airport.id } %>
 <% else %>
   <p><%= @game.user_airline.name %> cannot fly this route due to political restrictions </p>
 <% end %>
