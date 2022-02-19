@@ -173,7 +173,7 @@ RSpec.describe "routes/view_route", type: :feature do
     expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized 0.0 hours per day. Seating 0 economy, 0 premium economy, 0 business. Currently flies 0 weekly flights"
   end
 
-  it "allows users to add flights" do
+  it "allows users to add and remove flights" do
     game = Fabricate(:game)
     nauru = Market.find_by(name: "Nauru")
     inu = Airport.find_by(iata: "INU")
@@ -206,6 +206,13 @@ RSpec.describe "routes/view_route", type: :feature do
 
     expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized #{block_time} hours per day. Seating 0 economy, 0 premium economy, 0 business. Currently flies #{frequencies} weekly flight"
     expect(AirplaneRoute.count).to eq airplane_route_count + 1
+
+    fill_in :frequencies, with: 0
+
+    click_on "Set frequencies"
+
+    expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized 0.0 hours per day. Seating 0 economy, 0 premium economy, 0 business. Currently flies 0 weekly flight"
+    expect(AirplaneRoute.count).to eq airplane_route_count
   end
 
   it "shows an error when the flights cannot be added" do

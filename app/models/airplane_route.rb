@@ -21,12 +21,16 @@ class AirplaneRoute < ApplicationRecord
   belongs_to :route, class_name: "AirlineRoute", foreign_key: :airline_route_id
 
   def set_frequency(frequency)
-    assign_attributes(
-      block_time_mins: (airplane.round_trip_block_time(route.distance) * frequency).round,
-      flight_cost: 1,
-      frequencies: frequency,
-    )
-    save
+    if frequency > 0
+      assign_attributes(
+        block_time_mins: (airplane.round_trip_block_time(route.distance) * frequency).round,
+        flight_cost: 1,
+        frequencies: frequency,
+      )
+      save
+    else
+      destroy!
+    end
   end
 
   private
