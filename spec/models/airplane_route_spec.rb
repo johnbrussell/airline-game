@@ -380,6 +380,62 @@ RSpec.describe AirplaneRoute do
     end
   end
 
+  context "set_frequency" do
+    it "is true when the airplane can add the requested service" do
+      market = Fabricate(:market, name: "Pacific")
+      airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
+      airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: market)
+      CabotageException.create!(country: market.country)
+      family = Fabricate(:aircraft_family)
+      distance = Calculation::Distance.between_airports(airport_1, airport_2)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
+      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411, airline: Airline.last)
+      block_time = airplane.round_trip_block_time(airline_route.distance).round
+      gates_1 = Gates.create!(airport: airport_1, game: airplane.game, current_gates: 100)
+      Slot.create!(gates: gates_1, lessee_id: Airline.last.id)
+      gates_2 = Gates.create!(airport: airport_2, game: airplane.game, current_gates: 100)
+      Slot.create!(gates: gates_2, lessee_id: Airline.last.id)
+      subject = AirplaneRoute.new(route: airline_route, airplane: airplane)
+
+      airplane_route_count = AirplaneRoute.count
+
+      expect(subject.new_record?).to be true
+      expect(subject.set_frequency(1)).to be true
+      expect(AirplaneRoute.count).to eq airplane_route_count + 1
+
+      subject.reload
+
+      expect(subject.new_record?).to be false
+      expect(subject.block_time_mins).to eq block_time
+      expect(subject.frequencies).to eq 1
+    end
+
+    it "is false when the airplane cannot add the requested service" do
+      market = Fabricate(:market, name: "Pacific")
+      airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
+      airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9996, elevation: 0, market: market)
+      CabotageException.create!(country: market.country)
+      family = Fabricate(:aircraft_family)
+      distance = Calculation::Distance.between_airports(airport_1, airport_2)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
+      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411, airline: Airline.last)
+      block_time = airplane.round_trip_block_time(airline_route.distance).round
+      gates_1 = Gates.create!(airport: airport_1, game: airplane.game, current_gates: 100)
+      Slot.create!(gates: gates_1, lessee_id: Airline.last.id)
+      gates_2 = Gates.create!(airport: airport_2, game: airplane.game, current_gates: 100)
+      Slot.create!(gates: gates_2, lessee_id: Airline.last.id)
+      subject = AirplaneRoute.new(route: airline_route, airplane: airplane)
+
+      airplane_route_count = AirplaneRoute.count
+
+      expect(subject.new_record?).to be true
+      expect(subject.set_frequency(1)).to be false
+      expect(AirplaneRoute.count).to eq airplane_route_count
+    end
+  end
+
   context "slots_sufficient" do
     it "is true when there are enough slots at the origin and destination to open the route" do
       market = Fabricate(:market, name: "Pacific")
