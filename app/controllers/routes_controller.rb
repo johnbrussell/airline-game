@@ -7,7 +7,8 @@ class RoutesController < ApplicationController
 
     @game = Game.find(params[:game_id])
     @airplanes = @route.airplanes + @route.airplanes_available_to_add_service
-    render :add_flights
+    @revenue = Calculation::MaximumRevenuePotential.new(@route.origin_airport, @route.destination_airport, @game.current_date)
+    render :view_route
   end
 
   def add_flights
