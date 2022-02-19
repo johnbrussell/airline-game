@@ -127,7 +127,9 @@ RSpec.describe "routes/view_route", type: :feature do
 
     visit game_view_route_path(game, params: { origin_id: inu.id, destination_id: fun.id })
 
-    expect(page).not_to have_button "Add or reduce flights on route"
+    expect(page).not_to have_content "#{airline.name} flights on FUN - INU"
+    expect(page).not_to have_content "Add service on FUN - INU"
+    expect(page).not_to have_button "Set frequencies"
     expect(page).to have_content "#{airline.name} cannot fly this route due to political restrictions"
   end
 
@@ -140,7 +142,7 @@ RSpec.describe "routes/view_route", type: :feature do
 
     visit game_view_route_path(game, params: { origin_id: inu.id, destination_id: fun.id })
 
-    expect(page).to have_content "#{airline.name} has 0 airplanes able to serve FUN - INU"
+    expect(page).to have_content "#{airline.name} has 0 airplanes currently operating flights on FUN - INU"
   end
 
   it "correctly singularizes the number of airplanes when necessary" do
@@ -155,7 +157,7 @@ RSpec.describe "routes/view_route", type: :feature do
 
     visit game_view_route_path(game, params: { origin_id: inu.id, destination_id: fun.id })
 
-    expect(page).to have_content "#{airline.name} has 1 airplane able to serve FUN - INU"
+    expect(page).to have_content "#{airline.name} has 1 airplane able to add flights on FUN - INU"
   end
 
   it "shows information about each airplane" do
@@ -170,7 +172,7 @@ RSpec.describe "routes/view_route", type: :feature do
 
     visit game_view_route_path(game, params: { origin_id: inu.id, destination_id: fun.id })
 
-    expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized 0.0 hours per day. Seating 0 economy, 0 premium economy, 0 business. Currently flies 0 weekly flights"
+    expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized 0.0 hours per day. Seating 0 economy, 0 premium economy, 0 business"
   end
 
   it "allows users to add and remove flights" do
@@ -197,7 +199,7 @@ RSpec.describe "routes/view_route", type: :feature do
 
     visit game_view_route_path(game, params: { origin_id: inu.id, destination_id: fun.id })
 
-    expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized 0.0 hours per day. Seating 0 economy, 0 premium economy, 0 business. Currently flies 0 weekly flights"
+    expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized 0.0 hours per day. Seating 0 economy, 0 premium economy, 0 business"
     expect(page).to have_button "Set frequencies"
 
     fill_in :frequencies, with: frequencies
@@ -205,6 +207,8 @@ RSpec.describe "routes/view_route", type: :feature do
     click_on "Set frequencies"
 
     expect(page).to have_content "#{airline.name} flights on FUN - INU"
+    expect(page).to have_content "#{airline.name} has 1 airplane currently operating flights on FUN - INU"
+    expect(page).to have_content "#{airline.name} has 0 airplanes able to add flights on FUN - INU"
     expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized #{block_time} hours per day. Seating 0 economy, 0 premium economy, 0 business. Currently flies #{frequencies} weekly flight"
     expect(AirplaneRoute.count).to eq airplane_route_count + 1
 
@@ -212,7 +216,10 @@ RSpec.describe "routes/view_route", type: :feature do
 
     click_on "Set frequencies"
 
-    expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized 0.0 hours per day. Seating 0 economy, 0 premium economy, 0 business. Currently flies 0 weekly flight"
+    expect(page).to have_content "Add service on FUN - INU"
+    expect(page).to have_content "#{airline.name} has 0 airplanes currently operating flights on FUN - INU"
+    expect(page).to have_content "#{airline.name} has 1 airplane able to add flights on FUN - INU"
+    expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized 0.0 hours per day. Seating 0 economy, 0 premium economy, 0 business"
     expect(AirplaneRoute.count).to eq airplane_route_count
   end
 
@@ -229,7 +236,7 @@ RSpec.describe "routes/view_route", type: :feature do
 
     visit game_view_route_path(game, params: { origin_id: inu.id, destination_id: fun.id })
 
-    expected_content = "#{family.manufacturer} #{model.name} currently utilized 0.0 hours per day. Seating 0 economy, 0 premium economy, 0 business. Currently flies 0 weekly flights"
+    expected_content = "#{family.manufacturer} #{model.name} currently utilized 0.0 hours per day. Seating 0 economy, 0 premium economy, 0 business"
     expect(page).to have_content expected_content
     expect(page).to have_button "Set frequencies"
 
