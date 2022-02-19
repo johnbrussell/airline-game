@@ -16,9 +16,9 @@ RSpec.describe "routes/view_route", type: :feature do
   it "has a link back to the game homepage" do
     game = Fabricate(:game)
     Fabricate(:airline, is_user_airline: true, game_id: game.id, base_id: Market.last.id)
-    visit game_view_route_path(game, params: { origin_id: Airport.find_by(iata: "FUN"), destination_id: Airport.find_by(iata: "FUN")})
+    visit game_view_route_path(game, params: { origin_id: Airport.find_by(iata: "FUN"), destination_id: Airport.find_by(iata: "INU")})
 
-    expect(page).to have_content "FUN - FUN"
+    expect(page).to have_content "FUN - INU"
 
     click_link "Return to game overview"
 
@@ -28,7 +28,7 @@ RSpec.describe "routes/view_route", type: :feature do
   it "has a link to view a different route" do
     game = Fabricate(:game)
     Fabricate(:airline, is_user_airline: true, game_id: game.id, name: "TIA", base_id: Market.last.id)
-    visit game_view_route_path(game, params: { origin_id: Airport.find_by(iata: "FUN"), destination_id: Airport.find_by(iata: "FUN")})
+    visit game_view_route_path(game, params: { origin_id: Airport.find_by(iata: "FUN"), destination_id: Airport.find_by(iata: "INU")})
 
     expect(page).to have_content "View a different route"
 
@@ -76,18 +76,7 @@ RSpec.describe "routes/view_route", type: :feature do
     expect(page).to have_content "$400.00 per week in economy class revenue"
     expect(page).to have_content "$200.00 per week in premium economy class revenue"
     expect(page).to have_content "$100.00 per week in business class revenue"
-    expect(page).to have_button "Add or reduce flights on route"
     expect(page).not_to have_content "#{airline.name} cannot fly this route due to political restrictions"
-
-    click_button "Add or reduce flights on route"
-
-    expect(page).to have_link "Return to route overview"
-    expect(page).to have_content "Adjust service on FUN - INU"
-
-    click_link "Return to route overview"
-
-    expect(page).to have_content "FUN - INU"
-    expect(page).to have_content "1000 miles"
   end
 
   it "displays the number of available slots the airline has at the origin and destination" do
@@ -140,5 +129,108 @@ RSpec.describe "routes/view_route", type: :feature do
 
     expect(page).not_to have_button "Add or reduce flights on route"
     expect(page).to have_content "#{airline.name} cannot fly this route due to political restrictions"
+  end
+
+  it "shows information about airplanes able to fly the route" do
+    game = Fabricate(:game)
+    nauru = Market.find_by(name: "Nauru")
+    inu = Airport.find_by(iata: "INU")
+    fun = Airport.find_by(iata: "FUN")
+    airline = Fabricate(:airline, base_id: nauru.id, game_id: game.id, is_user_airline: true)
+
+    visit game_view_route_path(game, params: { origin_id: inu.id, destination_id: fun.id })
+
+    expect(page).to have_content "#{airline.name} has 0 airplanes able to serve FUN - INU"
+  end
+
+  it "correctly singularizes the number of airplanes when necessary" do
+    game = Fabricate(:game)
+    nauru = Market.find_by(name: "Nauru")
+    inu = Airport.find_by(iata: "INU")
+    fun = Airport.find_by(iata: "FUN")
+    airline = Fabricate(:airline, base_id: nauru.id, game_id: game.id, is_user_airline: true)
+    family = Fabricate(:aircraft_family)
+    model = Fabricate(:aircraft_model, max_range: 13000, takeoff_distance: 100, family: family)
+    aircraft = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group)
+
+    visit game_view_route_path(game, params: { origin_id: inu.id, destination_id: fun.id })
+
+    expect(page).to have_content "#{airline.name} has 1 airplane able to serve FUN - INU"
+  end
+
+  it "shows information about each airplane" do
+    game = Fabricate(:game)
+    nauru = Market.find_by(name: "Nauru")
+    inu = Airport.find_by(iata: "INU")
+    fun = Airport.find_by(iata: "FUN")
+    airline = Fabricate(:airline, base_id: nauru.id, game_id: game.id, is_user_airline: true)
+    family = Fabricate(:aircraft_family)
+    model = Fabricate(:aircraft_model, max_range: 13000, takeoff_distance: 100, family: family)
+    aircraft_1 = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group)
+
+    visit game_view_route_path(game, params: { origin_id: inu.id, destination_id: fun.id })
+
+    expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized 0.0 hours per day. Seating 0 economy, 0 premium economy, 0 business. Currently flies 0 weekly flights"
+  end
+
+  it "allows users to add flights" do
+    game = Fabricate(:game)
+    nauru = Market.find_by(name: "Nauru")
+    inu = Airport.find_by(iata: "INU")
+    fun = Airport.find_by(iata: "FUN")
+    airline = Fabricate(:airline, base_id: nauru.id, game_id: game.id, is_user_airline: true)
+    family = Fabricate(:aircraft_family)
+    model = Fabricate(:aircraft_model, max_range: 13000, takeoff_distance: 100, family: family)
+    aircraft_1 = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group)
+    gates_inu = Gates.create!(airport: inu, game: game, current_gates: 100)
+    Slot.create!(gates: gates_inu, lessee_id: airline.id)
+    Slot.create!(gates: gates_inu, lessee_id: airline.id)
+    Slot.create!(gates: gates_inu, lessee_id: airline.id)
+    gates_fun = Gates.create!(airport: fun, game: game, current_gates: 100)
+    Slot.create!(gates: gates_fun, lessee_id: airline.id)
+    Slot.create!(gates: gates_fun, lessee_id: airline.id)
+    Slot.create!(gates: gates_fun, lessee_id: airline.id)
+
+    frequencies = [1, 2, 3].sample
+    block_time = (aircraft_1.round_trip_block_time(Calculation::Distance.between_airports(inu, fun)) * frequencies / 60.0 / 7).round(1)
+    airplane_route_count = AirplaneRoute.count
+
+    visit game_view_route_path(game, params: { origin_id: inu.id, destination_id: fun.id })
+
+    expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized 0.0 hours per day. Seating 0 economy, 0 premium economy, 0 business. Currently flies 0 weekly flights"
+    expect(page).to have_button "Set frequencies"
+
+    fill_in :frequencies, with: frequencies
+
+    click_on "Set frequencies"
+
+    expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized #{block_time} hours per day. Seating 0 economy, 0 premium economy, 0 business. Currently flies #{frequencies} weekly flight"
+    expect(AirplaneRoute.count).to eq airplane_route_count + 1
+  end
+
+  it "shows an error when the flights cannot be added" do
+    game = Fabricate(:game)
+    nauru = Market.find_by(name: "Nauru")
+    inu = Airport.find_by(iata: "INU")
+    fun = Airport.find_by(iata: "FUN")
+    airline = Fabricate(:airline, base_id: nauru.id, game_id: game.id, is_user_airline: true)
+    family = Fabricate(:aircraft_family)
+    model = Fabricate(:aircraft_model, max_range: 13000, takeoff_distance: 100, family: family)
+    aircraft_1 = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group)
+    airplane_route_count = AirplaneRoute.count
+
+    visit game_view_route_path(game, params: { origin_id: inu.id, destination_id: fun.id })
+
+    expected_content = "#{family.manufacturer} #{model.name} currently utilized 0.0 hours per day. Seating 0 economy, 0 premium economy, 0 business. Currently flies 0 weekly flights"
+    expect(page).to have_content expected_content
+    expect(page).to have_button "Set frequencies"
+
+    fill_in :frequencies, with: 1
+
+    click_on "Set frequencies"
+
+    expect(page).to have_content expected_content
+    expect(page).to have_content "Slots not leased in sufficient quantity"
+    expect(AirplaneRoute.count).to eq airplane_route_count
   end
 end

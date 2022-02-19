@@ -50,7 +50,6 @@ RSpec.describe AirlineRoute do
       airplane = Fabricate(:airplane, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, aircraft_model: super_model)
       other_airline_airplane = Fabricate(:airplane, aircraft_family: family, operator_id: other_airline.id, base_country_group: other_airline.base.country_group, aircraft_model: super_model)
       too_much_time_airplane = Fabricate(:airplane, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, aircraft_model: super_model)
-      too_much_time_but_operates_route_airplane = Fabricate(:airplane, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, aircraft_model: super_model)
       disconnected_network_airplane = Fabricate(:airplane, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, aircraft_model: super_model)
       incapable_of_airport_airplane = Fabricate(:airplane, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, aircraft_model: incapable_model)
 
@@ -58,12 +57,11 @@ RSpec.describe AirlineRoute do
       other_airline_airline_route = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: other_airline)
       too_much_time_airline_route = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: trw.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline)
       too_much_time_route = AirplaneRoute.new(route: too_much_time_airline_route, airplane: too_much_time_airplane, frequencies: 10000, block_time_mins: 1441 * 7, flight_cost: 1).save(validate: false)
-      too_much_time_but_operates_route_route = AirplaneRoute.new(route: subject, airplane: too_much_time_but_operates_route_airplane, frequencies: 10000, block_time_mins: 1441 * 7, flight_cost: 1).save(validate: false)
       disconnected_airline_route = AirlineRoute.create!(origin_airport_id: maj.id, destination_airport_id: trw.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline)
       disconnected_route = AirplaneRoute.new(route: disconnected_airline_route, airplane: disconnected_network_airplane, frequencies: 1, block_time_mins: 1, flight_cost: 1).save(validate: false)
       subject.reload
 
-      expect(subject.airplanes_available_to_add_service).to eq [too_much_time_but_operates_route_airplane, airplane]
+      expect(subject.airplanes_available_to_add_service).to eq [airplane]
       expect(other_airline_airline_route.airplanes_available_to_add_service).to eq [other_airline_airplane]
     end
   end

@@ -6,17 +6,9 @@ class RoutesController < ApplicationController
     @airplane_route.set_frequency(params[:frequencies].to_i)
 
     @game = Game.find(params[:game_id])
-    @airplanes = @route.airplanes_available_to_add_service
-    render :add_flights
-  end
-
-  def add_flights
-    @game = Game.find(params[:game_id])
-    airports = [Airport.find(params[:origin_id]), Airport.find(params[:destination_id])]
-    origin = airports.min_by { |a| a.iata }
-    destination = airports.max_by { |a| a.iata }
-    @route = AirlineRoute.find_or_create_by_airline_and_route(@game.user_airline, origin, destination)
-    @airplanes = @route.airplanes_available_to_add_service
+    @airplanes = @route.airplanes + @route.airplanes_available_to_add_service
+    @revenue = Calculation::MaximumRevenuePotential.new(@route.origin_airport, @route.destination_airport, @game.current_date)
+    render :view_route
   end
 
   def select_route
@@ -27,8 +19,10 @@ class RoutesController < ApplicationController
   def view_route
     @game = Game.find(params[:game_id])
     airports = [Airport.find(params[:origin_id]), Airport.find(params[:destination_id])]
-    @origin = airports.min_by { |a| a.iata }
-    @destination = airports.max_by { |a| a.iata }
-    @revenue = Calculation::MaximumRevenuePotential.new(@origin, @destination, @game.current_date)
+    origin = airports.min_by { |a| a.iata }
+    destination = airports.max_by { |a| a.iata }
+    @route = AirlineRoute.find_or_create_by_airline_and_route(@game.user_airline, origin, destination)
+    @airplanes = @route.airplanes + @route.airplanes_available_to_add_service
+    @revenue = Calculation::MaximumRevenuePotential.new(origin, destination, @game.current_date)
   end
 end

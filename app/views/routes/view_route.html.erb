@@ -1,12 +1,12 @@
 <h1>Airline Game</h1>
 <p><a href=<%=game_path(@game)%>>Return to game overview</a> <br/>
 <a href=<%= game_select_route_path(@game) %>> View a different route </a><br/>
-<a href=<%= game_airport_path(@game, @origin) %>> View <%= @origin.iata %> </a><br/>
-<a href=<%= game_airport_path(@game, @destination) %>> View <%= @destination.iata %> </a></p>
-<h2><%= "#{@origin.iata} - #{@destination.iata}" %></h2>
-<p><%= "#{Calculation::Distance.between_airports(@origin, @destination).round} miles" %></p>
-<p><%= "#{@game.user_airline.name} has #{@origin.leased_unused_slots(@game.user_airline)} available #{"slot".pluralize(@origin.leased_unused_slots(@game.user_airline))} at #{@origin.iata}" %> <br/>
-<%= "#{@game.user_airline.name} has #{@destination.leased_unused_slots(@game.user_airline)} available #{"slot".pluralize(@destination.leased_unused_slots(@game.user_airline))} at #{@destination.iata}" %></p>
+<a href=<%= game_airport_path(@game, @route.origin_airport) %>> View <%= @route.origin_airport.iata %> </a><br/>
+<a href=<%= game_airport_path(@game, @route.destination_airport) %>> View <%= @route.destination_airport.iata %> </a></p>
+<h2><%= "#{@route.origin_airport.iata} - #{@route.destination_airport.iata}" %></h2>
+<p><%= "#{Calculation::Distance.between_airports(@route.origin_airport, @route.destination_airport).round} miles" %></p>
+<p><%= "#{@game.user_airline.name} has #{@route.origin_airport.leased_unused_slots(@game.user_airline)} available #{"slot".pluralize(@route.origin_airport.leased_unused_slots(@game.user_airline))} at #{@route.origin_airport.iata}" %> <br/>
+<%= "#{@game.user_airline.name} has #{@route.destination_airport.leased_unused_slots(@game.user_airline)} available #{"slot".pluralize(@route.destination_airport.leased_unused_slots(@game.user_airline))} at #{@route.destination_airport.iata}" %></p>
 <p>At current demand levels, this route can support up to:
   <ul>
     <li>$<%= number_with_precision(@revenue.max_economy_class_revenue_per_week, :precision => 2) %> per week in economy class revenue</li>
@@ -14,8 +14,27 @@
     <li>$<%= number_with_precision(@revenue.max_business_class_revenue_per_week, :precision => 2) %> per week in business class revenue</li>
   </ul>
 </p>
-<% if @game.user_airline.can_fly_between?(@origin.market, @destination.market) %>
-  <%= button_to "Add or reduce flights on route", game_add_flights_path(@game), method: :get, params: { origin_id: @origin.id, destination_id: @destination.id } %>
+<% if @game.user_airline.can_fly_between?(@route.origin_airport.market, @route.destination_airport.market) %>
+  <p><%= @game.user_airline.name %> has <%= @airplanes.count %> <%= "airplane".pluralize(@airplanes.count) %> able to serve <%= @route.origin_airport_iata %> - <%= @route.destination_airport_iata %> </p>
+  <% if @airplane_route&.errors&.any? %>
+    <p>
+      <% @airplane_route.errors.full_messages.each do |message| %>
+        <div class="error"><%= message %></div>
+      <% end %>
+    </p>
+  <% end %>
+
+  <% @airplanes.each do |airplane| %>
+    <%= form_with url: game_add_flights_path, method: :patch do |form| %>
+      <%= form.hidden_field :route_id, value: @route.id %>
+      <%= form.hidden_field :airplane_id, value: airplane.id %>
+      <%= form.label :frequencies, "#{airplane.family.manufacturer} #{airplane.model.name} currently utilized #{number_with_precision(airplane.utilization, :precision => 1)} hours per day.
+                                    Seating #{airplane.economy_seats} economy, #{airplane.premium_economy_seats} premium economy, #{airplane.business_seats} business.
+                                    Currently flies #{@route.frequencies_on_airplane(airplane)} weekly #{"flight".pluralize(@route.frequencies_on_airplane(airplane))}" %>
+      <%= form.number_field :frequencies, in: 0..100, value: @route.frequencies_on_airplane(airplane) %>
+      <%= form.submit "Set frequencies" %>
+    <% end %>
+  <% end %>
 <% else %>
   <p><%= @game.user_airline.name %> cannot fly this route due to political restrictions </p>
 <% end %>
