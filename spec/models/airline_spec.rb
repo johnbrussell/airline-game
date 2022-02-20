@@ -313,6 +313,29 @@ RSpec.describe Airline do
     end
   end
 
+  context "routes_at_airport" do
+    it "includes both origins and destinations" do
+      airline = Fabricate(:airline)
+
+      airport_1 = Fabricate(:airport, market: airline.base, iata: "AAA")
+      airport_2 = Fabricate(:airport, market: airline.base, iata: "BBB")
+      airport_3 = Fabricate(:airport, market: airline.base, iata: "CCC")
+      airport_4 = Fabricate(:airport, market: airline.base, iata: "DDD")
+
+      AirlineRoute.new(airline: airline, origin_airport: airport_1, destination_airport: airport_2, economy_price: 1, business_price: 2, premium_economy_price: 3, distance: 100).save(validate: false)
+      route_1 = AirlineRoute.last
+      AirlineRoute.new(airline: airline, origin_airport: airport_2, destination_airport: airport_3, economy_price: 1, business_price: 2, premium_economy_price: 3, distance: 100).save(validate: false)
+      route_2 = AirlineRoute.last
+
+      airline.reload
+
+      expect(airline.routes_at_airport(airport_1)).to eq [route_1]
+      expect(airline.routes_at_airport(airport_2)).to eq [route_1, route_2]
+      expect(airline.routes_at_airport(airport_3)).to eq [route_2]
+      expect(airline.routes_at_airport(airport_4)).to eq []
+    end
+  end
+
   context "validate_a_user_airline_exists" do
     it "is false for a user airline" do
       airline = Airline.create!(cash_on_hand: 1, name: "foo", is_user_airline: true, base_id: 1, game_id: 1)
