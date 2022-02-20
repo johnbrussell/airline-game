@@ -22,9 +22,9 @@ class Slot < ApplicationRecord
   def self.num_used(airline, airport)
     # Nothing on Slot indicates usage; calculate by counting frequencies on all routes to/from airport
     AirlineRoute
-      .where("airline_id == ?", airline.id)
-      .where("origin_airport_id == ?", airport.id)
-      .or(AirlineRoute.where("destination_airport_id == ?", airport.id))
+      .where(airline_id: airline.id)
+      .where(origin_airport_id: airport.id)
+      .or(AirlineRoute.where(airline_id: airline.id).where(destination_airport_id: airport.id))
       .joins(:airplane_routes)
       .sum("airplane_routes.frequencies")
   end
