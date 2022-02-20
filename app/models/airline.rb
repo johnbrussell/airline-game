@@ -8,6 +8,16 @@ class Airline < ApplicationRecord
 
   before_destroy :validate_a_user_airline_exists
 
+  has_many :airline_routes
+
+  def self.at_airport(airport, game)
+    Airline
+      .joins(:airline_routes)
+      .where(game_id: game.id)
+      .where("airline_routes.destination_airport_id == ? OR airline_routes.origin_airport_id == ?", airport.id, airport.id)
+      .uniq
+  end
+
   def base
     @base ||= Market.find(base_id)
   end

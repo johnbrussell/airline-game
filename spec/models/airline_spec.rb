@@ -1,6 +1,46 @@
 require "rails_helper"
 
 RSpec.describe Airline do
+  context "at_airport" do
+    it "returns empty when no airlines serve an airport" do
+      airport = Fabricate(:airport)
+      game = Fabricate(:game)
+
+      expect(Airline.at_airport(airport, game)).to eq []
+    end
+
+    it "finds all airlines that serve the airport" do
+      game = Fabricate(:game)
+      other_game = Fabricate(:game)
+
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, market: inu.market, iata: "FUN")
+      maj = Fabricate(:airport, market: inu.market, iata: "MAJ")
+
+      airline = Fabricate(:airline, game_id: game.id, base_id: Airport.last.market.id)
+      other_airline = Fabricate(:airline, game_id: game.id, base_id: Airport.last.market.id)
+      other_game_airline = Fabricate(:airline, game_id: other_game.id, base_id: Airport.last.market.id)
+
+      family = Fabricate(:aircraft_family)
+      airplane = Fabricate(:airplane, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group)
+      other_airplane = Fabricate(:airplane, aircraft_family: family, operator_id: other_airline.id, base_country_group: other_airline.base.country_group)
+      other_game_airplane = Fabricate(:airplane, aircraft_family: family, operator_id: other_game_airline.id, base_country_group: other_game_airline.base.country_group)
+
+      AirlineRoute.new(airline: airline, origin_airport: fun, destination_airport: inu, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 1).save(validate: false)
+      AirlineRoute.new(airline: airline, origin_airport: inu, destination_airport: maj, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 1).save(validate: false)
+      AirlineRoute.new(airline: other_airline, origin_airport: fun, destination_airport: maj, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 1).save(validate: false)
+      AirlineRoute.new(airline: other_game_airline, origin_airport: fun, destination_airport: maj, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 1).save(validate: false)
+      AirlineRoute.new(airline: other_game_airline, origin_airport: inu, destination_airport: maj, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 1).save(validate: false)
+
+      expect(Airline.at_airport(inu, game)).to eq [airline]
+      expect(Airline.at_airport(fun, game)).to eq [airline, other_airline]
+      expect(Airline.at_airport(maj, game)).to eq [airline, other_airline]
+      expect(Airline.at_airport(fun, other_game)).to eq [other_game_airline]
+      expect(Airline.at_airport(inu, other_game)).to eq [other_game_airline]
+      expect(Airline.at_airport(fun, other_game)).to eq [other_game_airline]
+    end
+  end
+
   context "can_fly_between?" do
     it "is true when flying a route within its home country group" do
       origins = [
