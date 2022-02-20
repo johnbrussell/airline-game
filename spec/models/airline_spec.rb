@@ -1,6 +1,50 @@
 require "rails_helper"
 
 RSpec.describe Airline do
+  context "at_airport" do
+    it "returns empty when no airlines serve an airport" do
+      airport = Fabricate(:airport)
+      game = Fabricate(:game)
+
+      expect(Airline.at_airport(airport, game)).to eq []
+    end
+
+    it "finds all airlines that serve the airport" do
+      game = Fabricate(:game)
+      other_game = Fabricate(:game)
+
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, market: inu.market, iata: "FUN")
+      maj = Fabricate(:airport, market: inu.market, iata: "MAJ")
+
+      airline = Fabricate(:airline, game_id: game.id, base_id: Airport.last.market.id)
+      other_airline = Fabricate(:airline, game_id: game.id, base_id: Airport.last.market.id)
+      other_game_airline = Fabricate(:airline, game_id: other_game.id, base_id: Airport.last.market.id)
+
+      inu_gates = Gates.create!(game: game, airport: inu, current_gates: 10)
+      fun_gates = Gates.create!(game: game, airport: fun, current_gates: 10)
+      maj_gates = Gates.create!(game: game, airport: maj, current_gates: 10)
+      other_inu_gates = Gates.create!(game: other_game, airport: inu, current_gates: 10)
+      other_fun_gates = Gates.create!(game: other_game, airport: fun, current_gates: 10)
+      other_maj_gates = Gates.create!(game: other_game, airport: maj, current_gates: 10)
+      Slot.create!(gates: inu_gates, lessee_id: airline.id)
+      Slot.create!(gates: fun_gates, lessee_id: airline.id)
+      Slot.create!(gates: maj_gates, lessee_id: airline.id)
+      Slot.create!(gates: fun_gates, lessee_id: other_airline.id)
+      Slot.create!(gates: maj_gates, lessee_id: other_airline.id)
+      Slot.create!(gates: other_maj_gates, lessee_id: other_game_airline.id)
+      Slot.create!(gates: other_fun_gates, lessee_id: other_game_airline.id)
+      Slot.create!(gates: other_inu_gates, lessee_id: other_game_airline.id)
+
+      expect(Airline.at_airport(inu, game)).to eq [airline]
+      expect(Airline.at_airport(fun, game)).to eq [airline, other_airline]
+      expect(Airline.at_airport(maj, game)).to eq [airline, other_airline]
+      expect(Airline.at_airport(fun, other_game)).to eq [other_game_airline]
+      expect(Airline.at_airport(inu, other_game)).to eq [other_game_airline]
+      expect(Airline.at_airport(maj, other_game)).to eq [other_game_airline]
+    end
+  end
+
   context "can_fly_between?" do
     it "is true when flying a route within its home country group" do
       origins = [
@@ -266,6 +310,29 @@ RSpec.describe Airline do
       subject.reload
 
       expect(subject.rival_country_groups).to eq ["Zanzibar"]
+    end
+  end
+
+  context "routes_at_airport" do
+    it "includes both origins and destinations" do
+      airline = Fabricate(:airline)
+
+      airport_1 = Fabricate(:airport, market: airline.base, iata: "AAA")
+      airport_2 = Fabricate(:airport, market: airline.base, iata: "BBB")
+      airport_3 = Fabricate(:airport, market: airline.base, iata: "CCC")
+      airport_4 = Fabricate(:airport, market: airline.base, iata: "DDD")
+
+      AirlineRoute.new(airline: airline, origin_airport: airport_1, destination_airport: airport_2, economy_price: 1, business_price: 2, premium_economy_price: 3, distance: 100).save(validate: false)
+      route_1 = AirlineRoute.last
+      AirlineRoute.new(airline: airline, origin_airport: airport_2, destination_airport: airport_3, economy_price: 1, business_price: 2, premium_economy_price: 3, distance: 100).save(validate: false)
+      route_2 = AirlineRoute.last
+
+      airline.reload
+
+      expect(airline.routes_at_airport(airport_1)).to eq [route_1]
+      expect(airline.routes_at_airport(airport_2)).to eq [route_1, route_2]
+      expect(airline.routes_at_airport(airport_3)).to eq [route_2]
+      expect(airline.routes_at_airport(airport_4)).to eq []
     end
   end
 

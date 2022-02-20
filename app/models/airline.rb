@@ -8,6 +8,17 @@ class Airline < ApplicationRecord
 
   before_destroy :validate_a_user_airline_exists
 
+  has_many :airline_routes
+  has_many :slots, foreign_key: "lessee_id"
+
+  def self.at_airport(airport, game)
+    Airline
+      .joins(slots: :gates)
+      .where(game_id: game.id)
+      .where("gates.airport_id == ?", airport.id)
+      .uniq
+  end
+
   def base
     @base ||= Market.find(base_id)
   end
@@ -23,6 +34,10 @@ class Airline < ApplicationRecord
       .map { |g| [g.country_one, g.country_two].reject { |c| c == base.country_group } }
       .flatten
       .uniq
+  end
+
+  def routes_at_airport(airport)
+    airline_routes.where("origin_airport_id == ? OR destination_airport_id == ?", airport.id, airport.id)
   end
 
   private

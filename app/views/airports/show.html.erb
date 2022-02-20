@@ -37,3 +37,16 @@ The cost to build a new gate is $<%= number_with_precision(@gates.gate_cost, :pr
 <% end %>
 
 <%= button_to "Build a gate", game_airport_build_a_gate_path(@game, @airport), method: :patch %>
+
+<h3> Slot holdings and usage </h3>
+<% @airlines.each do |airline| %>
+  <p><%= airline.name %> has <%= Slot.num_leased(airline, @airport) %> <%= "slot".pluralize(Slot.num_leased(airline, @airport)) %> (<%= Slot.num_used(airline, @airport) %> used) </p>
+  <ul>
+    <% airline.routes_at_airport(@airport).each do |route| %>
+      <li>
+        <a href=<%=game_airline_route_add_flights_path(@game, route)%>><%= route.name %></a>: <%= route.total_frequencies %> weekly <%= "flight".pluralize(route.total_frequencies) %>.
+        <%= route.total_economy_seats %> economy seats, <%= route.total_premium_economy_seats %> premium economy seats, <%= route.total_business_seats %> business seats
+      </li>
+    <% end %>
+  </ul>
+<% end %>

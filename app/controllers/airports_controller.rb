@@ -4,6 +4,7 @@ class AirportsController < ApplicationController
     @airport = Airport.find(params[:airport_id])
     @gates = Gates.at_airport(@airport, @game)
     @gates.build_new_gate(@game.user_airline, @game.current_date)
+    @airlines = Airline.at_airport(@airport, @game)
     render :show
   end
 
@@ -12,6 +13,7 @@ class AirportsController < ApplicationController
     @airport = Airport.find(params[:airport_id])
     @gates = Gates.at_airport(@airport, @game)
     @gates.lease_a_slot(@game.user_airline)
+    @airlines = Airline.at_airport(@airport, @game)
     render :show
   end
 
@@ -28,5 +30,6 @@ class AirportsController < ApplicationController
     @game = Game.find(params[:game_id])
     @airport = Airport.find(params[:id] || params[:airport_id])
     @gates = Gates.at_airport(@airport, @game)
+    @airlines = Airline.at_airport(@airport, @game)
   end
 end
