@@ -56,7 +56,7 @@ RSpec.describe Slot do
 
       family = Fabricate(:aircraft_family)
       airplane = Fabricate(:airplane, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group)
-      other_airplane = Fabricate(:airplane, aircraft_family: family, operator_id: other_airline.id, base_country_group: airline.base.country_group)
+      other_airplane = Fabricate(:airplane, aircraft_family: family, operator_id: other_airline.id, base_country_group: other_airline.base.country_group)
 
       AirlineRoute.new(airline: airline, origin_airport: fun, destination_airport: inu, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 1).save(validate: false)
       fun_inu = AirlineRoute.last
