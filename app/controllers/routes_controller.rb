@@ -2,6 +2,8 @@ class RoutesController < ApplicationController
   def select_route
     @game = Game.find(params[:game_id])
     @airports = Airport.select_options
+    @origin = params[:origin] || 1
+    @destination = params[:destination] || 2
   end
 
   def update_price_or_frequency

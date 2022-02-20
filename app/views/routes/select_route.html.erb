@@ -6,7 +6,7 @@
 <%= form_with url: game_airline_route_add_flights_path(game_id: @game.id, airline_route_id: -1), method: :get do |form| %>
   <%= form.hidden_field :game_id, value: @game.id %>
   <%= form.hidden_field :airline_route_id, value: nil %>
-  <%= form.select :origin_id, @airports %>
-  <%= form.select :destination_id, @airports %>
+  <%= form.select :origin_id, @airports, selected: @origin %>
+  <%= form.select :destination_id, @airports, selected: @destination %>
   <%= form.submit "Go" %>
 <% end %>
