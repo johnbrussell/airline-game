@@ -25,16 +25,21 @@ RSpec.describe "routes/view_route", type: :feature do
     expect(page).to have_content "Airline Game Home"
   end
 
-  it "has a link to view a different route" do
+  it "has a link to view a different route that remembers which route it was on" do
     game = Fabricate(:game)
     Fabricate(:airline, is_user_airline: true, game_id: game.id, name: "TIA", base_id: Market.last.id)
     visit game_airline_route_add_flights_path(game, -1, params: { origin_id: Airport.find_by(iata: "FUN"), destination_id: Airport.find_by(iata: "INU")})
 
+    expect(page).to have_content "FUN - INU"
     expect(page).to have_content "View a different route"
 
     click_link "View a different route"
 
     expect(page).to have_content "Select a route to view"
+
+    click_button "Go"
+
+    expect(page).to have_content "FUN - INU"
   end
 
   it "displays the route in alphabetical order" do
