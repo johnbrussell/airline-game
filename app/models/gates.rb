@@ -28,7 +28,9 @@ class Gates < ApplicationRecord
   end
 
   def build_new_gate(airline, current_date)
-    if airline.cash_on_hand >= gate_cost
+    if RivalCountryGroup.rivals?(airline.base.country_group, airport.market.country_group)
+      errors.add(:airline, "cannot build gates due to political restrictions")
+    elsif airline.cash_on_hand >= gate_cost
       Slot.insert_all!([
         {
           "gates_id": id,
@@ -51,7 +53,9 @@ class Gates < ApplicationRecord
   end
 
   def lease_a_slot(airline)
-    if num_available_slots > 0
+    if RivalCountryGroup.rivals?(airline.base.country_group, airport.market.country_group)
+      errors.add(:airline, "cannot lease slots due to political restrictions")
+    elsif num_available_slots > 0
       rent = Calculation::SlotRent.calculate(airport, game) / Slot::LEASE_TERM_DAYS
       slot = slots.available.first
       slot.assign_attributes(

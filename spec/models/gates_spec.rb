@@ -168,6 +168,59 @@ RSpec.describe Gates do
 
       expect(gates.errors.map { |g| "#{g.attribute} #{g.message}" }).to include "airline_cash_on_hand not sufficient to build"
     end
+
+    it "adds an error if the airline is politically disallowed from building the gate" do
+      Market.create!(
+        name: "Nauru",
+        country: "Nauru",
+        country_group: "Nauru",
+        income: 1000,
+      )
+      Market.create!(
+        name: "Bar",
+        country: "Baz",
+        country_group: "Foobar",
+        income: 1,
+      )
+      airport = Airport.create!(
+        iata: "DCA",
+        exclusive_catchment: 0,
+        runway: 1000,
+        elevation: 10,
+        start_gates: 1,
+        easy_gates: 2,
+        latitude: 40,
+        longitude: -70,
+        market: Market.last,
+      )
+      airline = Airline.create!(
+        name: "Foo",
+        cash_on_hand: 200000000,
+        is_user_airline: false,
+        base_id: 1,
+        game_id: 6,
+      )
+      date = Date.today
+      game = Game.create!(current_date: date, start_date: date, end_date: date)
+      gates = Gates.create!(airport: airport, current_gates: 1, game: game)
+      RivalCountryGroup.create!(country_one: "Foobar", country_two: "Nauru")
+
+      old_slots = gates.slots.count
+      old_cash_on_hand = airline.cash_on_hand
+
+      gates.build_new_gate(airline, date)
+      gates.reload
+
+      expected_slots = old_slots
+
+      expect(expected_slots).to eq gates.slots.count
+
+      airline.reload
+
+      expect(airline.cash_on_hand).to eq old_cash_on_hand
+
+      expect(gates.errors.full_messages).to include "Airline cannot build gates due to political restrictions"
+    end
   end
 
   context "lease_a_slot" do
@@ -228,6 +281,59 @@ RSpec.describe Gates do
       expect(subject.errors.map { |e| "#{e.attribute} #{e.message}" }).to include "slots must be available to lease"
       expect(airline.cash_on_hand).to eq original_cash_on_hand
       expect(Slot.where(lessee_id: airline.id).count).to eq 0
+    end
+
+    it "adds an error if the airline is politically disallowed from leasing slots" do
+      Market.create!(
+        name: "Nauru",
+        country: "Nauru",
+        country_group: "Nauru",
+        income: 1000,
+      )
+      Market.create!(
+        name: "Bar",
+        country: "Baz",
+        country_group: "Foobar",
+        income: 1,
+      )
+      airport = Airport.create!(
+        iata: "DCA",
+        exclusive_catchment: 0,
+        runway: 1000,
+        elevation: 10,
+        start_gates: 1,
+        easy_gates: 2,
+        latitude: 40,
+        longitude: -70,
+        market: Market.last,
+      )
+      airline = Airline.create!(
+        name: "Foo",
+        cash_on_hand: 200000000,
+        is_user_airline: false,
+        base_id: 1,
+        game_id: 6,
+      )
+      date = Date.today
+      game = Game.create!(current_date: date, start_date: date, end_date: date)
+      gates = Gates.create!(airport: airport, current_gates: 1, game: game)
+      RivalCountryGroup.create!(country_one: "Foobar", country_two: "Nauru")
+
+      old_slots = gates.slots.count
+      old_cash_on_hand = airline.cash_on_hand
+
+      gates.lease_a_slot(airline)
+      gates.reload
+
+      expected_slots = old_slots
+
+      expect(expected_slots).to eq gates.slots.count
+
+      airline.reload
+
+      expect(airline.cash_on_hand).to eq old_cash_on_hand
+
+      expect(gates.errors.full_messages).to include "Airline cannot lease slots due to political restrictions"
     end
   end
 
