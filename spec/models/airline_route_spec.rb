@@ -185,6 +185,38 @@ RSpec.describe AirlineRoute do
     end
   end
 
+  context "set_price" do
+    it "updates the price" do
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      airline = Fabricate(:airline, base_id: inu.market.id, name: "A")
+      subject = AirlineRoute.create!(economy_price: 1, distance: 2, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
+
+      expect(subject.set_price(4, 5, 6)).to be true
+      subject.reload
+
+      expect(subject.economy_price).to eq 4
+      expect(subject.premium_economy_price).to eq 5
+      expect(subject.business_price).to eq 6
+    end
+
+    it "returns false if the update fails" do
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      airline = Fabricate(:airline, base_id: inu.market.id, name: "A")
+      subject = AirlineRoute.create!(economy_price: 1, distance: 2, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
+
+      expect(subject.set_price(4, 5, -6)).to be false
+
+      expect(subject.errors.full_messages).to include("Business price must be greater than 0")
+
+      subject.reload
+      expect(subject.economy_price).to eq 1
+      expect(subject.premium_economy_price).to eq 2
+      expect(subject.business_price).to eq 3
+    end
+  end
+
   context "total_business_seats" do
     it "is zero if there are no frequencies" do
       expect(AirlineRoute.new.total_business_seats).to eq 0

@@ -62,6 +62,14 @@ class AirlineRoute < ApplicationRecord
     "#{origin_airport_iata} - #{destination_airport_iata}"
   end
 
+  def set_price(economy, premium_economy, business)
+    update(
+      economy_price: economy,
+      premium_economy_price: premium_economy,
+      business_price: business,
+    )
+  end
+
   def total_frequencies
     airplane_routes.sum(&:frequencies)
   end
