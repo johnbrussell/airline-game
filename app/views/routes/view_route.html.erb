@@ -15,8 +15,27 @@
   </ul>
 </p>
 <% if @game.user_airline.can_fly_between?(@route.origin_airport.market, @route.destination_airport.market) %>
-  <h3><%= "#{@game.user_airline.name} flights on #{@route.name}" %></h3>
+  <h3><%= @game.user_airline.name %> pricing on <%= @route.name %> </h3>
+  <% if @route.errors.any? %>
+    <p>
+      <% @route.errors.full_messages.each do |message| %>
+        <div class="error"><%= message %></div>
+      <% end %>
+    </p>
+  <% end %>
+  <p>
+    <%= form_with url: game_airline_route_add_flights_path(@game, @route), method: :patch do |form| %>
+      <%= form.label "Economy: $" %>
+      <%= form.number_field :economy_price, step: 0.01, min: 0.01, value: @route.economy_price %> <br/>
+      <%= form.label "Premium economy: $" %>
+      <%= form.number_field :premium_economy_price, step: 0.01, min: 0.01, value: @route.premium_economy_price %> <br/>
+      <%= form.label "Business: $" %>
+      <%= form.number_field :business_price, step: 0.01, min: 0.01, value: @route.business_price %> <br/>
+      <%= form.submit "Set pricing" %>
+    <% end %>
+  </p>
 
+  <h3><%= "#{@game.user_airline.name} flights on #{@route.name}" %></h3>
   <p><%= @game.user_airline.name %> has <%= @route.airplanes.count %> <%= "airplane".pluralize(@route.airplanes.count) %> currently operating flights on <%= @route.origin_airport_iata %> - <%= @route.destination_airport_iata %> </p>
   <% if @airplane_route&.errors&.any? %>
     <p>
@@ -37,7 +56,7 @@
     <% end %>
   <% end %>
 <% else %>
-  <p><%= @game.user_airline.name %> cannot fly this route due to political restrictions </p>
+  <h4><%= @game.user_airline.name %> cannot fly this route due to political restrictions </h4>
 <% end %>
 
 <h3> Service on <%= @route.name %> </h3>

@@ -32,7 +32,7 @@ Rails.application.routes.draw do
     get "/select_route", to: "routes#select_route"
     resources :airline_routes do
       get "/add_flights", to: "routes#view_route"
-      patch "/add_flights", to: "routes#add_airplane_flights"
+      patch "/add_flights", to: "routes#update_price_or_frequency"
     end
   end
 end

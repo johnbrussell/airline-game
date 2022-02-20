@@ -1,20 +1,24 @@
 class RoutesController < ApplicationController
-  def add_airplane_flights
-    @route = AirlineRoute.find(params[:airline_route_id])
-    @airplane_route = AirplaneRoute.find_or_initialize_by(airplane_id: params[:airplane_id], route: @route)
+  def select_route
+    @game = Game.find(params[:game_id])
+    @airports = Airport.select_options
+  end
 
-    @airplane_route.set_frequency(params[:frequencies].to_i)
+  def update_price_or_frequency
+    if params.include?(:economy_price) && params.include?(:premium_economy_price) && params.include?(:business_price)
+      @route = AirlineRoute.find(params[:airline_route_id])
+      @route.set_price(params[:economy_price], params[:premium_economy_price], params[:business_price])
+    elsif params.include?(:frequencies)
+      @route = AirlineRoute.find(params[:airline_route_id])
+      @airplane_route = AirplaneRoute.find_or_initialize_by(airplane_id: params[:airplane_id], route: @route)
+      @airplane_route.set_frequency(params[:frequencies].to_i)
+    end
 
     @game = Game.find(params[:game_id])
     @airplanes = @route.airplanes + @route.airplanes_available_to_add_service
     @revenue = Calculation::MaximumRevenuePotential.new(@route.origin_airport, @route.destination_airport, @game.current_date)
     @all_service = AirlineRoute.operators_of_route(@route.origin_airport, @route.destination_airport)
     render :view_route
-  end
-
-  def select_route
-    @game = Game.find(params[:game_id])
-    @airports = Airport.select_options
   end
 
   def view_route
