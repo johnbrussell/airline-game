@@ -183,4 +183,25 @@ RSpec.describe "airports/show", type: :feature do
       expect(page).to have_content "Airline cash on hand not sufficient to lease"
     end
   end
+
+  it "shows information about airline slot holdings at the airport" do
+    game = Game.last
+    airline = Airline.last
+    other_airline = Fabricate(:airline, name: "B Air", base_id: Market.find_by(name: "Boston").id, game_id: game.id)
+    gates = Gates.create!(current_gates: 1, airport: Airport.find_by(iata: "INU"), game: game)
+    Slot.create!(gates_id: gates.id, lessee_id: airline.id)
+    Slot.create!(gates_id: gates.id, lessee_id: other_airline.id)
+    Slot.create!(gates_id: gates.id, lessee_id: other_airline.id)
+
+    allow(Slot).to receive(:num_used).and_return 10000000000
+    allow(Slot).to receive(:num_used).with(airline, Airport.find_by(iata: "INU")).and_return 0
+    allow(Slot).to receive(:num_used).with(other_airline, Airport.find_by(iata: "INU")).and_return 1
+    expect(Airline).to receive(:at_airport).with(Airport.find_by(iata: "INU"), game).and_return [airline, other_airline]
+
+    visit game_airport_path(game, Airport.find_by(iata: "INU"))
+
+    expect(page).to have_content "Slot holdings and usage"
+    expect(page).to have_content "#{airline.name} has 1 slot (0 used)"
+    expect(page).to have_content "#{other_airline.name} has 2 slots (1 used)"
+  end
 end
