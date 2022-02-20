@@ -1,6 +1,6 @@
 class RoutesController < ApplicationController
   def add_airplane_flights
-    @route = AirlineRoute.find(params[:route_id])
+    @route = AirlineRoute.find(params[:airline_route_id])
     @airplane_route = AirplaneRoute.find_or_initialize_by(airplane_id: params[:airplane_id], route: @route)
 
     @airplane_route.set_frequency(params[:frequencies].to_i)
@@ -8,6 +8,7 @@ class RoutesController < ApplicationController
     @game = Game.find(params[:game_id])
     @airplanes = @route.airplanes + @route.airplanes_available_to_add_service
     @revenue = Calculation::MaximumRevenuePotential.new(@route.origin_airport, @route.destination_airport, @game.current_date)
+    @all_service = AirlineRoute.operators_of_route(@route.origin_airport, @route.destination_airport)
     render :view_route
   end
 
@@ -18,11 +19,16 @@ class RoutesController < ApplicationController
 
   def view_route
     @game = Game.find(params[:game_id])
-    airports = [Airport.find(params[:origin_id]), Airport.find(params[:destination_id])]
-    origin = airports.min_by { |a| a.iata }
-    destination = airports.max_by { |a| a.iata }
-    @route = AirlineRoute.find_or_create_by_airline_and_route(@game.user_airline, origin, destination)
+    @route = if params[:origin_id].present? && params[:destination_id].present?
+      airports = [Airport.find(params[:origin_id]), Airport.find(params[:destination_id])]
+      origin = [Airport.find(params[:origin_id]), Airport.find(params[:destination_id])].min_by{ |a| a.iata }
+      destination = [Airport.find(params[:origin_id]), Airport.find(params[:destination_id])].max_by{ |a| a.iata }
+      AirlineRoute.find_or_create_by_airline_and_route(@game.user_airline, origin, destination)
+    else
+      AirlineRoute.find(params[:airline_route_id])
+    end
     @airplanes = @route.airplanes + @route.airplanes_available_to_add_service
-    @revenue = Calculation::MaximumRevenuePotential.new(origin, destination, @game.current_date)
+    @revenue = Calculation::MaximumRevenuePotential.new(@route.origin_airport, @route.destination_airport, @game.current_date)
+    @all_service = AirlineRoute.operators_of_route(@route.origin_airport, @route.destination_airport)
   end
 end

@@ -58,8 +58,30 @@ class AirlineRoute < ApplicationRecord
     record
   end
 
+  def name
+    "#{origin_airport_iata} - #{destination_airport_iata}"
+  end
+
   def total_frequencies
     airplane_routes.sum(&:frequencies)
+  end
+
+  def total_business_seats
+    airplane_routes.sum do |airplane_route|
+      airplane_route.frequencies * airplane_route.airplane.business_seats
+    end
+  end
+
+  def total_economy_seats
+    airplane_routes.sum do |airplane_route|
+      airplane_route.frequencies * airplane_route.airplane.economy_seats
+    end
+  end
+
+  def total_premium_economy_seats
+    airplane_routes.sum do |airplane_route|
+      airplane_route.frequencies * airplane_route.airplane.premium_economy_seats
+    end
   end
 
   private

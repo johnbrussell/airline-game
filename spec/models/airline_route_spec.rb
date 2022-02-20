@@ -175,6 +175,64 @@ RSpec.describe AirlineRoute do
     end
   end
 
+  context "name" do
+    it "is the IATA codes separated by a dash" do
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+
+      subject = AirlineRoute.new(origin_airport: fun, destination_airport: inu)
+      expect(subject.name).to eq "FUN - INU"
+    end
+  end
+
+  context "total_business_seats" do
+    it "is zero if there are no frequencies" do
+      expect(AirlineRoute.new.total_business_seats).to eq 0
+    end
+
+    it "calculates correctly if there are frequencies" do
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+
+      airline_a = Fabricate(:airline, base_id: inu.market.id, name: "A")
+      family = Fabricate(:aircraft_family)
+      super_model = Fabricate(:aircraft_model, takeoff_distance: 100, max_range: 13000, floor_space: 100000)
+      airplane_1 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model, business_seats: 1, premium_economy_seats: 5, economy_seats: 30)
+      airplane_2 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model, business_seats: 2, premium_economy_seats: 4, economy_seats: 100)
+
+      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_a)
+      airplane_route_1 = AirplaneRoute.new(airplane: airplane_1, route: subject, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
+      airplane_route_2 = AirplaneRoute.new(airplane: airplane_2, route: subject, block_time_mins: 1, frequencies: 2, flight_cost: 1).save(validate: false)
+      subject.reload
+
+      expect(subject.total_business_seats).to eq 5
+    end
+  end
+
+  context "total_economy_seats" do
+    it "is zero if there are no frequencies" do
+      expect(AirlineRoute.new.total_economy_seats).to eq 0
+    end
+
+    it "calculates correctly if there are frequencies" do
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+
+      airline_a = Fabricate(:airline, base_id: inu.market.id, name: "A")
+      family = Fabricate(:aircraft_family)
+      super_model = Fabricate(:aircraft_model, takeoff_distance: 100, max_range: 13000, floor_space: 100000)
+      airplane_1 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model, business_seats: 1, premium_economy_seats: 5, economy_seats: 30)
+      airplane_2 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model, business_seats: 2, premium_economy_seats: 4, economy_seats: 100)
+
+      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_a)
+      airplane_route_1 = AirplaneRoute.new(airplane: airplane_1, route: subject, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
+      airplane_route_2 = AirplaneRoute.new(airplane: airplane_2, route: subject, block_time_mins: 1, frequencies: 2, flight_cost: 1).save(validate: false)
+      subject.reload
+
+      expect(subject.total_economy_seats).to eq 230
+    end
+  end
+
   context "total_frequencies" do
     it "calculates correctly" do
       inu = Fabricate(:airport, iata: "INU")
@@ -203,6 +261,30 @@ RSpec.describe AirlineRoute do
       subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_a)
 
       expect(subject.total_frequencies).to eq 0
+    end
+  end
+
+  context "total_premium_economy_seats" do
+    it "is zero if there are no frequencies" do
+      expect(AirlineRoute.new.total_premium_economy_seats).to eq 0
+    end
+
+    it "calculates correctly if there are frequencies" do
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+
+      airline_a = Fabricate(:airline, base_id: inu.market.id, name: "A")
+      family = Fabricate(:aircraft_family)
+      super_model = Fabricate(:aircraft_model, takeoff_distance: 100, max_range: 13000, floor_space: 100000)
+      airplane_1 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model, business_seats: 1, premium_economy_seats: 5, economy_seats: 30)
+      airplane_2 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model, business_seats: 2, premium_economy_seats: 4, economy_seats: 100)
+
+      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_a)
+      airplane_route_1 = AirplaneRoute.new(airplane: airplane_1, route: subject, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
+      airplane_route_2 = AirplaneRoute.new(airplane: airplane_2, route: subject, block_time_mins: 1, frequencies: 2, flight_cost: 1).save(validate: false)
+      subject.reload
+
+      expect(subject.total_premium_economy_seats).to eq 13
     end
   end
 end
