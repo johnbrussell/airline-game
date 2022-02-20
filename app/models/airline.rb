@@ -8,13 +8,13 @@ class Airline < ApplicationRecord
 
   before_destroy :validate_a_user_airline_exists
 
-  has_many :airline_routes
+  has_many :slots, foreign_key: "lessee_id"
 
   def self.at_airport(airport, game)
     Airline
-      .joins(:airline_routes)
+      .joins(slots: :gates)
       .where(game_id: game.id)
-      .where("airline_routes.destination_airport_id == ? OR airline_routes.origin_airport_id == ?", airport.id, airport.id)
+      .where("gates.airport_id == ?", airport.id)
       .uniq
   end
 
