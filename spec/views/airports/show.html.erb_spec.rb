@@ -8,18 +8,18 @@ RSpec.describe "airports/show", type: :feature do
       start_date: Date.yesterday,
       end_date: Date.tomorrow,
     )
-    Airline.create!(
-      game_id: game.id,
-      name: "A Air",
-      cash_on_hand: 10000000.0,
-      base_id: 1,
-      is_user_airline: true,
-    )
     boston = Market.create!(
       name: "Boston",
       country: "United States",
       country_group: "United States",
       income: 100,
+    )
+    Airline.create!(
+      game_id: game.id,
+      name: "A Air",
+      cash_on_hand: 10000000.0,
+      base_id: boston.id,
+      is_user_airline: true,
     )
     nauru = Market.create!(
       name: "Nauru",
@@ -203,5 +203,48 @@ RSpec.describe "airports/show", type: :feature do
     expect(page).to have_content "Slot holdings and usage"
     expect(page).to have_content "#{airline.name} has 1 slot (0 used)"
     expect(page).to have_content "#{other_airline.name} has 2 slots (1 used)"
+  end
+
+  it "shows information about airline routes at the airport" do
+    game = Game.last
+    airline = Airline.last
+    other_airline = Fabricate(:airline, name: "B Air", base_id: Market.find_by(name: "Boston").id, game_id: game.id)
+    gates = Gates.create!(current_gates: 1, airport: Airport.find_by(iata: "INU"), game: game)
+    Slot.create!(gates_id: gates.id, lessee_id: airline.id)
+    Slot.create!(gates_id: gates.id, lessee_id: airline.id)
+    Slot.create!(gates_id: gates.id, lessee_id: airline.id)
+    Slot.create!(gates_id: gates.id, lessee_id: other_airline.id)
+    Slot.create!(gates_id: gates.id, lessee_id: other_airline.id)
+    Slot.create!(gates_id: gates.id, lessee_id: other_airline.id)
+    Slot.create!(gates_id: gates.id, lessee_id: other_airline.id)
+
+    inu = Airport.find_by(iata: "INU")
+    fun = Fabricate(:airport, market: Market.find_by(name: "Boston"), iata: "FUN")
+    bos = Airport.find_by(iata: "BOS")
+
+    family = Fabricate(:aircraft_family)
+    model = Fabricate(:aircraft_model, max_range: 13000, takeoff_distance: 100, family: family, floor_space: 100000000)
+    aircraft_1 = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, economy_seats: 100, premium_economy_seats: 10, business_seats: 8)
+    aircraft_2 = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: other_airline.id, base_country_group: other_airline.base.country_group, economy_seats: 50, premium_economy_seats: 3, business_seats: 0)
+
+    fun_inu = AirlineRoute.create!(airline: airline, origin_airport: fun, destination_airport: inu, distance: 1, economy_price: 1, premium_economy_price: 2, business_price: 4)
+    AirplaneRoute.new(route: fun_inu, airplane: aircraft_1, flight_cost: 1, block_time_mins: 100, frequencies: 3).save(validate: false)
+    bos_inu = AirlineRoute.create!(airline: other_airline, origin_airport: bos, destination_airport: inu, distance: 1, economy_price: 1, premium_economy_price: 2, business_price: 4)
+    AirplaneRoute.new(route: bos_inu, airplane: aircraft_2, flight_cost: 1, block_time_mins: 100, frequencies: 4).save(validate: false)
+
+    visit game_airport_path(game, Airport.find_by(iata: "INU"))
+
+    expect(page).to have_content "Slot holdings and usage"
+    expect(page).to have_content "#{airline.name} has 3 slots (3 used)"
+    expect(page).to have_link "FUN - INU"
+    expect(page).to have_content "FUN - INU: 3 weekly flights. 300 economy seats, 30 premium economy seats, 24 business seats"
+    expect(page).to have_content "#{other_airline.name} has 4 slots (4 used)"
+    expect(page).to have_link "BOS - INU"
+    expect(page).to have_content "BOS - INU: 4 weekly flights. 200 economy seats, 12 premium economy seats, 0 business seats"
+
+    click_link "BOS - INU"
+
+    expect(page).to have_content "Service on BOS - INU"
+    expect(page).to have_content "#{other_airline.name} operates 4 weekly flights with 200 economy seats, 12 premium economy seats, and 0 business seats. Tickets sell for $1.00 in economy, $2.00 in premium economy, and $4.00 in business"
   end
 end
