@@ -240,8 +240,37 @@ RSpec.describe Gates do
 
       expect(slot.lessee_id).to eq airline.id
       expect(slot.rent).to be > 0
-      expect(slot.lease_expiry).to eq game.current_date + Slot::LEASE_TERM_DAYS
+      expect(slot.lease_expiry).to eq game.current_date + 1.day
       expect(airline.cash_on_hand).to eq original_cash_on_hand - original_cash_on_hand / Slot::LEASE_TERM_DAYS
+    end
+
+    it "uses a longer lease expiry when the airline is above the use it or lose it threshold" do
+      game = Fabricate(:game)
+      airport = Fabricate(:airport)
+      original_cash_on_hand = 100000000.0
+      airline = Fabricate(:airline, game_id: game.id, base_id: airport.market.id, cash_on_hand: original_cash_on_hand)
+      subject = Gates.create!(airport: airport, current_gates: airport.start_gates, game: game)
+
+      slot = Slot.create!(gates_id: subject.id)
+      slot_2 = Slot.create!(gates_id: subject.id)
+      allow(Calculation::SlotRent).to receive(:calculate).with(airport, game).and_return original_cash_on_hand.to_f
+
+      subject.lease_a_slot(airline)
+
+      allow(Slot).to receive(:num_used).with(airline, airport).and_return(1)
+
+      subject.lease_a_slot(airline)
+      slot.reload
+      slot_2.reload
+      airline.reload
+
+      expect(slot.lessee_id).to eq airline.id
+      expect(slot.rent).to be > 0
+      expect(slot.lease_expiry).to eq game.current_date + 1.day
+      expect(slot_2.lessee_id).to eq airline.id
+      expect(slot_2.rent).to be > 0
+      expect(slot_2.lease_expiry).to eq game.current_date + Slot::LEASE_TERM_DAYS.days
+      assert_in_epsilon airline.cash_on_hand, original_cash_on_hand - original_cash_on_hand / Slot::LEASE_TERM_DAYS * 2, 0.0000001
     end
 
     it "adds an error if the airline does not have enough cash on hand" do

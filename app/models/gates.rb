@@ -12,6 +12,7 @@ class Gates < ApplicationRecord
   NEW_SLOT_LEASE_DURATION = 3.years
   EASY_GATE_COST = 10000000
   DIFFICULT_GATE_COST = 100000000
+  USE_IT_OR_LOSE_IT_THRESHOLD = 0.8
 
   def self.at_airport(airport, game)
     if find_by(airport: airport, game: game).present?
@@ -56,11 +57,11 @@ class Gates < ApplicationRecord
     if RivalCountryGroup.rivals?(airline.base.country_group, airport.market.country_group)
       errors.add(:airline, "cannot lease slots due to political restrictions")
     elsif num_available_slots > 0
-      rent = Calculation::SlotRent.calculate(airport, game) / Slot::LEASE_TERM_DAYS
+      rent = Calculation::SlotRent.calculate(airport, game) / Slot::LEASE_TERM_DAYS # Calculation::SlotRent assumes term is Slot::LEASE_TERM_DAYS
       slot = slots.available.first
       slot.assign_attributes(
         lessee_id: airline.id,
-        lease_expiry: game.current_date + Slot::LEASE_TERM_DAYS.days,
+        lease_expiry: game.current_date + lease_term(airline).days,
         rent: rent,
       )
       if airline.cash_on_hand >= rent
@@ -87,6 +88,18 @@ class Gates < ApplicationRecord
     def current_gates_greater_than_start_gates
       if current_gates < airport.start_gates
         errors.add(:current_gates, "cannot be less than minimum gates at airport")
+      end
+    end
+
+    def is_above_use_it_or_lose_it_threshold(airline)
+      (Slot.num_leased(airline, airport) * USE_IT_OR_LOSE_IT_THRESHOLD).floor() >= Slot.num_used(airline, airport)
+    end
+
+    def lease_term(airline)
+      if is_above_use_it_or_lose_it_threshold(airline)
+        1
+      else
+        Slot::LEASE_TERM_DAYS
       end
     end
 end
