@@ -46,14 +46,7 @@
   <% end %>
 
   <% @route.airplanes.each do |airplane| %>
-    <%= form_with url: game_airline_route_add_flights_path(@game, @route), method: :patch do |form| %>
-      <%= form.hidden_field :airplane_id, value: airplane.id %>
-      <%= form.label :frequencies, "#{airplane.family.manufacturer} #{airplane.model.name} currently utilized #{number_with_precision(airplane.utilization, :precision => 1)} hours per day.
-                                    Seating #{airplane.economy_seats} economy, #{airplane.premium_economy_seats} premium economy, #{airplane.business_seats} business.
-                                    Currently flies #{@route.frequencies_on_airplane(airplane)} weekly #{"flight".pluralize(@route.frequencies_on_airplane(airplane))}" %>
-      <%= form.number_field :frequencies, in: 0..100, value: @route.frequencies_on_airplane(airplane) %>
-      <%= form.submit "Set frequencies" %>
-    <% end %>
+    <%= render partial: "user_airline_frequencies", locals: { airplane: airplane } %>
   <% end %>
 <% else %>
   <h4><%= @game.user_airline.name %> cannot fly this route due to political restrictions </h4>
@@ -76,12 +69,6 @@
   <h3><%= "Add service on #{@route.name}" %></h3>
   <p><%= @game.user_airline.name %> has <%= @route.airplanes_available_to_add_service.count %> <%= "airplane".pluralize(@route.airplanes_available_to_add_service.count) %> able to add flights on <%= @route.name %> </p>
   <% @route.airplanes_available_to_add_service.each do |airplane| %>
-    <%= form_with url: game_airline_route_add_flights_path(@game, @route), method: :patch do |form| %>
-      <%= form.hidden_field :airplane_id, value: airplane.id %>
-      <%= form.label :frequencies, "#{airplane.family.manufacturer} #{airplane.model.name} currently utilized #{number_with_precision(airplane.utilization, :precision => 1)} hours per day.
-                                    Seating #{airplane.economy_seats} economy, #{airplane.premium_economy_seats} premium economy, #{airplane.business_seats} business" %>
-      <%= form.number_field :frequencies, in: 0..100, value: @route.frequencies_on_airplane(airplane) %>
-      <%= form.submit "Set frequencies" %>
-    <% end %>
+    <%= render partial: "user_airline_frequencies", locals: { airplane: airplane } %>
   <% end %>
 <% end %>
