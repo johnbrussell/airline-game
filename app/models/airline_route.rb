@@ -39,6 +39,7 @@ class AirlineRoute < ApplicationRecord
       .joins(:airline)
       .where(origin_airport_id: origin.id, destination_airport_id: destination.id)
       .order("airlines.name")
+      .uniq
   end
 
   def airplanes_available_to_add_service
