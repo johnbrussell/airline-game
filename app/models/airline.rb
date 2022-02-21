@@ -37,7 +37,10 @@ class Airline < ApplicationRecord
   end
 
   def routes_at_airport(airport)
-    airline_routes.where("origin_airport_id == ? OR destination_airport_id == ?", airport.id, airport.id)
+    airline_routes
+      .joins(:airplane_routes)
+      .where("origin_airport_id == ? OR destination_airport_id == ?", airport.id, airport.id)
+      .uniq
   end
 
   private
