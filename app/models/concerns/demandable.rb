@@ -14,7 +14,7 @@ module Demandable
     end
 
     def distance
-      Calculation::Distance.between_airports(@origin, @destination)
+      @distance ||= Calculation::Distance.between_airports(@origin, @destination)
     end
 
     def domestic?
