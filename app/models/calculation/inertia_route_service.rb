@@ -130,7 +130,7 @@ class Calculation::InertiaRouteService
 
     def inertia_airplane
       Airplane.new(
-        base_country_group: @origin.market.country_group,
+        base_country_group: "foo",
         business_seats: business_seats_per_flight,
         construction_date: Date.today,
         economy_seats: economy_seats_per_flight,
