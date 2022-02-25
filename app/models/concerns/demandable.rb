@@ -1,10 +1,9 @@
 module Demandable
   extend ActiveSupport::Concern
 
-  def initialize(origin, destination, current_date)
+  def initialize(origin, destination)
     @origin = origin
     @destination = destination
-    @current_date = current_date
   end
 
   private
