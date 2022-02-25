@@ -2,11 +2,11 @@ class Calculation::GovernmentDemand
   include Islandable
   include Populatable
 
-  def demand(current_date)
+  def demand
     if origin_market == destination_market || !origin_market.is_national_capital || RivalCountryGroup.rivals?(origin_market.country_group, destination_market.country_group)
       0
     else
-      airport_population(current_date) / 100.0 * distance_demand * border_multiplier * island_multipler
+      airport_population / 100.0 * distance_demand * border_multiplier * island_multipler
     end
   end
 

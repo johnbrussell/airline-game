@@ -1,4 +1,6 @@
 class Calculation::MaximumRevenuePotential
+  include Demandable
+
   BUSINESS_MAX_DISTANCE = 4000
   MAX_RELATIVE_BUSINESS_DOLLARS_BUSINESS = 2.0
   MAX_RELATIVE_BUSINESS_DOLLARS_LEISURE = 0.5
@@ -6,12 +8,6 @@ class Calculation::MaximumRevenuePotential
   MAX_RELATIVE_PREMIUM_ECONOMY_DEMAND_LEISURE = 0.25
   PREMIUM_ECONOMY_MAX_DISTANCE = 1625
   WEEKS_PER_YEAR = 365.25 / 7
-
-  def initialize(airport_1, airport_2, date)
-    @airport_1 = airport_1
-    @airport_2 = airport_2
-    @date = date
-  end
 
   def max_business_class_revenue_per_week
     (business_dollars_business + leisure_dollars_business) / WEEKS_PER_YEAR
@@ -41,10 +37,6 @@ class Calculation::MaximumRevenuePotential
 
     def business_dollars_premium_economy
       pct_business_dollars_premium_economy * total_business_dollars
-    end
-
-    def distance
-      Calculation::Distance.between_airports(@airport_1, @airport_2)
     end
 
     def leisure_dollars_business
@@ -120,7 +112,7 @@ class Calculation::MaximumRevenuePotential
     end
 
     def route_dollars
-      @route_dollars ||= Calculation::RouteDollars.new(@date, @airport_1, @airport_2)
+      @route_dollars ||= Calculation::RouteDollars.new(@current_date, @origin, @destination)
     end
 
     def total_business_dollars

@@ -242,7 +242,7 @@ RSpec.describe "routes/view_route", type: :feature do
     airline = Fabricate(:airline, base_id: nauru.id, game_id: game.id, is_user_airline: true)
     other_airline = Fabricate(:airline, base_id: funafuti.id, game_id: game.id, name: "TIA")
     family = Fabricate(:aircraft_family)
-    model = Fabricate(:aircraft_model, max_range: 13000, takeoff_distance: 100, family: family)
+    model = Fabricate(:aircraft_model, max_range: 13000, takeoff_distance: 100, speed: 1000, family: family)
     aircraft_1 = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group)
     aircraft_2 = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: other_airline.id, base_country_group: other_airline.base.country_group)
     gates_inu = Gates.create!(airport: inu, game: game, current_gates: 100)

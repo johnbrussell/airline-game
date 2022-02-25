@@ -5,7 +5,7 @@ module Populatable
 
   private
 
-    def airport_population(current_date)
-      AirportPopulation.calculate(@destination, current_date).population
+    def airport_population
+      @airport_population ||= AirportPopulation.calculate(@destination, @current_date).population
     end
 end
