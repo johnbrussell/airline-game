@@ -14,7 +14,7 @@ RSpec.describe Calculation::TotalMarketDemand do
         mock_business_demand = instance_double(Calculation::ResidentDemand)
 
         expect(Calculation::ResidentDemand).to receive(:new).with(origin_airport, airport, date).and_return mock_business_demand
-        expect(mock_business_demand).to receive(:business_demand).with(no_args).and_return(expected_demand)
+        expect(mock_business_demand).to receive(:business_demand).with(date).and_return(expected_demand)
 
         actual = Calculation::TotalMarketDemand.business(origin_airport, destination_market, date)
 
@@ -27,7 +27,7 @@ RSpec.describe Calculation::TotalMarketDemand do
         mock_government_demand = instance_double(Calculation::GovernmentDemand)
 
         expect(Calculation::GovernmentDemand).to receive(:new).with(origin_airport, airport, date).and_return mock_government_demand
-        expect(mock_government_demand).to receive(:demand).with(no_args).and_return(expected_demand)
+        expect(mock_government_demand).to receive(:demand).with(date).and_return(expected_demand)
 
         actual = Calculation::TotalMarketDemand.government(origin_airport, destination_market, date)
 
@@ -40,7 +40,7 @@ RSpec.describe Calculation::TotalMarketDemand do
         mock_leisure_demand = instance_double(Calculation::ResidentDemand)
 
         expect(Calculation::ResidentDemand).to receive(:new).with(origin_airport, airport, date).and_return mock_leisure_demand
-        expect(mock_leisure_demand).to receive(:leisure_demand).with(no_args).and_return(expected_demand)
+        expect(mock_leisure_demand).to receive(:leisure_demand).with(date).and_return(expected_demand)
 
         actual = Calculation::TotalMarketDemand.leisure(origin_airport, destination_market, date)
 
@@ -53,7 +53,7 @@ RSpec.describe Calculation::TotalMarketDemand do
         mock_tourist_demand = instance_double(Calculation::TouristDemand)
 
         expect(Calculation::TouristDemand).to receive(:new).with(origin_airport, airport, date).and_return mock_tourist_demand
-        expect(mock_tourist_demand).to receive(:demand).with(no_args).and_return(expected_demand)
+        expect(mock_tourist_demand).to receive(:demand).with(date).and_return(expected_demand)
 
         actual = Calculation::TotalMarketDemand.tourist(origin_airport, destination_market, date)
 
@@ -82,9 +82,9 @@ RSpec.describe Calculation::TotalMarketDemand do
         expect(Calculation::ResidentDemand).to receive(:new).with(origin_airport, airport_1, date).and_return mock_airport_1_demand
         expect(Calculation::ResidentDemand).to receive(:new).with(origin_airport, airport_2, date).and_return mock_airport_2_demand
         expect(Calculation::ResidentDemand).to receive(:new).with(origin_airport, airport_3, date).and_return mock_airport_3_demand
-        expect(mock_airport_1_demand).to receive(:business_demand).with(no_args).and_return(demand_airport_1)
-        expect(mock_airport_2_demand).to receive(:business_demand).with(no_args).and_return(demand_airport_2)
-        expect(mock_airport_3_demand).to receive(:business_demand).with(no_args).and_return(demand_airport_3)
+        expect(mock_airport_1_demand).to receive(:business_demand).with(date).and_return(demand_airport_1)
+        expect(mock_airport_2_demand).to receive(:business_demand).with(date).and_return(demand_airport_2)
+        expect(mock_airport_3_demand).to receive(:business_demand).with(date).and_return(demand_airport_3)
 
         actual = Calculation::TotalMarketDemand.business(origin_airport, destination_market, date)
 
@@ -101,9 +101,9 @@ RSpec.describe Calculation::TotalMarketDemand do
         expect(Calculation::GovernmentDemand).to receive(:new).with(origin_airport, airport_1, date).and_return mock_airport_1_demand
         expect(Calculation::GovernmentDemand).to receive(:new).with(origin_airport, airport_2, date).and_return mock_airport_2_demand
         expect(Calculation::GovernmentDemand).to receive(:new).with(origin_airport, airport_3, date).and_return mock_airport_3_demand
-        expect(mock_airport_1_demand).to receive(:demand).with(no_args).and_return(demand_airport_1)
-        expect(mock_airport_2_demand).to receive(:demand).with(no_args).and_return(demand_airport_2)
-        expect(mock_airport_3_demand).to receive(:demand).with(no_args).and_return(demand_airport_3)
+        expect(mock_airport_1_demand).to receive(:demand).with(date).and_return(demand_airport_1)
+        expect(mock_airport_2_demand).to receive(:demand).with(date).and_return(demand_airport_2)
+        expect(mock_airport_3_demand).to receive(:demand).with(date).and_return(demand_airport_3)
 
         actual = Calculation::TotalMarketDemand.government(origin_airport, destination_market, date)
 
@@ -120,9 +120,9 @@ RSpec.describe Calculation::TotalMarketDemand do
         expect(Calculation::ResidentDemand).to receive(:new).with(origin_airport, airport_1, date).and_return mock_airport_1_demand
         expect(Calculation::ResidentDemand).to receive(:new).with(origin_airport, airport_2, date).and_return mock_airport_2_demand
         expect(Calculation::ResidentDemand).to receive(:new).with(origin_airport, airport_3, date).and_return mock_airport_3_demand
-        expect(mock_airport_1_demand).to receive(:leisure_demand).with(no_args).and_return(demand_airport_1)
-        expect(mock_airport_2_demand).to receive(:leisure_demand).with(no_args).and_return(demand_airport_2)
-        expect(mock_airport_3_demand).to receive(:leisure_demand).with(no_args).and_return(demand_airport_3)
+        expect(mock_airport_1_demand).to receive(:leisure_demand).with(date).and_return(demand_airport_1)
+        expect(mock_airport_2_demand).to receive(:leisure_demand).with(date).and_return(demand_airport_2)
+        expect(mock_airport_3_demand).to receive(:leisure_demand).with(date).and_return(demand_airport_3)
 
         actual = Calculation::TotalMarketDemand.leisure(origin_airport, destination_market, date)
 
@@ -139,9 +139,9 @@ RSpec.describe Calculation::TotalMarketDemand do
         expect(Calculation::TouristDemand).to receive(:new).with(origin_airport, airport_1, date).and_return mock_airport_1_demand
         expect(Calculation::TouristDemand).to receive(:new).with(origin_airport, airport_2, date).and_return mock_airport_2_demand
         expect(Calculation::TouristDemand).to receive(:new).with(origin_airport, airport_3, date).and_return mock_airport_3_demand
-        expect(mock_airport_1_demand).to receive(:demand).with(no_args).and_return(demand_airport_1)
-        expect(mock_airport_2_demand).to receive(:demand).with(no_args).and_return(demand_airport_2)
-        expect(mock_airport_3_demand).to receive(:demand).with(no_args).and_return(demand_airport_3)
+        expect(mock_airport_1_demand).to receive(:demand).with(date).and_return(demand_airport_1)
+        expect(mock_airport_2_demand).to receive(:demand).with(date).and_return(demand_airport_2)
+        expect(mock_airport_3_demand).to receive(:demand).with(date).and_return(demand_airport_3)
 
         actual = Calculation::TotalMarketDemand.tourist(origin_airport, destination_market, date)
 

@@ -101,7 +101,7 @@ class Calculation::TouristDemandTest < ActiveSupport::TestCase
   test "demand is zero when origin and destination market are the same" do
     micronesia = Market.find_by!(name: "Micronesia")
 
-    actual = Calculation::TouristDemand.new(micronesia.airports.first, micronesia.airports.last, Date.today).demand
+    actual = Calculation::TouristDemand.new(micronesia.airports.first, micronesia.airports.last, Date.today).demand(Date.today)
     expected = 0
 
     assert actual == expected
@@ -113,7 +113,7 @@ class Calculation::TouristDemandTest < ActiveSupport::TestCase
     kosrae.update!(country_group: "Federated States of Micronesia")
     RivalCountryGroup.create!(country_one: kosrae.country_group, country_two: micronesia.country_group)
 
-    actual = Calculation::TouristDemand.new(micronesia.airports.first, kosrae.airports.last, Date.today).demand
+    actual = Calculation::TouristDemand.new(micronesia.airports.first, kosrae.airports.last, Date.today).demand(Date.today)
     expected = 0
 
     assert actual == expected
@@ -123,7 +123,7 @@ class Calculation::TouristDemandTest < ActiveSupport::TestCase
     pohnpei = Market.find_by!(name: "Pohnpei")
     micronesia = Market.find_by!(name: "Micronesia")
 
-    actual = Calculation::TouristDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).demand
+    actual = Calculation::TouristDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).demand(Date.today)
     expected = micronesia.populations.first.population
 
     assert actual == expected
@@ -135,7 +135,7 @@ class Calculation::TouristDemandTest < ActiveSupport::TestCase
     pohnpei = Market.find_by!(name: "Pohnpei")
     micronesia = Market.find_by!(name: "Micronesia")
 
-    actual = Calculation::TouristDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).demand
+    actual = Calculation::TouristDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).demand(Date.today)
     expected = micronesia.populations.first.population / 3.0
 
     assert actual == expected
@@ -147,7 +147,7 @@ class Calculation::TouristDemandTest < ActiveSupport::TestCase
     pohnpei = Market.find_by!(name: "Pohnpei")
     micronesia = Market.find_by!(name: "Micronesia")
 
-    actual = Calculation::TouristDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).demand
+    actual = Calculation::TouristDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).demand(Date.today)
     expected = micronesia.populations.first.population / 3.0 * 2
 
     assert actual == expected
@@ -161,7 +161,7 @@ class Calculation::TouristDemandTest < ActiveSupport::TestCase
 
     subject = Calculation::TouristDemand.new(micronesia.airports.last, kosrae.airports.first, Date.today)
 
-    actual = subject.demand
+    actual = subject.demand(Date.today)
 
     assert actual > kosrae.populations.first.population
   end
@@ -176,7 +176,7 @@ class Calculation::TouristDemandTest < ActiveSupport::TestCase
 
     subject = Calculation::TouristDemand.new(micronesia.airports.last, kosrae.airports.first, Date.today)
 
-    actual = subject.demand
+    actual = subject.demand(Date.today)
 
     assert actual < kosrae.populations.first.population
   end
@@ -189,7 +189,7 @@ class Calculation::TouristDemandTest < ActiveSupport::TestCase
 
     subject = Calculation::TouristDemand.new(micronesia.airports.last, kosrae.airports.first, Date.today)
 
-    actual = subject.demand
+    actual = subject.demand(Date.today)
 
     assert actual < kosrae.populations.first.population
   end
