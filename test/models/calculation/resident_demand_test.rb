@@ -101,8 +101,8 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
   test "demand is zero when origin and destination market are the same" do
     micronesia = Market.find_by!(name: "Micronesia")
 
-    actual_business = Calculation::ResidentDemand.new(micronesia.airports.first, micronesia.airports.last, Date.today).business_demand
-    actual_leisure = Calculation::ResidentDemand.new(micronesia.airports.first, micronesia.airports.last, Date.today).leisure_demand
+    actual_business = Calculation::ResidentDemand.new(micronesia.airports.first, micronesia.airports.last).business_demand(Date.today)
+    actual_leisure = Calculation::ResidentDemand.new(micronesia.airports.first, micronesia.airports.last).leisure_demand(Date.today)
     expected = 0
 
     assert actual_business == expected
@@ -115,8 +115,8 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     kosrae.update!(country_group: "Federated States of Micronesia")
     RivalCountryGroup.create!(country_one: kosrae.country_group, country_two: micronesia.country_group)
 
-    actual_business = Calculation::ResidentDemand.new(micronesia.airports.first, kosrae.airports.last, Date.today).business_demand
-    actual_leisure = Calculation::ResidentDemand.new(micronesia.airports.first, kosrae.airports.last, Date.today).leisure_demand
+    actual_business = Calculation::ResidentDemand.new(micronesia.airports.first, kosrae.airports.last).business_demand(Date.today)
+    actual_leisure = Calculation::ResidentDemand.new(micronesia.airports.first, kosrae.airports.last).leisure_demand(Date.today)
     expected = 0
 
     assert actual_business == expected
@@ -127,7 +127,7 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     pohnpei = Market.find_by!(name: "Pohnpei")
     kosrae = Market.find_by!(name: "Kosrae")
 
-    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).business_demand
+    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first).business_demand(Date.today)
     expected = Calculation::DemandCurve.new(:business).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, kosrae.airports.first)) / 100.0 * kosrae.populations.first.population
 
     assert_in_epsilon actual, expected, 0.000001
@@ -139,7 +139,7 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
 
     IslandException.create!(market_one: "Pohnpei", market_two: "Kosrae")
 
-    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).business_demand
+    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first).business_demand(Date.today)
     expected = Calculation::DemandCurve.new(:business).relative_demand(Calculation::Distance.between_airports(pohnpei.airports.first, kosrae.airports.first)) / 100.0 * kosrae.populations.first.population / 2.0
 
     assert_in_epsilon actual, expected, 0.000001
@@ -149,7 +149,7 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     pohnpei = Market.find_by!(name: "Pohnpei")
     micronesia = Market.find_by!(name: "Micronesia")
 
-    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
+    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last).leisure_demand(Date.today)
     expected = Calculation::DemandCurve.new(:leisure).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, micronesia.airports.last)) / 100.0 * micronesia.populations.first.population
 
     assert_in_epsilon actual, expected, 0.000001
@@ -161,7 +161,7 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
 
     IslandException.create!(market_one: "Pohnpei", market_two: "Micronesia")
 
-    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
+    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last).leisure_demand(Date.today)
     expected = Calculation::DemandCurve.new(:leisure).relative_demand(Calculation::Distance.between_airports(pohnpei.airports.first, micronesia.airports.last)) / 100.0 * micronesia.populations.first.population / 2.0
 
     assert_in_epsilon actual, expected, 0.000001
@@ -173,7 +173,7 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     pohnpei = Market.find_by!(name: "Pohnpei")
     kosrae = Market.find_by!(name: "Kosrae")
 
-    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).business_demand
+    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first).business_demand(Date.today)
     expected = Calculation::DemandCurve.new(:business).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, kosrae.airports.first)) / 100.0 * kosrae.populations.first.population / 2.0
 
     assert_in_epsilon actual, expected, 0.000001
@@ -185,7 +185,7 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     pohnpei = Market.find_by!(name: "Pohnpei")
     micronesia = Market.find_by!(name: "Micronesia")
 
-    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
+    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last).leisure_demand(Date.today)
     expected = Calculation::DemandCurve.new(:leisure).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, micronesia.airports.last)) / 100.0 * micronesia.populations.first.population / 2.0
 
     assert_in_epsilon actual, expected, 0.000001
@@ -198,10 +198,10 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     kosrae = Market.find_by!(name: "Kosrae")
     micronesia = Market.find_by!(name: "Micronesia")
 
-    actual_business = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).business_demand
+    actual_business = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first).business_demand(Date.today)
     expected_business = kosrae.populations.first.population / 2.0
 
-    actual_leisure = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
+    actual_leisure = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last).leisure_demand(Date.today)
     expected_leisure = micronesia.populations.first.population / 2.0
 
     assert actual_business == expected_business
@@ -214,7 +214,7 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     pohnpei = Market.find_by!(name: "Pohnpei")
     kosrae = Market.find_by!(name: "Kosrae")
 
-    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).business_demand
+    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first).business_demand(Date.today)
     expected = Calculation::DemandCurve.new(:business).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, kosrae.airports.first)) / 100.0 * kosrae.populations.first.population / 12.0
 
     assert_in_epsilon actual, expected, 0.000001
@@ -226,7 +226,7 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     pohnpei = Market.find_by!(name: "Pohnpei")
     kosrae = Market.find_by!(name: "Kosrae")
 
-    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).business_demand
+    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first).business_demand(Date.today)
     expected = Calculation::DemandCurve.new(:business).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, kosrae.airports.first)) / 100.0 * kosrae.populations.first.population / 12.0 * 9
 
     assert_in_epsilon actual, expected, 0.000001
@@ -238,7 +238,7 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     pohnpei = Market.find_by!(name: "Pohnpei")
     micronesia = Market.find_by!(name: "Micronesia")
 
-    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
+    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last).leisure_demand(Date.today)
     expected = Calculation::DemandCurve.new(:leisure).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, micronesia.airports.last)) / 100.0 * micronesia.populations.first.population / 12.0
 
     assert_in_epsilon actual, expected, 0.000001
@@ -250,7 +250,7 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     pohnpei = Market.find_by!(name: "Pohnpei")
     micronesia = Market.find_by!(name: "Micronesia")
 
-    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
+    actual = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last).leisure_demand(Date.today)
     expected = Calculation::DemandCurve.new(:leisure).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, micronesia.airports.last)) / 100.0 * micronesia.populations.first.population / 12.0 * 9
 
     assert_in_epsilon actual, expected, 0.000001
@@ -263,10 +263,10 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     kosrae = Market.find_by!(name: "Kosrae")
     micronesia = Market.find_by!(name: "Micronesia")
 
-    actual_business = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).business_demand
+    actual_business = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first).business_demand(Date.today)
     expected_business = 1000 / 8.0
 
-    actual_leisure = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
+    actual_leisure = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last).leisure_demand(Date.today)
     expected_leisure = micronesia.populations.first.population / 8.0
 
     assert actual_business == expected_business
@@ -280,10 +280,10 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     kosrae = Market.find_by!(name: "Kosrae")
     micronesia = Market.find_by!(name: "Micronesia")
 
-    actual_business = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).business_demand
+    actual_business = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first).business_demand(Date.today)
     expected_business = 1000 / 8.0 * 3
 
-    actual_leisure = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
+    actual_leisure = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last).leisure_demand(Date.today)
     expected_leisure = micronesia.populations.first.population / 8.0 * 3
 
     assert actual_business == expected_business
@@ -294,10 +294,10 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     micronesia = Market.find_by!(name: "Micronesia")
     kosrae = Market.find_by!(name: "Kosrae")
 
-    subject = Calculation::ResidentDemand.new(micronesia.airports.last, kosrae.airports.first, Date.today)
+    subject = Calculation::ResidentDemand.new(micronesia.airports.last, kosrae.airports.first)
 
-    actual_business = subject.business_demand
-    actual_leisure = subject.leisure_demand
+    actual_business = subject.business_demand(Date.today)
+    actual_leisure = subject.leisure_demand(Date.today)
 
     assert actual_business > kosrae.populations.first.population
     assert actual_leisure > kosrae.populations.first.population
@@ -309,10 +309,10 @@ class Calculation::ResidentDemandTest < ActiveSupport::TestCase
     micronesia = Market.find_by!(name: "Micronesia")
     kosrae = Market.find_by!(name: "Kosrae")
 
-    subject = Calculation::ResidentDemand.new(micronesia.airports.last, kosrae.airports.first, Date.today)
+    subject = Calculation::ResidentDemand.new(micronesia.airports.last, kosrae.airports.first)
 
-    actual_business = subject.business_demand
-    actual_leisure = subject.leisure_demand
+    actual_business = subject.business_demand(Date.today)
+    actual_leisure = subject.leisure_demand(Date.today)
 
     assert actual_business < kosrae.populations.first.population
     assert actual_leisure < kosrae.populations.first.population

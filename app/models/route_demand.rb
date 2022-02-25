@@ -30,18 +30,18 @@ class RouteDemand < ApplicationRecord
   private
 
     def self.business_demand(origin_airport, destination_airport, date)
-      Calculation::ResidentDemand.new(origin_airport, destination_airport, date).business_demand
+      Calculation::ResidentDemand.new(origin_airport, destination_airport).business_demand(date)
     end
 
     def self.government_demand(origin_airport, destination_airport, date)
-      Calculation::GovernmentDemand.new(origin_airport, destination_airport, date).demand
+      Calculation::GovernmentDemand.new(origin_airport, destination_airport).demand(date)
     end
 
     def self.leisure_demand(origin_airport, destination_airport, date)
-      Calculation::ResidentDemand.new(origin_airport, destination_airport, date).leisure_demand
+      Calculation::ResidentDemand.new(origin_airport, destination_airport).leisure_demand(date)
     end
 
     def self.tourist_demand(origin_airport, destination_airport, date)
-      Calculation::TouristDemand.new(origin_airport, destination_airport, date).demand
+      Calculation::TouristDemand.new(origin_airport, destination_airport).demand(date)
     end
 end

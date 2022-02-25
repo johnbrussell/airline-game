@@ -11,9 +11,9 @@ RSpec.describe RouteDemand do
       mock_government_demand = double
       mock_tourist_demand = double
 
-      expect(Calculation::ResidentDemand).to receive(:new).twice.with(airport_1, airport_2, date).and_return(mock_resident_demand)
-      expect(Calculation::GovernmentDemand).to receive(:new).with(airport_1, airport_2, date).and_return(mock_government_demand)
-      expect(Calculation::TouristDemand).to receive(:new).with(airport_1, airport_2, date).and_return(mock_tourist_demand)
+      expect(Calculation::ResidentDemand).to receive(:new).twice.with(airport_1, airport_2).and_return(mock_resident_demand)
+      expect(Calculation::GovernmentDemand).to receive(:new).with(airport_1, airport_2).and_return(mock_government_demand)
+      expect(Calculation::TouristDemand).to receive(:new).with(airport_1, airport_2).and_return(mock_tourist_demand)
 
       expect(mock_resident_demand).to receive(:business_demand).and_return(4)
       expect(mock_government_demand).to receive(:demand).and_return(1)

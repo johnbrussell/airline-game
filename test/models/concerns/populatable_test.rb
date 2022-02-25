@@ -51,9 +51,9 @@ class PopulatableTest < ActiveSupport::TestCase
       exclusive_catchment: 0.5,
     )
 
-    subject = TestClass.new(origin_market.airports.first, Market.last.airports.first, Date.today)
+    subject = TestClass.new(origin_market.airports.first, Market.last.airports.first)
 
-    assert subject.send(:airport_population) == 9950
+    assert subject.send(:airport_population, Date.today) == 9950
   end
 end
 

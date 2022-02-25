@@ -102,7 +102,7 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
   test "demand is zero when origin and destination market are the same" do
     micronesia = Market.find_by!(name: "Micronesia")
 
-    actual = Calculation::GovernmentDemand.new(micronesia.airports.first, micronesia.airports.last, Date.today).demand
+    actual = Calculation::GovernmentDemand.new(micronesia.airports.first, micronesia.airports.last).demand(Date.today)
     expected = 0
 
     assert actual == expected
@@ -112,7 +112,7 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
     micronesia = Market.find_by!(name: "Micronesia")
     pohnpei = Market.find_by!(name: "Pohnpei")
 
-    actual = Calculation::GovernmentDemand.new(micronesia.airports.first, pohnpei.airports.last, Date.today).demand
+    actual = Calculation::GovernmentDemand.new(micronesia.airports.first, pohnpei.airports.last).demand(Date.today)
     expected = 0
 
     assert actual == expected
@@ -124,7 +124,7 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
     kosrae.update!(country_group: "Federated States of Micronesia", is_national_capital: true)
     RivalCountryGroup.create!(country_one: kosrae.country_group, country_two: micronesia.country_group)
 
-    actual = Calculation::GovernmentDemand.new(kosrae.airports.first, micronesia.airports.last, Date.today).demand
+    actual = Calculation::GovernmentDemand.new(kosrae.airports.first, micronesia.airports.last).demand(Date.today)
     expected = 0
 
     assert actual == expected
@@ -134,7 +134,7 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
     pohnpei = Market.find_by!(name: "Pohnpei")
     kosrae = Market.find_by!(name: "Kosrae")
 
-    actual = Calculation::GovernmentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).demand
+    actual = Calculation::GovernmentDemand.new(pohnpei.airports.first, kosrae.airports.first).demand(Date.today)
     expected = Calculation::DemandCurve.new(:business).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, kosrae.airports.first)) / 100.0 * kosrae.populations.first.population
 
     assert_in_epsilon actual, expected, 0.000001
@@ -146,7 +146,7 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
 
     IslandException.create!(market_one: "Pohnpei", market_two: "Kosrae")
 
-    actual = Calculation::GovernmentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).demand
+    actual = Calculation::GovernmentDemand.new(pohnpei.airports.first, kosrae.airports.first).demand(Date.today)
     expected = Calculation::DemandCurve.new(:business).relative_demand(Calculation::Distance.between_airports(pohnpei.airports.first, kosrae.airports.first)) / 100.0 * kosrae.populations.first.population / 2.0
 
     assert_in_epsilon actual, expected, 0.000001
@@ -158,7 +158,7 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
     pohnpei = Market.find_by!(name: "Pohnpei")
     kosrae = Market.find_by!(name: "Kosrae")
 
-    actual = Calculation::GovernmentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).demand
+    actual = Calculation::GovernmentDemand.new(pohnpei.airports.first, kosrae.airports.first).demand(Date.today)
     expected = Calculation::DemandCurve.new(:business).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, kosrae.airports.first)) / 100.0 * kosrae.populations.first.population / 2.0
 
     assert_in_epsilon actual, expected, 0.000001
@@ -171,7 +171,7 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
     kosrae = Market.find_by!(name: "Kosrae")
     micronesia = Market.find_by!(name: "Micronesia")
 
-    actual = Calculation::GovernmentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).demand
+    actual = Calculation::GovernmentDemand.new(pohnpei.airports.first, kosrae.airports.first).demand(Date.today)
     expected = kosrae.populations.first.population / 2.0
 
     assert actual == expected
@@ -183,7 +183,7 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
     pohnpei = Market.find_by!(name: "Pohnpei")
     kosrae = Market.find_by!(name: "Kosrae")
 
-    actual = Calculation::GovernmentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).demand
+    actual = Calculation::GovernmentDemand.new(pohnpei.airports.first, kosrae.airports.first).demand(Date.today)
     expected = Calculation::DemandCurve.new(:business).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, kosrae.airports.first)) / 100.0 * kosrae.populations.first.population / 100.0
 
     assert_in_epsilon actual, expected, 0.000001
@@ -195,7 +195,7 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
     pohnpei = Market.find_by!(name: "Pohnpei")
     kosrae = Market.find_by!(name: "Kosrae")
 
-    actual = Calculation::GovernmentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).demand
+    actual = Calculation::GovernmentDemand.new(pohnpei.airports.first, kosrae.airports.first).demand(Date.today)
     expected = Calculation::DemandCurve.new(:business).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, kosrae.airports.first)) / 100.0 * 33 * kosrae.populations.first.population / 100.0
 
     assert_in_epsilon actual, expected, 0.000001
@@ -208,7 +208,7 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
     kosrae = Market.find_by!(name: "Kosrae")
     micronesia = Market.find_by!(name: "Micronesia")
 
-    actual = Calculation::GovernmentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).demand
+    actual = Calculation::GovernmentDemand.new(pohnpei.airports.first, kosrae.airports.first).demand(Date.today)
     expected = 1000 / 200.0
 
     assert_in_epsilon actual, expected, 0.000001
@@ -220,9 +220,9 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
     micronesia = Market.find_by!(name: "Micronesia")
     kosrae = Market.find_by!(name: "Kosrae")
 
-    subject = Calculation::GovernmentDemand.new(micronesia.airports.last, kosrae.airports.first, Date.today)
+    subject = Calculation::GovernmentDemand.new(micronesia.airports.last, kosrae.airports.first)
 
-    actual = subject.demand
+    actual = subject.demand(Date.today)
 
     assert actual > kosrae.populations.first.population
   end
@@ -235,9 +235,9 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
 
     IslandException.create!(market_one: "Micronesia", market_two: "Kosrae")
 
-    subject = Calculation::GovernmentDemand.new(micronesia.airports.last, kosrae.airports.first, Date.today)
+    subject = Calculation::GovernmentDemand.new(micronesia.airports.last, kosrae.airports.first)
 
-    actual = subject.demand
+    actual = subject.demand(Date.today)
 
     assert actual < kosrae.populations.first.population
   end
@@ -248,9 +248,9 @@ class Calculation::GovernmentDemandTest < ActiveSupport::TestCase
     micronesia = Market.find_by!(name: "Micronesia")
     kosrae = Market.find_by!(name: "Kosrae")
 
-    subject = Calculation::GovernmentDemand.new(micronesia.airports.last, kosrae.airports.first, Date.today)
+    subject = Calculation::GovernmentDemand.new(micronesia.airports.last, kosrae.airports.first)
 
-    actual = subject.demand
+    actual = subject.demand(Date.today)
 
     assert actual < kosrae.populations.first.population
   end
