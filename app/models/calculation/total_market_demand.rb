@@ -49,7 +49,7 @@ class Calculation::TotalMarketDemand
       destination_market.airports.map { |airport|
         {
           airport: airport,
-          demand: Calculation::ResidentDemand.new(origin_airport, airport).business_demand(date),
+          demand: Calculation::ResidentDemand.new(origin_airport, airport, date).business_demand,
         }
       }
     end
@@ -58,7 +58,7 @@ class Calculation::TotalMarketDemand
       destination_market.airports.map { |airport|
         {
           airport: airport,
-          demand: Calculation::GovernmentDemand.new(origin_airport, airport).demand(date),
+          demand: Calculation::GovernmentDemand.new(origin_airport, airport, date).demand,
         }
       }
     end
@@ -67,7 +67,7 @@ class Calculation::TotalMarketDemand
       destination_market.airports.map { |airport|
         {
           airport: airport,
-          demand: Calculation::ResidentDemand.new(origin_airport, airport).leisure_demand(date),
+          demand: Calculation::ResidentDemand.new(origin_airport, airport, date).leisure_demand,
         }
       }
     end
@@ -76,7 +76,7 @@ class Calculation::TotalMarketDemand
       destination_market.airports.map { |airport|
         {
           airport: airport,
-          demand: Calculation::TouristDemand.new(origin_airport, airport).demand(date),
+          demand: Calculation::TouristDemand.new(origin_airport, airport, date).demand,
         }
       }
     end

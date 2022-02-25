@@ -1,11 +1,11 @@
 class Calculation::TouristDemand
   include Populatable
 
-  def demand(current_date)
+  def demand
     if origin_market == destination_market || RivalCountryGroup.rivals?(origin_market.country_group, destination_market.country_group)
       0
     else
-      airport_population(current_date) / 100.0 * distance_demand * border_multiplier
+      airport_population / 100.0 * distance_demand * border_multiplier
     end
   end
 

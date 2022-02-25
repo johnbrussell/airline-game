@@ -1,9 +1,10 @@
 module Demandable
   extend ActiveSupport::Concern
 
-  def initialize(origin, destination)
+  def initialize(origin, destination, current_date)
     @origin = origin
     @destination = destination
+    @current_date = current_date
   end
 
   private
@@ -13,7 +14,7 @@ module Demandable
     end
 
     def distance
-      @distance ||= Calculation::Distance.between_airports(@origin, @destination)
+      Calculation::Distance.between_airports(@origin, @destination)
     end
 
     def domestic?

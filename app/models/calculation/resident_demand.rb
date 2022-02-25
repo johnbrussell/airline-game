@@ -2,12 +2,12 @@ class Calculation::ResidentDemand
   include Islandable
   include Populatable
 
-  def business_demand(current_date)
-    raw_demand(:business, current_date)
+  def business_demand
+    raw_demand(:business)
   end
 
-  def leisure_demand(current_date)
-    raw_demand(:leisure, current_date)
+  def leisure_demand
+    raw_demand(:leisure)
   end
 
   private
@@ -64,11 +64,11 @@ class Calculation::ResidentDemand
       end
     end
 
-    def raw_demand(type, current_date)
+    def raw_demand(type)
       if origin_market == destination_market || RivalCountryGroup.rivals?(origin_market.country_group, destination_market.country_group)
         0
       else
-        airport_population(current_date) / 100.0 * distance_demand(type) * border_multiplier * island_multipler
+        airport_population / 100.0 * distance_demand(type) * border_multiplier * island_multipler
       end
     end
 end
