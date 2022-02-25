@@ -143,6 +143,10 @@ class Airplane < ApplicationRecord
     value / 2.0
   end
 
+  def num_seats
+    economy_seats + premium_economy_seats + business_seats
+  end
+
   def purchase(airline, business_seats, premium_economy_seats, economy_seats)
     if built?
       assign_attributes(base_country_group: airline.base.country_group)
@@ -257,10 +261,6 @@ class Airplane < ApplicationRecord
         where("construction_date <= ?", game.current_date).
         where("aircraft_families.id == ?", aircraft_model.family.id).
         count
-    end
-
-    def num_seats
-      economy_seats + premium_economy_seats + business_seats
     end
 
     def operator_changes_appropriately

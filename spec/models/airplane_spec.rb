@@ -1135,6 +1135,17 @@ RSpec.describe Airplane do
     end
   end
 
+  context "num_seats" do
+    it "is equal to the number of seats on the airplane" do
+      family = Fabricate(:aircraft_family)
+      subject = Fabricate(:airplane, aircraft_family: family)
+
+      subject.update(economy_seats: 10, business_seats: 20, premium_economy_seats: 30)
+
+      expect(subject.num_seats).to eq 60
+    end
+  end
+
   context "purchase" do
     purchase_price_new = 100000000
 
@@ -1274,17 +1285,6 @@ RSpec.describe Airplane do
   end
 
   context "range_from_airport" do
-    context "num_seats" do
-      it "is equal to the number of seats on the airplane" do
-        family = Fabricate(:aircraft_family)
-        subject = Fabricate(:airplane, aircraft_family: family)
-
-        subject.update(economy_seats: 10, business_seats: 20, premium_economy_seats: 30)
-
-        expect(subject.send(:num_seats)).to eq 60
-      end
-    end
-
     context "percent_of_max_seats_uninstalled" do
       it "is 0 when the seats on the plane are maximized" do
         family = Fabricate(:aircraft_family)
