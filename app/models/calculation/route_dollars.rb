@@ -64,7 +64,7 @@ class Calculation::RouteDollars
     end
 
     def origin_route_demand
-      @origin_route_demand ||= RouteDemand.calculate(@date, origin_global_demand.airport, @destination_airport)
+      @origin_route_demand ||= RouteDemand.calculate(@date, @destination_airport, @origin_airport)
     end
 
     def destination_global_demand
@@ -72,6 +72,6 @@ class Calculation::RouteDollars
     end
 
     def destination_route_demand
-      @destination_route_demand ||= RouteDemand.calculate(@date, destination_global_demand.airport, @origin_airport)
+      @destination_route_demand ||= RouteDemand.calculate(@date, @origin_airport, @destination_airport)
     end
 end
