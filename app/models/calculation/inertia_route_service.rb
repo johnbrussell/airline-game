@@ -68,6 +68,10 @@ class Calculation::InertiaRouteService
     end
   end
 
+  def flight_cost
+    @flight_cost ||= Calculation::FlightCostCalculator.new(inertia_airplane, distance).cost
+  end
+
   def premium_economy_fare
     if premium_economy_frequencies == 0
       0
@@ -122,10 +126,6 @@ class Calculation::InertiaRouteService
 
     def economy_revenue
       revenue.max_economy_class_revenue_per_week * REVENUE_PERCENTAGE
-    end
-
-    def flight_cost
-      @flight_cost ||= Calculation::FlightCostCalculator.new(inertia_airplane, distance).cost
     end
 
     def inertia_airplane
