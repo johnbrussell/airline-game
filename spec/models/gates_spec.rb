@@ -58,7 +58,7 @@ RSpec.describe Gates do
 
   context "build_new_gate" do
     it "creates new slots for the appropriate airline and updates the number of gates on the Airport and charges the airline" do
-      Market.create!(
+      market = Market.create!(
         name: "Bar",
         country: "Baz",
         country_group: "Foobar",
@@ -73,13 +73,13 @@ RSpec.describe Gates do
         easy_gates: 2,
         latitude: 40,
         longitude: -70,
-        market: Market.last,
+        market: market,
       )
       airline = Airline.create!(
         name: "Foo",
         cash_on_hand: 1000000000,
         is_user_airline: false,
-        base_id: 1,
+        base_id: market.id,
         game_id: 6,
       )
       date = Date.today
@@ -124,7 +124,7 @@ RSpec.describe Gates do
     end
 
     it "adds an error if the airline does not have enough cash on hand" do
-      Market.create!(
+      market = Market.create!(
         name: "Bar",
         country: "Baz",
         country_group: "Foobar",
@@ -145,7 +145,7 @@ RSpec.describe Gates do
         name: "Foo",
         cash_on_hand: 0,
         is_user_airline: false,
-        base_id: 1,
+        base_id: market.id,
         game_id: 6,
       )
       date = Date.today
@@ -170,7 +170,7 @@ RSpec.describe Gates do
     end
 
     it "adds an error if the airline is politically disallowed from building the gate" do
-      Market.create!(
+      market = Market.create!(
         name: "Nauru",
         country: "Nauru",
         country_group: "Nauru",
@@ -197,7 +197,7 @@ RSpec.describe Gates do
         name: "Foo",
         cash_on_hand: 200000000,
         is_user_airline: false,
-        base_id: 1,
+        base_id: market.id,
         game_id: 6,
       )
       date = Date.today
@@ -313,7 +313,7 @@ RSpec.describe Gates do
     end
 
     it "adds an error if the airline is politically disallowed from leasing slots" do
-      Market.create!(
+      market = Market.create!(
         name: "Nauru",
         country: "Nauru",
         country_group: "Nauru",
@@ -340,7 +340,7 @@ RSpec.describe Gates do
         name: "Foo",
         cash_on_hand: 200000000,
         is_user_airline: false,
-        base_id: 1,
+        base_id: market.id,
         game_id: 6,
       )
       date = Date.today

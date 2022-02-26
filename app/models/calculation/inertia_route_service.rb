@@ -68,6 +68,10 @@ class Calculation::InertiaRouteService
     end
   end
 
+  def flight_cost
+    @flight_cost ||= Calculation::FlightCostCalculator.new(inertia_airplane, distance).cost
+  end
+
   def premium_economy_fare
     if premium_economy_frequencies == 0
       0
@@ -124,13 +128,9 @@ class Calculation::InertiaRouteService
       revenue.max_economy_class_revenue_per_week * REVENUE_PERCENTAGE
     end
 
-    def flight_cost
-      @flight_cost ||= Calculation::FlightCostCalculator.new(inertia_airplane, distance).cost
-    end
-
     def inertia_airplane
       Airplane.new(
-        base_country_group: @origin.market.country_group,
+        base_country_group: "foo",
         business_seats: business_seats_per_flight,
         construction_date: Date.today,
         economy_seats: economy_seats_per_flight,
