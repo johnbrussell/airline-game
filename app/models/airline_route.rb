@@ -10,6 +10,7 @@ class AirlineRoute < ApplicationRecord
   validate :airline_can_fly_route
   validate :airports_alphabetized
 
+  has_one :revenue, class_name: "AirlineRouteRevenue"
   has_many :airplane_routes
   has_many :airplanes, through: :airplane_routes
   belongs_to :airline
