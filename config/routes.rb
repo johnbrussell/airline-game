@@ -4,6 +4,8 @@ Rails.application.routes.draw do
   resources :games do
     resources :airlines do
       resources :airplanes
+
+      get "/routes", to: "routes#index"
     end
 
     resources :airplanes do
