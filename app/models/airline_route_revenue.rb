@@ -8,4 +8,16 @@ class AirlineRouteRevenue < ApplicationRecord
   validates :business_pax, numericality: { greater_than_or_equal_to: 0 }
   validates :revenue, presence: true
   validates :revenue, numericality: { greater_than_or_equal_to: 0 }
+  validate :revenue_calculated_correctly
+
+  belongs_to :airline_route
+
+  private
+
+    def revenue_calculated_correctly
+      pax_revenue = airline_route.economy_price * economy_pax + airline_route.premium_economy_price * premium_economy_pax + airline_route.business_price * business_pax
+      if pax_revenue.round(2) != revenue
+        errors.add(:revenue, "not calculated correctly")
+      end
+    end
 end
