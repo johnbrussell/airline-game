@@ -36,6 +36,15 @@ class Airline < ApplicationRecord
       .uniq
   end
 
+  def routes
+    airline_routes
+      .joins(:airplane_routes)
+      .joins("LEFT OUTER JOIN airports AS origin_airports ON airline_routes.origin_airport_id == origin_airports.id")
+      .joins("LEFT OUTER JOIN airports AS destination_airports ON airline_routes.destination_airport_id == destination_airports.id")
+      .order("origin_airports.iata, destination_airports.iata")
+      .uniq
+  end
+
   def routes_at_airport(airport)
     airline_routes
       .joins(:airplane_routes)
