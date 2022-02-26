@@ -34,9 +34,9 @@ class Calculation::ResidentDemand
 
     def distance_demand(type)
       if origin_market.is_island && !IslandException.excepted?(origin_market, destination_market)
-        demand_curve(type).relative_demand_island(distance)
+        demand_curve(type).relative_demand_island(distance) * Calculation::InertiaRouteService.new(@origin, @destination, @date).flight_cost / 10000.0
       else
-        demand_curve(type).relative_demand(distance)
+        demand_curve(type).relative_demand(distance) * Calculation::InertiaRouteService.new(@origin, @destination, @date).flight_cost / 10000.0
       end
     end
 

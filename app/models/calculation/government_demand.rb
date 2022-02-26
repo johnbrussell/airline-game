@@ -28,9 +28,9 @@ class Calculation::GovernmentDemand
 
     def distance_demand
       if origin_market.is_island && !IslandException.excepted?(origin_market, destination_market)
-        demand_curve.relative_demand_island(distance)
+        demand_curve.relative_demand_island(distance) * Calculation::InertiaRouteService.new(@origin, @destination, @date).flight_cost / 10000.0
       else
-        demand_curve.relative_demand(distance)
+        demand_curve.relative_demand(distance) * Calculation::InertiaRouteService.new(@origin, @destination, @date).flight_cost / 10000.0
       end
     end
 end
