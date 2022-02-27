@@ -8,9 +8,10 @@ class Calculation::FlightCostCalculator
   RAMP_AGENT_COST_PER_FLIGHT = 35
   SERVICE_COST_PER_HOUR = 0.17
 
-  def initialize(airplane, distance)
+  def initialize(airplane, distance, service_quality)
     @airplane = airplane
     @distance = distance
+    @service_quality = service_quality
   end
 
   def cost
@@ -40,7 +41,7 @@ class Calculation::FlightCostCalculator
     end
 
     def in_flight_service
-      SERVICE_COST_PER_HOUR / 60 * flight_time_mins * @airplane.num_seats
+      SERVICE_COST_PER_HOUR / 60 * flight_time_mins * @airplane.num_seats * @service_quality
     end
 
     def num_gate_agents

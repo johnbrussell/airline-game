@@ -35,13 +35,13 @@ RSpec.describe Calculation::FlightCostCalculator do
 
   context "cost" do
     it "is greater than zero and increases with distance" do
-      zero_distance_cost = Calculation::FlightCostCalculator.new(airplane, 0).cost
+      zero_distance_cost = Calculation::FlightCostCalculator.new(airplane, 0, 1).cost
       expect(zero_distance_cost).to be > 0
 
-      one_distance_cost = Calculation::FlightCostCalculator.new(airplane, 1).cost
+      one_distance_cost = Calculation::FlightCostCalculator.new(airplane, 1, 1).cost
       expect(one_distance_cost).to be > zero_distance_cost
 
-      one_thousand_distance_cost = Calculation::FlightCostCalculator.new(airplane, 1000).cost
+      one_thousand_distance_cost = Calculation::FlightCostCalculator.new(airplane, 1000, 1).cost
       expect(one_thousand_distance_cost).to be > one_distance_cost
     end
   end
@@ -61,10 +61,10 @@ RSpec.describe Calculation::FlightCostCalculator do
       distance = 100
 
       expect(mock_model).to receive(:flight_time_mins).with(distance).and_return(60)
-      expect(Calculation::FlightCostCalculator.new(mock_airplane, distance).send(:pilots)).to eq Calculation::FlightCostCalculator::PILOT_HOURLY_COST * num_pilots
+      expect(Calculation::FlightCostCalculator.new(mock_airplane, distance, 1).send(:pilots)).to eq Calculation::FlightCostCalculator::PILOT_HOURLY_COST * num_pilots
 
       expect(mock_model).to receive(:flight_time_mins).with(distance).and_return(90)
-      expect(Calculation::FlightCostCalculator.new(mock_airplane, distance).send(:pilots)).to eq Calculation::FlightCostCalculator::PILOT_HOURLY_COST * num_pilots * 1.5
+      expect(Calculation::FlightCostCalculator.new(mock_airplane, distance, 1).send(:pilots)).to eq Calculation::FlightCostCalculator::PILOT_HOURLY_COST * num_pilots * 1.5
     end
   end
 
@@ -83,10 +83,10 @@ RSpec.describe Calculation::FlightCostCalculator do
       distance = 100
 
       expect(mock_model).to receive(:flight_time_mins).with(distance).and_return(60)
-      expect(Calculation::FlightCostCalculator.new(mock_airplane, distance).send(:flight_attendants)).to eq Calculation::FlightCostCalculator::FA_HOURLY_COST * num_fas
+      expect(Calculation::FlightCostCalculator.new(mock_airplane, distance, 1).send(:flight_attendants)).to eq Calculation::FlightCostCalculator::FA_HOURLY_COST * num_fas
 
       expect(mock_model).to receive(:flight_time_mins).with(distance).and_return(90)
-      expect(Calculation::FlightCostCalculator.new(mock_airplane, distance).send(:flight_attendants)).to eq Calculation::FlightCostCalculator::FA_HOURLY_COST * num_fas * 1.5
+      expect(Calculation::FlightCostCalculator.new(mock_airplane, distance, 1).send(:flight_attendants)).to eq Calculation::FlightCostCalculator::FA_HOURLY_COST * num_fas * 1.5
     end
   end
 
@@ -105,7 +105,7 @@ RSpec.describe Calculation::FlightCostCalculator do
       distance = 100
 
       expect(mock_model).to receive(:flight_fuel_burn).with(distance).and_return(1000)
-      expect(Calculation::FlightCostCalculator.new(mock_airplane, distance).send(:fuel)).to eq Calculation::FlightCostCalculator::FUEL_COST_PER_GALLON * 1000
+      expect(Calculation::FlightCostCalculator.new(mock_airplane, distance, 1).send(:fuel)).to eq Calculation::FlightCostCalculator::FUEL_COST_PER_GALLON * 1000
     end
   end
 
@@ -127,11 +127,37 @@ RSpec.describe Calculation::FlightCostCalculator do
 
       expect(mock_model).to receive(:flight_time_mins).with(distance).and_return(60)
       expect(mock_airplane).to receive(:num_seats).and_return(num_seats)
-      expect(Calculation::FlightCostCalculator.new(mock_airplane, distance).send(:in_flight_service)).to eq Calculation::FlightCostCalculator::SERVICE_COST_PER_HOUR * num_seats
+      expect(Calculation::FlightCostCalculator.new(mock_airplane, distance, 1).send(:in_flight_service)).to eq Calculation::FlightCostCalculator::SERVICE_COST_PER_HOUR * num_seats
 
       expect(mock_model).to receive(:flight_time_mins).with(distance).and_return(90)
       expect(mock_airplane).to receive(:num_seats).and_return(num_seats)
-      assert_in_epsilon Calculation::FlightCostCalculator.new(mock_airplane, distance).send(:in_flight_service), Calculation::FlightCostCalculator::SERVICE_COST_PER_HOUR * num_seats * 1.5, 0.000001
+      assert_in_epsilon Calculation::FlightCostCalculator.new(mock_airplane, distance, 1).send(:in_flight_service), Calculation::FlightCostCalculator::SERVICE_COST_PER_HOUR * num_seats * 1.5, 0.000001
+    end
+
+    it "scales linearly with service quality" do
+      mock_model = instance_double(
+        AircraftModel,
+        **aircraft_model_attributes,
+      )
+      mock_airplane = instance_double(
+        Airplane,
+        aircraft_model: mock_model,
+        **airplane_attributes,
+      )
+
+      distance = 100
+
+      num_seats = (1..154).to_a.sample
+
+      expect(mock_model).to receive(:flight_time_mins).with(distance).and_return(60)
+      expect(mock_airplane).to receive(:num_seats).and_return(num_seats)
+      expect(Calculation::FlightCostCalculator.new(mock_airplane, distance, 1).send(:in_flight_service)).to eq Calculation::FlightCostCalculator::SERVICE_COST_PER_HOUR * num_seats
+
+      service_quality = (1..5).to_a.sample
+
+      expect(mock_model).to receive(:flight_time_mins).with(distance).and_return(60)
+      expect(mock_airplane).to receive(:num_seats).and_return(num_seats)
+      assert_in_epsilon Calculation::FlightCostCalculator.new(mock_airplane, distance, service_quality).send(:in_flight_service), Calculation::FlightCostCalculator::SERVICE_COST_PER_HOUR * num_seats * service_quality, 0.000001
     end
   end
 
@@ -153,7 +179,7 @@ RSpec.describe Calculation::FlightCostCalculator do
         )
 
         expect(mock_airplane).to receive(:num_seats).and_return(1)
-        expect(Calculation::FlightCostCalculator.new(mock_airplane, distance).send(:num_ramp_agents)).to eq 1
+        expect(Calculation::FlightCostCalculator.new(mock_airplane, distance, 1).send(:num_ramp_agents)).to eq 1
       end
 
       it "is two for planes with flight attendants" do
@@ -170,7 +196,7 @@ RSpec.describe Calculation::FlightCostCalculator do
         )
 
         expect(mock_airplane).to receive(:num_seats).and_return(1)
-        expect(Calculation::FlightCostCalculator.new(mock_airplane, distance).send(:num_ramp_agents)).to eq 2
+        expect(Calculation::FlightCostCalculator.new(mock_airplane, distance, 1).send(:num_ramp_agents)).to eq 2
       end
 
       it "increases with plane size" do
@@ -187,7 +213,7 @@ RSpec.describe Calculation::FlightCostCalculator do
         )
 
         expect(mock_airplane).to receive(:num_seats).and_return(Calculation::FlightCostCalculator::MARGINAL_RAMP_AGENT_PAX / 2 + 1)
-        expect(Calculation::FlightCostCalculator.new(mock_airplane, distance).send(:num_ramp_agents)).to eq 3
+        expect(Calculation::FlightCostCalculator.new(mock_airplane, distance, 1).send(:num_ramp_agents)).to eq 3
       end
     end
 
@@ -209,7 +235,7 @@ RSpec.describe Calculation::FlightCostCalculator do
       expected_ramp = 2 + Calculation::FlightCostCalculator::MARGINAL_GATE_AGENT_PAX
       expected_gate = 1 + Calculation::FlightCostCalculator::MARGINAL_RAMP_AGENT_PAX
 
-      subject = Calculation::FlightCostCalculator.new(mock_airplane, distance)
+      subject = Calculation::FlightCostCalculator.new(mock_airplane, distance, 1)
 
       expect(subject.send(:num_ramp_agents)).to eq expected_ramp
       expect(subject.send(:num_gate_agents)).to eq expected_gate

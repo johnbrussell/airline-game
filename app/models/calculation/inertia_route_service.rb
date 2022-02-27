@@ -4,6 +4,7 @@ class Calculation::InertiaRouteService
   INERTIA_PLANE_FUEL_BURN_CONSTANT = 118.4
   INERTIA_PLANE_MAX_NARROWBODY_SEATS = 199
   INERTIA_PLANE_SPEED = 556
+  INERTIA_SERVICE_QUALITY = 1
   LOAD_FACTOR = 0.7
   MAX_PASSENGERS_PER_FA = 50
   REVENUE_PERCENTAGE = 0.5
@@ -69,7 +70,7 @@ class Calculation::InertiaRouteService
   end
 
   def flight_cost
-    @flight_cost ||= Calculation::FlightCostCalculator.new(inertia_airplane, distance).cost
+    @flight_cost ||= Calculation::FlightCostCalculator.new(inertia_airplane, distance, INERTIA_SERVICE_QUALITY).cost
   end
 
   def premium_economy_fare

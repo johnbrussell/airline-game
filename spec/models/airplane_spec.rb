@@ -579,6 +579,24 @@ RSpec.describe Airplane do
     end
   end
 
+  context "legroom_reputation" do
+    it "is equivalent to the square root of the percentage of the floor space that is unused" do
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, family: family, floor_space: Airplane::ECONOMY_SEAT_SIZE * 4)
+      subject = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 1)
+
+      expect(subject.legroom_reputation).to eq Math.sqrt(0.75)
+
+      subject.update(economy_seats: 4)
+
+      expect(subject.legroom_reputation).to eq 0
+
+      subject.update(economy_seats: 0)
+
+      expect(subject.legroom_reputation).to eq 1
+    end
+  end
+
   context "maintenance_cost_per_day" do
     it "is the aircraft model's maintenance rate when the airplane is unique in its family" do
       family = Fabricate(:aircraft_family)
@@ -809,6 +827,75 @@ RSpec.describe Airplane do
       subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
 
       expect(subject.send(:num_in_family)).to eq 3
+    end
+  end
+
+  context "on_time_reputation" do
+    let(:family) { Fabricate(:aircraft_family) }
+    let(:model) { Fabricate(:aircraft_model, family: family, speed: 100, num_aisles: 1) }
+    let(:origin) { Fabricate(:airport, iata: "ACV") }
+    let(:destination) { Fabricate(:airport, market: origin.market, iata: "LAS") }
+    let(:airline) { Fabricate(:airline, base_id: origin.market.id) }
+
+    it "is 1 when the airplane is not utilized" do
+      expect(Airplane.new.on_time_reputation).to eq 1
+    end
+
+    it "is 1 irrespective of utilization when the airplane flies few flights" do
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model)
+
+      airline_route = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, economy_price: 1, business_price: 3, premium_economy_price: 2, distance: 1, airline: airline)
+      airplane_route_1 = AirplaneRoute.new(airplane: subject, route: airline_route, frequencies: 1, block_time_mins: 1, flight_cost: 1).save(validate: false)
+
+      expect(Calculation::Distance).to receive(:between_airports).with(origin, destination).and_return 200000
+
+      subject.reload
+
+      expect(subject.utilization).to be > Airplane::MAX_TOTAL_BLOCK_TIME_HOURS_PER_DAY
+      expect(subject.on_time_reputation).to eq 1
+    end
+
+    it "is 1 when the airplane is utilized BLOCK_TIME_HOURS_PER_DAY_FOR_GOOD_ON_TIME_PERFORMANCE hours per day" do
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1, business_seats: 0, premium_economy_seats: 0)
+
+      airline_route = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, economy_price: 1, business_price: 3, premium_economy_price: 2, distance: 1, airline: airline)
+      airplane_route_1 = AirplaneRoute.new(airplane: subject, route: airline_route, frequencies: Airplane::MAX_TOTAL_BLOCK_TIME_HOURS_PER_DAY, block_time_mins: 1, flight_cost: 1).save(validate: false)
+
+      expect(Calculation::Distance).to receive(:between_airports).with(origin, destination).and_return 27.40075
+
+      subject.reload
+
+      expect(subject.on_time_reputation).to eq 1
+      assert_in_epsilon subject.utilization, Airplane::BLOCK_TIME_HOURS_PER_DAY_FOR_GOOD_ON_TIME_PERFORMANCE, 0.000001
+    end
+
+    it "is between 0.1 and 1 when the airplane is utilized less than the maximum" do
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1, business_seats: 0, premium_economy_seats: 0)
+
+      airline_route = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, economy_price: 1, business_price: 3, premium_economy_price: 2, distance: 1, airline: airline)
+      airplane_route_1 = AirplaneRoute.new(airplane: subject, route: airline_route, frequencies: Airplane::MAX_TOTAL_BLOCK_TIME_HOURS_PER_DAY, block_time_mins: 1, flight_cost: 1).save(validate: false)
+
+      expect(Calculation::Distance).to receive(:between_airports).with(origin, destination).and_return 30
+
+      subject.reload
+
+      expect(subject.on_time_reputation).to be < 1
+      expect(subject.on_time_reputation).to be > 0.1
+      expect(subject.utilization).to be > Airplane::BLOCK_TIME_HOURS_PER_DAY_FOR_GOOD_ON_TIME_PERFORMANCE
+      expect(subject.utilization).to be < Airplane::MAX_TOTAL_BLOCK_TIME_HOURS_PER_DAY
+    end
+
+    it "is 0.1 when the airplane is utilized maximally" do
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1, business_seats: 0, premium_economy_seats: 0)
+
+      airline_route = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, economy_price: 1, business_price: 3, premium_economy_price: 2, distance: 1, airline: airline)
+      airplane_route_1 = AirplaneRoute.new(airplane: subject, route: airline_route, frequencies: Airplane::MAX_TOTAL_BLOCK_TIME_HOURS_PER_DAY, block_time_mins: 1, flight_cost: 1).save(validate: false)
+
+      expect(Calculation::Distance).to receive(:between_airports).with(origin, destination).and_return 286.74603176116
+      subject.reload
+
+      assert_in_epsilon subject.on_time_reputation, 0.1, 0.00000001
+      assert_in_epsilon subject.utilization, Airplane::MAX_TOTAL_BLOCK_TIME_HOURS_PER_DAY, 0.000001
     end
   end
 
