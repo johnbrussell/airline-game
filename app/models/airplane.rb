@@ -55,13 +55,17 @@ class Airplane < ApplicationRecord
   ECONOMY_SEAT_SIZE = 28 * 17
   PREMIUM_ECONOMY_SEAT_SIZE = 36 * 17
   BUSINESS_SEAT_SIZE = 72 * 17
+  BLOCK_TIME_HOURS_PER_DAY_FOR_GOOD_ON_TIME_PERFORMANCE = 5
+  DAYS_PER_WEEK = 7.0
   ELEVATION_FOR_TAKEOFF_MULTIPLIER = 2000
   EMPTY_PLANE_RANGE_MULTIPLIER = 1.25
   MIN_MAINTENANCE_RATE = 0.8
   MAX_LEASE_DAYS = 3652
-  MAX_TOTAL_BLOCK_TIME_MINS = 20 * 7 * 60
+  MAX_TOTAL_BLOCK_TIME_HOURS_PER_DAY = 20
+  MAX_TOTAL_BLOCK_TIME_MINS = MAX_TOTAL_BLOCK_TIME_HOURS_PER_DAY * 7 * 60
   MIN_PERCENT_OF_LEASE_NEEDED_AS_CASH_ON_HAND_TO_LEASE = 0.08
   MIN_TURN_TIME_MINS = 10
+  MINUTES_PER_HOUR = 60.0
   NUM_IN_FAMILY_FOR_MIN_MAINTENANCE_RATE = 100.0
   PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE = 0.4
   TAKEOFF_ELEVATION_MULTIPLIER = 1.15
@@ -147,6 +151,19 @@ class Airplane < ApplicationRecord
     economy_seats + premium_economy_seats + business_seats
   end
 
+  def on_time_reputation
+    unutilized_block_time = MAX_TOTAL_BLOCK_TIME_HOURS_PER_DAY - [
+      total_flights,
+      utilization,
+    ].min
+    block_time_divisor = (MAX_TOTAL_BLOCK_TIME_HOURS_PER_DAY - BLOCK_TIME_HOURS_PER_DAY_FOR_GOOD_ON_TIME_PERFORMANCE).to_f
+
+    [
+      (unutilized_block_time / block_time_divisor) * 0.9 + 0.1,
+      1
+    ].min
+  end
+
   def purchase(airline, business_seats, premium_economy_seats, economy_seats)
     if built?
       assign_attributes(base_country_group: airline.base.country_group)
@@ -202,7 +219,7 @@ class Airplane < ApplicationRecord
   end
 
   def utilization
-    total_block_time / 60.0 / 7.0
+    total_block_time / DAYS_PER_WEEK / MINUTES_PER_HOUR
   end
 
   private
@@ -326,6 +343,10 @@ class Airplane < ApplicationRecord
 
     def total_block_time
       airplane_routes.map{ |r| r.frequencies * round_trip_block_time(r.route.distance) }.sum
+    end
+
+    def total_flights
+      airplane_routes.map{ |r| r.frequencies * 2 }.sum
     end
 
     def update_downstream_block_times
