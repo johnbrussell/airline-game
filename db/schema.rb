@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_26_173610) do
+ActiveRecord::Schema.define(version: 2022_02_27_123104) do
 
   create_table "aircraft_families", force: :cascade do |t|
     t.string "name", null: false
@@ -70,6 +70,7 @@ ActiveRecord::Schema.define(version: 2022_02_26_173610) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "airline_id", null: false
+    t.integer "service_quality", default: 1, null: false
   end
 
   create_table "airlines", force: :cascade do |t|
