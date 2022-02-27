@@ -20,11 +20,13 @@ class AirplaneRoute < ApplicationRecord
   belongs_to :airplane
   belongs_to :route, class_name: "AirlineRoute", foreign_key: :airline_route_id
 
+  delegate :distance, to: :route
+
   def set_frequency(frequency)
     if frequency > 0
       assign_attributes(
         block_time_mins: (airplane.round_trip_block_time(route.distance) * frequency).round,
-        flight_cost: 1,
+        flight_cost: one_way_single_frequency_flight_cost * 2,
         frequencies: frequency,
       )
       save
@@ -57,6 +59,10 @@ class AirplaneRoute < ApplicationRecord
       if other_airplane_routes.map(&:block_time_mins).sum + block_time_mins > Airplane::MAX_TOTAL_BLOCK_TIME_MINS
         errors.add(:airplane, "has too much block time")
       end
+    end
+
+    def one_way_single_frequency_flight_cost
+      Calculation::FlightCostCalculator.new(airplane, distance).cost
     end
 
     def other_airplane_routes

@@ -397,6 +397,8 @@ RSpec.describe AirplaneRoute do
       gates_2 = Gates.create!(airport: airport_2, game: airplane.game, current_gates: 100)
       Slot.create!(gates: gates_2, lessee_id: Airline.last.id)
       subject = AirplaneRoute.new(route: airline_route, airplane: airplane)
+      flight_cost_calculator = instance_double(Calculation::FlightCostCalculator, cost: 100.40)
+      expect(Calculation::FlightCostCalculator).to receive(:new).with(airplane, distance).and_return(flight_cost_calculator)
 
       airplane_route_count = AirplaneRoute.count
 
@@ -409,6 +411,7 @@ RSpec.describe AirplaneRoute do
       expect(subject.new_record?).to be false
       expect(subject.block_time_mins).to eq block_time
       expect(subject.frequencies).to eq 1
+      expect(subject.flight_cost).to eq 200.80
 
       subject.set_frequency(0)
       expect(AirplaneRoute.count).to eq airplane_route_count
