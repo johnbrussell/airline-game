@@ -139,6 +139,10 @@ class Airplane < ApplicationRecord
     (value - value_at_age(age_in_days + lease_in_days)) * lease_premium / lease_in_days
   end
 
+  def legroom_reputation
+    1 - floor_space_used.to_f / aircraft_model.floor_space
+  end
+
   def maintenance_cost_per_day
     aircraft_model.maintenance_cost_per_day(age_in_days) * maintenance_rate
   end
@@ -258,6 +262,10 @@ class Airplane < ApplicationRecord
       end
     end
 
+    def floor_space_used
+      ECONOMY_SEAT_SIZE * economy_seats + PREMIUM_ECONOMY_SEAT_SIZE * premium_economy_seats + BUSINESS_SEAT_SIZE * business_seats
+    end
+
     def is_transfer_while_utilized?
       copy = Airplane.find(id)
       copy.operator_id != operator_id && airplane_routes.any?
@@ -324,7 +332,7 @@ class Airplane < ApplicationRecord
     end
 
     def seats_fit_on_plane
-      if ECONOMY_SEAT_SIZE * economy_seats + PREMIUM_ECONOMY_SEAT_SIZE * premium_economy_seats + BUSINESS_SEAT_SIZE * business_seats > aircraft_model.floor_space
+      if floor_space_used > aircraft_model.floor_space
         errors.add(:seats, "require more total floor space than available on airplane")
       end
     end

@@ -579,6 +579,24 @@ RSpec.describe Airplane do
     end
   end
 
+  context "legroom_reputation" do
+    it "is equivalent to the percentage of the floor space that is unused" do
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, family: family, floor_space: Airplane::ECONOMY_SEAT_SIZE * 4)
+      subject = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 1)
+
+      expect(subject.legroom_reputation).to eq 0.75
+
+      subject.update(economy_seats: 4)
+
+      expect(subject.legroom_reputation).to eq 0
+
+      subject.update(economy_seats: 0)
+
+      expect(subject.legroom_reputation).to eq 1
+    end
+  end
+
   context "maintenance_cost_per_day" do
     it "is the aircraft model's maintenance rate when the airplane is unique in its family" do
       family = Fabricate(:aircraft_family)
