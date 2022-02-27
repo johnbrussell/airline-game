@@ -1,0 +1,9 @@
+<h1>Airline Game</h1>
+<p><a href=<%=game_path(@game)%>>Return to game overview</a></p>
+<h2><%= @airline.name %> routes</h2>
+
+<ul>
+  <% @airline.routes.each do |route| %>
+    <li><a href=<%=game_airline_route_add_flights_path(@game, route.id)%>><%= route.name %></li>
+  <% end %>
+</ul>
