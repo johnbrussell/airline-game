@@ -22,6 +22,13 @@ class AirlineRoute < ApplicationRecord
   delegate :iata, to: :origin_airport, prefix: true
   delegate :iata, to: :destination_airport, prefix: true
 
+  REPUTATION_WEIGHTS = {
+    ifs: 0.1,
+    legroom: 0.9,
+  }
+  MIN_REPUTATION = 1
+  MAX_REPUTATION = 2
+
   def self.find_or_create_by_airline_and_route(airline, origin_airport, destination_airport)
     record = find_or_create_by(airline: airline, origin_airport: origin_airport, destination_airport: destination_airport)
     if record.new_record?
@@ -66,6 +73,10 @@ class AirlineRoute < ApplicationRecord
     "#{origin_airport_iata} - #{destination_airport_iata}"
   end
 
+  def reputation
+    REPUTATION_WEIGHTS[:ifs] * ifs_reputation + REPUTATION_WEIGHTS[:legroom] * legroom_reputation
+  end
+
   def set_price(economy, premium_economy, business)
     update(
       economy_price: economy,
@@ -108,5 +119,22 @@ class AirlineRoute < ApplicationRecord
       if Airport.find(destination_airport_id).iata <= Airport.find(origin_airport_id).iata
         errors.add(:destination_airport_id, "must correspond to an airport with iata alphabetically after origin airport's iata")
       end
+    end
+
+    def ifs_reputation
+      scale_reputation(service_quality, 1, 5)
+    end
+
+    def legroom_reputation
+      avg_reputation = airplane_routes.sum { |ar| ar.frequencies * ar.airplane.num_seats * ar.airplane.legroom_reputation } / total_seats.to_f / total_frequencies
+      scale_reputation(avg_reputation, 0, 1)
+    end
+
+    def scale_reputation(input_reptuation, input_min, input_max)
+      (input_reptuation - input_min) * (MAX_REPUTATION - MIN_REPUTATION) / (input_max - input_min).to_f + MIN_REPUTATION
+    end
+
+    def total_seats
+      airplane_routes.sum { |ar| ar.frequencies * ar.airplane.num_seats }
     end
 end

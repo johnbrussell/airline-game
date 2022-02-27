@@ -185,6 +185,56 @@ RSpec.describe AirlineRoute do
     end
   end
 
+  context "reputation" do
+    let(:origin) { Fabricate(:airport, iata: "BOS") }
+    let(:destination) { Fabricate(:airport, iata: "ORH", market: origin.market) }
+    let(:airline) { Fabricate(:airline, base_id: destination.market.id) }
+    let(:family) { Fabricate(:aircraft_family) }
+    let(:model) { Fabricate(:aircraft_model, family: family, floor_space: Airplane::ECONOMY_SEAT_SIZE * 10) }
+
+    it "is minimal for a minimal legroom reputation and a minimal in flight service reputation" do
+      airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 10)
+      subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, distance: 1, airline: airline, economy_price: 1, premium_economy_price: 2, business_price: 4)
+      AirplaneRoute.new(route: subject, frequencies: 1, block_time_mins: 1, flight_cost: 1, airplane: airplane).save(validate: false)
+      subject.reload
+
+      expect(subject.reputation).to eq AirlineRoute::MIN_REPUTATION
+    end
+
+    it "is maximal for a maximal legroom reputation and a maximal in flight service reputation" do
+      model.update(floor_space: 10000000000)
+      airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 1)
+      subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, distance: 1, service_quality: 5, airline: airline, economy_price: 1, premium_economy_price: 2, business_price: 4)
+      AirplaneRoute.new(route: subject, frequencies: 1, block_time_mins: 1, flight_cost: 1, airplane: airplane).save(validate: false)
+      subject.reload
+
+      assert_in_epsilon subject.reputation, AirlineRoute::MAX_REPUTATION, 0.0000001
+    end
+
+    it "is weighted accurately between legroom and in flight service" do
+      airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 10)
+      subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, distance: 1, service_quality: 5, airline: airline, economy_price: 1, premium_economy_price: 2, business_price: 4)
+      AirplaneRoute.new(route: subject, frequencies: 1, block_time_mins: 1, flight_cost: 1, airplane: airplane).save(validate: false)
+      subject.reload
+
+      expect(subject.reputation).to eq AirlineRoute::MIN_REPUTATION + (AirlineRoute::MAX_REPUTATION - AirlineRoute::MIN_REPUTATION) * 0.1
+    end
+
+    it "is weighted accurately by seats" do
+      model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 50000)
+      airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 50000)
+      other_airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 1)
+      subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, distance: 1, airline: airline, economy_price: 1, premium_economy_price: 2, business_price: 4)
+      AirplaneRoute.new(route: subject, frequencies: 1, block_time_mins: 1, flight_cost: 1, airplane: airplane).save(validate: false)
+      AirplaneRoute.new(route: subject, frequencies: 1, block_time_mins: 1, flight_cost: 1, airplane: other_airplane).save(validate: false)
+      subject.reload
+
+      expect(subject.reputation).to be < AirlineRoute::MAX_REPUTATION
+      expect(subject.reputation).to be > AirlineRoute::MIN_REPUTATION
+      assert_in_epsilon subject.reputation, AirlineRoute::MIN_REPUTATION, 0.00001
+    end
+  end
+
   context "set_price" do
     it "updates the price" do
       inu = Fabricate(:airport, iata: "INU")
