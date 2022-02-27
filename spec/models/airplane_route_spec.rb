@@ -6,6 +6,42 @@ RSpec.describe AirplaneRoute do
     Fabricate(:airline, base_id: base.id)
   end
 
+  context "on_route" do
+    it "finds all AirplaneRoutes on a route in a game" do
+      game = Game.last
+      other_game = Fabricate(:game)
+      airline_1 = Airline.last
+      airline_2 = Fabricate(:airline, game_id: game.id, base_id: airline_1.base_id)
+      airline_3 = Fabricate(:airline, game_id: other_game.id, base_id: airline_1.base_id)
+      origin = Fabricate(:airport, iata: "FUN", market: airline_1.base)
+      destination = Fabricate(:airport, iata: "INU", market: airline_1.base)
+      other_destination = Fabricate(:airport, iata: "MAJ", market: airline_1.base)
+      airline_route_1 = AirlineRoute.create!(airline: airline_1, distance: 1, economy_price: 1, premium_economy_price: 1, business_price: 1, origin_airport: origin, destination_airport: destination)
+      airline_route_2 = AirlineRoute.create!(airline: airline_2, distance: 1, economy_price: 1, premium_economy_price: 1, business_price: 1, origin_airport: origin, destination_airport: destination)
+      airline_route_3 = AirlineRoute.create!(airline: airline_2, distance: 1, economy_price: 1, premium_economy_price: 1, business_price: 1, origin_airport: origin, destination_airport: other_destination)
+      airline_route_4 = AirlineRoute.create!(airline: airline_3, distance: 1, economy_price: 1, premium_economy_price: 1, business_price: 1, origin_airport: origin, destination_airport: destination)
+
+      family = Fabricate(:aircraft_family)
+      airplane_1 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_1)
+      airplane_2 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_1)
+      airplane_3 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_2)
+      airplane_4 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_3)
+
+      AirplaneRoute.new(route: airline_route_1, airplane: airplane_1, flight_cost: 1, block_time_mins: 4, frequencies: 2).save(validate: false)
+      airplane_route_1 = AirplaneRoute.last
+      AirplaneRoute.new(route: airline_route_1, airplane: airplane_2, flight_cost: 1, block_time_mins: 4, frequencies: 2).save(validate: false)
+      airplane_route_2 = AirplaneRoute.last
+      AirplaneRoute.new(route: airline_route_2, airplane: airplane_3, flight_cost: 1, block_time_mins: 4, frequencies: 2).save(validate: false)
+      airplane_route_3 = AirplaneRoute.last
+      AirplaneRoute.new(route: airline_route_3, airplane: airplane_3, flight_cost: 1, block_time_mins: 4, frequencies: 2).save(validate: false)
+      airplane_route_4 = AirplaneRoute.last
+      AirplaneRoute.new(route: airline_route_4, airplane: airplane_4, flight_cost: 1, block_time_mins: 4, frequencies: 2).save(validate: false)
+      airplane_route_5 = AirplaneRoute.last
+
+      expect(AirplaneRoute.on_route(origin, destination, game)).to eq [airplane_route_1, airplane_route_2, airplane_route_3]
+    end
+  end
+
   context "airplane_can_fly_route" do
     it "is true when the airplane can fly the route" do
       market = Fabricate(:market, name: "Pacific")
