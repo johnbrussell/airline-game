@@ -140,7 +140,7 @@ class Airplane < ApplicationRecord
   end
 
   def legroom_reputation
-    1 - floor_space_used.to_f / aircraft_model.floor_space
+    Math.sqrt(1 - floor_space_used.to_f / aircraft_model.floor_space)
   end
 
   def maintenance_cost_per_day

@@ -580,12 +580,12 @@ RSpec.describe Airplane do
   end
 
   context "legroom_reputation" do
-    it "is equivalent to the percentage of the floor space that is unused" do
+    it "is equivalent to the square root of the percentage of the floor space that is unused" do
       family = Fabricate(:aircraft_family)
       model = Fabricate(:aircraft_model, family: family, floor_space: Airplane::ECONOMY_SEAT_SIZE * 4)
       subject = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 1)
 
-      expect(subject.legroom_reputation).to eq 0.75
+      expect(subject.legroom_reputation).to eq Math.sqrt(0.75)
 
       subject.update(economy_seats: 4)
 
