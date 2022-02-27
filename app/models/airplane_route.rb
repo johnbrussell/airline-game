@@ -20,7 +20,9 @@ class AirplaneRoute < ApplicationRecord
   belongs_to :airplane
   belongs_to :route, class_name: "AirlineRoute", foreign_key: :airline_route_id
 
-  delegate :distance, to: :route
+  delegate :distance,
+           :service_quality,
+           to: :route
 
   def set_frequency(frequency)
     if frequency > 0
@@ -62,7 +64,7 @@ class AirplaneRoute < ApplicationRecord
     end
 
     def one_way_single_frequency_flight_cost
-      Calculation::FlightCostCalculator.new(airplane, distance).cost
+      Calculation::FlightCostCalculator.new(airplane, distance, service_quality).cost
     end
 
     def other_airplane_routes

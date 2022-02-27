@@ -390,7 +390,7 @@ RSpec.describe AirplaneRoute do
       distance = Calculation::Distance.between_airports(airport_1, airport_2)
       model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
       airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
-      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411, airline: Airline.last)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411, airline: Airline.last, service_quality: 4)
       block_time = airplane.round_trip_block_time(airline_route.distance).round
       gates_1 = Gates.create!(airport: airport_1, game: airplane.game, current_gates: 100)
       Slot.create!(gates: gates_1, lessee_id: Airline.last.id)
@@ -398,7 +398,7 @@ RSpec.describe AirplaneRoute do
       Slot.create!(gates: gates_2, lessee_id: Airline.last.id)
       subject = AirplaneRoute.new(route: airline_route, airplane: airplane)
       flight_cost_calculator = instance_double(Calculation::FlightCostCalculator, cost: 100.40)
-      expect(Calculation::FlightCostCalculator).to receive(:new).with(airplane, distance).and_return(flight_cost_calculator)
+      expect(Calculation::FlightCostCalculator).to receive(:new).with(airplane, distance, 4).and_return(flight_cost_calculator)
 
       airplane_route_count = AirplaneRoute.count
 
