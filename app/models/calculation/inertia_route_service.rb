@@ -18,19 +18,7 @@ class Calculation::InertiaRouteService
   SHORT_DISTANCE_ECONOMY_SEATS = 57
 
   def business_fare
-    if business_frequencies == 0
-      0
-    else
-      (business_frequencies / desired_business_frequencies) * (business_revenue / desired_business_frequencies / business_seats_per_flight)
-    end
-  end
-
-  def business_frequencies
-    if business_seats_per_flight == 0
-      0
-    else
-      (desired_business_frequencies / LOAD_FACTOR).ceil()
-    end
+    [frequencies / desired_business_frequencies, 1].max * (business_revenue / desired_business_frequencies / business_seats_per_flight)
   end
 
   def business_seats_per_flight
@@ -44,19 +32,7 @@ class Calculation::InertiaRouteService
   end
 
   def economy_fare
-    if economy_frequencies == 0
-      0
-    else
-      (economy_frequencies / desired_economy_frequencies) * (economy_revenue / desired_economy_frequencies / economy_seats_per_flight)
-    end
-  end
-
-  def economy_frequencies
-    if economy_seats_per_flight == 0
-      0
-    else
-      (desired_economy_frequencies / LOAD_FACTOR).ceil()
-    end
+    [frequencies / desired_economy_frequencies, 1].max * (economy_revenue / desired_economy_frequencies / economy_seats_per_flight)
   end
 
   def economy_seats_per_flight
@@ -73,20 +49,22 @@ class Calculation::InertiaRouteService
     @flight_cost ||= Calculation::FlightCostCalculator.new(inertia_airplane, distance, INERTIA_SERVICE_QUALITY).cost
   end
 
-  def premium_economy_fare
-    if premium_economy_frequencies == 0
-      0
-    else
-      (premium_economy_frequencies / desired_premium_economy_frequencies) * (premium_economy_revenue / desired_premium_economy_frequencies / premium_economy_seats_per_flight)
-    end
+  def frequencies
+    (
+      (
+        desired_economy_frequencies * revenue.max_economy_class_revenue_per_week
+        + desired_premium_economy_frequencies * revenue.max_premium_economy_class_revenue_per_week
+        + desired_business_frequencies * revenue.max_business_class_revenue_per_week
+      ) / (
+        revenue.max_economy_class_revenue_per_week
+        + revenue.max_premium_economy_class_revenue_per_week
+        + revenue.max_business_class_revenue_per_week
+      ) / LOAD_FACTOR
+    ).ceil()
   end
 
-  def premium_economy_frequencies
-    if premium_economy_seats_per_flight == 0
-      0
-    else
-      (desired_premium_economy_frequencies / LOAD_FACTOR).ceil()
-    end
+  def premium_economy_fare
+    [frequencies / desired_premium_economy_frequencies, 1].max * (premium_economy_revenue / desired_premium_economy_frequencies / premium_economy_seats_per_flight)
   end
 
   def premium_economy_seats_per_flight
