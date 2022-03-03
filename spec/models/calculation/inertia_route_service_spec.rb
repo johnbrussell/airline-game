@@ -29,12 +29,13 @@ RSpec.describe Calculation::InertiaRouteService do
 
     it "calculates frequencies correctly" do
       expect(subject.send(:desired_business_frequencies)).to eq 5
+      expect(subject.business_frequencies).to eq 8
 
       expect(subject.send(:desired_economy_frequencies)).to eq 5
+      expect(subject.economy_frequencies).to eq 8
 
       expect(subject.send(:desired_premium_economy_frequencies)).to eq 5
-
-      expect(subject.send(:frequencies)).to eq 8
+      expect(subject.premium_economy_frequencies).to eq 8
     end
 
     it "calculates fares correctly" do
@@ -84,14 +85,15 @@ RSpec.describe Calculation::InertiaRouteService do
     it "calculates frequencies correctly" do
       expect(subject.send(:desired_business_frequencies)).to be > 4
       expect(subject.send(:desired_business_frequencies)).to be < 5
+      expect(subject.business_frequencies).to eq 8
 
       expect(subject.send(:desired_economy_frequencies)).to be > 4
       expect(subject.send(:desired_economy_frequencies)).to be < 5
+      expect(subject.economy_frequencies).to eq 8
 
       expect(subject.send(:desired_premium_economy_frequencies)).to be > 4
       expect(subject.send(:desired_premium_economy_frequencies)).to be < 5
-
-      expect(subject.frequencies).to eq 8
+      expect(subject.premium_economy_frequencies).to eq 8
     end
 
     it "calculates fares correctly" do
