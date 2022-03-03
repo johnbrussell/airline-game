@@ -148,15 +148,15 @@ class AirlineRoute < ApplicationRecord
     end
 
     def max_route_business_fare
-      [AirlineRoute.operators_of_route(origin_airport, destination_airport).map(&:business_price).max, inertia_route.business_fare].max
+      [AirlineRoute.operators_of_route(origin_airport, destination_airport).map(&:business_price).max, inertia_route.business_fare, 1].compact.max
     end
 
     def max_route_economy_fare
-      [AirlineRoute.operators_of_route(origin_airport, destination_airport).map(&:economy_price).max, inertia_route.economy_fare].max
+      [AirlineRoute.operators_of_route(origin_airport, destination_airport).map(&:economy_price).max, inertia_route.economy_fare].compact.max
     end
 
     def max_route_premium_economy_fare
-      [AirlineRoute.operators_of_route(origin_airport, destination_airport).map(&:premium_economy_price).max, inertia_route.premium_economy_fare].max
+      [AirlineRoute.operators_of_route(origin_airport, destination_airport).map(&:premium_economy_price).max, inertia_route.premium_economy_fare].compact.max
     end
 
     def premium_economy_fare_reputation

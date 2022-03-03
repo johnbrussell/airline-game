@@ -238,6 +238,25 @@ RSpec.describe AirlineRoute do
       expect(subject.reputation).to be > AirlineRoute::MIN_REPUTATION
       assert_in_epsilon subject.reputation, AirlineRoute::MIN_REPUTATION, 0.00001
     end
+
+    it "calculates correctly when no airline operates a route" do
+      model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 1)
+      airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 1)
+      airplane_route = AirplaneRoute.new(route: subject, frequencies: 1, block_time_mins: 1, flight_cost: 1, airplane: airplane)
+      subject = AirlineRoute.new(
+        origin_airport: origin,
+        destination_airport: destination,
+        distance: 1,
+        airline: airline,
+        economy_price: 30000,
+        premium_economy_price: 45750,
+        business_price: 50000,
+        airplane_routes: [airplane_route],
+        service_quality: 5,
+      )
+
+      expect(subject.reputation).to eq AirlineRoute::MIN_REPUTATION + 0.1
+    end
   end
 
   context "set_price" do
