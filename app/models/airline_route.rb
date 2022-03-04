@@ -44,11 +44,12 @@ class AirlineRoute < ApplicationRecord
     record
   end
 
-  def self.operators_of_route(origin, destination)
+  def self.operators_of_route(origin, destination, game)
     AirlineRoute
       .joins(:airplane_routes)
       .joins(:airline)
       .where(origin_airport_id: origin.id, destination_airport_id: destination.id)
+      .where("airlines.game_id == ?", game.id)
       .order("airlines.name")
       .uniq
   end
@@ -130,6 +131,10 @@ class AirlineRoute < ApplicationRecord
       1 - (economy_price / max_route_economy_fare.to_f)
     end
 
+    def game
+      @game ||= Game.find(airline.game_id)
+    end
+
     def fare_reputation
       scale_reputation((business_fare_reputation * total_business_seats + economy_fare_reputation * total_economy_seats + premium_economy_fare_reputation * total_premium_economy_seats) / total_seats.to_f, 0, 1)
     end
@@ -139,7 +144,7 @@ class AirlineRoute < ApplicationRecord
     end
 
     def inertia_route
-      @inertia_route ||= Calculation::InertiaRouteService.new(origin_airport, destination_airport, Game.find(airline.game_id).current_date)
+      @inertia_route ||= Calculation::InertiaRouteService.new(origin_airport, destination_airport, game.current_date)
     end
 
     def legroom_reputation
@@ -148,15 +153,15 @@ class AirlineRoute < ApplicationRecord
     end
 
     def max_route_business_fare
-      [AirlineRoute.operators_of_route(origin_airport, destination_airport).map(&:business_price).max, inertia_route.business_fare, 1].compact.max
+      [AirlineRoute.operators_of_route(origin_airport, destination_airport, game).map(&:business_price).max, inertia_route.business_fare, 1].compact.max
     end
 
     def max_route_economy_fare
-      [AirlineRoute.operators_of_route(origin_airport, destination_airport).map(&:economy_price).max, inertia_route.economy_fare].compact.max
+      [AirlineRoute.operators_of_route(origin_airport, destination_airport, game).map(&:economy_price).max, inertia_route.economy_fare].compact.max
     end
 
     def max_route_premium_economy_fare
-      [AirlineRoute.operators_of_route(origin_airport, destination_airport).map(&:premium_economy_price).max, inertia_route.premium_economy_fare].compact.max
+      [AirlineRoute.operators_of_route(origin_airport, destination_airport, game).map(&:premium_economy_price).max, inertia_route.premium_economy_fare].compact.max
     end
 
     def premium_economy_fare_reputation
