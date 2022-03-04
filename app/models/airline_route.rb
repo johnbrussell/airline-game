@@ -76,7 +76,7 @@ class AirlineRoute < ApplicationRecord
   end
 
   def reputation
-    REPUTATION_WEIGHTS[:fare] * fare_reputation + REPUTATION_WEIGHTS[:ifs] * ifs_reputation + REPUTATION_WEIGHTS[:legroom] * legroom_reputation
+    @reputation ||= REPUTATION_WEIGHTS[:fare] * fare_reputation + REPUTATION_WEIGHTS[:ifs] * ifs_reputation + REPUTATION_WEIGHTS[:legroom] * legroom_reputation
   end
 
   def set_price(economy, premium_economy, business)
