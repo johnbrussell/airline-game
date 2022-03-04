@@ -24,6 +24,14 @@ class AirplaneRoute < ApplicationRecord
            :service_quality,
            to: :route
 
+  def self.on_route(origin, destination, game)
+    AirplaneRoute
+      .joins(route: :airline)
+      .where("airline_routes.origin_airport_id == ?", origin.id)
+      .where("airline_routes.destination_airport_id == ?", destination.id)
+      .where("airlines.game_id == ?", game.id)
+  end
+
   def set_frequency(frequency)
     if frequency > 0
       assign_attributes(

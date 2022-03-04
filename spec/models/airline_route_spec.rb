@@ -3,36 +3,45 @@ require "rails_helper"
 RSpec.describe AirlineRoute do
   context "operators_of_route" do
     it "includes only routes from airlines that operate the route and sorts them" do
+      game = Fabricate(:game)
+      other_game = Fabricate(:game)
+
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
 
-      airline_c = Fabricate(:airline, base_id: inu.market.id, name: "C")
-      airline_a = Fabricate(:airline, base_id: inu.market.id, name: "A")
-      airline_b = Fabricate(:airline, base_id: inu.market.id, name: "B")
-      other_airline = Fabricate(:airline, base_id: inu.market.id)
+      airline_c = Fabricate(:airline, base_id: inu.market.id, name: "C", game_id: game.id)
+      airline_a = Fabricate(:airline, base_id: inu.market.id, name: "A", game_id: game.id)
+      airline_b = Fabricate(:airline, base_id: inu.market.id, name: "B", game_id: game.id)
+      other_airline = Fabricate(:airline, base_id: inu.market.id, game_id: game.id)
+      other_game_airline = Fabricate(:airline, base_id: inu.market.id, game_id: other_game.id)
       family = Fabricate(:aircraft_family)
       super_model = Fabricate(:aircraft_model, takeoff_distance: 100, max_range: 13000)
       airplane_c = Fabricate(:airplane, aircraft_family: family, operator_id: airline_c.id, base_country_group: airline_c.base.country_group, aircraft_model: super_model)
       airplane_a = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model)
       airplane_b = Fabricate(:airplane, aircraft_family: family, operator_id: airline_b.id, base_country_group: airline_b.base.country_group, aircraft_model: super_model)
+      airplane_other_game = Fabricate(:airplane, aircraft_family: family, operator_id: other_game_airline.id, base_country_group: other_game_airline.base.country_group, aircraft_model: super_model)
 
       airline_route_c = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_c)
       airline_route_a = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_a)
       airline_route_b = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_b)
+      airline_route_other_game = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: other_game_airline)
       airplane_route_c = AirplaneRoute.new(airplane: airplane_c, route: airline_route_c, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
       airplane_route_a = AirplaneRoute.new(airplane: airplane_a, route: airline_route_a, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
       airplane_route_b = AirplaneRoute.new(airplane: airplane_b, route: airline_route_b, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
+      airplane_route_other_game = AirplaneRoute.new(airplane: airplane_other_game, route: airline_route_other_game, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
 
       AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: other_airline)
 
-      expect(AirlineRoute.operators_of_route(fun, inu)).to eq [airline_route_a, airline_route_b, airline_route_c]
+      expect(AirlineRoute.operators_of_route(fun, inu, game)).to eq [airline_route_a, airline_route_b, airline_route_c]
     end
 
     it "is empty if no airline operates the route" do
+      game = Fabricate(:game)
+
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
 
-      expect(AirlineRoute.operators_of_route(fun, inu)).to eq []
+      expect(AirlineRoute.operators_of_route(fun, inu, game)).to eq []
     end
   end
 
@@ -191,40 +200,45 @@ RSpec.describe AirlineRoute do
     let(:airline) { Fabricate(:airline, base_id: destination.market.id) }
     let(:family) { Fabricate(:aircraft_family) }
     let(:model) { Fabricate(:aircraft_model, family: family, floor_space: Airplane::ECONOMY_SEAT_SIZE * 10) }
+    let(:inertia) { instance_double(Calculation::InertiaRouteService, business_fare: 50000, economy_fare: 30000, premium_economy_fare: 45750) }
 
-    it "is minimal for a minimal legroom reputation and a minimal in flight service reputation" do
+    before(:each) do
+      allow(Calculation::InertiaRouteService).to receive(:new).with(origin, destination, Game.find(airline.game_id).current_date).and_return(inertia)
+    end
+
+    it "is minimal for a minimal legroom reputation and a minimal in flight service reputation and a minimal fare reputation" do
       airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 10)
-      subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, distance: 1, airline: airline, economy_price: 1, premium_economy_price: 2, business_price: 4)
+      subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, distance: 1, airline: airline, economy_price: 50200, premium_economy_price: 81500, business_price: 50000)
       AirplaneRoute.new(route: subject, frequencies: 1, block_time_mins: 1, flight_cost: 1, airplane: airplane).save(validate: false)
       subject.reload
 
       expect(subject.reputation).to eq AirlineRoute::MIN_REPUTATION
     end
 
-    it "is maximal for a maximal legroom reputation and a maximal in flight service reputation" do
+    it "is maximal for a maximal legroom reputation and a maximal in flight service reputation and maximal fare reputation" do
       model.update(floor_space: 10000000000)
       airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 1)
-      subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, distance: 1, service_quality: 5, airline: airline, economy_price: 1, premium_economy_price: 2, business_price: 4)
+      subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, distance: 1, service_quality: 5, airline: airline, economy_price: 0.01, premium_economy_price: 0.01, business_price: 0.01)
       AirplaneRoute.new(route: subject, frequencies: 1, block_time_mins: 1, flight_cost: 1, airplane: airplane).save(validate: false)
       subject.reload
 
       assert_in_epsilon subject.reputation, AirlineRoute::MAX_REPUTATION, 0.0000001
     end
 
-    it "is weighted accurately between legroom and in flight service" do
+    it "is weighted accurately between legroom, in flight service, and fare" do
       airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 10)
-      subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, distance: 1, service_quality: 5, airline: airline, economy_price: 1, premium_economy_price: 2, business_price: 4)
+      subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, distance: 1, service_quality: 5, airline: airline, economy_price: 30000 / 2, premium_economy_price: 45750 / 2, business_price: 50000 / 2)
       AirplaneRoute.new(route: subject, frequencies: 1, block_time_mins: 1, flight_cost: 1, airplane: airplane).save(validate: false)
       subject.reload
 
-      expect(subject.reputation).to eq AirlineRoute::MIN_REPUTATION + (AirlineRoute::MAX_REPUTATION - AirlineRoute::MIN_REPUTATION) * 0.1
+      assert_in_epsilon subject.reputation, AirlineRoute::MIN_REPUTATION + (AirlineRoute::MAX_REPUTATION - AirlineRoute::MIN_REPUTATION) * 0.1 + (AirlineRoute::MAX_REPUTATION - AirlineRoute::MIN_REPUTATION) * 0.45 / 2, 0.0000001
     end
 
     it "is weighted accurately by seats" do
       model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 50000)
       airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 50000)
       other_airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 1)
-      subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, distance: 1, airline: airline, economy_price: 1, premium_economy_price: 2, business_price: 4)
+      subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, distance: 1, airline: airline, economy_price: 30000, premium_economy_price: 45750, business_price: 50000)
       AirplaneRoute.new(route: subject, frequencies: 1, block_time_mins: 1, flight_cost: 1, airplane: airplane).save(validate: false)
       AirplaneRoute.new(route: subject, frequencies: 1, block_time_mins: 1, flight_cost: 1, airplane: other_airplane).save(validate: false)
       subject.reload
@@ -232,6 +246,25 @@ RSpec.describe AirlineRoute do
       expect(subject.reputation).to be < AirlineRoute::MAX_REPUTATION
       expect(subject.reputation).to be > AirlineRoute::MIN_REPUTATION
       assert_in_epsilon subject.reputation, AirlineRoute::MIN_REPUTATION, 0.00001
+    end
+
+    it "calculates correctly when no airline operates a route" do
+      model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 1)
+      airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 1)
+      airplane_route = AirplaneRoute.new(route: subject, frequencies: 1, block_time_mins: 1, flight_cost: 1, airplane: airplane)
+      subject = AirlineRoute.new(
+        origin_airport: origin,
+        destination_airport: destination,
+        distance: 1,
+        airline: airline,
+        economy_price: 30000,
+        premium_economy_price: 45750,
+        business_price: 50000,
+        airplane_routes: [airplane_route],
+        service_quality: 5,
+      )
+
+      expect(subject.reputation).to eq AirlineRoute::MIN_REPUTATION + 0.1
     end
   end
 

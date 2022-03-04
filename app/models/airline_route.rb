@@ -23,8 +23,9 @@ class AirlineRoute < ApplicationRecord
   delegate :iata, to: :destination_airport, prefix: true
 
   REPUTATION_WEIGHTS = {
+    fare: 0.45,
     ifs: 0.1,
-    legroom: 0.9,
+    legroom: 0.45,
   }
   MIN_REPUTATION = 1
   MAX_REPUTATION = 2
@@ -43,11 +44,12 @@ class AirlineRoute < ApplicationRecord
     record
   end
 
-  def self.operators_of_route(origin, destination)
+  def self.operators_of_route(origin, destination, game)
     AirlineRoute
       .joins(:airplane_routes)
       .joins(:airline)
       .where(origin_airport_id: origin.id, destination_airport_id: destination.id)
+      .where("airlines.game_id == ?", game.id)
       .order("airlines.name")
       .uniq
   end
@@ -74,7 +76,7 @@ class AirlineRoute < ApplicationRecord
   end
 
   def reputation
-    REPUTATION_WEIGHTS[:ifs] * ifs_reputation + REPUTATION_WEIGHTS[:legroom] * legroom_reputation
+    @reputation ||= REPUTATION_WEIGHTS[:fare] * fare_reputation + REPUTATION_WEIGHTS[:ifs] * ifs_reputation + REPUTATION_WEIGHTS[:legroom] * legroom_reputation
   end
 
   def set_price(economy, premium_economy, business)
@@ -121,13 +123,49 @@ class AirlineRoute < ApplicationRecord
       end
     end
 
+    def business_fare_reputation
+      1 - (business_price / max_route_business_fare.to_f)
+    end
+
+    def economy_fare_reputation
+      1 - (economy_price / max_route_economy_fare.to_f)
+    end
+
+    def game
+      @game ||= Game.find(airline.game_id)
+    end
+
+    def fare_reputation
+      scale_reputation((business_fare_reputation * total_business_seats + economy_fare_reputation * total_economy_seats + premium_economy_fare_reputation * total_premium_economy_seats) / total_seats.to_f, 0, 1)
+    end
+
     def ifs_reputation
       scale_reputation(service_quality, 1, 5)
+    end
+
+    def inertia_route
+      @inertia_route ||= Calculation::InertiaRouteService.new(origin_airport, destination_airport, game.current_date)
     end
 
     def legroom_reputation
       avg_reputation = airplane_routes.sum { |ar| ar.frequencies * ar.airplane.num_seats * ar.airplane.legroom_reputation } / total_seats.to_f / total_frequencies
       scale_reputation(avg_reputation, 0, 1)
+    end
+
+    def max_route_business_fare
+      [AirlineRoute.operators_of_route(origin_airport, destination_airport, game).map(&:business_price).max, inertia_route.business_fare, 1].compact.max
+    end
+
+    def max_route_economy_fare
+      [AirlineRoute.operators_of_route(origin_airport, destination_airport, game).map(&:economy_price).max, inertia_route.economy_fare].compact.max
+    end
+
+    def max_route_premium_economy_fare
+      [AirlineRoute.operators_of_route(origin_airport, destination_airport, game).map(&:premium_economy_price).max, inertia_route.premium_economy_fare].compact.max
+    end
+
+    def premium_economy_fare_reputation
+      1 - (premium_economy_price / max_route_premium_economy_fare.to_f)
     end
 
     def scale_reputation(input_reptuation, input_min, input_max)
