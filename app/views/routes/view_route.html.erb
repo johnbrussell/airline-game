@@ -45,9 +45,13 @@
     </p>
   <% end %>
 
-  <% @route.airplanes.each do |airplane| %>
-    <%= render partial: "user_airline_frequencies", locals: { airplane: airplane } %>
-  <% end %>
+  <ul>
+    <% @route.airplanes.each do |airplane| %>
+      <li>
+        <%= render partial: "user_airline_frequencies", locals: { airplane: airplane } %>
+      </li>
+    <% end %>
+  </ul>
 <% else %>
   <h4><%= @game.user_airline.name %> cannot fly this route due to political restrictions </h4>
 <% end %>
@@ -68,7 +72,11 @@
 <% if @game.user_airline.can_fly_between?(@route.origin_airport.market, @route.destination_airport.market) %>
   <h3><%= "Add service on #{@route.name}" %></h3>
   <p><%= @game.user_airline.name %> has <%= @route.airplanes_available_to_add_service.count %> <%= "airplane".pluralize(@route.airplanes_available_to_add_service.count) %> able to add flights on <%= @route.name %> </p>
-  <% @route.airplanes_available_to_add_service.each do |airplane| %>
-    <%= render partial: "user_airline_frequencies", locals: { airplane: airplane } %>
-  <% end %>
+  <ul>
+    <% @route.airplanes_available_to_add_service.each do |airplane| %>
+      <li>
+        <%= render partial: "user_airline_frequencies", locals: { airplane: airplane } %>
+      </li>
+    <% end %>
+  <ul>
 <% end %>
