@@ -445,4 +445,51 @@ RSpec.describe AirlineRoute do
       expect(subject.total_premium_economy_seats).to eq 13
     end
   end
+
+  context "update_revenue" do
+    it "sets revenue to zero when frequencies are zero" do
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      airline = Fabricate(:airline, base_id: inu.market.id, name: "A")
+      subject = AirlineRoute.create!(economy_price: 1, distance: 2, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
+      AirlineRouteRevenue.new(airline_route: subject, revenue: 1, business_pax: 2, economy_pax: 3, premium_economy_pax: 4).save(validate: false)
+      subject.reload
+
+      subject.update_revenue
+
+      result = subject.revenue
+
+      expect(result.revenue).to eq 0
+      expect(result.business_pax).to eq 0
+      expect(result.economy_pax).to eq 0
+      expect(result.premium_economy_pax).to eq 0
+    end
+
+    it "updates revenue when frequencies are nonzero" do
+      inu_market = Fabricate(:market, name: "Nauru", country: "Nauru", country_group: "Nauru", income: 100000)
+      fun_market = Fabricate(:market, name: "Funafuti", country: "Tuvalu", country_group: "Tuvalu", income: 20000)
+      inu_population = Population.create!(year: 2000, population: 14000, market_id: inu_market.id)
+      fun_population = Population.create!(year: 2003, population: 6000, market_id: fun_market.id)
+      inu_tourists = Tourists.create!(year: 2000, volume: 1400, market_id: inu_market.id)
+      fun_tourists = Tourists.create!(year: 2003, volume: 6300, market_id: fun_market.id)
+      inu = Fabricate(:airport, iata: "INU", market: inu_market)
+      fun = Fabricate(:airport, iata: "FUN", market: fun_market)
+      airline = Fabricate(:airline, base_id: inu.market.id, name: "A")
+      subject = AirlineRoute.create!(economy_price: 1, distance: 2, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
+      family = Fabricate(:aircraft_family)
+      airplane = Fabricate(:airplane, operator_id: airline.id, base_country_group: airline.base.country_group, business_seats: 1, economy_seats: 1, premium_economy_seats: 1, aircraft_family: family)
+      AirplaneRoute.new(airplane: airplane, route: subject, frequencies: 1, flight_cost: 1, block_time_mins: 1).save(validate: false)
+      AirlineRouteRevenue.new(airline_route: subject, revenue: 106, business_pax: 10, economy_pax: 21, premium_economy_pax: 0).save(validate: false)
+      subject.reload
+
+      subject.update_revenue
+
+      result = subject.revenue
+
+      expect(result.revenue).to eq 6
+      expect(result.business_pax).to eq 1
+      expect(result.economy_pax).to eq 1
+      expect(result.premium_economy_pax).to eq 1
+    end
+  end
 end

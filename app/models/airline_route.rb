@@ -80,9 +80,7 @@ class AirlineRoute < ApplicationRecord
   end
 
   def set_price(economy, premium_economy, business)
-    if update(economy_price: economy, premium_economy_price: premium_economy, business_price: business)
-      Calculation::AirlineRouteRevenueUpdater.new(origin_airport, destination_airport, game.current_date).upsert(game)
-    end
+    update(economy_price: economy, premium_economy_price: premium_economy, business_price: business) && update_revenue
   end
 
   def total_frequencies
@@ -104,6 +102,14 @@ class AirlineRoute < ApplicationRecord
   def total_premium_economy_seats
     airplane_routes.sum do |airplane_route|
       airplane_route.frequencies * airplane_route.airplane.premium_economy_seats
+    end
+  end
+
+  def update_revenue
+    if total_frequencies == 0
+      revenue&.zero_out
+    else
+      Calculation::AirlineRouteRevenueUpdater.new(origin_airport, destination_airport, game.current_date).upsert(game)
     end
   end
 
