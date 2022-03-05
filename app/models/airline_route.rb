@@ -23,9 +23,10 @@ class AirlineRoute < ApplicationRecord
   delegate :iata, to: :destination_airport, prefix: true
 
   REPUTATION_WEIGHTS = {
-    fare: 0.45,
+    fare: 0.3,
+    frequency: 0.3,
     ifs: 0.1,
-    legroom: 0.45,
+    legroom: 0.3,
   }
   MIN_REPUTATION = 1
   MAX_REPUTATION = 2
@@ -76,7 +77,7 @@ class AirlineRoute < ApplicationRecord
   end
 
   def reputation
-    @reputation ||= REPUTATION_WEIGHTS[:fare] * fare_reputation + REPUTATION_WEIGHTS[:ifs] * ifs_reputation + REPUTATION_WEIGHTS[:legroom] * legroom_reputation
+    @reputation ||= REPUTATION_WEIGHTS[:fare] * fare_reputation + REPUTATION_WEIGHTS[:frequency] * frequency_reputation + REPUTATION_WEIGHTS[:ifs] * ifs_reputation + REPUTATION_WEIGHTS[:legroom] * legroom_reputation
   end
 
   def set_price(economy, premium_economy, business)
@@ -143,6 +144,10 @@ class AirlineRoute < ApplicationRecord
       scale_reputation((business_fare_reputation * total_business_seats + economy_fare_reputation * total_economy_seats + premium_economy_fare_reputation * total_premium_economy_seats) / total_seats.to_f, 0, 1)
     end
 
+    def frequency_reputation
+      scale_reputation([total_frequencies, 245].min, 1, 245)
+    end
+
     def ifs_reputation
       scale_reputation(service_quality, 1, 5)
     end
@@ -152,7 +157,7 @@ class AirlineRoute < ApplicationRecord
     end
 
     def legroom_reputation
-      avg_reputation = airplane_routes.sum { |ar| ar.frequencies * ar.airplane.num_seats * ar.airplane.legroom_reputation } / total_seats.to_f / total_frequencies
+      avg_reputation = airplane_routes.sum { |ar| ar.frequencies * ar.airplane.num_seats * ar.airplane.legroom_reputation } / total_seats.to_f
       scale_reputation(avg_reputation, 0, 1)
     end
 

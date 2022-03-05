@@ -206,7 +206,7 @@ RSpec.describe AirlineRoute do
       allow(Calculation::InertiaRouteService).to receive(:new).with(origin, destination, Game.find(airline.game_id).current_date).and_return(inertia)
     end
 
-    it "is minimal for a minimal legroom reputation and a minimal in flight service reputation and a minimal fare reputation" do
+    it "is minimal for a minimal legroom reputation and a minimal in flight service reputation and a minimal fare reputation and a minimal frequency reputation" do
       airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 10)
       subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, distance: 1, airline: airline, economy_price: 50200, premium_economy_price: 81500, business_price: 50000)
       AirplaneRoute.new(route: subject, frequencies: 1, block_time_mins: 1, flight_cost: 1, airplane: airplane).save(validate: false)
@@ -215,11 +215,11 @@ RSpec.describe AirlineRoute do
       expect(subject.reputation).to eq AirlineRoute::MIN_REPUTATION
     end
 
-    it "is maximal for a maximal legroom reputation and a maximal in flight service reputation and maximal fare reputation" do
+    it "is maximal for a maximal legroom reputation and a maximal in flight service reputation and maximal fare reputation and a maximal frequency reputation" do
       model.update(floor_space: 10000000000)
       airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 1)
       subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, distance: 1, service_quality: 5, airline: airline, economy_price: 0.01, premium_economy_price: 0.01, business_price: 0.01)
-      AirplaneRoute.new(route: subject, frequencies: 1, block_time_mins: 1, flight_cost: 1, airplane: airplane).save(validate: false)
+      AirplaneRoute.new(route: subject, frequencies: 245, block_time_mins: 1, flight_cost: 1, airplane: airplane).save(validate: false)
       subject.reload
 
       assert_in_epsilon subject.reputation, AirlineRoute::MAX_REPUTATION, 0.0000001
@@ -231,12 +231,12 @@ RSpec.describe AirlineRoute do
       AirplaneRoute.new(route: subject, frequencies: 1, block_time_mins: 1, flight_cost: 1, airplane: airplane).save(validate: false)
       subject.reload
 
-      assert_in_epsilon subject.reputation, AirlineRoute::MIN_REPUTATION + (AirlineRoute::MAX_REPUTATION - AirlineRoute::MIN_REPUTATION) * 0.1 + (AirlineRoute::MAX_REPUTATION - AirlineRoute::MIN_REPUTATION) * 0.45 / 2, 0.0000001
+      assert_in_epsilon subject.reputation, AirlineRoute::MIN_REPUTATION + (AirlineRoute::MAX_REPUTATION - AirlineRoute::MIN_REPUTATION) * 0.1 + (AirlineRoute::MAX_REPUTATION - AirlineRoute::MIN_REPUTATION) * 0.3 / 2, 0.0000001
     end
 
     it "is weighted accurately by seats" do
-      model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 50000)
-      airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 50000)
+      model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 500000)
+      airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 500000)
       other_airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 1)
       subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, distance: 1, airline: airline, economy_price: 30000, premium_economy_price: 45750, business_price: 50000)
       AirplaneRoute.new(route: subject, frequencies: 1, block_time_mins: 1, flight_cost: 1, airplane: airplane).save(validate: false)
@@ -245,7 +245,7 @@ RSpec.describe AirlineRoute do
 
       expect(subject.reputation).to be < AirlineRoute::MAX_REPUTATION
       expect(subject.reputation).to be > AirlineRoute::MIN_REPUTATION
-      assert_in_epsilon subject.reputation, AirlineRoute::MIN_REPUTATION, 0.00001
+      assert_in_epsilon subject.reputation, AirlineRoute::MIN_REPUTATION + 1/245.0 * AirlineRoute::REPUTATION_WEIGHTS[:frequency], 0.00001
     end
 
     it "calculates correctly when no airline operates a route" do

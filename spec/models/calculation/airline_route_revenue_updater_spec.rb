@@ -660,10 +660,10 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
 
       result = AirlineRouteRevenue.last
 
-      assert_in_epsilon result.revenue, (business_seats * business_fare + premium_economy_seats * premium_economy_fare + economy_seats * economy_fare) * frequencies * 2 * 2 / 3.0, 0.00000001
-      assert_in_epsilon result.economy_pax, economy_seats * frequencies * 2 * 2 / 3.0, 0.00000001
-      assert_in_epsilon result.premium_economy_pax, premium_economy_seats * frequencies * 2 * 2 / 3.0, 0.00000001
-      assert_in_epsilon result.business_pax, business_seats * frequencies * 2 * 2 / 3.0, 0.00000001
+      assert_in_epsilon result.revenue, (business_seats * business_fare + premium_economy_seats * premium_economy_fare + economy_seats * economy_fare) * frequencies * 2 * 2 / 3.0 * (1 + 0.3 / (245 * 3).to_f), 0.00001
+      assert_in_epsilon result.economy_pax, economy_seats * frequencies * 2 * 2 / 3.0 * (1 + 0.3 / (245 * 3).to_f), 0.00001
+      assert_in_epsilon result.premium_economy_pax, premium_economy_seats * frequencies * 2 * 2 / 3.0 * (1 + 0.3 / (245 * 3).to_f), 0.00001
+      assert_in_epsilon result.business_pax, business_seats * frequencies * 2 * 2 / 3.0 * (1 + 0.3 / (245 * 3).to_f), 0.00001
       expect(result.airline_route_id).to eq airline_route.id
     end
 
@@ -728,10 +728,10 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
 
       result = AirlineRouteRevenue.last
 
-      assert_in_epsilon result.revenue, (business_seats * business_fare + premium_economy_seats * premium_economy_fare + economy_seats * economy_fare) * frequencies * 2 * 2 / 3.0, 0.00000001
-      assert_in_epsilon result.economy_pax, economy_seats * frequencies * 2 * 2 / 3.0, 0.00000001
-      assert_in_epsilon result.premium_economy_pax, premium_economy_seats * frequencies * 2 * 2 / 3.0, 0.00000001
-      assert_in_epsilon result.business_pax, business_seats * frequencies * 2 * 2 / 3.0, 0.00000001
+      assert_in_epsilon result.revenue, (business_seats * business_fare + premium_economy_seats * premium_economy_fare + economy_seats * economy_fare) * frequencies * 2 * 2 / 3.0 * (1 + 0.3 / (245 * 3).to_f), 0.00001
+      assert_in_epsilon result.economy_pax, economy_seats * frequencies * 2 * 2 / 3.0 * (1 + 0.3 / (245 * 3).to_f), 0.00001
+      assert_in_epsilon result.premium_economy_pax, premium_economy_seats * frequencies * 2 * 2 / 3.0 * (1 + 0.3 / (245 * 3).to_f), 0.00001
+      assert_in_epsilon result.business_pax, business_seats * frequencies * 2 * 2 / 3.0 * (1 + 0.3 / (245 * 3).to_f), 0.00001
       expect(result.airline_route_id).to eq airline_route.id
     end
   end
