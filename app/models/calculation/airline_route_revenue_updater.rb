@@ -101,7 +101,11 @@ class Calculation::AirlineRouteRevenueUpdater
     end
 
     def relevant_airline_routes_business(game)
-      relevant_airline_routes(game) + [inertia_airline_route_business(game)]
+      if inertia_calculator.business_frequencies > 0
+        relevant_airline_routes(game) + [inertia_airline_route_business(game)]
+      else
+        relevant_airline_routes(game)
+      end
     end
 
     def relevant_airline_routes_economy(game)
