@@ -417,11 +417,16 @@ RSpec.describe AirplaneRoute do
   end
 
   context "set_frequency" do
-    it "is true when the airplane can add the requested service" do
-      market = Fabricate(:market, name: "Pacific")
-      airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
-      airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: market)
-      CabotageException.create!(country: market.country)
+    it "updates the frequency when the airplane can add the requested service" do
+      inu_market = Market.find_by(name: "Default")
+      inu_market.update(name: "Nauru", income: 10000, country: "Nauru", country_group: "Nauru")
+      inu_population = Population.create!(year: 2000, population: 10000, market_id: inu_market.id)
+      inu_tourists = Tourists.create!(year: 2000, volume: 1000, market_id: inu_market.id)
+      fun_market = Fabricate(:market, name: "Funafuti", income: 10000, country: "Tuvalu", country_group: "Tuvalu")
+      fun_population = Population.create!(year: 2000, population: 10000, market_id: fun_market.id)
+      fun_tourists = Tourists.create!(year: 2000, volume: 1000, market_id: fun_market.id)
+      airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: fun_market)
+      airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: inu_market)
       family = Fabricate(:aircraft_family)
       distance = Calculation::Distance.between_airports(airport_1, airport_2)
       model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
@@ -434,13 +439,23 @@ RSpec.describe AirplaneRoute do
       Slot.create!(gates: gates_2, lessee_id: Airline.last.id)
       subject = AirplaneRoute.new(route: airline_route, airplane: airplane)
       flight_cost_calculator = instance_double(Calculation::FlightCostCalculator, cost: 100.40)
-      expect(Calculation::FlightCostCalculator).to receive(:new).with(airplane, distance, 4).and_return(flight_cost_calculator)
+      allow(Calculation::FlightCostCalculator).to receive(:new).and_return(flight_cost_calculator)
+      airline_route.reload
 
       airplane_route_count = AirplaneRoute.count
 
+      expect(AirlineRouteRevenue.count).to eq 0
+
       expect(subject.new_record?).to be true
-      expect(subject.set_frequency(1)).to be true
+      subject.set_frequency(1)
       expect(AirplaneRoute.count).to eq airplane_route_count + 1
+
+      expect(AirlineRouteRevenue.count).to eq 1
+      revenue = AirlineRouteRevenue.last
+      expect(revenue.revenue).to eq 1
+      expect(revenue.business_pax).to eq 0
+      expect(revenue.premium_economy_pax).to eq 0
+      expect(revenue.economy_pax).to eq 1
 
       subject.reload
 
@@ -451,9 +466,16 @@ RSpec.describe AirplaneRoute do
 
       subject.set_frequency(0)
       expect(AirplaneRoute.count).to eq airplane_route_count
+
+      expect(AirlineRouteRevenue.count).to eq 1
+      revenue = AirlineRouteRevenue.last
+      expect(revenue.revenue).to eq 0
+      expect(revenue.business_pax).to eq 0
+      expect(revenue.premium_economy_pax).to eq 0
+      expect(revenue.economy_pax).to eq 0
     end
 
-    it "is false when the airplane cannot add the requested service" do
+    it "does not update the frequency when the airplane cannot add the requested service" do
       market = Fabricate(:market, name: "Pacific")
       airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
       airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: market)
@@ -473,8 +495,12 @@ RSpec.describe AirplaneRoute do
       airplane_route_count = AirplaneRoute.count
 
       expect(subject.new_record?).to be true
-      expect(subject.set_frequency(10000)).to be false
+
+      subject.set_frequency(10000)
+
       expect(AirplaneRoute.count).to eq airplane_route_count
+      expect(subject.new_record?).to be true
+      expect(AirlineRouteRevenue.count).to eq 0
     end
   end
 

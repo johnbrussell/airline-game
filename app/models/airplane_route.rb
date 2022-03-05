@@ -43,6 +43,8 @@ class AirplaneRoute < ApplicationRecord
     else
       destroy!
     end
+
+    route.update_revenue
   end
 
   private
