@@ -13,6 +13,15 @@ class AirlineRouteRevenue < ApplicationRecord
 
   belongs_to :airline_route
 
+  def zero_out
+    update(
+      economy_pax: 0,
+      premium_economy_pax: 0,
+      business_pax: 0,
+      revenue: 0,
+    )
+  end
+
   private
 
     def enough_seating_for_passengers
