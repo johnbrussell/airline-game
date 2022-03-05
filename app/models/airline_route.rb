@@ -88,6 +88,10 @@ class AirlineRoute < ApplicationRecord
     update(economy_price: economy, premium_economy_price: premium_economy, business_price: business) && update_revenue
   end
 
+  def total_flight_costs
+    airplane_routes.sum { |ar| ar.frequencies * ar.flight_cost }
+  end
+
   def total_frequencies
     airplane_routes.sum(&:frequencies)
   end

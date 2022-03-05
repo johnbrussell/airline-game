@@ -417,6 +417,27 @@ RSpec.describe AirlineRoute do
     end
   end
 
+  context "total_flight_costs" do
+    it "is calculated correctly for a single plane" do
+      airplane_route_1 = AirplaneRoute.new(flight_cost: 200, frequencies: 1)
+      subject = AirlineRoute.new(
+        airplane_routes: [airplane_route_1],
+      )
+
+      expect(subject.total_flight_costs).to eq 200
+    end
+
+    it "is calculated correctly for multiple planes and frequencies" do
+      airplane_route_1 = AirplaneRoute.new(flight_cost: 200, frequencies: 1)
+      airplane_route_2 = AirplaneRoute.new(flight_cost: 300, frequencies: 2)
+      subject = AirlineRoute.new(
+        airplane_routes: [airplane_route_1, airplane_route_2],
+      )
+
+      expect(subject.total_flight_costs).to eq 800
+    end
+  end
+
   context "total_frequencies" do
     it "calculates correctly" do
       inu = Fabricate(:airport, iata: "INU")
