@@ -184,6 +184,32 @@ RSpec.describe AirlineRoute do
     end
   end
 
+  context "load_factor" do
+    it "is calculated correctly for a single plane" do
+      airplane_1 = Airplane.new(economy_seats: 75, business_seats: 12, premium_economy_seats: 13)
+      airplane_route_1 = AirplaneRoute.new(airplane: airplane_1, frequencies: 1)
+      subject = AirlineRoute.new(
+        airplane_routes: [airplane_route_1],
+        revenue: AirlineRouteRevenue.new(economy_pax: 10, business_pax: 12, premium_economy_pax: 13),
+      )
+
+      expect(subject.load_factor).to eq 35.0
+    end
+
+    it "is calculated correctly for multiple planes and frequencies" do
+      airplane_1 = Airplane.new(economy_seats: 75, business_seats: 12, premium_economy_seats: 13)
+      airplane_route_1 = AirplaneRoute.new(airplane: airplane_1, frequencies: 1)
+      airplane_2 = Airplane.new(economy_seats: 70, business_seats: 10, premium_economy_seats: 20)
+      airplane_route_2 = AirplaneRoute.new(airplane: airplane_2, frequencies: 2)
+      subject = AirlineRoute.new(
+        airplane_routes: [airplane_route_1, airplane_route_2],
+        revenue: AirlineRouteRevenue.new(economy_pax: 27, business_pax: 33, premium_economy_pax: 30),
+      )
+
+      expect(subject.load_factor).to eq 30.0
+    end
+  end
+
   context "name" do
     it "is the IATA codes separated by a dash" do
       inu = Fabricate(:airport, iata: "INU")

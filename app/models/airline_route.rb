@@ -72,6 +72,10 @@ class AirlineRoute < ApplicationRecord
     airplane_routes.select { |ar| ar.airplane == airplane }.sum(&:frequencies)
   end
 
+  def load_factor
+    (revenue.economy_pax + revenue.premium_economy_pax + revenue.business_pax) / total_seats.to_f * 100
+  end
+
   def name
     "#{origin_airport_iata} - #{destination_airport_iata}"
   end
