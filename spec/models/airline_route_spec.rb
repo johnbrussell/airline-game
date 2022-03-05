@@ -269,18 +269,61 @@ RSpec.describe AirlineRoute do
   end
 
   context "set_price" do
-    it "updates the price" do
+    it "updates the price when the airline does not fly the route" do
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       airline = Fabricate(:airline, base_id: inu.market.id, name: "A")
       subject = AirlineRoute.create!(economy_price: 1, distance: 2, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
 
-      expect(subject.set_price(4, 5, 6)).to be true
+      expect(subject.revenue).to be nil
+
+      subject.set_price(4, 5, 6)
+
+      expect(subject.errors.full_messages.empty?).to be true
+
       subject.reload
 
       expect(subject.economy_price).to eq 4
       expect(subject.premium_economy_price).to eq 5
       expect(subject.business_price).to eq 6
+      expect(subject.revenue).to be nil
+    end
+
+    it "updates the price when the airline flies the route" do
+      inu_market = Fabricate(:market, name: "Nauru", country: "Nauru", country_group: "Nauru", income: 100000)
+      fun_market = Fabricate(:market, name: "Funafuti", country: "Tuvalu", country_group: "Tuvalu", income: 20000)
+      inu_population = Population.create!(year: 2000, population: 14000, market_id: inu_market.id)
+      fun_population = Population.create!(year: 2003, population: 6000, market_id: fun_market.id)
+      inu_tourists = Tourists.create!(year: 2000, volume: 1400, market_id: inu_market.id)
+      fun_tourists = Tourists.create!(year: 2003, volume: 6300, market_id: fun_market.id)
+      inu = Fabricate(:airport, iata: "INU", market: inu_market)
+      fun = Fabricate(:airport, iata: "FUN", market: fun_market)
+      airline = Fabricate(:airline, base_id: inu.market.id, name: "A")
+      subject = AirlineRoute.create!(economy_price: 1, distance: 2, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
+      family = Fabricate(:aircraft_family)
+      airplane = Fabricate(:airplane, operator_id: airline.id, base_country_group: airline.base.country_group, business_seats: 1, economy_seats: 1, premium_economy_seats: 1, aircraft_family: family)
+      AirplaneRoute.new(airplane: airplane, route: subject, frequencies: 1, flight_cost: 1, block_time_mins: 1).save(validate: false)
+      AirlineRouteRevenue.create!(airline_route: subject, revenue: 6, business_pax: 1, economy_pax: 1, premium_economy_pax: 1)
+      subject.reload
+
+      expect(subject.revenue.revenue).to eq 6
+      expect(subject.revenue.business_pax).to eq 1
+      expect(subject.revenue.economy_pax).to eq 1
+      expect(subject.revenue.premium_economy_pax).to eq 1
+
+      subject.set_price(4, 5, 6)
+
+      expect(subject.errors.full_messages.empty?).to be true
+
+      subject.reload
+
+      expect(subject.economy_price).to eq 4
+      expect(subject.premium_economy_price).to eq 5
+      expect(subject.business_price).to eq 6
+      expect(subject.revenue.revenue).to eq 15
+      expect(subject.revenue.business_pax).to eq 1
+      expect(subject.revenue.economy_pax).to eq 1
+      expect(subject.revenue.premium_economy_pax).to eq 1
     end
 
     it "returns false if the update fails" do
@@ -289,7 +332,7 @@ RSpec.describe AirlineRoute do
       airline = Fabricate(:airline, base_id: inu.market.id, name: "A")
       subject = AirlineRoute.create!(economy_price: 1, distance: 2, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
 
-      expect(subject.set_price(4, 5, -6)).to be false
+      subject.set_price(4, 5, -6)
 
       expect(subject.errors.full_messages).to include("Business price must be greater than 0")
 

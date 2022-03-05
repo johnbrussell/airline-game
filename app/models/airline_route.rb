@@ -80,11 +80,9 @@ class AirlineRoute < ApplicationRecord
   end
 
   def set_price(economy, premium_economy, business)
-    update(
-      economy_price: economy,
-      premium_economy_price: premium_economy,
-      business_price: business,
-    )
+    if update(economy_price: economy, premium_economy_price: premium_economy, business_price: business)
+      Calculation::AirlineRouteRevenueUpdater.new(origin_airport, destination_airport, game.current_date).upsert(game)
+    end
   end
 
   def total_frequencies
