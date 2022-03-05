@@ -163,6 +163,32 @@ RSpec.describe AirlineRoute do
     end
   end
 
+  context "flight_profit" do
+    it "is calculated correctly for a single plane" do
+      airplane_1 = Airplane.new(economy_seats: 75, business_seats: 12, premium_economy_seats: 13)
+      airplane_route_1 = AirplaneRoute.new(airplane: airplane_1, frequencies: 1, flight_cost: 200)
+      subject = AirlineRoute.new(
+        airplane_routes: [airplane_route_1],
+        revenue: AirlineRouteRevenue.new(economy_pax: 10, business_pax: 12, premium_economy_pax: 13, revenue: 250),
+      )
+
+      expect(subject.flight_profit).to eq 50
+    end
+
+    it "is calculated correctly for multiple planes and frequencies" do
+      airplane_1 = Airplane.new(economy_seats: 75, business_seats: 12, premium_economy_seats: 13)
+      airplane_route_1 = AirplaneRoute.new(airplane: airplane_1, frequencies: 1, flight_cost: 200)
+      airplane_2 = Airplane.new(economy_seats: 70, business_seats: 10, premium_economy_seats: 20)
+      airplane_route_2 = AirplaneRoute.new(airplane: airplane_2, frequencies: 2, flight_cost: 300)
+      subject = AirlineRoute.new(
+        airplane_routes: [airplane_route_1, airplane_route_2],
+        revenue: AirlineRouteRevenue.new(economy_pax: 9, business_pax: 11, premium_economy_pax: 10, revenue: 250),
+      )
+
+      expect(subject.flight_profit).to eq -550
+    end
+  end
+
   context "frequencies_on_airplane" do
     it "calculates correctly" do
       inu = Fabricate(:airport, iata: "INU")
