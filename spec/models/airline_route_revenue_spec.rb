@@ -48,4 +48,24 @@ RSpec.describe AirlineRouteRevenue do
       expect(subject.errors.full_messages).to include "Seats not sufficient to seat passengers"
     end
   end
+
+  context "zero_out" do
+    let(:origin_airport) { Fabricate(:airport, iata: "KWA") }
+    let(:destination_airport) { Fabricate(:airport, market: origin_airport.market, iata: "MAJ") }
+    let(:airline) { Fabricate(:airline, base_id: origin_airport.market.id) }
+    let(:airline_route) { AirlineRoute.create!(origin_airport: origin_airport, destination_airport: destination_airport, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline, distance: 1) }
+
+    it "sets revenue and passengers to zero" do
+      AirlineRouteRevenue.new(revenue: 174, economy_pax: 138, premium_economy_pax: 12, business_pax: 4, airline_route: airline_route).save(validate: false)
+      subject = AirlineRouteRevenue.last
+
+      expect(subject.zero_out).to be true
+      subject.reload
+
+      expect(subject.revenue).to eq 0
+      expect(subject.business_pax).to eq 0
+      expect(subject.premium_economy_pax).to eq 0
+      expect(subject.economy_pax).to eq 0
+    end
+  end
 end

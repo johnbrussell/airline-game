@@ -42,7 +42,7 @@ class AirplaneRoute < ApplicationRecord
       save
     else
       destroy!
-    end
+    end && route.update_revenue
   end
 
   private
