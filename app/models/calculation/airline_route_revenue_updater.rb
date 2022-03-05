@@ -6,9 +6,9 @@ class Calculation::AirlineRouteRevenueUpdater
       arr = AirlineRouteRevenue.find_or_initialize_by(airline_route: airline_route)
       arr.assign_attributes(
         revenue: (earned_revenue[:business] + earned_revenue[:premium_economy] + earned_revenue[:economy]).round(2),
-        economy_pax: earned_revenue[:economy] / airline_route.economy_price.to_f,
-        premium_economy_pax: earned_revenue[:premium_economy] / airline_route.premium_economy_price.to_f,
-        business_pax: earned_revenue[:business] / airline_route.business_price.to_f,
+        economy_pax: (earned_revenue[:economy] / airline_route.economy_price.to_f).round(7),
+        premium_economy_pax: (earned_revenue[:premium_economy] / airline_route.premium_economy_price.to_f).round(7),
+        business_pax: (earned_revenue[:business] / airline_route.business_price.to_f).round(7),
       )
       arr.save!
     end
