@@ -163,6 +163,32 @@ RSpec.describe AirlineRoute do
     end
   end
 
+  context "flight_profit" do
+    it "is calculated correctly for a single plane" do
+      airplane_1 = Airplane.new(economy_seats: 75, business_seats: 12, premium_economy_seats: 13)
+      airplane_route_1 = AirplaneRoute.new(airplane: airplane_1, frequencies: 1, flight_cost: 200)
+      subject = AirlineRoute.new(
+        airplane_routes: [airplane_route_1],
+        revenue: AirlineRouteRevenue.new(economy_pax: 10, business_pax: 12, premium_economy_pax: 13, revenue: 250),
+      )
+
+      expect(subject.flight_profit).to eq 50 / 7.0
+    end
+
+    it "is calculated correctly for multiple planes and frequencies" do
+      airplane_1 = Airplane.new(economy_seats: 75, business_seats: 12, premium_economy_seats: 13)
+      airplane_route_1 = AirplaneRoute.new(airplane: airplane_1, frequencies: 1, flight_cost: 200)
+      airplane_2 = Airplane.new(economy_seats: 70, business_seats: 10, premium_economy_seats: 20)
+      airplane_route_2 = AirplaneRoute.new(airplane: airplane_2, frequencies: 2, flight_cost: 300)
+      subject = AirlineRoute.new(
+        airplane_routes: [airplane_route_1, airplane_route_2],
+        revenue: AirlineRouteRevenue.new(economy_pax: 9, business_pax: 11, premium_economy_pax: 10, revenue: 250),
+      )
+
+      expect(subject.flight_profit).to eq -550 / 7.0
+    end
+  end
+
   context "frequencies_on_airplane" do
     it "calculates correctly" do
       inu = Fabricate(:airport, iata: "INU")
@@ -181,6 +207,32 @@ RSpec.describe AirlineRoute do
 
       expect(subject.frequencies_on_airplane(airplane_1)).to eq 1
       expect(subject.frequencies_on_airplane(airplane_2)).to eq 2
+    end
+  end
+
+  context "load_factor" do
+    it "is calculated correctly for a single plane" do
+      airplane_1 = Airplane.new(economy_seats: 75, business_seats: 12, premium_economy_seats: 13)
+      airplane_route_1 = AirplaneRoute.new(airplane: airplane_1, frequencies: 1)
+      subject = AirlineRoute.new(
+        airplane_routes: [airplane_route_1],
+        revenue: AirlineRouteRevenue.new(economy_pax: 10, business_pax: 12, premium_economy_pax: 13),
+      )
+
+      expect(subject.load_factor).to eq 35.0
+    end
+
+    it "is calculated correctly for multiple planes and frequencies" do
+      airplane_1 = Airplane.new(economy_seats: 75, business_seats: 12, premium_economy_seats: 13)
+      airplane_route_1 = AirplaneRoute.new(airplane: airplane_1, frequencies: 1)
+      airplane_2 = Airplane.new(economy_seats: 70, business_seats: 10, premium_economy_seats: 20)
+      airplane_route_2 = AirplaneRoute.new(airplane: airplane_2, frequencies: 2)
+      subject = AirlineRoute.new(
+        airplane_routes: [airplane_route_1, airplane_route_2],
+        revenue: AirlineRouteRevenue.new(economy_pax: 27, business_pax: 33, premium_economy_pax: 30),
+      )
+
+      expect(subject.load_factor).to eq 30.0
     end
   end
 
@@ -388,6 +440,27 @@ RSpec.describe AirlineRoute do
       subject.reload
 
       expect(subject.total_economy_seats).to eq 230
+    end
+  end
+
+  context "total_flight_costs" do
+    it "is calculated correctly for a single plane" do
+      airplane_route_1 = AirplaneRoute.new(flight_cost: 200, frequencies: 1)
+      subject = AirlineRoute.new(
+        airplane_routes: [airplane_route_1],
+      )
+
+      expect(subject.total_flight_costs).to eq 200
+    end
+
+    it "is calculated correctly for multiple planes and frequencies" do
+      airplane_route_1 = AirplaneRoute.new(flight_cost: 200, frequencies: 1)
+      airplane_route_2 = AirplaneRoute.new(flight_cost: 300, frequencies: 2)
+      subject = AirlineRoute.new(
+        airplane_routes: [airplane_route_1, airplane_route_2],
+      )
+
+      expect(subject.total_flight_costs).to eq 800
     end
   end
 

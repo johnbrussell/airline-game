@@ -68,8 +68,16 @@ class AirlineRoute < ApplicationRecord
     @distance ||= Calculation::Distance.between_airports(origin_airport, destination_airport)
   end
 
+  def flight_profit
+    (revenue.revenue - total_flight_costs) / 7.0
+  end
+
   def frequencies_on_airplane(airplane)
     airplane_routes.select { |ar| ar.airplane == airplane }.sum(&:frequencies)
+  end
+
+  def load_factor
+    (revenue.economy_pax + revenue.premium_economy_pax + revenue.business_pax) / total_seats.to_f * 100
   end
 
   def name
@@ -82,6 +90,10 @@ class AirlineRoute < ApplicationRecord
 
   def set_price(economy, premium_economy, business)
     update(economy_price: economy, premium_economy_price: premium_economy, business_price: business) && update_revenue
+  end
+
+  def total_flight_costs
+    airplane_routes.sum { |ar| ar.frequencies * ar.flight_cost }
   end
 
   def total_frequencies

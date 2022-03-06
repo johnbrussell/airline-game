@@ -36,7 +36,19 @@
   </p>
 
   <h3><%= "#{@game.user_airline.name} flights on #{@route.name}" %></h3>
-  <p><%= @game.user_airline.name %> has <%= @route.airplanes.count %> <%= "airplane".pluralize(@route.airplanes.count) %> currently operating flights on <%= @route.origin_airport_iata %> - <%= @route.destination_airport_iata %> </p>
+  <% if @route.airplanes.count > 0 %>
+    <p class="inline">
+      <%= @game.user_airline.name %> operates <%= @route.total_frequencies %> weekly <%= "flight".pluralize(@route.total_frequencies) %> on <%= @route.name %>.  Profit: $
+      <% if @route.flight_profit >= 0 %>
+        <div class="inline profitable"> <%= number_with_precision(@route.flight_profit, :precision => 2) %> </div>
+      <% else %>
+        <div class="inline unprofitable"> <%= number_with_precision(@route.flight_profit, :precision => 2) %> </div>
+      <% end %>
+      daily.  Load factor: <%= number_with_precision(@route.load_factor, :precision => 1) %>%.
+    </p>
+  <% else %>
+    <p><%= @game.user_airline.name %> is not currently operating flights on <%= @route.name %>
+  <% end %>
   <% if @airplane_route&.errors&.any? %>
     <p>
       <% @airplane_route.errors.full_messages.each do |message| %>
@@ -45,9 +57,13 @@
     </p>
   <% end %>
 
-  <% @route.airplanes.each do |airplane| %>
-    <%= render partial: "user_airline_frequencies", locals: { airplane: airplane } %>
-  <% end %>
+  <ul>
+    <% @route.airplanes.each do |airplane| %>
+      <li>
+        <%= render partial: "user_airline_frequencies", locals: { airplane: airplane } %>
+      </li>
+    <% end %>
+  </ul>
 <% else %>
   <h4><%= @game.user_airline.name %> cannot fly this route due to political restrictions </h4>
 <% end %>
@@ -68,7 +84,11 @@
 <% if @game.user_airline.can_fly_between?(@route.origin_airport.market, @route.destination_airport.market) %>
   <h3><%= "Add service on #{@route.name}" %></h3>
   <p><%= @game.user_airline.name %> has <%= @route.airplanes_available_to_add_service.count %> <%= "airplane".pluralize(@route.airplanes_available_to_add_service.count) %> able to add flights on <%= @route.name %> </p>
-  <% @route.airplanes_available_to_add_service.each do |airplane| %>
-    <%= render partial: "user_airline_frequencies", locals: { airplane: airplane } %>
-  <% end %>
+  <ul>
+    <% @route.airplanes_available_to_add_service.each do |airplane| %>
+      <li>
+        <%= render partial: "user_airline_frequencies", locals: { airplane: airplane } %>
+      </li>
+    <% end %>
+  <ul>
 <% end %>

@@ -13,3 +13,11 @@
 .red {
   color: #da0707;
 }
+
+.profitable {
+  color: #008000;
+}
+
+.unprofitable {
+  color: #da0707;
+}

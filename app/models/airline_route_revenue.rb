@@ -32,8 +32,8 @@ class AirlineRouteRevenue < ApplicationRecord
 
     def revenue_calculated_correctly
       pax_revenue = airline_route.economy_price * economy_pax + airline_route.premium_economy_price * premium_economy_pax + airline_route.business_price * business_pax
-      if (pax_revenue.round(2) - revenue).abs > 0.01
-        errors.add(:revenue, "not calculated correctly.  Expected #{revenue}, got #{pax_revenue}")
+      if (pax_revenue.round(2) - revenue.to_f).round(2).abs > 0.01
+        errors.add(:revenue, "not calculated correctly.  Expected #{revenue}, got #{pax_revenue}.  Difference #{(pax_revenue.round(2) - revenue).round(2).abs}")
       end
     end
 end

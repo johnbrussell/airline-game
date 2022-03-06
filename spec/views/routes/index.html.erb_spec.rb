@@ -29,9 +29,11 @@ RSpec.describe "routes/index", type: :feature do
 
     AirlineRoute.new(airline: airline, origin_airport: airport_2, destination_airport: airport_3, economy_price: 1, business_price: 2, premium_economy_price: 3, distance: 100).save(validate: false)
     route_1 = AirlineRoute.last
+    AirlineRouteRevenue.new(airline_route_id: route_1.id, revenue: 100, business_pax: 1, economy_pax: 2, premium_economy_pax: 1).save(validate: false)
     AirplaneRoute.new(route: route_1, airplane: airplane_1, frequencies: 1, flight_cost: 1, block_time_mins: 1).save(validate: false)
     AirlineRoute.new(airline: airline, origin_airport: airport_1, destination_airport: airport_4, economy_price: 1, business_price: 2, premium_economy_price: 3, distance: 100).save(validate: false)
     route_2 = AirlineRoute.last
+    AirlineRouteRevenue.new(airline_route_id: route_2.id, revenue: 100, business_pax: 1, economy_pax: 2, premium_economy_pax: 1).save(validate: false)
     AirplaneRoute.new(route: route_2, airplane: airplane_2, frequencies: 1, flight_cost: 1, block_time_mins: 1).save(validate: false)
     AirlineRoute.new(airline: airline, origin_airport: airport_1, destination_airport: airport_3, economy_price: 1, business_price: 2, premium_economy_price: 3, distance: 100).save(validate: false)
 
