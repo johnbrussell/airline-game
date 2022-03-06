@@ -180,6 +180,11 @@ RSpec.describe "routes/view_route", type: :feature do
     visit game_airline_route_add_flights_path(game, -1, params: { origin_id: inu.id, destination_id: fun.id })
 
     expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized 0.0 hours per day. Seating 0 economy, 0 premium economy, 0 business"
+    expect(page).to have_link "#{family.manufacturer} #{model.name}"
+
+    click_link "#{family.manufacturer} #{model.name}"
+
+    expect(page).to have_content "Return to #{airline.name} fleet page"
   end
 
   it "allows users to add and remove flights" do

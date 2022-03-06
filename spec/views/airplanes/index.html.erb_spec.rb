@@ -98,6 +98,24 @@ RSpec.describe "airplanes/index", type: :feature do
         expect(page).to have_content("A Air operates 2 airplanes")
         expect(page).to have_content("Boeing 737-300 constructed 2020-01-01. 0 economy, 0 premium economy, 0 business.")
         expect(page).to have_content("Boeing 737-300 constructed 2019-01-01. 100 economy, 10 premium economy, 8 business.")
+
+        expect(page).to have_link "Boeing 737-300"
+        first(:link, "Boeing 737-300").click
+
+        expect(page).to have_content "Return to #{airline.name} fleet page"
+      end
+
+      it "does not link to the airplane view page for non-user aircraft" do
+        game = Game.last
+        airline = Airline.last
+        airline.update(is_user_airline: false)
+
+        visit game_airline_airplanes_path(game.id, airline.id)
+
+        expect(page).to have_content("A Air operates 1 airplane")
+        expect(page).to have_content("Boeing 737-300 constructed 2020-01-01. 0 economy, 0 premium economy, 0 business.")
+
+        expect(page).not_to have_link "Boeing 737-300"
       end
 
       it "correctly singularizes" do
@@ -120,6 +138,11 @@ RSpec.describe "airplanes/index", type: :feature do
         expect(page).to have_content "A Air operates 1 airplane"
         expect(page).to have_content("Upcoming deliveries")
         expect(page).to have_content("Boeing 737-300 to be delivered 2022-01-01. 0 economy, 0 premium economy, 0 business.")
+
+        expect(page).to have_link "Boeing 737-300"
+        first(:link, "Boeing 737-300").click
+
+        expect(page).to have_content "Return to #{airline.name} fleet page"
       end
 
       it "does not display for non-user airlines" do
@@ -134,6 +157,8 @@ RSpec.describe "airplanes/index", type: :feature do
         expect(page).to have_content "A Air operates 1 airplane"
         expect(page).not_to have_content "Upcoming deliveries"
         expect(page).not_to have_content("Boeing 737-300 to be delivered 2021-01-01. 0 economy, 0 premium economy, 0 business.")
+
+        expect(page).not_to have_link "Boeing 737-300"
       end
     end
   end

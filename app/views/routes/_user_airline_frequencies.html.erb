@@ -1,8 +1,15 @@
 <%= form_with url: game_airline_route_add_flights_path(@game, @route), method: :patch do |form| %>
   <%= form.hidden_field :airplane_id, value: airplane.id %>
-  <%= form.label :frequencies, "#{airplane.family.manufacturer} #{airplane.model.name} currently utilized #{number_with_precision(airplane.utilization, :precision => 1)} hours per day.
-                                Seating #{airplane.economy_seats} economy, #{airplane.premium_economy_seats} premium economy, #{airplane.business_seats} business.
-                                #{if @route.frequencies_on_airplane(airplane) > 0 then ['Currently flies', @route.frequencies_on_airplane(airplane).to_s, 'weekly', 'flight'.pluralize(@route.frequencies_on_airplane(airplane))].join(' ') end}" %>
+  <% if airplane.operator_id == @game.user_airline.id %>
+    <%= form.label :frequencies, "#{link_to "#{airplane.aircraft_model.family.manufacturer} #{airplane.aircraft_model.name}", game_airline_airplane_path(@game, @game.user_airline, airplane)}".html_safe %>
+    <%= form.label :frequencies, "currently utilized #{number_with_precision(airplane.utilization, :precision => 1)} hours per day.
+                                  Seating #{airplane.economy_seats} economy, #{airplane.premium_economy_seats} premium economy, #{airplane.business_seats} business.
+                                  #{if @route.frequencies_on_airplane(airplane) > 0 then ['Currently flies', @route.frequencies_on_airplane(airplane).to_s, 'weekly', 'flight'.pluralize(@route.frequencies_on_airplane(airplane))].join(' ') end}" %>
+  <% else %>
+    <%= form.label :frequencies, "#{airplane.family.manufacturer} #{airplane.model.name} currently utilized #{number_with_precision(airplane.utilization, :precision => 1)} hours per day.
+                                  Seating #{airplane.economy_seats} economy, #{airplane.premium_economy_seats} premium economy, #{airplane.business_seats} business.
+                                  #{if @route.frequencies_on_airplane(airplane) > 0 then ['Currently flies', @route.frequencies_on_airplane(airplane).to_s, 'weekly', 'flight'.pluralize(@route.frequencies_on_airplane(airplane))].join(' ') end}" %>
+  <% end %>
   <%= form.number_field :frequencies, in: 0..100, value: @route.frequencies_on_airplane(airplane) %>
   <%= form.submit "Set frequencies" %>
 <% end %>
