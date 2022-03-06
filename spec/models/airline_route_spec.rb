@@ -172,7 +172,7 @@ RSpec.describe AirlineRoute do
         revenue: AirlineRouteRevenue.new(economy_pax: 10, business_pax: 12, premium_economy_pax: 13, revenue: 250),
       )
 
-      expect(subject.flight_profit).to eq 50
+      expect(subject.flight_profit).to eq 50 / 7.0
     end
 
     it "is calculated correctly for multiple planes and frequencies" do
@@ -185,7 +185,7 @@ RSpec.describe AirlineRoute do
         revenue: AirlineRouteRevenue.new(economy_pax: 9, business_pax: 11, premium_economy_pax: 10, revenue: 250),
       )
 
-      expect(subject.flight_profit).to eq -550
+      expect(subject.flight_profit).to eq -550 / 7.0
     end
   end
 

@@ -69,7 +69,7 @@ class AirlineRoute < ApplicationRecord
   end
 
   def flight_profit
-    revenue.revenue - total_flight_costs
+    (revenue.revenue - total_flight_costs) / 7.0
   end
 
   def frequencies_on_airplane(airplane)

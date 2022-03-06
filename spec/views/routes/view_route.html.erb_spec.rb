@@ -149,7 +149,7 @@ RSpec.describe "routes/view_route", type: :feature do
 
     visit game_airline_route_add_flights_path(game, -1, params: { origin_id: inu.id, destination_id: fun.id })
 
-    expect(page).to have_content "#{airline.name} has 0 airplanes currently operating flights on FUN - INU"
+    expect(page).to have_content "#{airline.name} is not currently operating flights on FUN - INU"
   end
 
   it "correctly singularizes the number of airplanes when necessary" do
@@ -217,7 +217,7 @@ RSpec.describe "routes/view_route", type: :feature do
 
     expect(page).not_to have_content "No airline serves FUN - INU"
     expect(page).to have_content "#{airline.name} flights on FUN - INU"
-    expect(page).to have_content "#{airline.name} has 1 airplane currently operating flights on FUN - INU"
+    expect(page).to have_content "#{airline.name} operates #{frequencies} weekly flight#{frequencies > 1 ? "s" : ""} on FUN - INU"
     expect(page).to have_content "#{airline.name} has 0 airplanes able to add flights on FUN - INU"
     expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized #{block_time} hours per day. Seating 0 economy, 0 premium economy, 1 business. Currently flies #{frequencies} weekly flight"
     expect(AirplaneRoute.count).to eq airplane_route_count + 1
@@ -229,12 +229,58 @@ RSpec.describe "routes/view_route", type: :feature do
 
     expect(page).to have_content "No airline serves FUN - INU"
     expect(page).to have_content "Add service on FUN - INU"
-    expect(page).to have_content "#{airline.name} has 0 airplanes currently operating flights on FUN - INU"
+    expect(page).to have_content "#{airline.name} is not currently operating flights on FUN - INU"
     expect(page).to have_content "#{airline.name} has 1 airplane able to add flights on FUN - INU"
     expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized 0.0 hours per day. Seating 0 economy, 0 premium economy, 1 business"
     expect(AirplaneRoute.count).to eq airplane_route_count
     expect(AirlineRouteRevenue.count).to eq 1
     expect(AirlineRouteRevenue.where("revenue > 0").count).to eq 0
+  end
+
+  it "shows user airline flight profitability information" do
+    game = Fabricate(:game)
+    nauru = Market.find_by(name: "Nauru")
+    inu = Airport.find_by(iata: "INU")
+    fun = Airport.find_by(iata: "FUN")
+    airline = Fabricate(:airline, base_id: nauru.id, game_id: game.id, is_user_airline: true)
+    family = Fabricate(:aircraft_family)
+    model = Fabricate(:aircraft_model, max_range: 13000, takeoff_distance: 100, family: family)
+    aircraft_1 = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, business_seats: 1)
+    gates_inu = Gates.create!(airport: inu, game: game, current_gates: 100)
+    Slot.create!(gates: gates_inu, lessee_id: airline.id)
+    Slot.create!(gates: gates_inu, lessee_id: airline.id)
+    Slot.create!(gates: gates_inu, lessee_id: airline.id)
+    gates_fun = Gates.create!(airport: fun, game: game, current_gates: 100)
+    Slot.create!(gates: gates_fun, lessee_id: airline.id)
+    Slot.create!(gates: gates_fun, lessee_id: airline.id)
+    Slot.create!(gates: gates_fun, lessee_id: airline.id)
+
+    block_time = (aircraft_1.round_trip_block_time(Calculation::Distance.between_airports(inu, fun)) / 60.0 / 7).round(1)
+    airplane_route_count = AirplaneRoute.count
+
+    visit game_airline_route_add_flights_path(game, -1, params: { origin_id: inu.id, destination_id: fun.id })
+
+    expect(page).to have_content "No airline serves FUN - INU"
+    expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized 0.0 hours per day. Seating 0 economy, 0 premium economy, 1 business"
+    expect(page).to have_button "Set frequencies"
+    expect(AirlineRouteRevenue.count).to eq 0
+
+    fill_in :frequencies, with: 1
+
+    click_on "Set frequencies"
+
+    expect(page).to have_button "Set frequencies"
+
+    arr = AirlineRouteRevenue.last
+    arr.assign_attributes(revenue: 10000.01)
+    arr.save(validate: false)
+    apr = AirplaneRoute.last
+    apr.assign_attributes(flight_cost: 10000.29)
+    apr.save(validate: false)
+
+    visit game_airline_route_add_flights_path(game, -1, params: { origin_id: inu.id, destination_id: fun.id })
+
+    expect(page).to have_content "#{airline.name} operates 1 weekly flight on FUN - INU. Profit: $\n-0.04\ndaily. Load factor: #{AirlineRouteRevenue.last.airline_route.load_factor.round(1)}%"
   end
 
   it "allows users to add flights and then updates their profitability when other airlines start service on the same route" do
@@ -244,7 +290,7 @@ RSpec.describe "routes/view_route", type: :feature do
     fun = Airport.find_by(iata: "FUN")
     airline = Fabricate(:airline, base_id: nauru.id, game_id: game.id, is_user_airline: true)
     family = Fabricate(:aircraft_family)
-    model = Fabricate(:aircraft_model, max_range: 13000, takeoff_distance: 100, family: family)
+    model = Fabricate(:aircraft_model, max_range: 13000, takeoff_distance: 100, speed: 1000, family: family)
     aircraft_1 = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, business_seats: 1)
     gates_inu = Gates.create!(airport: inu, game: game, current_gates: 100)
     Slot.create!(gates: gates_inu, lessee_id: airline.id)
@@ -270,30 +316,39 @@ RSpec.describe "routes/view_route", type: :feature do
 
     click_on "Set frequencies"
 
-    expect(page).to have_content "#{airline.name} has 1 airplane currently operating flights on FUN - INU"
+    expect(page).to have_content "#{airline.name} operates #{frequencies} weekly flight#{frequencies > 1 ? "s" : ""} on FUN - INU"
     expect(page).to have_content "#{airline.name} has 0 airplanes able to add flights on FUN - INU"
     expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized #{block_time} hours per day. Seating 0 economy, 0 premium economy, 1 business. Currently flies #{frequencies} weekly flight"
     expect(AirplaneRoute.count).to eq airplane_route_count + 1
     expect(AirlineRouteRevenue.count).to eq 1
-    original_revenue = AirlineRouteRevenue.last.revenue
+    revenue = AirlineRouteRevenue.last
+    original_revenue = revenue.revenue
     original_pax = AirlineRouteRevenue.last.business_pax
 
     other_airline = Fabricate(:airline, base_id: nauru.id, game_id: game.id)
-    super_model = Fabricate(:aircraft_model, family: family, takeoff_distance: 101, max_range: 13000, floor_space: Airplane::BUSINESS_SEAT_SIZE * 10000)
-    aircraft_2 = Fabricate(:airplane, aircraft_model: super_model, aircraft_family: family, operator_id: other_airline.id, base_country_group: airline.base.country_group, business_seats: 10000)
+    other_business_seats = 100000
+    other_frequencies = 100
+    super_model = Fabricate(:aircraft_model, family: family, takeoff_distance: 101, max_range: 13000, floor_space: Airplane::BUSINESS_SEAT_SIZE * other_business_seats)
+    aircraft_2 = Fabricate(:airplane, aircraft_model: super_model, aircraft_family: family, operator_id: other_airline.id, base_country_group: airline.base.country_group, business_seats: other_business_seats)
     Slot.create!(gates: gates_inu, lessee_id: other_airline.id)
     Slot.create!(gates: gates_fun, lessee_id: other_airline.id)
-    other_airline_route = AirlineRoute.create!(airline: other_airline, business_price: 1, distance: 1, origin_airport: fun, destination_airport: inu, economy_price: 1000, premium_economy_price: 10000)
-    AirplaneRoute.new(route: other_airline_route, airplane: aircraft_2, frequencies: 1, flight_cost: 1, block_time_mins: 1).save(validate: false)
+    other_airline_route = AirlineRoute.create!(airline: other_airline, business_price: 1, distance: 1, origin_airport: fun, destination_airport: inu, economy_price: 1000, premium_economy_price: 10000, service_quality: 5)
+    AirplaneRoute.new(route: other_airline_route, airplane: aircraft_2, frequencies: other_frequencies, flight_cost: 1, block_time_mins: 1).save(validate: false)
 
-    visit game_airline_route_add_flights_path(game, -1, params: { origin_id: inu.id, destination_id: fun.id })
     click_on "Set frequencies"
 
-    user_airline_revenue = AirlineRouteRevenue.where(airline_route_id: AirlineRoute.where(airline: airline).first.id).first
-    expect(user_airline_revenue.revenue).to be < original_revenue
-    expect(user_airline_revenue.business_pax).to be < original_pax
-    expect(user_airline_revenue.revenue).to be > 0
-    expect(user_airline_revenue.business_pax).to be > 0
+    expect(page).to have_button "Set frequencies"
+
+    click_on "Set frequencies"
+
+    expect(page).to have_content "#{airline.name} operates #{frequencies} weekly flight#{frequencies > 1 ? "s" : ""} on FUN - INU"
+    expect(page).to have_content "#{other_airline.name} operates #{other_frequencies} weekly flights with 0 economy seats, 0 premium economy seats, and #{other_business_seats * other_frequencies} business seats"
+
+    revenue.reload
+    expect(revenue.revenue).to be < original_revenue
+    expect(revenue.business_pax).to be < original_pax
+    expect(revenue.revenue).to be > 0
+    expect(revenue.business_pax).to be > 0
   end
 
   it "shows all service on the route" do
@@ -337,7 +392,7 @@ RSpec.describe "routes/view_route", type: :feature do
     click_on "Set frequencies"
 
     expect(page).to have_content "#{airline.name} flights on FUN - INU"
-    expect(page).to have_content "#{airline.name} has 1 airplane currently operating flights on FUN - INU"
+    expect(page).to have_content "#{airline.name} operates #{frequencies} weekly flight#{frequencies > 1 ? "s" : ""} on FUN - INU"
     expect(page).to have_content "#{airline.name} has 0 airplanes able to add flights on FUN - INU"
     expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized #{block_time} hours per day. Seating 1 economy, 1 premium economy, 1 business. Currently flies #{frequencies} weekly flight"
     expect(page).to have_content "#{airline.name} operates #{frequencies} weekly #{if frequencies > 1 then "flights" else "flight" end} with #{aircraft_1.economy_seats * frequencies} economy seats, #{aircraft_1.premium_economy_seats * frequencies} premium economy seats, and #{aircraft_1.business_seats * frequencies} business seats."
@@ -351,7 +406,7 @@ RSpec.describe "routes/view_route", type: :feature do
     click_on "Set pricing"
 
     expect(page).to have_content "#{airline.name} flights on FUN - INU"
-    expect(page).to have_content "#{airline.name} has 1 airplane currently operating flights on FUN - INU"
+    expect(page).to have_content "#{airline.name} operates #{frequencies} weekly flight#{frequencies > 1 ? "s" : ""} on FUN - INU"
     expect(page).to have_content "#{airline.name} has 0 airplanes able to add flights on FUN - INU"
     expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized #{block_time} hours per day. Seating 1 economy, 1 premium economy, 1 business. Currently flies #{frequencies} weekly flight"
     expect(page).to have_content "#{airline.name} operates #{frequencies} weekly #{if frequencies > 1 then "flights" else "flight" end} with #{aircraft_1.economy_seats * frequencies} economy seats, #{aircraft_1.premium_economy_seats * frequencies} premium economy seats, and #{aircraft_1.business_seats * frequencies} business seats."
@@ -364,7 +419,7 @@ RSpec.describe "routes/view_route", type: :feature do
     click_on "Set frequencies"
 
     expect(page).to have_content "Add service on FUN - INU"
-    expect(page).to have_content "#{airline.name} has 0 airplanes currently operating flights on FUN - INU"
+    expect(page).to have_content "#{airline.name} is not currently operating flights on FUN - INU"
     expect(page).to have_content "#{airline.name} has 1 airplane able to add flights on FUN - INU"
     expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized 0.0 hours per day. Seating 1 economy, 1 premium economy, 1 business"
     expect(page).to have_content "#{other_airline.name} operates 1 weekly flight with #{aircraft_2.economy_seats} economy seats, #{aircraft_2.premium_economy_seats} premium economy seats, and #{aircraft_2.business_seats} business seats. Tickets sell for $1.00 in economy, $2.00 in premium economy, and $4000.00 in business"
@@ -403,7 +458,7 @@ RSpec.describe "routes/view_route", type: :feature do
     click_on "Set frequencies"
 
     expect(page).to have_content "#{airline.name} flights on FUN - INU"
-    expect(page).to have_content "#{airline.name} has 1 airplane currently operating flights on FUN - INU"
+    expect(page).to have_content "#{airline.name} operates #{frequencies} weekly flight#{frequencies > 1 ? "s" : ""} on FUN - INU"
     expect(page).to have_content "#{airline.name} has 0 airplanes able to add flights on FUN - INU"
     expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized #{block_time} hours per day. Seating 0 economy, 1 premium economy, 0 business. Currently flies #{frequencies} weekly flight"
     expect(AirplaneRoute.count).to eq airplane_route_count + 1
@@ -413,7 +468,7 @@ RSpec.describe "routes/view_route", type: :feature do
     visit current_path
 
     expect(page).to have_content "#{airline.name} flights on FUN - INU"
-    expect(page).to have_content "#{airline.name} has 1 airplane currently operating flights on FUN - INU"
+    expect(page).to have_content "#{airline.name} operates #{frequencies} weekly flight#{frequencies > 1 ? "s" : ""} on FUN - INU"
     expect(page).to have_content "#{airline.name} has 0 airplanes able to add flights on FUN - INU"
     expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized #{block_time} hours per day. Seating 0 economy, 1 premium economy, 0 business. Currently flies #{frequencies} weekly flight"
     expect(AirplaneRoute.count).to eq airplane_route_count + 1
