@@ -5,7 +5,7 @@ class Calculation::InertiaRouteService
   INERTIA_PLANE_MAX_NARROWBODY_SEATS = 199
   INERTIA_PLANE_SPEED = 556
   INERTIA_SERVICE_QUALITY = 1
-  LOAD_FACTOR = 0.7
+  MANAGEMENT_OVERHEAD = 1.4
   MAX_PASSENGERS_PER_FA = 50
   REVENUE_PERCENTAGE = 0.5
   LONG_DISTANCE = 4000
@@ -21,7 +21,7 @@ class Calculation::InertiaRouteService
     if business_frequencies == 0
       0
     else
-      (business_frequencies / desired_business_frequencies) * (business_revenue / desired_business_frequencies / business_seats_per_flight)
+      (business_frequencies / desired_business_frequencies) * (business_revenue / desired_business_frequencies / business_seats_per_flight) * MANAGEMENT_OVERHEAD
     end
   end
 
@@ -47,7 +47,7 @@ class Calculation::InertiaRouteService
     if economy_frequencies == 0
       0
     else
-      (economy_frequencies / desired_economy_frequencies) * (economy_revenue / desired_economy_frequencies / economy_seats_per_flight)
+      (economy_frequencies / desired_economy_frequencies) * (economy_revenue / desired_economy_frequencies / economy_seats_per_flight) * MANAGEMENT_OVERHEAD
     end
   end
 
@@ -77,7 +77,7 @@ class Calculation::InertiaRouteService
     if premium_economy_frequencies == 0
       0
     else
-      (premium_economy_frequencies / desired_premium_economy_frequencies) * (premium_economy_revenue / desired_premium_economy_frequencies / premium_economy_seats_per_flight)
+      (premium_economy_frequencies / desired_premium_economy_frequencies) * (premium_economy_revenue / desired_premium_economy_frequencies / premium_economy_seats_per_flight) * MANAGEMENT_OVERHEAD
     end
   end
 
