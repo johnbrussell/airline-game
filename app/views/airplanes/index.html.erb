@@ -9,7 +9,11 @@
 <ul>
   <% @built_airplanes.each do |airplane| %>
     <li>
-      <%= render partial: "airplane_info", locals: { airplane: airplane } %>
+      <% if @airline.is_user_airline %>
+        <a href=<%= game_airline_airplane_path(@game, @airline, airplane) %>><%= render partial: "airplane_name", locals: { airplane: airplane } %></a><%= render partial: "airplane_info", locals: { airplane: airplane } %>
+      <% else %>
+        <%= render partial: "airplane_name", locals: { airplane: airplane } %><%= render partial: "airplane_info", locals: { airplane: airplane } %>
+      <% end %>
     </li>
   <% end %>
 </ul>
@@ -19,7 +23,11 @@
   <ul>
     <% @unbuilt_airplanes.each do |airplane| %>
       <li>
-        <%= render partial: "airplane_info", locals: { airplane: airplane } %>
+        <% if @airline.is_user_airline %>
+          <a href=<%= game_airline_airplane_path(@game, @airline, airplane) %>><%= render partial: "airplane_name", locals: { airplane: airplane } %></a><%= render partial: "airplane_info", locals: { airplane: airplane } %>
+        <% else %>
+          <%= render partial: "airplane_name", locals: { airplane: airplane } %><%= render partial: "airplane_info", locals: { airplane: airplane } %>
+        <% end %>
       </li>
     <% end %>
   </ul>
