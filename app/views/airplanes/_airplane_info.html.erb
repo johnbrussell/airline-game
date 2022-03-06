@@ -1,0 +1,3 @@
+<%= "#{airplane.aircraft_model.family.manufacturer} #{airplane.aircraft_model.name}
+     #{if airplane.construction_date > @game.current_date then "to be delivered" else "constructed" end} #{airplane.construction_date}.
+     #{airplane.economy_seats} economy, #{airplane.premium_economy_seats} premium economy, #{airplane.business_seats} business." %>
