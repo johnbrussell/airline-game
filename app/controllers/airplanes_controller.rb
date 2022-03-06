@@ -52,4 +52,10 @@ class AirplanesController < ApplicationController
     @game = Game.find(params[:game_id])
     @airplane = Airplane.find(params[:airplane_id])
   end
+
+  def show
+    @game = Game.find(params[:game_id])
+    @airline = Airline.find(params[:airline_id])
+    @airplane = Airplane.find(params[:id])
+  end
 end
