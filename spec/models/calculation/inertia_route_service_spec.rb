@@ -29,30 +29,30 @@ RSpec.describe Calculation::InertiaRouteService do
 
     it "calculates frequencies correctly" do
       expect(subject.send(:desired_business_frequencies)).to eq 5
-      expect(subject.business_frequencies).to eq 8
+      expect(subject.business_frequencies).to eq 5
 
       expect(subject.send(:desired_economy_frequencies)).to eq 5
-      expect(subject.economy_frequencies).to eq 8
+      expect(subject.economy_frequencies).to eq 5
 
       expect(subject.send(:desired_premium_economy_frequencies)).to eq 5
-      expect(subject.premium_economy_frequencies).to eq 8
+      expect(subject.premium_economy_frequencies).to eq 5
     end
 
     it "calculates fares correctly" do
       expect(subject.send(:business_revenue)).to eq business_revenue * Calculation::InertiaRouteService::REVENUE_PERCENTAGE
-      assert_in_epsilon subject.business_fare, subject.send(:business_revenue) * (8/5.0) / Calculation::InertiaRouteService::LONG_DISTANCE_BUSINESS_SEATS / 5, 0.000001
+      assert_in_epsilon subject.business_fare, subject.send(:business_revenue) / Calculation::InertiaRouteService::LONG_DISTANCE_BUSINESS_SEATS / 5, 0.000001
 
-      expect(subject.send(:business_flight_cost)).to be <= subject.business_fare * subject.business_seats_per_flight * Calculation::InertiaRouteService::LOAD_FACTOR
+      expect(subject.send(:business_flight_cost)).to be <= subject.business_fare * subject.business_seats_per_flight
 
       expect(subject.send(:economy_revenue)).to eq economy_revenue * Calculation::InertiaRouteService::REVENUE_PERCENTAGE
-      assert_in_epsilon subject.economy_fare, subject.send(:economy_revenue) * (8/5.0) / Calculation::InertiaRouteService::LONG_DISTANCE_ECONOMY_SEATS / 5, 0.000001
+      assert_in_epsilon subject.economy_fare, subject.send(:economy_revenue) / Calculation::InertiaRouteService::LONG_DISTANCE_ECONOMY_SEATS / 5, 0.000001
 
-      expect(subject.send(:economy_flight_cost)).to be <= subject.economy_fare * subject.economy_seats_per_flight * Calculation::InertiaRouteService::LOAD_FACTOR
+      expect(subject.send(:economy_flight_cost)).to be <= subject.economy_fare * subject.economy_seats_per_flight
 
       expect(subject.send(:premium_economy_revenue)).to eq premium_economy_revenue * Calculation::InertiaRouteService::REVENUE_PERCENTAGE
-      assert_in_epsilon subject.premium_economy_fare, subject.send(:premium_economy_revenue) * (8/5.0) / Calculation::InertiaRouteService::LONG_DISTANCE_PREMIUM_ECONOMY_SEATS / 5, 0.000001
+      assert_in_epsilon subject.premium_economy_fare, subject.send(:premium_economy_revenue) / Calculation::InertiaRouteService::LONG_DISTANCE_PREMIUM_ECONOMY_SEATS / 5, 0.000001
 
-      expect(subject.send(:premium_economy_flight_cost)).to be <= subject.premium_economy_fare * subject.premium_economy_seats_per_flight * Calculation::InertiaRouteService::LOAD_FACTOR
+      expect(subject.send(:premium_economy_flight_cost)).to be <= subject.premium_economy_fare * subject.premium_economy_seats_per_flight
     end
   end
 
@@ -85,35 +85,35 @@ RSpec.describe Calculation::InertiaRouteService do
     it "calculates frequencies correctly" do
       expect(subject.send(:desired_business_frequencies)).to be > 4
       expect(subject.send(:desired_business_frequencies)).to be < 5
-      expect(subject.business_frequencies).to eq 8
+      expect(subject.business_frequencies).to eq 5
 
       expect(subject.send(:desired_economy_frequencies)).to be > 4
       expect(subject.send(:desired_economy_frequencies)).to be < 5
-      expect(subject.economy_frequencies).to eq 8
+      expect(subject.economy_frequencies).to eq 5
 
       expect(subject.send(:desired_premium_economy_frequencies)).to be > 4
       expect(subject.send(:desired_premium_economy_frequencies)).to be < 5
-      expect(subject.premium_economy_frequencies).to eq 8
+      expect(subject.premium_economy_frequencies).to eq 5
     end
 
     it "calculates fares correctly" do
       expect(subject.send(:business_revenue)).to eq business_revenue * Calculation::InertiaRouteService::REVENUE_PERCENTAGE
-      expect(subject.business_fare).to be > subject.send(:business_revenue) * (8/5.0) / Calculation::InertiaRouteService::LONG_DISTANCE_BUSINESS_SEATS / 5
-      expect(subject.business_fare).to be < subject.send(:business_revenue) * (8/4.0) / Calculation::InertiaRouteService::LONG_DISTANCE_BUSINESS_SEATS / 4
+      expect(subject.business_fare).to be > subject.send(:business_revenue) / Calculation::InertiaRouteService::LONG_DISTANCE_BUSINESS_SEATS / 5
+      expect(subject.business_fare).to be < subject.send(:business_revenue) / Calculation::InertiaRouteService::LONG_DISTANCE_BUSINESS_SEATS / 4
 
-      expect(subject.send(:business_flight_cost)).to be <= subject.business_fare * subject.business_seats_per_flight * Calculation::InertiaRouteService::LOAD_FACTOR
+      expect(subject.send(:business_flight_cost)).to be <= subject.business_fare * subject.business_seats_per_flight
 
       expect(subject.send(:economy_revenue)).to eq economy_revenue * Calculation::InertiaRouteService::REVENUE_PERCENTAGE
-      expect(subject.economy_fare).to be > subject.send(:economy_revenue) * (8/5.0) / Calculation::InertiaRouteService::LONG_DISTANCE_ECONOMY_SEATS / 5
-      expect(subject.economy_fare).to be < subject.send(:economy_revenue) * (8/4.0) / Calculation::InertiaRouteService::LONG_DISTANCE_ECONOMY_SEATS / 4
+      expect(subject.economy_fare).to be > subject.send(:economy_revenue) / Calculation::InertiaRouteService::LONG_DISTANCE_ECONOMY_SEATS / 5
+      expect(subject.economy_fare).to be < subject.send(:economy_revenue) / Calculation::InertiaRouteService::LONG_DISTANCE_ECONOMY_SEATS / 4
 
-      expect(subject.send(:economy_flight_cost)).to be <= subject.economy_fare * subject.economy_seats_per_flight * Calculation::InertiaRouteService::LOAD_FACTOR
+      expect(subject.send(:economy_flight_cost)).to be <= subject.economy_fare * subject.economy_seats_per_flight
 
       expect(subject.send(:premium_economy_revenue)).to eq premium_economy_revenue * Calculation::InertiaRouteService::REVENUE_PERCENTAGE
-      expect(subject.premium_economy_fare).to be > subject.send(:premium_economy_revenue) * (8/5.0) / Calculation::InertiaRouteService::LONG_DISTANCE_PREMIUM_ECONOMY_SEATS / 5
-      expect(subject.premium_economy_fare).to be < subject.send(:premium_economy_revenue) * (8/4.0) / Calculation::InertiaRouteService::LONG_DISTANCE_PREMIUM_ECONOMY_SEATS / 4
+      expect(subject.premium_economy_fare).to be > subject.send(:premium_economy_revenue) / Calculation::InertiaRouteService::LONG_DISTANCE_PREMIUM_ECONOMY_SEATS / 5
+      expect(subject.premium_economy_fare).to be < subject.send(:premium_economy_revenue) / Calculation::InertiaRouteService::LONG_DISTANCE_PREMIUM_ECONOMY_SEATS / 4
 
-      expect(subject.send(:premium_economy_flight_cost)).to be <= subject.premium_economy_fare * subject.premium_economy_seats_per_flight * Calculation::InertiaRouteService::LOAD_FACTOR
+      expect(subject.send(:premium_economy_flight_cost)).to be <= subject.premium_economy_fare * subject.premium_economy_seats_per_flight
     end
   end
 

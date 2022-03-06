@@ -29,7 +29,7 @@ class Calculation::InertiaRouteService
     if business_seats_per_flight == 0
       0
     else
-      (desired_business_frequencies / LOAD_FACTOR).ceil()
+      desired_business_frequencies.ceil()
     end
   end
 
@@ -55,7 +55,7 @@ class Calculation::InertiaRouteService
     if economy_seats_per_flight == 0
       0
     else
-      (desired_economy_frequencies / LOAD_FACTOR).ceil()
+      desired_economy_frequencies.ceil()
     end
   end
 
@@ -85,7 +85,7 @@ class Calculation::InertiaRouteService
     if premium_economy_seats_per_flight == 0
       0
     else
-      (desired_premium_economy_frequencies / LOAD_FACTOR).ceil()
+      desired_premium_economy_frequencies.ceil()
     end
   end
 
