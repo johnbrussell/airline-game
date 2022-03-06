@@ -37,14 +37,16 @@
 
   <h3><%= "#{@game.user_airline.name} flights on #{@route.name}" %></h3>
   <% if @route.airplanes.count > 0 %>
-    <p class="inline">
-      <%= @game.user_airline.name %> operates <%= @route.total_frequencies %> weekly <%= "flight".pluralize(@route.total_frequencies) %> on <%= @route.name %>.  Profit: $
-      <% if @route.flight_profit >= 0 %>
-        <div class="inline profitable"> <%= number_with_precision(@route.flight_profit, :precision => 2) %> </div>
-      <% else %>
-        <div class="inline unprofitable"> <%= number_with_precision(@route.flight_profit, :precision => 2) %> </div>
-      <% end %>
-      daily.  Load factor: <%= number_with_precision(@route.load_factor, :precision => 1) %>%.
+    <p>
+      <div class="inline">
+        <%= @game.user_airline.name %> operates <%= @route.total_frequencies %> weekly <%= "flight".pluralize(@route.total_frequencies) %> on <%= @route.name %>.  Profit: $
+        <% if @route.flight_profit >= 0 %>
+          <div class="inline profitable"> <%= number_with_precision(@route.flight_profit, :precision => 2) %> </div>
+        <% else %>
+          <div class="inline unprofitable"> <%= number_with_precision(@route.flight_profit, :precision => 2) %> </div>
+        <% end %>
+        daily.  Load factor: <%= number_with_precision(@route.load_factor, :precision => 1) %>%.
+      </div>
     </p>
   <% else %>
     <p><%= @game.user_airline.name %> is not currently operating flights on <%= @route.name %>
