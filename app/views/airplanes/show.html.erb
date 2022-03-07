@@ -7,7 +7,8 @@
 <h2><%= "#{@airplane.aircraft_model.family.manufacturer} #{@airplane.aircraft_model.name}" %></h2>
 <p>
   <% if @airplane.lease_expiry.present? %>
-    <%= "#{@airline.name} has leased this airplane through #{@airplane.lease_expiry}" %>
+    <%= "#{@airline.name} has leased this airplane through #{@airplane.lease_expiry}" %><br/>
+    <%= "Spending $#{number_with_precision(@airplane.lease_rate, :precision => 2, :delimiter => ',')} daily to lease" %>
   <% else %>
     <%= "#{@airline.name} owns this airplane" %>
   <% end %><br/>
