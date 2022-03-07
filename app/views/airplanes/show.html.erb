@@ -5,6 +5,12 @@
 <a href=<%=game_airline_airplanes_path(@game, @airline)%>>Return to <%=@game.user_airline.name%> fleet page</a></p>
 
 <h2><%= "#{@airplane.aircraft_model.family.manufacturer} #{@airplane.aircraft_model.name}" %></h2>
+<% if @airplane.lease_expiry.present? %>
+  <p><%= "#{@airline.name} has leased this airplane through #{@airplane.lease_expiry}" %> </p>
+<% else %>
+  <p><%= "#{@airline.name} owns this airplane" %> </p>
+<% end %>
+
 
 <h3>Configuration</h3>
 <ul>
