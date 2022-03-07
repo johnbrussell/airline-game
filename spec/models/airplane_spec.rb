@@ -456,6 +456,43 @@ RSpec.describe Airplane do
     end
   end
 
+  context "daily_profit" do
+    it "calculates correctly" do
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, speed: 1000, takeoff_distance: 100, max_range: 1000000, price: 1000)
+      subject = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group, lease_rate: 1, business_seats: 1, economy_seats: 1, premium_economy_seats: 1)
+      subject.update(construction_date: subject.game.current_date)
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      CabotageException.create!(country: inu.market.country)
+
+      allow(Calculation::Distance).to receive(:between_airports).with(fun, inu).and_return 100
+
+      route = AirlineRoute.create!(
+        economy_price: 1,
+        business_price: 2,
+        premium_economy_price: 1.5,
+        origin_airport: fun,
+        destination_airport: inu,
+        distance: 100,
+        airline: Airline.last,
+      )
+      AirplaneRoute.new(
+        block_time_mins: 1,
+        frequencies: 1,
+        flight_cost: 1,
+        airplane: subject,
+        route: route,
+      ).save(validate: false)
+      AirlineRouteRevenue.new(airline_route: route, business_pax: 1, economy_pax: 1, premium_economy_pax: 1, revenue: 4.5).save!
+      subject.reload
+
+      maintenance = subject.maintenance_cost_per_day.round(2)
+
+      expect(subject.daily_profit.round(2)).to eq 4.5 / 7 - 1 / 7.0 - 1 - maintenance
+    end
+  end
+
   context "has_operator?" do
     before(:each) do
       game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
