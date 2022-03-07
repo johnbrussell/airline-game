@@ -21,3 +21,6 @@
   <li><%= @airplane.premium_economy_seats %> premium economy <%= "seat".pluralize(@airplane.premium_economy_seats) %></li>
   <li><%= @airplane.business_seats %> business <%= "seat".pluralize(@airplane.business_seats) %></li>
 </ul>
+
+<h3>Utilization</h3>
+<p>This airplane is utilized <%= number_with_precision(@airplane.utilization, :precision => 1) %> hours per day</p>
