@@ -55,10 +55,11 @@ class AirlineRoute < ApplicationRecord
       .uniq
   end
 
-  def airplanes_available_to_add_service
+  def airplanes_available_to_add_service(game)
     Airplane
       .where(operator_id: airline.id)
       .where("airplanes.id NOT IN (?)", airplanes.map(&:id) + ["default value because empty lists cause where not in commands to always return []"])
+      .built(game)
       .neatly_sorted
       .select { |a| a.can_fly_between?(origin_airport, destination_airport) }
       .select { |a| a.has_time_to_fly?(distance) }
