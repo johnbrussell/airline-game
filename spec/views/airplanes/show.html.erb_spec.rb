@@ -62,6 +62,7 @@ RSpec.describe "airplanes/show", type: :feature do
       expect(page).to have_content "Fuel burn: #{airplane.model.fuel_burn} gallons per hour"
       expect(page).to have_content "To be delivered #{airplane.construction_date}"
       expect(page).not_to have_content "Including maintenance and ownership costs, this airplane earns $"
+      expect(page).to have_content "Maximum seats: #{airplane.model.max_economy_seats}"
 
       date = Date.tomorrow
       airplane.update(lease_expiry: date, lease_rate: 10, construction_date: game.current_date)
