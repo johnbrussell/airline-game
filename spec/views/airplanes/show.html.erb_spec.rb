@@ -53,15 +53,22 @@ RSpec.describe "airplanes/show", type: :feature do
       expect(page).to have_content "1 premium economy seat"
       expect(page).to have_content "2 economy seats"
       expect(page).to have_content "#{airline.name} owns this airplane"
-      expect(page).to have_content "Value: $1,000.00"
-      expect(page).to have_content "This airplane is utilized 0.0 hours per day"
+      expect(page).not_to have_content "Value: $1,000.00"
+      expect(page).not_to have_content "Daily maintenance costs: $"
+      expect(page).not_to have_content "This airplane is utilized 0.0 hours per day"
       expect(page).to have_content "Takeoff length: #{airplane.model.takeoff_distance} feet"
       expect(page).to have_content "Range: #{airplane.model.max_range} miles"
       expect(page).to have_content "Fuel burn: #{airplane.model.fuel_burn} gallons per hour"
       expect(page).to have_content "To be delivered #{airplane.construction_date}"
+      expect(page).not_to have_content "Including maintenance and ownership costs, this airplane earns $"
 
       date = Date.tomorrow
-      airplane.update(lease_expiry: date, lease_rate: 10, construction_date: game.current_date - 1.day)
+      airplane.update(lease_expiry: date, lease_rate: 10, construction_date: game.current_date)
+
+      visit game_airline_airplane_path(game, airline, airplane)
+
+      expect(page).to have_content "This airplane is utilized 0.0 hours per day"
+
       AirlineRoute.new(origin_airport: fun, destination_airport: inu, distance: 1, economy_price: 1, business_price: 3, premium_economy_price: 2, airline: airline).save(validate: false)
       AirplaneRoute.new(airline_route_id: AirlineRoute.last.id, frequencies: 1, flight_cost: 11, block_time_mins: 60, airplane_id: airplane.id).save(validate: false)
       AirlineRouteRevenue.new(airline_route_id: AirlineRoute.last.id, revenue: 4, business_pax: 0, economy_pax: 2, premium_economy_pax: 1).save(validate: false)
@@ -73,7 +80,8 @@ RSpec.describe "airplanes/show", type: :feature do
       expect(page).to have_content "Leased for $10.00 daily"
       expect(page).to have_content "Constructed #{airplane.construction_date}"
       expect(page).to have_content "Daily maintenance costs: $#{airplane.maintenance_cost_per_day.round(2)}"
-      expect(page).to have_content "Including maintenance and ownership costs, this airplane earns $\n-11.08"
+      expect(page).to have_content "Including maintenance and ownership costs, this airplane earns $\n-11.08\nin profits per day"
+      expect(page).to have_content "Value: $1,000.00"
     end
   end
 end
