@@ -8,6 +8,7 @@ class AirplaneRoute < ApplicationRecord
   validates :frequencies, presence: true
   validates :frequencies, numericality: { greater_than: 0 }
 
+  validate :airplane_built
   validate :airplane_can_fly_route
   validate :airplane_operated_by_airline
   validate :airplane_time_is_logical
@@ -53,6 +54,12 @@ class AirplaneRoute < ApplicationRecord
   end
 
   private
+
+    def airplane_built
+      if !airplane.built?
+        errors.add(:airplane, "cannot fly before it is built")
+      end
+    end
 
     def airplane_can_fly_route
       if !airplane.can_fly_between?(route.origin_airport, route.destination_airport)
