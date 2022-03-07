@@ -3,3 +3,63 @@
 <p><a href=<%=game_path(@game)%> >Return to game overview</a><br/>
 <a href=<%=game_airline_path(@game, @airline)%>>Return to <%= @game.user_airline.name %> overview</a><br/>
 <a href=<%=game_airline_airplanes_path(@game, @airline)%>>Return to <%=@game.user_airline.name%> fleet page</a></p>
+
+<h2><%= "#{@airplane.aircraft_model.family.manufacturer} #{@airplane.aircraft_model.name}" %></h2>
+
+<p>
+  <%= "Takeoff length: #{@airplane.model.takeoff_distance} feet" %><br/>
+  <%= "Range: #{@airplane.model.max_range} miles" %><br/>
+  <%= "Fuel burn: #{@airplane.model.fuel_burn} gallons per hour" %>
+</p>
+
+<h3>Value</h3>
+<p>
+  <% if @airplane.construction_date > @game.current_date %>
+    <%= "To be delivered #{@airplane.construction_date}" %>
+  <% else %>
+    <%= "Constructed #{@airplane.construction_date}" %>
+  <% end %><br/>
+  <% if @airplane.lease_expiry.present? %>
+    <%= "#{@airline.name} has leased this airplane through #{@airplane.lease_expiry}" %><br/>
+    <%= "Leased for $#{number_with_precision(@airplane.lease_rate, :precision => 2, :delimiter => ',')} daily" %>
+  <% else %>
+    <%= "#{@airline.name} owns this airplane" %>
+  <% end %><br/>
+  <%= "Value: $#{number_with_precision(@airplane.purchase_price, :precision => 2, :delimiter => ',')}" %><br/>
+  <%= "Daily maintenance costs: $#{number_with_precision(@airplane.maintenance_cost_per_day, :precision => 2, :delimiter => ',')}" %>
+</p>
+
+
+<h3>Configuration</h3>
+<ul>
+  <li><%= @airplane.economy_seats %> economy <%= "seat".pluralize(@airplane.economy_seats) %></li>
+  <li><%= @airplane.premium_economy_seats %> premium economy <%= "seat".pluralize(@airplane.premium_economy_seats) %></li>
+  <li><%= @airplane.business_seats %> business <%= "seat".pluralize(@airplane.business_seats) %></li>
+</ul>
+
+<h3>Utilization</h3>
+<p>This airplane is utilized <%= number_with_precision(@airplane.utilization, :precision => 1) %> hours per day</p>
+<ul>
+  <% @airplane.airplane_routes.sort_by(&:name).each do |route| %>
+    <li><%= "#{link_to route.name, game_airline_route_add_flights_path(@game, route.route.id)}:".html_safe %>
+      <%= route.frequencies %> weekly <%= "flight".pluralize(route.frequencies) %>.  $
+      <% if route.daily_profit >= 0 %>
+        <div class="inline profitable"><%= number_with_precision(route.daily_profit, :precision => 2, delimiter: ',') %></div>
+      <% else %>
+        <div class="inline unprofitable"><%= number_with_precision(route.daily_profit, :precision => 2, delimiter: ',') %></div>
+      <% end %>
+      daily profits
+    </li>
+  <% end %>
+</ul>
+
+<p>
+  <div class="inline">Including maintenance and ownership costs, this airplane earns $
+    <% if @airplane.daily_profit >= 0 %>
+      <div class="inline profitable"><%= number_with_precision(@airplane.daily_profit, :precision => 2, :delimiter => ',') %></div>
+    <% else %>
+      <div class="inline unprofitable"><%= number_with_precision(@airplane.daily_profit, :precision => 2, :delimiter => ',') %></div>
+    <% end %>
+    in profits per day.
+  </div>
+</p>

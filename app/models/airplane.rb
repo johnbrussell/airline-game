@@ -90,6 +90,10 @@ class Airplane < ApplicationRecord
       routes_connected_with?(airport_1.iata, airport_2.iata)
   end
 
+  def daily_profit
+    airplane_routes.sum(&:daily_profit) - maintenance_cost_per_day - daily_lease_expense
+  end
+
   def has_operator?
     operator_id.present?
   end
@@ -260,6 +264,10 @@ class Airplane < ApplicationRecord
       if !routes.all?{ |r| can_fly_between?(r.origin_airport, r.destination_airport) }
         errors.add(:routes, "are not all able to be flown by the aircraft")
       end
+    end
+
+    def daily_lease_expense
+      lease_rate.nil? ? 0 : lease_rate
     end
 
     def floor_space_used

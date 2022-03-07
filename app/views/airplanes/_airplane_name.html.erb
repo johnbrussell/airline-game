@@ -1,1 +1,5 @@
-<%= "#{airplane.aircraft_model.family.manufacturer} #{airplane.aircraft_model.name}" %>
+<% if airplane.operator_id == @game.user_airline.id %>
+  <%= "#{link_to "#{airplane.aircraft_model.family.manufacturer} #{airplane.aircraft_model.name}", game_airline_airplane_path(@game, airline, airplane)}".html_safe %>
+<% else %>
+  <%= "#{airplane.aircraft_model.family.manufacturer} #{airplane.aircraft_model.name}" %>
+<% end %>

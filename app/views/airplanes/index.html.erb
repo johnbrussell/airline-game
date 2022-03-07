@@ -9,11 +9,7 @@
 <ul>
   <% @built_airplanes.each do |airplane| %>
     <li>
-      <% if @airline.is_user_airline %>
-        <a href=<%= game_airline_airplane_path(@game, @airline, airplane) %>><%= render partial: "airplane_name", locals: { airplane: airplane } %></a><%= render partial: "airplane_info", locals: { airplane: airplane } %>
-      <% else %>
-        <%= render partial: "airplane_name", locals: { airplane: airplane } %><%= render partial: "airplane_info", locals: { airplane: airplane } %>
-      <% end %>
+      <%= render partial: "airplane_name", locals: { airplane: airplane, airline: @airline } %><%= render partial: "airplane_info", locals: { airplane: airplane } %>
     </li>
   <% end %>
 </ul>
@@ -23,11 +19,7 @@
   <ul>
     <% @unbuilt_airplanes.each do |airplane| %>
       <li>
-        <% if @airline.is_user_airline %>
-          <a href=<%= game_airline_airplane_path(@game, @airline, airplane) %>><%= render partial: "airplane_name", locals: { airplane: airplane } %></a><%= render partial: "airplane_info", locals: { airplane: airplane } %>
-        <% else %>
-          <%= render partial: "airplane_name", locals: { airplane: airplane } %><%= render partial: "airplane_info", locals: { airplane: airplane } %>
-        <% end %>
+        <%= render partial: "airplane_name", locals: { airplane: airplane, airline: @airline } %><%= render partial: "airplane_info", locals: { airplane: airplane } %>
       </li>
     <% end %>
   </ul>
