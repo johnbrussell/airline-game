@@ -41,6 +41,8 @@ RSpec.describe "airplanes/show", type: :feature do
     end
 
     it "shows information about the airplane" do
+      airplane.aircraft_model.update(price: 1000)
+
       visit game_airline_airplane_path(game, airline, airplane)
 
       expect(page).to have_content "#{airplane.model.family.manufacturer} #{airplane.model.name}"
@@ -49,6 +51,7 @@ RSpec.describe "airplanes/show", type: :feature do
       expect(page).to have_content "1 premium economy seat"
       expect(page).to have_content "2 economy seats"
       expect(page).to have_content "#{airline.name} owns this airplane"
+      expect(page).to have_content "Value: $1,000.00"
 
       date = Date.tomorrow
       airplane.update(lease_expiry: date)
