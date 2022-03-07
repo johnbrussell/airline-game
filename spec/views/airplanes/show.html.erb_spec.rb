@@ -46,7 +46,6 @@ RSpec.describe "airplanes/show", type: :feature do
       visit game_airline_airplane_path(game, airline, airplane)
 
       expect(page).to have_content "#{airplane.model.family.manufacturer} #{airplane.model.name}"
-      expect(page).to have_content "Airplane #{airplane.id}"
       expect(page).to have_content "0 business seats"
       expect(page).to have_content "1 premium economy seat"
       expect(page).to have_content "2 economy seats"
