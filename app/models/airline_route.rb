@@ -118,6 +118,10 @@ class AirlineRoute < ApplicationRecord
     end
   end
 
+  def total_seats
+    airplane_routes.sum { |ar| ar.frequencies * ar.airplane.num_seats }
+  end
+
   def update_revenue
     if total_frequencies == 0
       revenue&.zero_out
@@ -191,9 +195,5 @@ class AirlineRoute < ApplicationRecord
 
     def scale_reputation(input_reptuation, input_min, input_max)
       (input_reptuation - input_min) * (MAX_REPUTATION - MIN_REPUTATION) / (input_max - input_min).to_f + MIN_REPUTATION
-    end
-
-    def total_seats
-      airplane_routes.sum { |ar| ar.frequencies * ar.airplane.num_seats }
     end
 end

@@ -25,12 +25,18 @@ class AirplaneRoute < ApplicationRecord
            :service_quality,
            to: :route
 
+  DAYS_PER_WEEK = 7.0
+
   def self.on_route(origin, destination, game)
     AirplaneRoute
       .joins(route: :airline)
       .where("airline_routes.origin_airport_id == ?", origin.id)
       .where("airline_routes.destination_airport_id == ?", destination.id)
       .where("airlines.game_id == ?", game.id)
+  end
+
+  def daily_profit
+    (revenue - expenses) / DAYS_PER_WEEK
   end
 
   def set_frequency(frequency)
@@ -72,12 +78,44 @@ class AirplaneRoute < ApplicationRecord
       end
     end
 
+    def expenses
+      frequencies * flight_cost
+    end
+
     def one_way_single_frequency_flight_cost
       Calculation::FlightCostCalculator.new(airplane, distance, service_quality).cost
     end
 
     def other_airplane_routes
       airplane.airplane_routes.reject { |r| r.id == id }
+    end
+
+    def revenue
+      revenue_business + revenue_economy + revenue_premium_economy
+    end
+
+    def revenue_business
+      if route.total_business_seats > 0
+        airplane.business_seats * frequencies / route.total_business_seats.to_f * route.business_price * route.revenue.business_pax
+      else
+        0
+      end
+    end
+
+    def revenue_economy
+      if route.total_economy_seats > 0
+        airplane.economy_seats * frequencies / route.total_economy_seats.to_f * route.economy_price * route.revenue.economy_pax
+      else
+        0
+      end
+    end
+
+    def revenue_premium_economy
+      if route.total_premium_economy_seats > 0
+        airplane.premium_economy_seats * frequencies / route.total_premium_economy_seats.to_f * route.premium_economy_price * route.revenue.premium_economy_pax
+      else
+        0
+      end
     end
 
     def routes_connected
