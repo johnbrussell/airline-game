@@ -109,6 +109,7 @@ RSpec.describe "airplanes/index", type: :feature do
         game = Game.last
         airline = Airline.last
         airline.update(is_user_airline: false)
+        other_airline = Fabricate(:airline, base_id: airline.base.id, is_user_airline: true, game_id: game.id)
 
         visit game_airline_airplanes_path(game.id, airline.id)
 
@@ -150,6 +151,7 @@ RSpec.describe "airplanes/index", type: :feature do
         airline = Airline.last
 
         airline.update(is_user_airline: false)
+        other_airline = Fabricate(:airline, base_id: airline.base.id, is_user_airline: true, game_id: game.id)
         airline.reload
 
         visit game_airline_airplanes_path(game.id, airline.id)
