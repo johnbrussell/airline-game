@@ -57,9 +57,10 @@ RSpec.describe "airplanes/show", type: :feature do
       expect(page).to have_content "Takeoff length: #{airplane.model.takeoff_distance} feet"
       expect(page).to have_content "Range: #{airplane.model.max_range} miles"
       expect(page).to have_content "Fuel burn: #{airplane.model.fuel_burn} gallons per hour"
+      expect(page).to have_content "Constructed #{airplane.construction_date}"
 
       date = Date.tomorrow
-      airplane.update(lease_expiry: date, lease_rate: 10)
+      airplane.update(lease_expiry: date, lease_rate: 10, construction_date: date)
       AirlineRoute.new(origin_airport: fun, destination_airport: inu, distance: 1, economy_price: 1, business_price: 3, premium_economy_price: 2, airline: airline).save(validate: false)
       AirplaneRoute.new(airline_route_id: AirlineRoute.last.id, frequencies: 1, flight_cost: 11, block_time_mins: 60, airplane_id: airplane.id).save(validate: false)
       AirlineRouteRevenue.new(airline_route_id: AirlineRoute.last.id, revenue: 4, business_pax: 0, economy_pax: 2, premium_economy_pax: 1).save(validate: false)
@@ -68,7 +69,8 @@ RSpec.describe "airplanes/show", type: :feature do
 
       expect(page).to have_content "#{airline.name} has leased this airplane through #{date}"
       expect(page).to have_content "FUN - INU: 1 weekly flight. $\n-1.00\ndaily profits"
-      expect(page).to have_content "Spending $10.00 daily to lease"
+      expect(page).to have_content "Leased for $10.00 daily"
+      expect(page).to have_content "To be delivered #{airplane.construction_date}"
     end
   end
 end

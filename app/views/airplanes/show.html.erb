@@ -14,9 +14,14 @@
 
 <h3>Value</h3>
 <p>
+  <% if @airplane.construction_date > @game.current_date %>
+    <%= "To be delivered #{@airplane.construction_date}" %>
+  <% else %>
+    <%= "Constructed #{@airplane.construction_date}" %>
+  <% end %><br/>
   <% if @airplane.lease_expiry.present? %>
     <%= "#{@airline.name} has leased this airplane through #{@airplane.lease_expiry}" %><br/>
-    <%= "Spending $#{number_with_precision(@airplane.lease_rate, :precision => 2, :delimiter => ',')} daily to lease" %>
+    <%= "Leased for $#{number_with_precision(@airplane.lease_rate, :precision => 2, :delimiter => ',')} daily" %>
   <% else %>
     <%= "#{@airline.name} owns this airplane" %>
   <% end %><br/>
