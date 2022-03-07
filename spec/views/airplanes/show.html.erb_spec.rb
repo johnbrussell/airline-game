@@ -5,7 +5,7 @@ RSpec.describe "airplanes/show", type: :feature do
   let(:game) { Fabricate(:game) }
   let(:airline) { Fabricate(:airline, game_id: game.id, is_user_airline: true) }
   let(:family) { Fabricate(:aircraft_family) }
-  let(:airplane) { Fabricate(:airplane, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group) }
+  let(:airplane) { Fabricate(:airplane, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, business_seats: 0, economy_seats: 2, premium_economy_seats: 1) }
 
   context "viewing the page" do
     it "links back to the game homepage" do
@@ -45,6 +45,9 @@ RSpec.describe "airplanes/show", type: :feature do
 
       expect(page).to have_content "#{airplane.model.family.manufacturer} #{airplane.model.name}"
       expect(page).to have_content "Airplane #{airplane.id}"
+      expect(page).to have_content "0 business seats"
+      expect(page).to have_content "1 premium economy seat"
+      expect(page).to have_content "2 economy seats"
     end
   end
 end
