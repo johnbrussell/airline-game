@@ -54,6 +54,9 @@ RSpec.describe "airplanes/show", type: :feature do
       expect(page).to have_content "#{airline.name} owns this airplane"
       expect(page).to have_content "Value: $1,000.00"
       expect(page).to have_content "This airplane is utilized 0.0 hours per day"
+      expect(page).to have_content "Takeoff length: #{airplane.model.takeoff_distance} feet"
+      expect(page).to have_content "Range: #{airplane.model.max_range} miles"
+      expect(page).to have_content "Fuel burn: #{airplane.model.fuel_burn} gallons per hour"
 
       date = Date.tomorrow
       airplane.update(lease_expiry: date, lease_rate: 10)
