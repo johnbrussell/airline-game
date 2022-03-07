@@ -21,6 +21,7 @@ class AirplaneRoute < ApplicationRecord
   belongs_to :route, class_name: "AirlineRoute", foreign_key: :airline_route_id
 
   delegate :distance,
+           :name,
            :service_quality,
            to: :route
 
