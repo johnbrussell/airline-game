@@ -52,3 +52,14 @@
     </li>
   <% end %>
 </ul>
+
+<p>
+  <div class="inline">Including maintenance and ownership costs, this airplane earns $
+    <% if @airplane.daily_profit >= 0 %>
+      <div class="inline profitable"><%= number_with_precision(@airplane.daily_profit, :precision => 2, :delimiter => ',') %></div>
+    <% else %>
+      <div class="inline unprofitable"><%= number_with_precision(@airplane.daily_profit, :precision => 2, :delimiter => ',') %></div>
+    <% end %>
+    in profits per day.
+  </div>
+</p>
