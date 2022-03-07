@@ -5,7 +5,6 @@
 <a href=<%=game_airline_airplanes_path(@game, @airline)%>>Return to <%=@game.user_airline.name%> fleet page</a></p>
 
 <h2><%= "#{@airplane.aircraft_model.family.manufacturer} #{@airplane.aircraft_model.name}" %></h2>
-<p>Airplane <%= @airplane.id %> </p>
 
 <h3>Configuration</h3>
 <ul>
@@ -13,3 +12,5 @@
   <li><%= @airplane.premium_economy_seats %> premium economy <%= "seat".pluralize(@airplane.premium_economy_seats) %></li>
   <li><%= @airplane.business_seats %> business <%= "seat".pluralize(@airplane.business_seats) %></li>
 </ul>
+
+<p>Airplane <%= @airplane.id %> </p>
