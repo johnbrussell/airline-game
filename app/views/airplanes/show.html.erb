@@ -25,7 +25,8 @@
   <% else %>
     <%= "#{@airline.name} owns this airplane" %>
   <% end %><br/>
-  <%= "Value: $#{number_with_precision(@airplane.purchase_price, :precision => 2, :delimiter => ',')}" %>
+  <%= "Value: $#{number_with_precision(@airplane.purchase_price, :precision => 2, :delimiter => ',')}" %><br/>
+  <%= "Daily maintenance costs: $#{number_with_precision(@airplane.maintenance_cost_per_day, :precision => 2, :delimiter => ',')}" %>
 </p>
 
 

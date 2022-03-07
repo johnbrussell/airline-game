@@ -58,6 +58,7 @@ RSpec.describe "airplanes/show", type: :feature do
       expect(page).to have_content "Range: #{airplane.model.max_range} miles"
       expect(page).to have_content "Fuel burn: #{airplane.model.fuel_burn} gallons per hour"
       expect(page).to have_content "Constructed #{airplane.construction_date}"
+      expect(page).to have_content "Daily maintenance costs: $#{airplane.maintenance_cost_per_day.round(2)}"
 
       date = Date.tomorrow
       airplane.update(lease_expiry: date, lease_rate: 10, construction_date: date)
