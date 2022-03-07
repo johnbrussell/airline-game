@@ -39,5 +39,12 @@ RSpec.describe "airplanes/show", type: :feature do
       expect(page).to have_content "#{airline.name} operates 1 airplane"
       expect(page).to have_content "Upcoming deliveries"
     end
+
+    it "shows information about the airplane" do
+      visit game_airline_airplane_path(game, airline, airplane)
+
+      expect(page).to have_content "#{airplane.model.family.manufacturer} #{airplane.model.name}"
+      expect(page).to have_content "Airplane #{airplane.id}"
+    end
   end
 end
