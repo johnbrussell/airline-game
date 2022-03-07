@@ -24,6 +24,10 @@
     <%= "Leased for $#{number_with_precision(@airplane.lease_rate, :precision => 2, :delimiter => ',')} daily" %>
   <% else %>
     <%= "#{@airline.name} owns this airplane" %>
+    <% if !@airplane.built? %>
+      <br/>
+      <%= "$#{number_with_precision(@airplane.new_plane_payment, :precision => 0, :delimiter => ',')} due at delivery" %>
+    <% end %>
   <% end %><br/>
   <% if @airplane.built? %>
     <%= "Value: $#{number_with_precision(@airplane.purchase_price, :precision => 2, :delimiter => ',')}" %><br/>

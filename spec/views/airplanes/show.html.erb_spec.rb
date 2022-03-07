@@ -53,6 +53,7 @@ RSpec.describe "airplanes/show", type: :feature do
       expect(page).to have_content "1 premium economy seat"
       expect(page).to have_content "2 economy seats"
       expect(page).to have_content "#{airline.name} owns this airplane"
+      expect(page).to have_content "$500 due at delivery"
       expect(page).not_to have_content "Value: $1,000.00"
       expect(page).not_to have_content "Daily maintenance costs: $"
       expect(page).not_to have_content "This airplane is utilized 0.0 hours per day"
