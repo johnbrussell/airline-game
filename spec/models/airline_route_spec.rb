@@ -162,6 +162,9 @@ RSpec.describe AirlineRoute do
       airline = Fabricate(:airline, base_id: inu.market.id, name: "A")
       original_record_count = AirlineRoute.count
 
+      inertia = instance_double(Calculation::InertiaRouteService, economy_fare: 1, business_fare: 0, premium_economy_fare: 1.5)
+      expect(Calculation::InertiaRouteService).to receive(:new).with(fun, inu, Game.find(airline.game_id).current_date).and_return(inertia)
+
       actual = AirlineRoute.find_or_create_by_airline_and_route(airline, fun, inu)
 
       expect(actual.present?).to be true
