@@ -52,6 +52,14 @@ RSpec.describe "airlines/index", type: :feature do
       click_link "View all airlines"
 
       expect(page).to have_content "There is 1 airline in the game"
+
+      visit game_airline_path(game.id, airline.id)
+
+      expect(page).to have_link "View routes"
+
+      click_link "View routes"
+
+      expect(page).to have_content "A Air routes"
     end
   end
 end
