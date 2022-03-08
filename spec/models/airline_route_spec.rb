@@ -303,7 +303,7 @@ RSpec.describe AirlineRoute do
 
       expect(subject.reputation).to be < AirlineRoute::MAX_REPUTATION
       expect(subject.reputation).to be > AirlineRoute::MIN_REPUTATION
-      assert_in_epsilon subject.reputation, AirlineRoute::MIN_REPUTATION + 1/245.0 * AirlineRoute::REPUTATION_WEIGHTS[:frequency], 0.00001
+      assert_in_epsilon subject.reputation, AirlineRoute::MIN_REPUTATION, 0.01
     end
 
     it "calculates correctly when no airline operates a route" do
@@ -322,7 +322,7 @@ RSpec.describe AirlineRoute do
         service_quality: 5,
       )
 
-      expect(subject.reputation).to eq AirlineRoute::MIN_REPUTATION + 0.1
+      expect(subject.reputation).to eq AirlineRoute::MIN_REPUTATION + (AirlineRoute::MAX_REPUTATION - AirlineRoute::MIN_REPUTATION) * AirlineRoute::REPUTATION_WEIGHTS[:ifs]
     end
   end
 

@@ -29,7 +29,7 @@ class AirlineRoute < ApplicationRecord
     legroom: 0.3,
   }
   MIN_REPUTATION = 1
-  MAX_REPUTATION = 2
+  MAX_REPUTATION = 4
 
   def self.find_or_create_by_airline_and_route(airline, origin_airport, destination_airport)
     record = find_or_create_by(airline: airline, origin_airport: origin_airport, destination_airport: destination_airport)
