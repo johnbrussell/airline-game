@@ -6,6 +6,6 @@
 <p>Based in <%= "#{@airline.base.name}, #{@airline.base.country}" %> </p>
 
 <p> <a href=<%=game_airline_airplanes_path(@game, @airline) %> > View fleet </a> <br/>
-View routes <br/>
+<a href=<%= game_airline_routes_path(@game, @airline) %>>View routes</a> <br/>
 View slot holdings <br/>
 View financial history <br/> </p>
