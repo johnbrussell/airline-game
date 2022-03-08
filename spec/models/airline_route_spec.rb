@@ -322,7 +322,7 @@ RSpec.describe AirlineRoute do
         service_quality: 5,
       )
 
-      expect(subject.reputation).to eq AirlineRoute::MIN_REPUTATION + 0.3
+      expect(subject.reputation).to eq AirlineRoute::MIN_REPUTATION + (AirlineRoute::MAX_REPUTATION - AirlineRoute::MIN_REPUTATION) * AirlineRoute::REPUTATION_WEIGHTS[:ifs]
     end
   end
 
