@@ -104,7 +104,7 @@ RSpec.describe "airplanes/lease_information", type: :feature do
         expect(page).to have_content "There is 1 new airplane available to buy or lease"
         expect(page).to have_content "Boeing 737-300 to be delivered #{airplane.construction_date}"
 
-        click_button "Lease"
+        click_button "View lease details"
 
         fill_in :airplane_days, with: 1
         fill_in :airplane_business_seats, with: 1
@@ -147,7 +147,7 @@ RSpec.describe "airplanes/lease_information", type: :feature do
         expect(page).to have_content "There is 1 new airplane available to buy or lease"
         expect(page).to have_content "Boeing 737-300 to be delivered #{airplane.construction_date}"
 
-        click_button "Lease"
+        click_button "View lease details"
 
         click_button "Cancel"
 
@@ -212,7 +212,7 @@ RSpec.describe "airplanes/lease_information", type: :feature do
         expect(page).to have_content "There is 1 used airplane available to buy or lease"
         expect(page).to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
 
-        click_button "Lease"
+        click_button "View lease details"
 
         fill_in :airplane_days, with: 1
         click_button "Lease"
@@ -251,7 +251,7 @@ RSpec.describe "airplanes/lease_information", type: :feature do
         expect(page).to have_content "There is 1 used airplane available to buy or lease"
         expect(page).to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
 
-        click_button "Lease"
+        click_button "View lease details"
 
         click_button "Cancel"
 
