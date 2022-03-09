@@ -71,6 +71,7 @@ class AirlineRoute < ApplicationRecord
   end
 
   def flight_profit
+    # Revenue and flight costs are both round trip
     (revenue.revenue - total_flight_costs) / 7.0
   end
 
