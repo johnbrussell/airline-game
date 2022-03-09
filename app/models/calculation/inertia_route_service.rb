@@ -18,11 +18,7 @@ class Calculation::InertiaRouteService
   SHORT_DISTANCE_ECONOMY_SEATS = 57
 
   def business_fare
-    if business_frequencies == 0
-      0
-    else
-      (business_frequencies / desired_business_frequencies) * (business_revenue / desired_business_frequencies / business_seats_per_flight) * MANAGEMENT_OVERHEAD
-    end
+    desired_business_fare * MANAGEMENT_OVERHEAD
   end
 
   def business_frequencies
@@ -44,11 +40,7 @@ class Calculation::InertiaRouteService
   end
 
   def economy_fare
-    if economy_frequencies == 0
-      0
-    else
-      (economy_frequencies / desired_economy_frequencies) * (economy_revenue / desired_economy_frequencies / economy_seats_per_flight) * MANAGEMENT_OVERHEAD
-    end
+    desired_economy_fare * MANAGEMENT_OVERHEAD
   end
 
   def economy_frequencies
@@ -74,11 +66,7 @@ class Calculation::InertiaRouteService
   end
 
   def premium_economy_fare
-    if premium_economy_frequencies == 0
-      0
-    else
-      (premium_economy_frequencies / desired_premium_economy_frequencies) * (premium_economy_revenue / desired_premium_economy_frequencies / premium_economy_seats_per_flight) * MANAGEMENT_OVERHEAD
-    end
+    desired_premium_economy_fare * MANAGEMENT_OVERHEAD
   end
 
   def premium_economy_frequencies
@@ -106,15 +94,39 @@ class Calculation::InertiaRouteService
     end
 
     def business_revenue
-      revenue.max_business_class_revenue_per_week * REVENUE_PERCENTAGE
+      revenue.max_business_class_revenue_per_week * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
+    end
+
+    def desired_business_fare
+      if business_frequencies == 0
+        0
+      else
+        (business_frequencies / desired_business_frequencies) * (business_revenue / desired_business_frequencies / business_seats_per_flight)
+      end
     end
 
     def desired_business_frequencies
       business_revenue.to_f / business_flight_cost
     end
 
+    def desired_economy_fare
+      if economy_frequencies == 0
+        0
+      else
+        (economy_frequencies / desired_economy_frequencies) * (economy_revenue / desired_economy_frequencies / economy_seats_per_flight)
+      end
+    end
+
     def desired_economy_frequencies
       economy_revenue.to_f / economy_flight_cost
+    end
+
+    def desired_premium_economy_fare
+      if premium_economy_frequencies == 0
+        0
+      else
+        (premium_economy_frequencies / desired_premium_economy_frequencies) * (premium_economy_revenue / desired_premium_economy_frequencies / premium_economy_seats_per_flight)
+      end
     end
 
     def desired_premium_economy_frequencies
@@ -126,7 +138,7 @@ class Calculation::InertiaRouteService
     end
 
     def economy_revenue
-      revenue.max_economy_class_revenue_per_week * REVENUE_PERCENTAGE
+      revenue.max_economy_class_revenue_per_week * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
     end
 
     def inertia_airplane
@@ -159,7 +171,7 @@ class Calculation::InertiaRouteService
     end
 
     def premium_economy_revenue
-      revenue.max_premium_economy_class_revenue_per_week * REVENUE_PERCENTAGE
+      revenue.max_premium_economy_class_revenue_per_week * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
     end
 
     def revenue

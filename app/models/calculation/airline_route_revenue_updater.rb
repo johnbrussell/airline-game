@@ -4,11 +4,12 @@ class Calculation::AirlineRouteRevenueUpdater
   def upsert(game)
     allocate_all(game).each do |airline_route, earned_revenue|
       arr = AirlineRouteRevenue.find_or_initialize_by(airline_route: airline_route)
+      # Round trip revenue count; one way passenger counts
       arr.assign_attributes(
         revenue: (earned_revenue[:business] + earned_revenue[:premium_economy] + earned_revenue[:economy]).round(2),
-        economy_pax: (earned_revenue[:economy] / airline_route.economy_price.to_f).round(7),
-        premium_economy_pax: (earned_revenue[:premium_economy] / airline_route.premium_economy_price.to_f).round(7),
-        business_pax: (earned_revenue[:business] / airline_route.business_price.to_f).round(7),
+        economy_pax: (earned_revenue[:economy] / airline_route.economy_price.to_f / 2.0).round(7),
+        premium_economy_pax: (earned_revenue[:premium_economy] / airline_route.premium_economy_price.to_f / 2.0).round(7),
+        business_pax: (earned_revenue[:business] / airline_route.business_price.to_f / 2.0).round(7),
       )
       arr.save!
     end
@@ -123,7 +124,7 @@ class Calculation::AirlineRouteRevenueUpdater
     def solicited_business_market_dollars_by_airline_flight(game)
       relevant_airline_routes_business(game).map do |airline_route|
         [
-          airline_route, airline_route.airplane_routes.flat_map { |ar| [ar.airplane.business_seats * airline_route.business_price] * ar.frequencies }
+          airline_route, airline_route.airplane_routes.flat_map { |ar| [ar.airplane.business_seats * airline_route.business_price * 2.0] * ar.frequencies }
         ]
       end.to_h
     end
@@ -131,7 +132,7 @@ class Calculation::AirlineRouteRevenueUpdater
     def solicited_economy_market_dollars_by_airline_flight(game)
       relevant_airline_routes_economy(game).map do |airline_route|
         [
-          airline_route, airline_route.airplane_routes.flat_map { |ar| [ar.airplane.economy_seats * airline_route.economy_price] * ar.frequencies }
+          airline_route, airline_route.airplane_routes.flat_map { |ar| [ar.airplane.economy_seats * airline_route.economy_price * 2.0] * ar.frequencies }
         ]
       end.to_h
     end
@@ -139,7 +140,7 @@ class Calculation::AirlineRouteRevenueUpdater
     def solicited_premium_economy_market_dollars_by_airline_flight(game)
       relevant_airline_routes_premium_economy(game).map do |airline_route|
         [
-          airline_route, airline_route.airplane_routes.flat_map { |ar| [ar.airplane.premium_economy_seats * airline_route.premium_economy_price] * ar.frequencies }
+          airline_route, airline_route.airplane_routes.flat_map { |ar| [ar.airplane.premium_economy_seats * airline_route.premium_economy_price * 2.0] * ar.frequencies }
         ]
       end.to_h
     end

@@ -364,10 +364,10 @@ RSpec.describe AirlineRoute do
       family = Fabricate(:aircraft_family)
       airplane = Fabricate(:airplane, operator_id: airline.id, base_country_group: airline.base.country_group, business_seats: 1, economy_seats: 1, premium_economy_seats: 1, aircraft_family: family)
       AirplaneRoute.new(airplane: airplane, route: subject, frequencies: 1, flight_cost: 1, block_time_mins: 1).save(validate: false)
-      AirlineRouteRevenue.create!(airline_route: subject, revenue: 6, business_pax: 1, economy_pax: 1, premium_economy_pax: 1)
+      AirlineRouteRevenue.create!(airline_route: subject, revenue: 12, business_pax: 1, economy_pax: 1, premium_economy_pax: 1)
       subject.reload
 
-      expect(subject.revenue.revenue).to eq 6
+      expect(subject.revenue.revenue).to eq 12
       expect(subject.revenue.business_pax).to eq 1
       expect(subject.revenue.economy_pax).to eq 1
       expect(subject.revenue.premium_economy_pax).to eq 1
@@ -381,7 +381,7 @@ RSpec.describe AirlineRoute do
       expect(subject.economy_price).to eq 4
       expect(subject.premium_economy_price).to eq 5
       expect(subject.business_price).to eq 6
-      expect(subject.revenue.revenue).to eq 15
+      expect(subject.revenue.revenue).to eq 30
       expect(subject.revenue.business_pax).to eq 1
       expect(subject.revenue.economy_pax).to eq 1
       expect(subject.revenue.premium_economy_pax).to eq 1
@@ -568,7 +568,7 @@ RSpec.describe AirlineRoute do
 
       result = subject.revenue
 
-      expect(result.revenue).to eq 6
+      expect(result.revenue).to eq 12
       expect(result.business_pax).to eq 1
       expect(result.economy_pax).to eq 1
       expect(result.premium_economy_pax).to eq 1
