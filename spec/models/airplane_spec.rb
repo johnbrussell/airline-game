@@ -484,7 +484,7 @@ RSpec.describe Airplane do
         airplane: subject,
         route: route,
       ).save(validate: false)
-      AirlineRouteRevenue.new(airline_route: route, business_pax: 1, economy_pax: 1, premium_economy_pax: 1, revenue: 4.5).save!
+      AirlineRouteRevenue.new(airline_route: route, business_pax: 1, economy_pax: 1, premium_economy_pax: 1, revenue: 9).save!
       subject.reload
 
       maintenance = subject.maintenance_cost_per_day.round(2)

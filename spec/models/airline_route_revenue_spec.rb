@@ -15,16 +15,16 @@ RSpec.describe AirlineRouteRevenue do
     end
 
     it "is true when revenue is calculated correctly and the seats are calculated correctly" do
-      subject = AirlineRouteRevenue.new(revenue: 174, economy_pax: 138, premium_economy_pax: 12, business_pax: 4, airline_route: airline_route)
+      subject = AirlineRouteRevenue.new(revenue: 174 * 2, economy_pax: 138, premium_economy_pax: 12, business_pax: 4, airline_route: airline_route)
 
       expect(subject.valid?).to be true
     end
 
     it "is false when revenue is not calculated correctly" do
-      subject = AirlineRouteRevenue.new(revenue: 174, economy_pax: 138.1, premium_economy_pax: 11.9, business_pax: 4, airline_route: airline_route)
+      subject = AirlineRouteRevenue.new(revenue: 174 * 2, economy_pax: 138.1, premium_economy_pax: 11.9, business_pax: 4, airline_route: airline_route)
 
       expect(subject.valid?).to be false
-      expect(subject.errors.full_messages).to include "Revenue not calculated correctly.  Expected 174.0, got 173.9.  Difference 0.1"
+      expect(subject.errors.full_messages).to include "Revenue not calculated correctly.  Expected 348.0, got 347.8.  Difference 0.2"
     end
 
     it "is false when seats are not sufficient for economy passengers" do
