@@ -3,8 +3,10 @@ require "rails_helper"
 RSpec.describe RouteDemand do
   context "calculate" do
     it "correctly calculates the demand" do
-      airport_1 = Fabricate(:airport, iata: "TVC")
-      airport_2 = Fabricate(:airport, market: airport_1.market)
+      market_1 = Fabricate(:market, name: "Foo")
+      market_2 = Fabricate(:market, name: "Bar")
+      airport_1 = Fabricate(:airport, iata: "TVC", market: market_1, exclusive_catchment: 1)
+      airport_2 = Fabricate(:airport, market: market_2, exclusive_catchment: 10)
       date = Date.today
 
       mock_resident_demand = double
@@ -29,6 +31,10 @@ RSpec.describe RouteDemand do
       expect(route_demand.destination_iata).to eq airport_2.iata
       expect(route_demand.year).to eq date.year
       expect(route_demand.business).to eq 4
+      expect(route_demand.exclusive_business).to eq 0.4
+      expect(route_demand.exclusive_government).to eq 0.1
+      expect(route_demand.exclusive_leisure).to eq 1
+      expect(route_demand.exclusive_tourist).to eq 4
       expect(route_demand.government).to eq 1
       expect(route_demand.leisure).to eq 10
       expect(route_demand.tourist).to eq 40
@@ -43,6 +49,10 @@ RSpec.describe RouteDemand do
         destination_iata: airport_2.iata,
         year: Date.today.year,
         business: 8,
+        exclusive_business: 8,
+        exclusive_government: 2,
+        exclusive_leisure: 20,
+        exclusive_tourist: 80,
         government: 2,
         leisure: 20,
         tourist: 80,
@@ -61,6 +71,10 @@ RSpec.describe RouteDemand do
       expect(route_demand.destination_iata).to eq airport_2.iata
       expect(route_demand.year).to eq Date.today.year
       expect(route_demand.business).to eq 8
+      expect(route_demand.exclusive_business).to eq 8
+      expect(route_demand.exclusive_government).to eq 2
+      expect(route_demand.exclusive_leisure).to eq 20
+      expect(route_demand.exclusive_tourist).to eq 80
       expect(route_demand.government).to eq 2
       expect(route_demand.leisure).to eq 20
       expect(route_demand.tourist).to eq 80
