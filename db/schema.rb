@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_27_123104) do
+ActiveRecord::Schema.define(version: 2022_03_09_194048) do
 
   create_table "aircraft_families", force: :cascade do |t|
     t.string "name", null: false
@@ -238,6 +238,10 @@ ActiveRecord::Schema.define(version: 2022_02_27_123104) do
     t.string "origin_iata", null: false
     t.float "tourist", null: false
     t.integer "year", null: false
+    t.float "exclusive_business", null: false
+    t.float "exclusive_government", null: false
+    t.float "exclusive_leisure", null: false
+    t.float "exclusive_tourist", null: false
   end
 
   create_table "slots", force: :cascade do |t|
