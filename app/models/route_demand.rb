@@ -2,6 +2,14 @@ class RouteDemand < ApplicationRecord
   validates :business, numericality: { greater_than_or_equal_to: 0 }
   validates :business, presence: true
   validates :destination_iata, presence: true
+  validates :exclusive_business, numericality: { greater_than_or_equal_to: 0 }
+  validates :exclusive_business, presence: true
+  validates :exclusive_government, numericality: { greater_than_or_equal_to: 0 }
+  validates :exclusive_government, presence: true
+  validates :exclusive_leisure, numericality: { greater_than_or_equal_to: 0 }
+  validates :exclusive_leisure, presence: true
+  validates :exclusive_tourist, numericality: { greater_than_or_equal_to: 0 }
+  validates :exclusive_tourist, presence: true
   validates :government, numericality: { greater_than_or_equal_to: 0 }
   validates :government, presence: true
   validates :leisure, numericality: { greater_than_or_equal_to: 0 }
