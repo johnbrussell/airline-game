@@ -178,7 +178,7 @@ RSpec.describe AirlineRoute do
       airplane_route_1 = AirplaneRoute.new(airplane: airplane_1, frequencies: 1, flight_cost: 200)
       subject = AirlineRoute.new(
         airplane_routes: [airplane_route_1],
-        revenue: AirlineRouteRevenue.new(economy_pax: 10, business_pax: 12, premium_economy_pax: 13, revenue: 250),
+        revenue: AirlineRouteRevenue.new(economy_pax: 10, business_pax: 12, premium_economy_pax: 13, revenue: 250, exclusive_revenue: 250),
       )
 
       expect(subject.flight_profit).to eq 50 / 7.0
@@ -191,7 +191,7 @@ RSpec.describe AirlineRoute do
       airplane_route_2 = AirplaneRoute.new(airplane: airplane_2, frequencies: 2, flight_cost: 300)
       subject = AirlineRoute.new(
         airplane_routes: [airplane_route_1, airplane_route_2],
-        revenue: AirlineRouteRevenue.new(economy_pax: 9, business_pax: 11, premium_economy_pax: 10, revenue: 250),
+        revenue: AirlineRouteRevenue.new(economy_pax: 9, business_pax: 11, premium_economy_pax: 10, revenue: 250, exclusive_revenue: 250),
       )
 
       expect(subject.flight_profit).to eq -550 / 7.0
@@ -364,10 +364,11 @@ RSpec.describe AirlineRoute do
       family = Fabricate(:aircraft_family)
       airplane = Fabricate(:airplane, operator_id: airline.id, base_country_group: airline.base.country_group, business_seats: 1, economy_seats: 1, premium_economy_seats: 1, aircraft_family: family)
       AirplaneRoute.new(airplane: airplane, route: subject, frequencies: 1, flight_cost: 1, block_time_mins: 1).save(validate: false)
-      AirlineRouteRevenue.create!(airline_route: subject, revenue: 12, business_pax: 1, economy_pax: 1, premium_economy_pax: 1)
+      AirlineRouteRevenue.create!(airline_route: subject, revenue: 12, exclusive_revenue: 12, business_pax: 1, economy_pax: 1, premium_economy_pax: 1)
       subject.reload
 
       expect(subject.revenue.revenue).to eq 12
+      expect(subject.revenue.exclusive_revenue).to eq 12
       expect(subject.revenue.business_pax).to eq 1
       expect(subject.revenue.economy_pax).to eq 1
       expect(subject.revenue.premium_economy_pax).to eq 1
@@ -382,6 +383,7 @@ RSpec.describe AirlineRoute do
       expect(subject.premium_economy_price).to eq 5
       expect(subject.business_price).to eq 6
       expect(subject.revenue.revenue).to eq 30
+      expect(subject.revenue.exclusive_revenue).to eq 30
       expect(subject.revenue.business_pax).to eq 1
       expect(subject.revenue.economy_pax).to eq 1
       expect(subject.revenue.premium_economy_pax).to eq 1
@@ -534,7 +536,7 @@ RSpec.describe AirlineRoute do
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       airline = Fabricate(:airline, base_id: inu.market.id, name: "A")
       subject = AirlineRoute.create!(economy_price: 1, distance: 2, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
-      AirlineRouteRevenue.new(airline_route: subject, revenue: 1, business_pax: 2, economy_pax: 3, premium_economy_pax: 4).save(validate: false)
+      AirlineRouteRevenue.new(airline_route: subject, revenue: 1, exclusive_revenue: 0.01, business_pax: 2, economy_pax: 3, premium_economy_pax: 4).save(validate: false)
       subject.reload
 
       subject.update_revenue
@@ -542,6 +544,7 @@ RSpec.describe AirlineRoute do
       result = subject.revenue
 
       expect(result.revenue).to eq 0
+      expect(result.exclusive_revenue).to eq 0
       expect(result.business_pax).to eq 0
       expect(result.economy_pax).to eq 0
       expect(result.premium_economy_pax).to eq 0
@@ -561,7 +564,7 @@ RSpec.describe AirlineRoute do
       family = Fabricate(:aircraft_family)
       airplane = Fabricate(:airplane, operator_id: airline.id, base_country_group: airline.base.country_group, business_seats: 1, economy_seats: 1, premium_economy_seats: 1, aircraft_family: family)
       AirplaneRoute.new(airplane: airplane, route: subject, frequencies: 1, flight_cost: 1, block_time_mins: 1).save(validate: false)
-      AirlineRouteRevenue.new(airline_route: subject, revenue: 106, business_pax: 10, economy_pax: 21, premium_economy_pax: 0).save(validate: false)
+      AirlineRouteRevenue.new(airline_route: subject, revenue: 106, exclusive_revenue: 105, business_pax: 10, economy_pax: 21, premium_economy_pax: 0).save(validate: false)
       subject.reload
 
       subject.update_revenue
@@ -569,6 +572,7 @@ RSpec.describe AirlineRoute do
       result = subject.revenue
 
       expect(result.revenue).to eq 12
+      expect(result.exclusive_revenue).to eq 12
       expect(result.business_pax).to eq 1
       expect(result.economy_pax).to eq 1
       expect(result.premium_economy_pax).to eq 1

@@ -72,6 +72,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       result = AirlineRouteRevenue.last
 
       expect(result.revenue).to eq (business_seats * business_fare + premium_economy_seats * premium_economy_fare + economy_seats * economy_fare) * frequencies
+      expect(result.revenue).to eq result.exclusive_revenue
       expect(result.economy_pax).to eq economy_seats * frequencies / 2.0
       expect(result.premium_economy_pax).to eq premium_economy_seats * frequencies / 2.0
       expect(result.business_pax).to eq business_seats * frequencies / 2.0
@@ -140,6 +141,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       result = AirlineRouteRevenue.last
 
       expect(result.revenue).to eq (business_seats * business_fare + premium_economy_seats * premium_economy_fare + economy_seats * economy_fare) * frequencies
+      expect(result.revenue).to eq result.exclusive_revenue
       expect(result.economy_pax).to eq economy_seats * frequencies / 2.0
       expect(result.premium_economy_pax).to eq premium_economy_seats * frequencies / 2.0
       expect(result.business_pax).to eq business_seats * frequencies / 2.0
@@ -212,6 +214,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       adjusted_reputation_difference = AirlineRoute::REPUTATION_WEIGHTS[:ifs] * reputation_difference
 
       expect(result.revenue).to be > (business_seats * business_fare + premium_economy_seats * premium_economy_fare + economy_seats * economy_fare) * frequencies
+      expect(result.revenue).to eq result.exclusive_revenue
       assert_in_delta result.revenue, (business_seats * business_fare + premium_economy_seats * premium_economy_fare + economy_seats * economy_fare) * frequencies * (1 + adjusted_reputation_difference / (2 + adjusted_reputation_difference)), 0.005
       expect(result.economy_pax).to be > economy_seats * frequencies / 2.0
       assert_in_delta result.economy_pax, economy_seats * frequencies * (1 + adjusted_reputation_difference / (2 + adjusted_reputation_difference)) / 2.0, 0.005
@@ -273,7 +276,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       )
       allow(Calculation::MaximumRevenuePotential).to receive(:new).and_return(maximum_revenue)
 
-      AirlineRouteRevenue.new(airline_route_id: airline_route.id, revenue: 1000, economy_pax: 20, business_pax: 1, premium_economy_pax: 999).save(validate: false)
+      AirlineRouteRevenue.new(airline_route_id: airline_route.id, revenue: 1000, exclusive_revenue: 1000, economy_pax: 20, business_pax: 1, premium_economy_pax: 999).save(validate: false)
 
       original_record_count = AirlineRouteRevenue.count
       expect(original_record_count).to eq 1
@@ -286,6 +289,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       result = AirlineRouteRevenue.last
 
       expect(result.revenue).to eq (business_seats * business_fare + premium_economy_seats * premium_economy_fare + economy_seats * economy_fare) * frequencies
+      expect(result.revenue).to eq result.exclusive_revenue
       expect(result.economy_pax).to eq economy_seats * frequencies / 2.0
       expect(result.premium_economy_pax).to eq premium_economy_seats * frequencies / 2.0
       expect(result.business_pax).to eq business_seats * frequencies / 2.0
@@ -343,7 +347,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       )
       allow(Calculation::MaximumRevenuePotential).to receive(:new).and_return(maximum_revenue)
 
-      AirlineRouteRevenue.new(airline_route_id: airline_route.id, revenue: 1000, economy_pax: 20, business_pax: 1, premium_economy_pax: 999).save(validate: false)
+      AirlineRouteRevenue.new(airline_route_id: airline_route.id, revenue: 1000, exclusive_revenue: 1000, economy_pax: 20, business_pax: 1, premium_economy_pax: 999).save(validate: false)
 
       original_record_count = AirlineRouteRevenue.count
       expect(original_record_count).to eq 1
@@ -356,6 +360,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       result = AirlineRouteRevenue.last
 
       expect(result.revenue).to eq (business_seats * business_fare + premium_economy_seats * premium_economy_fare + economy_seats * economy_fare) * frequencies * 2
+      expect(result.revenue).to eq result.exclusive_revenue
       expect(result.economy_pax).to eq economy_seats * frequencies
       expect(result.premium_economy_pax).to eq premium_economy_seats * frequencies
       expect(result.business_pax).to eq business_seats * frequencies
@@ -413,7 +418,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       )
       allow(Calculation::MaximumRevenuePotential).to receive(:new).and_return(maximum_revenue)
 
-      AirlineRouteRevenue.new(airline_route_id: airline_route.id, revenue: 1000, economy_pax: 20, business_pax: 1, premium_economy_pax: 999).save(validate: false)
+      AirlineRouteRevenue.new(airline_route_id: airline_route.id, revenue: 1000, exclusive_revenue: 1000, economy_pax: 20, business_pax: 1, premium_economy_pax: 999).save(validate: false)
 
       original_record_count = AirlineRouteRevenue.count
       expect(original_record_count).to eq 1
@@ -426,6 +431,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       result = AirlineRouteRevenue.last
 
       expect(result.revenue).to eq (business_seats * business_fare + premium_economy_seats * premium_economy_fare + economy_seats * economy_fare) * frequencies * 2.0
+      expect(result.revenue).to eq result.exclusive_revenue
       expect(result.economy_pax).to eq economy_seats * frequencies
       expect(result.premium_economy_pax).to eq premium_economy_seats * frequencies
       expect(result.business_pax).to eq business_seats * frequencies
@@ -483,7 +489,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       )
       allow(Calculation::MaximumRevenuePotential).to receive(:new).and_return(maximum_revenue)
 
-      AirlineRouteRevenue.new(airline_route_id: airline_route.id, revenue: 1000, economy_pax: 20, business_pax: 1, premium_economy_pax: 999).save(validate: false)
+      AirlineRouteRevenue.new(airline_route_id: airline_route.id, revenue: 1000, exclusive_revenue: 1000, economy_pax: 20, business_pax: 1, premium_economy_pax: 999).save(validate: false)
 
       original_record_count = AirlineRouteRevenue.count
       expect(original_record_count).to eq 1
@@ -496,6 +502,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       result = AirlineRouteRevenue.last
 
       expect(result.revenue).to eq (business_seats * business_fare + premium_economy_seats * premium_economy_fare + economy_seats * economy_fare) * frequencies * 2.0
+      expect(result.revenue).to eq result.exclusive_revenue
       expect(result.economy_pax).to eq economy_seats * frequencies
       expect(result.premium_economy_pax).to eq premium_economy_seats * frequencies
       expect(result.business_pax).to eq business_seats * frequencies
@@ -581,6 +588,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       result = AirlineRouteRevenue.first
 
       assert_in_epsilon result.revenue, (business_seats * business_fare + premium_economy_seats * premium_economy_fare + economy_seats * economy_fare) * frequencies * 2 / 3.0, 0.00000001
+      expect(result.revenue).to eq result.exclusive_revenue
       assert_in_epsilon result.economy_pax, economy_seats * frequencies * 2 / 3.0 / 2.0, 0.0000001
       assert_in_epsilon result.premium_economy_pax, premium_economy_seats * frequencies * 2 / 3.0 / 2.0, 0.0000001
       assert_in_epsilon result.business_pax, business_seats * frequencies * 2 / 3.0 / 2.0, 0.0000001
@@ -588,6 +596,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       result = AirlineRouteRevenue.last
 
       assert_in_epsilon result.revenue, (business_seats * business_fare + premium_economy_seats * premium_economy_fare + economy_seats * economy_fare) * frequencies * 2 / 3.0, 0.00000001
+      expect(result.revenue).to eq result.exclusive_revenue
       assert_in_epsilon result.economy_pax, economy_seats * frequencies * 2 / 3.0 / 2.0, 0.0000001
       assert_in_epsilon result.premium_economy_pax, premium_economy_seats * frequencies * 2 / 3.0 / 2.0, 0.0000001
       assert_in_epsilon result.business_pax, business_seats * frequencies * 2 / 3.0 / 2.0, 0.0000001
@@ -665,6 +674,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       reputation_difference = AirlineRoute::MAX_REPUTATION - AirlineRoute::MIN_REPUTATION
 
       assert_in_epsilon result.revenue, (business_seats * business_fare + premium_economy_seats * premium_economy_fare + economy_seats * economy_fare) * frequencies * 2 * 2 / 3.0 * (1 + reputation_difference * 0.3 / (245 * 3).to_f), 0.00001
+      expect(result.revenue).to eq result.exclusive_revenue
       assert_in_epsilon result.economy_pax, economy_seats * frequencies * 2 * 2 / 3.0 * (1 + reputation_difference * 0.3 / (245 * 3).to_f) / 2.0, 0.00001
       assert_in_epsilon result.premium_economy_pax, premium_economy_seats * frequencies * 2 * 2 / 3.0 * (1 + reputation_difference * 0.3 / (245 * 3).to_f) / 2.0, 0.00001
       assert_in_epsilon result.business_pax, business_seats * frequencies * 2 * 2 / 3.0 * (1 + reputation_difference * 0.3 / (245 * 3).to_f) / 2.0, 0.00001
@@ -735,6 +745,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       reputation_difference = AirlineRoute::MAX_REPUTATION - AirlineRoute::MIN_REPUTATION
 
       assert_in_epsilon result.revenue, (business_seats * business_fare + premium_economy_seats * premium_economy_fare + economy_seats * economy_fare) * frequencies * 2 * 2 / 3.0 * (1 + reputation_difference * 0.3 / (245 * 3).to_f), 0.00001
+      expect(result.revenue).to eq result.exclusive_revenue
       assert_in_epsilon result.economy_pax, economy_seats * frequencies * 2 * 2 / 3.0 * (1 + reputation_difference * 0.3 / (245 * 3).to_f) / 2.0, 0.00001
       assert_in_epsilon result.premium_economy_pax, premium_economy_seats * frequencies * 2 * 2 / 3.0 * (1 + reputation_difference * 0.3 / (245 * 3).to_f) / 2.0, 0.00001
       assert_in_epsilon result.business_pax, business_seats * frequencies * 2 * 2 / 3.0 * (1 + reputation_difference * 0.3 / (245 * 3).to_f) / 2.0, 0.00001
