@@ -15,34 +15,34 @@ RSpec.describe AirlineRouteRevenue do
     end
 
     it "is true when revenue is calculated correctly and the seats are calculated correctly" do
-      subject = AirlineRouteRevenue.new(revenue: 174 * 2, economy_pax: 138, premium_economy_pax: 12, business_pax: 4, airline_route: airline_route)
+      subject = AirlineRouteRevenue.new(revenue: 174 * 2, exclusive_revenue: 1, economy_pax: 138, premium_economy_pax: 12, business_pax: 4, airline_route: airline_route)
 
       expect(subject.valid?).to be true
     end
 
     it "is false when revenue is not calculated correctly" do
-      subject = AirlineRouteRevenue.new(revenue: 174 * 2, economy_pax: 138.1, premium_economy_pax: 11.9, business_pax: 4, airline_route: airline_route)
+      subject = AirlineRouteRevenue.new(revenue: 174 * 2, exclusive_revenue: 1, economy_pax: 138.1, premium_economy_pax: 11.9, business_pax: 4, airline_route: airline_route)
 
       expect(subject.valid?).to be false
       expect(subject.errors.full_messages).to include "Revenue not calculated correctly.  Expected 348.0, got 347.8.  Difference 0.2"
     end
 
     it "is false when seats are not sufficient for economy passengers" do
-      subject = AirlineRouteRevenue.new(revenue: 174, economy_pax: 138.1, premium_economy_pax: 11.9, business_pax: 4, airline_route: airline_route)
+      subject = AirlineRouteRevenue.new(revenue: 174, exclusive_revenue: 1, economy_pax: 138.1, premium_economy_pax: 11.9, business_pax: 4, airline_route: airline_route)
 
       expect(subject.valid?).to be false
       expect(subject.errors.full_messages).to include "Seats not sufficient to seat passengers"
     end
 
     it "is false when seats are not sufficient for premium economy passengers" do
-      subject = AirlineRouteRevenue.new(revenue: 174, economy_pax: 138, premium_economy_pax: 12.1, business_pax: 4, airline_route: airline_route)
+      subject = AirlineRouteRevenue.new(revenue: 174, exclusive_revenue: 1, economy_pax: 138, premium_economy_pax: 12.1, business_pax: 4, airline_route: airline_route)
 
       expect(subject.valid?).to be false
       expect(subject.errors.full_messages).to include "Seats not sufficient to seat passengers"
     end
 
     it "is false when seats are not sufficient for business passengers" do
-      subject = AirlineRouteRevenue.new(revenue: 174, economy_pax: 138, premium_economy_pax: 12, business_pax: 4.1, airline_route: airline_route)
+      subject = AirlineRouteRevenue.new(revenue: 174, exclusive_revenue: 1, economy_pax: 138, premium_economy_pax: 12, business_pax: 4.1, airline_route: airline_route)
 
       expect(subject.valid?).to be false
       expect(subject.errors.full_messages).to include "Seats not sufficient to seat passengers"
@@ -56,13 +56,14 @@ RSpec.describe AirlineRouteRevenue do
     let(:airline_route) { AirlineRoute.create!(origin_airport: origin_airport, destination_airport: destination_airport, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline, distance: 1) }
 
     it "sets revenue and passengers to zero" do
-      AirlineRouteRevenue.new(revenue: 174, economy_pax: 138, premium_economy_pax: 12, business_pax: 4, airline_route: airline_route).save(validate: false)
+      AirlineRouteRevenue.new(revenue: 174, exclusive_revenue: 174, economy_pax: 138, premium_economy_pax: 12, business_pax: 4, airline_route: airline_route).save(validate: false)
       subject = AirlineRouteRevenue.last
 
       expect(subject.zero_out).to be true
       subject.reload
 
       expect(subject.revenue).to eq 0
+      expect(subject.exclusive_revenue).to eq 0
       expect(subject.business_pax).to eq 0
       expect(subject.premium_economy_pax).to eq 0
       expect(subject.economy_pax).to eq 0

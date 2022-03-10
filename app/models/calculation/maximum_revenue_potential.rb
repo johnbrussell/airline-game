@@ -17,6 +17,18 @@ class Calculation::MaximumRevenuePotential
     (business_dollars_economy + leisure_dollars_economy) / WEEKS_PER_YEAR
   end
 
+  def max_exclusive_business_class_revenue_per_week
+    (exclusive_business_dollars_business + exclusive_leisure_dollars_business) / WEEKS_PER_YEAR
+  end
+
+  def max_exclusive_economy_class_revenue_per_week
+    (exclusive_business_dollars_economy + exclusive_leisure_dollars_economy) / WEEKS_PER_YEAR
+  end
+
+  def max_exclusive_premium_economy_class_revenue_per_week
+    (exclusive_business_dollars_premium_economy + exclusive_leisure_dollars_premium_economy) / WEEKS_PER_YEAR
+  end
+
   def max_premium_economy_class_revenue_per_week
     (business_dollars_premium_economy + leisure_dollars_premium_economy) / WEEKS_PER_YEAR
   end
@@ -37,6 +49,30 @@ class Calculation::MaximumRevenuePotential
 
     def business_dollars_premium_economy
       pct_business_dollars_premium_economy * total_business_dollars
+    end
+
+    def exclusive_business_dollars_business
+      pct_business_dollars_business * total_exclusive_business_dollars
+    end
+
+    def exclusive_business_dollars_economy
+      pct_business_dollars_economy * total_exclusive_business_dollars
+    end
+
+    def exclusive_business_dollars_premium_economy
+      pct_business_dollars_premium_economy * total_exclusive_business_dollars
+    end
+
+    def exclusive_leisure_dollars_business
+      pct_leisure_dollars_business * total_exclusive_leisure_dollars
+    end
+
+    def exclusive_leisure_dollars_economy
+      pct_leisure_dollars_economy * total_exclusive_leisure_dollars
+    end
+
+    def exclusive_leisure_dollars_premium_economy
+      pct_leisure_dollars_premium_economy * total_exclusive_leisure_dollars
     end
 
     def leisure_dollars_business
@@ -117,6 +153,14 @@ class Calculation::MaximumRevenuePotential
 
     def total_business_dollars
       route_dollars.business + route_dollars.government
+    end
+
+    def total_exclusive_business_dollars
+      route_dollars.exclusive_business + route_dollars.exclusive_government
+    end
+
+    def total_exclusive_leisure_dollars
+      route_dollars.exclusive_leisure + route_dollars.exclusive_tourist
     end
 
     def total_leisure_dollars

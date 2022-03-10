@@ -334,7 +334,7 @@ RSpec.describe AirplaneRoute do
       AirplaneRoute.new(airplane: other_airplane, route: airline_route, frequencies: 1, flight_cost: 100, block_time_mins: 1).save(validate: false)
       other_airplane_route = AirplaneRoute.last
       AirplaneRoute.new(airplane: airplane, route: airline_route, frequencies: 1, flight_cost: 150, block_time_mins: 1).save(validate: false)
-      revenue = AirlineRouteRevenue.create!(business_pax: 20, premium_economy_pax: 40, economy_pax: 200, revenue: 600, airline_route_id: airline_route.id)
+      revenue = AirlineRouteRevenue.create!(business_pax: 20, premium_economy_pax: 40, economy_pax: 200, revenue: 600, exclusive_revenue: 123.44, airline_route_id: airline_route.id)
       subject = AirplaneRoute.last
 
       expect(subject.daily_profit).to eq 0
@@ -355,7 +355,7 @@ RSpec.describe AirplaneRoute do
       AirplaneRoute.new(airplane: other_airplane, route: airline_route, frequencies: 1, flight_cost: 100, block_time_mins: 1).save(validate: false)
       other_airplane_route = AirplaneRoute.last
       AirplaneRoute.new(airplane: airplane, route: airline_route, frequencies: 1, flight_cost: 150, block_time_mins: 1).save(validate: false)
-      revenue = AirlineRouteRevenue.create!(business_pax: 0, premium_economy_pax: 40, economy_pax: 200, revenue: 520, airline_route_id: airline_route.id)
+      revenue = AirlineRouteRevenue.create!(business_pax: 0, premium_economy_pax: 40, economy_pax: 200, revenue: 520, exclusive_revenue: 1, airline_route_id: airline_route.id)
       subject = AirplaneRoute.last
 
       expect(subject.daily_profit).to eq -20 / 7.0
@@ -542,6 +542,7 @@ RSpec.describe AirplaneRoute do
       expect(AirlineRouteRevenue.count).to eq 1
       revenue = AirlineRouteRevenue.last
       expect(revenue.revenue).to eq 2
+      expect(revenue.exclusive_revenue).to eq 2
       expect(revenue.business_pax).to eq 0
       expect(revenue.premium_economy_pax).to eq 0
       expect(revenue.economy_pax).to eq 1
@@ -559,6 +560,7 @@ RSpec.describe AirplaneRoute do
       expect(AirlineRouteRevenue.count).to eq 1
       revenue = AirlineRouteRevenue.last
       expect(revenue.revenue).to eq 0
+      expect(revenue.exclusive_revenue).to eq 0
       expect(revenue.business_pax).to eq 0
       expect(revenue.premium_economy_pax).to eq 0
       expect(revenue.economy_pax).to eq 0

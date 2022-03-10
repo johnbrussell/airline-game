@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_27_123104) do
+ActiveRecord::Schema.define(version: 2022_03_09_212529) do
 
   create_table "aircraft_families", force: :cascade do |t|
     t.string "name", null: false
@@ -57,6 +57,7 @@ ActiveRecord::Schema.define(version: 2022_02_27_123104) do
     t.float "business_pax", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.float "exclusive_revenue", null: false
     t.index ["airline_route_id"], name: "index_airline_route_revenues_on_airline_route_id"
   end
 
@@ -238,6 +239,10 @@ ActiveRecord::Schema.define(version: 2022_02_27_123104) do
     t.string "origin_iata", null: false
     t.float "tourist", null: false
     t.integer "year", null: false
+    t.float "exclusive_business", null: false
+    t.float "exclusive_government", null: false
+    t.float "exclusive_leisure", null: false
+    t.float "exclusive_tourist", null: false
   end
 
   create_table "slots", force: :cascade do |t|
