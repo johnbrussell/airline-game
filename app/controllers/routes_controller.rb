@@ -25,6 +25,7 @@ class RoutesController < ApplicationController
     @airplanes = @route.airplanes + @route.airplanes_available_to_add_service(@game)
     @revenue = Calculation::MaximumRevenuePotential.new(@route.origin_airport, @route.destination_airport, @game.current_date)
     @all_service = AirlineRoute.operators_of_route(@route.origin_airport, @route.destination_airport, @game)
+    @other_market_service = AirlineRoute.operators_of_other_market_routes(@route.origin_airport, @route.destination_airport, @game)
     render :view_route
   end
 
@@ -41,5 +42,6 @@ class RoutesController < ApplicationController
     @airplanes = @route.airplanes + @route.airplanes_available_to_add_service(@game)
     @revenue = Calculation::MaximumRevenuePotential.new(@route.origin_airport, @route.destination_airport, @game.current_date)
     @all_service = AirlineRoute.operators_of_route(@route.origin_airport, @route.destination_airport, @game)
+    @other_market_service = AirlineRoute.operators_of_other_market_routes(@route.origin_airport, @route.destination_airport, @game)
   end
 end

@@ -18,13 +18,17 @@ RSpec.describe "routes/index", type: :feature do
     game = Fabricate(:game)
     airline = Fabricate(:airline, is_user_airline: true, game_id: game.id, name: "Danielle's Dirigibles")
 
+    other_market = Fabricate(:market, name: "Other")
+    Population.create!(market_id: other_market.id, year: 2000, population: 1)
+    Tourists.create!(market_id: other_market.id, year: 2001, volume: 10000000)
+
     family = Fabricate(:aircraft_family)
     airplane_1 = Fabricate(:airplane, aircraft_family: family)
     airplane_2 = Fabricate(:airplane, aircraft_family: family)
 
     airport_1 = Fabricate(:airport, market: airline.base, iata: "AAA")
     airport_2 = Fabricate(:airport, market: airline.base, iata: "BBB")
-    airport_3 = Fabricate(:airport, market: airline.base, iata: "CCC")
+    airport_3 = Fabricate(:airport, market: other_market, iata: "CCC")
     airport_4 = Fabricate(:airport, market: airline.base, iata: "DDD")
 
     AirlineRoute.new(airline: airline, origin_airport: airport_2, destination_airport: airport_3, economy_price: 1, business_price: 2, premium_economy_price: 3, distance: 100).save(validate: false)

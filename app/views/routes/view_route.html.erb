@@ -73,14 +73,17 @@
 <h3> Service on <%= @route.name %> </h3>
 <% if @all_service.any? %>
   <% @all_service.each do |airline_route| %>
-    <p> <%= "#{airline_route.airline.name} operates #{airline_route.total_frequencies} weekly" %> <%= 'flight'.pluralize(airline_route.total_frequencies) %>
-        <%= "with #{airline_route.total_economy_seats} economy seats, #{airline_route.total_premium_economy_seats} premium economy seats, and #{airline_route.total_business_seats} business seats." %>
-        <%= "Tickets sell for $#{number_with_precision(airline_route.economy_price, :precision => 2)} in economy,
-             $#{number_with_precision(airline_route.premium_economy_price, :precision => 2)} in premium economy,
-             and $#{number_with_precision(airline_route.business_price, :precision => 2)} in business" %></p>
+    <%= render partial: "generic_airline_frequencies", locals: { airline_route: airline_route, include_name: false } %>
   <% end %>
 <% else %>
   <p> No airline serves <%= @route.name %> </p>
+<% end %>
+
+<% if @other_market_service.any? %>
+  <h4> Other service between <%= @route.origin_airport.market.name %> and <%= @route.destination_airport.market.name %> areas </h4>
+  <% @other_market_service.each do |airline_route| %>
+    <%= render partial: "generic_airline_frequencies", locals: { airline_route: airline_route, include_name: true } %>
+  <% end %>
 <% end %>
 
 <% if @game.user_airline.can_fly_between?(@route.origin_airport.market, @route.destination_airport.market) %>
