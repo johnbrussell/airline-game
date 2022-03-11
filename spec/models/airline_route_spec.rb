@@ -50,6 +50,46 @@ RSpec.describe AirlineRoute do
     end
   end
 
+  context "operators_of_other_market_routes" do
+    it "includes only routes from airlines that operate in the market and sorts them" do
+      game = Fabricate(:game)
+      other_game = Fabricate(:game)
+
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+      maj = Fabricate(:airport, iata: "MAJ", market: inu.market)
+
+      airline_c = Fabricate(:airline, base_id: inu.market.id, name: "C", game_id: game.id)
+      airline_a = Fabricate(:airline, base_id: inu.market.id, name: "A", game_id: game.id)
+      airline_b = Fabricate(:airline, base_id: inu.market.id, name: "B", game_id: game.id)
+      airline_d = Fabricate(:airline, base_id: inu.market.id, name: "D", game_id: game.id)
+      other_airline = Fabricate(:airline, base_id: inu.market.id, game_id: game.id)
+      other_game_airline = Fabricate(:airline, base_id: inu.market.id, game_id: other_game.id)
+      family = Fabricate(:aircraft_family)
+      super_model = Fabricate(:aircraft_model, takeoff_distance: 100, max_range: 13000)
+      airplane_c = Fabricate(:airplane, aircraft_family: family, operator_id: airline_c.id, base_country_group: airline_c.base.country_group, aircraft_model: super_model)
+      airplane_a = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model)
+      airplane_b = Fabricate(:airplane, aircraft_family: family, operator_id: airline_b.id, base_country_group: airline_b.base.country_group, aircraft_model: super_model)
+      airplane_d = Fabricate(:airplane, aircraft_family: family, operator_id: airline_d.id, base_country_group: airline_d.base.country_group, aircraft_model: super_model)
+      airplane_other_game = Fabricate(:airplane, aircraft_family: family, operator_id: other_game_airline.id, base_country_group: other_game_airline.base.country_group, aircraft_model: super_model)
+
+      airline_route_c = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_c)
+      airline_route_a = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_a)
+      airline_route_b = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_b)
+      airline_route_d = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: maj.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_d)
+      airline_route_other_game = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: other_game_airline)
+      airplane_route_c = AirplaneRoute.new(airplane: airplane_c, route: airline_route_c, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
+      airplane_route_a = AirplaneRoute.new(airplane: airplane_a, route: airline_route_a, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
+      airplane_route_b = AirplaneRoute.new(airplane: airplane_b, route: airline_route_b, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
+      airplane_route_d = AirplaneRoute.new(airplane: airplane_d, route: airline_route_d, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
+      airplane_route_other_game = AirplaneRoute.new(airplane: airplane_other_game, route: airline_route_other_game, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
+
+      AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: other_airline)
+
+      expect(AirlineRoute.operators_of_other_market_routes(fun, inu, game)).to eq [airline_route_d]
+    end
+  end
+
   context "operators_of_route" do
     it "includes only routes from airlines that operate the route and sorts them" do
       game = Fabricate(:game)
