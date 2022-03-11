@@ -46,6 +46,19 @@ class AirlineRoute < ApplicationRecord
     record
   end
 
+  def self.operators_in_market(origin_market, destination_market, game)
+    AirlineRoute
+      .joins(:airplane_routes)
+      .joins(:airline)
+      .joins("INNER JOIN airports AS origin_airports ON airline_routes.origin_airport_id == origin_airports.id")
+      .joins("INNER JOIN airports AS destination_airports ON airline_routes.destination_airport_id == destination_airports.id")
+      .where("(origin_airports.market_id == #{origin_market.id} AND destination_airports.market_id == #{destination_market.id})
+              OR (destination_airports.market_id == #{origin_market.id} AND origin_airports.market_id == #{destination_market.id})")
+      .where("airlines.game_id == ?", game.id)
+      .order("airlines.name")
+      .uniq
+  end
+
   def self.operators_of_route(origin, destination, game)
     AirlineRoute
       .joins(:airplane_routes)
