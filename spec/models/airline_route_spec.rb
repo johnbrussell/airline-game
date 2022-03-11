@@ -344,6 +344,29 @@ RSpec.describe AirlineRoute do
     end
   end
 
+  context "relative_demand_to" do
+    let(:origin_market) { Fabricate(:market, name: "Boston") }
+    let(:destination_market) { Fabricate(:market, name: "New York") }
+    let(:this_origin_airport) { Fabricate(:airport, iata: "BOS", market: origin_market) }
+    let(:this_destination_airport) { Fabricate(:airport, iata: "JFK", market: destination_market) }
+    let(:other_origin_airport) { Fabricate(:airport, iata: "PVD", market: origin_market) }
+    let(:other_destination_airport) { Fabricate(:airport, iata: "HPN", market: destination_market) }
+    let(:this_revenue) { instance_double(Calculation::MaximumRevenuePotential, max_economy_class_revenue_per_week: 150.0) }
+    let(:other_revenue) { instance_double(Calculation::MaximumRevenuePotential, max_economy_class_revenue_per_week: 200.0) }
+    let(:airline) { Fabricate(:airline, base_id: origin_market.id) }
+
+    before(:each) do
+      allow(Calculation::MaximumRevenuePotential).to receive(:new).with(this_origin_airport, this_destination_airport, Game.find(airline.game_id).current_date).and_return(this_revenue)
+      allow(Calculation::MaximumRevenuePotential).to receive(:new).with(other_origin_airport, other_destination_airport, Game.find(airline.game_id).current_date).and_return(other_revenue)
+    end
+
+    it "calculates correctly" do
+      subject = AirlineRoute.new(origin_airport: this_origin_airport, destination_airport: this_destination_airport, airline: airline)
+
+      expect(subject.relative_demand_to(other_origin_airport, other_destination_airport, :economy)).to eq 0.75
+    end
+  end
+
   context "reputation" do
     let(:origin) { Fabricate(:airport, iata: "BOS") }
     let(:destination) { Fabricate(:airport, iata: "ORH", market: origin.market) }
