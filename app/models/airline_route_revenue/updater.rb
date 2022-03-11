@@ -21,38 +21,10 @@ class AirlineRouteRevenue::Updater
 
   private
 
-    def allocate(solicitations, class_revenue)
-      unallocated_solicitations = solicitations.clone
-      unallocated_revenue = class_revenue
-      earned_revenue = solicitations.map { |airline_route, flights| [airline_route, 0] }.to_h
-
-      while unallocated_solicitations.any? && unallocated_revenue.round(2) > 0
-        new_unallocated_solicitations = {}
-        new_unallocated_revenue = unallocated_revenue
-        total_reputation = unallocated_solicitations.sum { |airline_route, flights| airline_route.reputation * flights.count }.to_f
-
-        unallocated_solicitations.each do |airline_route, flights|
-          desired_revenue_allocation_per_flight = airline_route.reputation.to_f / total_reputation * unallocated_revenue
-          new_flights = flights.map do |flight|
-            actual_revenue_allocation = [desired_revenue_allocation_per_flight, flight].min
-            earned_revenue[airline_route] += actual_revenue_allocation
-            new_unallocated_revenue -= actual_revenue_allocation
-            flight - actual_revenue_allocation unless flight <= desired_revenue_allocation_per_flight || flight == 0
-          end.compact
-          new_unallocated_solicitations[airline_route] = new_flights if new_flights.any?
-        end
-
-        unallocated_solicitations = new_unallocated_solicitations
-        unallocated_revenue = new_unallocated_revenue
-      end
-
-      earned_revenue
-    end
-
     def allocate_all(game)
-      economy = allocate(solicited_economy_market_dollars_by_airline_flight(game), revenue_potential.max_economy_class_revenue_per_week)
-      premium_economy = allocate(solicited_premium_economy_market_dollars_by_airline_flight(game), revenue_potential.max_premium_economy_class_revenue_per_week)
-      business = allocate(solicited_business_market_dollars_by_airline_flight(game), revenue_potential.max_business_class_revenue_per_week)
+      economy = AirlineRouteRevenue::Allocator.allocate(solicited_economy_market_dollars_by_airline_flight(game), revenue_potential.max_economy_class_revenue_per_week)
+      premium_economy = AirlineRouteRevenue::Allocator.allocate(solicited_premium_economy_market_dollars_by_airline_flight(game), revenue_potential.max_premium_economy_class_revenue_per_week)
+      business = AirlineRouteRevenue::Allocator.allocate(solicited_business_market_dollars_by_airline_flight(game), revenue_potential.max_business_class_revenue_per_week)
 
       economy.select{ |ar, _| ar.airline.id.present? }.map do |airline_route, revenues|
         [airline_route, { :economy => revenues, :premium_economy => premium_economy[airline_route], :business => business[airline_route] }]
