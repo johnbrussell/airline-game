@@ -365,6 +365,15 @@ RSpec.describe AirlineRoute do
 
       expect(subject.relative_demand_to(other_origin_airport, other_destination_airport, :economy)).to eq 0.75
     end
+
+    it "is 1 on itself" do
+      allow(Calculation::MaximumRevenuePotential).to receive(:new).with(this_destination_airport, this_origin_airport, Game.find(airline.game_id).current_date).and_return(this_revenue)
+      
+      subject = AirlineRoute.new(origin_airport: this_origin_airport, destination_airport: this_destination_airport, airline: airline)
+
+      expect(subject.relative_demand_to(this_origin_airport, this_destination_airport, :economy)).to eq 1
+      expect(subject.relative_demand_to(this_destination_airport, this_origin_airport, :economy)).to eq 1
+    end
   end
 
   context "reputation" do
