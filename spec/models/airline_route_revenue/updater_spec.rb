@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Calculation::AirlineRouteRevenueUpdater do
+RSpec.describe AirlineRouteRevenue::Updater do
   let(:game) { Fabricate(:game) }
   let(:market) { Fabricate(:market) }
   let(:airline) { Fabricate(:airline, game_id: game.id, base_id: market.id) }
@@ -64,7 +64,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       original_record_count = AirlineRouteRevenue.count
       expect(original_record_count).to eq 0
 
-      subject = Calculation::AirlineRouteRevenueUpdater.new(origin_airport, destination_airport, Date.today)
+      subject = AirlineRouteRevenue::Updater.new(origin_airport, destination_airport, Date.today)
       subject.upsert(game)
 
       expect(AirlineRouteRevenue.count).to eq 1
@@ -135,7 +135,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       original_record_count = AirlineRouteRevenue.count
       expect(original_record_count).to eq 0
 
-      subject = Calculation::AirlineRouteRevenueUpdater.new(origin_airport, destination_airport, Date.today)
+      subject = AirlineRouteRevenue::Updater.new(origin_airport, destination_airport, Date.today)
       subject.upsert(game)
 
       expect(AirlineRouteRevenue.count).to eq 1
@@ -207,7 +207,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       original_record_count = AirlineRouteRevenue.count
       expect(original_record_count).to eq 0
 
-      subject = Calculation::AirlineRouteRevenueUpdater.new(origin_airport, destination_airport, Date.today)
+      subject = AirlineRouteRevenue::Updater.new(origin_airport, destination_airport, Date.today)
       subject.upsert(game)
 
       expect(AirlineRouteRevenue.count).to eq 1
@@ -287,7 +287,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       original_record_count = AirlineRouteRevenue.count
       expect(original_record_count).to eq 1
 
-      subject = Calculation::AirlineRouteRevenueUpdater.new(origin_airport, destination_airport, Date.today)
+      subject = AirlineRouteRevenue::Updater.new(origin_airport, destination_airport, Date.today)
       subject.upsert(game)
 
       expect(AirlineRouteRevenue.count).to eq 1
@@ -360,7 +360,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       original_record_count = AirlineRouteRevenue.count
       expect(original_record_count).to eq 1
 
-      subject = Calculation::AirlineRouteRevenueUpdater.new(origin_airport, destination_airport, Date.today)
+      subject = AirlineRouteRevenue::Updater.new(origin_airport, destination_airport, Date.today)
       subject.upsert(game)
 
       expect(AirlineRouteRevenue.count).to eq 1
@@ -433,7 +433,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       original_record_count = AirlineRouteRevenue.count
       expect(original_record_count).to eq 1
 
-      subject = Calculation::AirlineRouteRevenueUpdater.new(origin_airport, destination_airport, Date.today)
+      subject = AirlineRouteRevenue::Updater.new(origin_airport, destination_airport, Date.today)
       subject.upsert(game)
 
       expect(AirlineRouteRevenue.count).to eq 1
@@ -506,7 +506,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       original_record_count = AirlineRouteRevenue.count
       expect(original_record_count).to eq 1
 
-      subject = Calculation::AirlineRouteRevenueUpdater.new(origin_airport, destination_airport, Date.today)
+      subject = AirlineRouteRevenue::Updater.new(origin_airport, destination_airport, Date.today)
       subject.upsert(game)
 
       expect(AirlineRouteRevenue.count).to eq 1
@@ -594,7 +594,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       original_record_count = AirlineRouteRevenue.count
       expect(original_record_count).to eq 0
 
-      subject = Calculation::AirlineRouteRevenueUpdater.new(origin_airport, destination_airport, Date.today)
+      subject = AirlineRouteRevenue::Updater.new(origin_airport, destination_airport, Date.today)
       subject.upsert(game)
 
       expect(AirlineRouteRevenue.count).to eq 2
@@ -682,7 +682,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       original_record_count = AirlineRouteRevenue.count
       expect(original_record_count).to eq 0
 
-      subject = Calculation::AirlineRouteRevenueUpdater.new(origin_airport, destination_airport, Date.today)
+      subject = AirlineRouteRevenue::Updater.new(origin_airport, destination_airport, Date.today)
       subject.upsert(game)
 
       expect(AirlineRouteRevenue.count).to eq 1
@@ -755,7 +755,7 @@ RSpec.describe Calculation::AirlineRouteRevenueUpdater do
       original_record_count = AirlineRouteRevenue.count
       expect(original_record_count).to eq 0
 
-      subject = Calculation::AirlineRouteRevenueUpdater.new(origin_airport, destination_airport, Date.today)
+      subject = AirlineRouteRevenue::Updater.new(origin_airport, destination_airport, Date.today)
       subject.upsert(game)
 
       expect(AirlineRouteRevenue.count).to eq 1

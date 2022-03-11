@@ -1,4 +1,4 @@
-class Calculation::AirlineRouteRevenueUpdater
+class AirlineRouteRevenue::Updater
   include Demandable
 
   def upsert(game)

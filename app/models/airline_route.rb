@@ -156,7 +156,7 @@ class AirlineRoute < ApplicationRecord
     if total_frequencies == 0
       revenue&.zero_out
     else
-      Calculation::AirlineRouteRevenueUpdater.new(origin_airport, destination_airport, game.current_date).upsert(game)
+      AirlineRouteRevenue::Updater.new(origin_airport, destination_airport, game.current_date).upsert(game)
     end
   end
 
