@@ -392,6 +392,7 @@ RSpec.describe "routes/view_route", type: :feature do
 
     other_market_route = AirlineRoute.create!(origin_airport: fun, destination_airport: maj, airline: airline, economy_price: 2, premium_economy_price: 3, business_price: 5, distance: 1009)
     AirplaneRoute.new(route: other_market_route, airplane: aircraft_3, frequencies: 1, block_time_mins: 0, flight_cost: 100).save(validate: false)
+    AirlineRouteRevenue.create!(airline_route_id: other_market_route.id, revenue: 20, exclusive_economy_revenue: 1, exclusive_business_revenue: 1, exclusive_premium_economy_revenue: 1, economy_pax: 1, business_pax: 1, premium_economy_pax: 1)
 
     frequencies = [1, 2, 3].sample
     block_time = (aircraft_1.round_trip_block_time(Calculation::Distance.between_airports(inu, fun)) * frequencies / 60.0 / 7).round(1)
