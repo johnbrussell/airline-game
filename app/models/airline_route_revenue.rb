@@ -8,8 +8,12 @@ class AirlineRouteRevenue < ApplicationRecord
   validates :business_pax, numericality: { greater_than_or_equal_to: 0 }
   validates :revenue, presence: true
   validates :revenue, numericality: { greater_than_or_equal_to: 0 }
-  validates :exclusive_revenue, presence: true
-  validates :exclusive_revenue, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: :revenue }
+  validates :exclusive_economy_revenue, presence: true
+  validates :exclusive_economy_revenue, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: :revenue }
+  validates :exclusive_premium_economy_revenue, presence: true
+  validates :exclusive_premium_economy_revenue, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: :revenue }
+  validates :exclusive_business_revenue, presence: true
+  validates :exclusive_business_revenue, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: :revenue }
   validate :revenue_calculated_correctly
   validate :enough_seating_for_passengers
 
@@ -21,7 +25,9 @@ class AirlineRouteRevenue < ApplicationRecord
       premium_economy_pax: 0,
       business_pax: 0,
       revenue: 0,
-      exclusive_revenue: 0,
+      exclusive_economy_revenue: 0,
+      exclusive_premium_economy_revenue: 0,
+      exclusive_business_revenue: 0,
     )
   end
 

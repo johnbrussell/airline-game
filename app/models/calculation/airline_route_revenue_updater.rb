@@ -8,7 +8,9 @@ class Calculation::AirlineRouteRevenueUpdater
       # Round trip revenue count; one way passenger counts
       arr.assign_attributes(
         revenue: total_revenue.round(2),
-        exclusive_revenue: total_revenue.round(2),
+        exclusive_economy_revenue: earned_revenue[:economy].round(2),
+        exclusive_premium_economy_revenue: earned_revenue[:premium_economy].round(2),
+        exclusive_business_revenue: earned_revenue[:business].round(2),
         economy_pax: (earned_revenue[:economy] / airline_route.economy_price.to_f / 2.0).round(7),
         premium_economy_pax: (earned_revenue[:premium_economy] / airline_route.premium_economy_price.to_f / 2.0).round(7),
         business_pax: (earned_revenue[:business] / airline_route.business_price.to_f / 2.0).round(7),
