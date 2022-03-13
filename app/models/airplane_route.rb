@@ -53,6 +53,10 @@ class AirplaneRoute < ApplicationRecord
     end && route.update_revenue
   end
 
+  def update_costs
+    update(flight_cost: one_way_single_frequency_flight_cost * 2)
+  end
+
   private
 
     def airplane_built

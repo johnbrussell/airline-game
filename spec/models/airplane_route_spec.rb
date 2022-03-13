@@ -686,6 +686,29 @@ RSpec.describe AirplaneRoute do
     end
   end
 
+  context "update_costs" do
+    it "calculates correctly" do
+      market = Fabricate(:market, name: "Pacific")
+      airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
+      airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: market)
+      CabotageException.create!(country: market.country)
+      family = Fabricate(:aircraft_family)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: 1000)
+      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411, airline: Airline.last)
+      block_time = airplane.round_trip_block_time(airline_route.distance).round
+      gates_1 = Gates.create!(airport: airport_1, game: airplane.game, current_gates: 100)
+      Slot.create!(gates: gates_1, lessee_id: Airline.last.id)
+      gates_2 = Gates.create!(airport: airport_2, game: airplane.game, current_gates: 100)
+      Slot.create!(gates: gates_2, lessee_id: Airline.last.id)
+      AirplaneRoute.new(route: airline_route, airplane: airplane, block_time_mins: block_time, flight_cost: 1, frequencies: 1).save(validate: false)
+      subject = AirplaneRoute.last
+
+      expect(subject.update_costs).to be true
+      expect(subject.flight_cost).to be > 1
+    end
+  end
+
   context "validate_remaining_routes_connected" do
     it "is true if the airplane has no other routes" do
       family = Fabricate(:aircraft_family)
