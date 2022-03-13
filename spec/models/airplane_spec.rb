@@ -2052,6 +2052,145 @@ RSpec.describe Airplane do
     end
   end
 
+  context "set_configuration" do
+    let(:family) { Fabricate(:aircraft_family) }
+    let(:model) { Fabricate(:aircraft_model, family: family, floor_space: Airplane::ECONOMY_SEAT_SIZE * 100, takeoff_distance: 10000, speed: 1000, max_range: 13000) }
+
+    it "updates the configuration, deducts cash from the airline, updates the flight costs, and adjusts the revenue on affected routes if the new configuration is valid" do
+      initial_cash_on_hand = 1000000
+      airline = Fabricate(:airline, cash_on_hand: initial_cash_on_hand)
+      subject = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, base_country_group: airline.base.country_group, operator_id: airline.id, economy_seats: 50, business_seats: 0, premium_economy_seats: 0)
+      game = Game.find(airline.game_id)
+      bos = Fabricate(:airport, iata: "BOS", market: airline.base, runway: 10000)
+      bos_gates = Gates.create!(airport: bos, game: game, current_gates: 5)
+      Slot.create!(lessee_id: airline.id, gates: bos_gates)
+      Population.create!(market_id: airline.base.id, year: 2000, population: 100)
+      Tourists.create!(market_id: airline.base.id, year: 2000, volume: 10)
+      lax = Fabricate(:airport, iata: "LAX", market: airline.base, runway: 10000)
+      lax_gates = Gates.create!(airport: lax, game: game, current_gates: 5)
+      Slot.create!(lessee_id: airline.id, gates: lax_gates)
+      airline_route = AirlineRoute.create!(airline: airline, origin_airport: bos, destination_airport: lax, distance: 2, economy_price: 1, business_price: 2, premium_economy_price: 2)
+      AirplaneRoute.new(airplane: subject, route: airline_route, flight_cost: 1, frequencies: 1, block_time_mins: 1).save(validate: false)
+      airplane_route = AirplaneRoute.last
+      AirlineRouteRevenue.create!(airline_route: airline_route, revenue: 100, economy_pax: 50, business_pax: 0, premium_economy_pax: 0, exclusive_economy_revenue: 0, exclusive_business_revenue: 0, exclusive_premium_economy_revenue: 0)
+      subject.reload
+
+      bos_global_demand = instance_double(GlobalDemand, business: 10, government: 10, leisure: 10, tourist: 10, airport: bos)
+      lax_global_demand = instance_double(GlobalDemand, business: 10, government: 10, leisure: 10, tourist: 10, airport: lax)
+      allow(GlobalDemand).to receive(:calculate).with(game.current_date, bos).and_return(bos_global_demand)
+      allow(GlobalDemand).to receive(:calculate).with(game.current_date, lax).and_return(lax_global_demand)
+
+      cost_to_reconfigure = subject.send(:cost_to_reconfigure, 1, 2, 3)
+      expect(cost_to_reconfigure).to eq Airplane::RECONFIGURATION_COST_PER_SEAT_ECONOMY +
+        Airplane::RECONFIGURATION_COST_PER_SEAT_PREMIUM_ECONOMY * 2 +
+        Airplane::RECONFIGURATION_COST_PER_SEAT_BUSINESS * 3 +
+        subject.send(:daily_profit)
+
+      expect(subject.set_configuration(3, 2, 1)).to be true
+
+      subject.reload
+      airline.reload
+      airline_route.reload
+      airplane_route.reload
+
+      assert_in_epsilon airline.cash_on_hand, initial_cash_on_hand - cost_to_reconfigure, 0.0000001
+      expect(subject.economy_seats).to eq 1
+      expect(subject.premium_economy_seats).to eq 2
+      expect(subject.business_seats).to eq 3
+      expect(airline_route.revenue.revenue).to eq 0
+      expect(airplane_route.flight_cost).to be > 1
+    end
+
+    it "does not update the configuration or deduct cash from the airline if the new configutation has too many seats" do
+      initial_cash_on_hand = 1000000
+      airline = Fabricate(:airline, cash_on_hand: initial_cash_on_hand)
+      subject = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, base_country_group: airline.base.country_group, operator_id: airline.id, economy_seats: 10, premium_economy_seats: 10, business_seats: 10)
+
+      expect(subject.set_configuration(3, 2, 100)).to be false
+      subject.reload
+      airline.reload
+
+      expect(airline.cash_on_hand).to eq initial_cash_on_hand
+      expect(subject.economy_seats).to eq 10
+      expect(subject.premium_economy_seats).to eq 10
+      expect(subject.business_seats).to eq 10
+      expect(subject.errors.full_messages).to include "Seats require more total floor space than available on airplane"
+    end
+
+    it "does not update the configutation or deduct cash from the airline if the airline does not have enough cash on hand" do
+      initial_cash_on_hand = 100
+      airline = Fabricate(:airline, cash_on_hand: initial_cash_on_hand)
+      subject = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, base_country_group: airline.base.country_group, operator_id: airline.id, economy_seats: 10, premium_economy_seats: 10, business_seats: 10)
+
+      expect(subject.set_configuration(3, 2, 1)).to be false
+      subject.reload
+      airline.reload
+
+      expect(airline.cash_on_hand).to eq initial_cash_on_hand
+      expect(subject.economy_seats).to eq 10
+      expect(subject.premium_economy_seats).to eq 10
+      expect(subject.business_seats).to eq 10
+      expect(subject.errors.full_messages).to include "Airline does not have enough cash on hand to reconfigure"
+    end
+
+    it "does not update the configutation or deduct cash from the airline if the airplane cannot fly all of its routes in the new configuration" do
+      initial_cash_on_hand = 10000000
+      airline = Fabricate(:airline, cash_on_hand: initial_cash_on_hand)
+      subject = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, base_country_group: airline.base.country_group, operator_id: airline.id, economy_seats: 10, premium_economy_seats: 10, business_seats: 10)
+      game = Game.find(airline.game_id)
+      bos = Fabricate(:airport, iata: "BOS", market: airline.base, runway: 990)
+      bos_gates = Gates.create!(airport: bos, game: game, current_gates: 5)
+      Slot.create!(lessee_id: airline.id, gates: bos_gates)
+      lax = Fabricate(:airport, iata: "LAX", market: airline.base, runway: 10000)
+      lax_gates = Gates.create!(airport: lax, game: game, current_gates: 5)
+      Slot.create!(lessee_id: airline.id, gates: lax_gates)
+      Population.create!(market_id: airline.base.id, year: 2000, population: 100)
+      Tourists.create!(market_id: airline.base.id, year: 2000, volume: 10)
+      airline_route = AirlineRoute.create!(airline: airline, origin_airport: bos, destination_airport: lax, distance: 2, economy_price: 1, business_price: 2, premium_economy_price: 2)
+      AirplaneRoute.new(airplane: subject, route: airline_route, flight_cost: 1, frequencies: 1, block_time_mins: 1).save(validate: false)
+      airplane_route = AirplaneRoute.last
+      AirlineRouteRevenue.create!(airline_route: airline_route, revenue: 2, economy_pax: 1, business_pax: 0, premium_economy_pax: 0, exclusive_economy_revenue: 0, exclusive_business_revenue: 0, exclusive_premium_economy_revenue: 0)
+      subject.reload
+
+      bos_global_demand = instance_double(GlobalDemand, business: 10, government: 10, leisure: 10, tourist: 10, airport: bos)
+      lax_global_demand = instance_double(GlobalDemand, business: 10, government: 10, leisure: 10, tourist: 10, airport: lax)
+      allow(GlobalDemand).to receive(:calculate).with(game.current_date, bos).and_return(bos_global_demand)
+      allow(GlobalDemand).to receive(:calculate).with(game.current_date, lax).and_return(lax_global_demand)
+
+      expect(subject.set_configuration(0, 0, 100)).to be false
+      subject.reload
+
+      expect(airline.cash_on_hand).to eq initial_cash_on_hand
+      expect(subject.economy_seats).to eq 10
+      expect(subject.premium_economy_seats).to eq 10
+      expect(subject.business_seats).to eq 10
+      expect(subject.errors.full_messages).to include "Routes are not all able to be flown by the aircraft"
+    end
+
+    it "does not update the configutation or deduct cash from the airline if the airplane does not have enough block time to fly all of its routes in the new configuration" do
+      initial_cash_on_hand = 10000000
+      airline = Fabricate(:airline, cash_on_hand: initial_cash_on_hand)
+      subject = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, base_country_group: airline.base.country_group, operator_id: airline.id, economy_seats: 10, premium_economy_seats: 10, business_seats: 10)
+      bos = Fabricate(:airport, iata: "BOS", market: airline.base, runway: 10000)
+      lax = Fabricate(:airport, iata: "LAX", market: airline.base, runway: 10000)
+      airline_route = AirlineRoute.create!(airline: airline, origin_airport: bos, destination_airport: lax, distance: 2, economy_price: 1, business_price: 2, premium_economy_price: 2)
+      AirplaneRoute.new(airplane: subject, route: airline_route, flight_cost: 1, frequencies: 1000, block_time_mins: 1).save(validate: false)
+      airplane_route = AirplaneRoute.last
+      AirlineRouteRevenue.create!(airline_route: airline_route, revenue: 100, economy_pax: 50, business_pax: 0, premium_economy_pax: 0, exclusive_economy_revenue: 0, exclusive_business_revenue: 0, exclusive_premium_economy_revenue: 0)
+      subject.reload
+
+      expect(subject.set_configuration(0, 0, 100)).to be false
+
+      subject.reload
+
+      expect(airline.cash_on_hand).to eq initial_cash_on_hand
+      expect(subject.economy_seats).to eq 10
+      expect(subject.premium_economy_seats).to eq 10
+      expect(subject.business_seats).to eq 10
+      expect(subject.errors.full_messages).to include "Airplane routes block time is too high"
+    end
+  end
+
   context "takeoff_distance" do
     it "is 1/2 the stated takeoff distance for a plane with no seats flying no distance taking off at sea level" do
       family = Fabricate(:aircraft_family)

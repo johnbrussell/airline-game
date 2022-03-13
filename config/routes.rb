@@ -3,7 +3,9 @@ Rails.application.routes.draw do
 
   resources :games do
     resources :airlines do
-      resources :airplanes
+      resources :airplanes do
+        get "/change_configuration", to: "airplanes#change_configuration"
+      end
 
       get "/routes", to: "routes#index"
     end

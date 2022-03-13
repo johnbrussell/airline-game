@@ -43,6 +43,7 @@
   <li><%= @airplane.premium_economy_seats %> premium economy <%= "seat".pluralize(@airplane.premium_economy_seats) %></li>
   <li><%= @airplane.business_seats %> business <%= "seat".pluralize(@airplane.business_seats) %></li>
 </ul>
+<%= button_to "Change", game_airline_airplane_change_configuration_path(@game, @airline, @airplane), method: :get %>
 
 <% if @airplane.built? %>
   <h3>Utilization</h3>

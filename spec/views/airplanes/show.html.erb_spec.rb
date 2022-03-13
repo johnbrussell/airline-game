@@ -34,6 +34,16 @@ RSpec.describe "airplanes/show", type: :feature do
     it "links back to the airline page" do
       visit game_airline_airplane_path(game, airline, airplane)
 
+      expect(page).to have_button "Change"
+
+      click_button "Change"
+
+      expect(page).to have_content "Change aircraft configuration"
+    end
+
+    it "links to an aircraft configuration change page" do
+      visit game_airline_airplane_path(game, airline, airplane)
+
       expect(page).to have_link "Return to #{airline.name} fleet page"
 
       click_link "Return to #{airline.name} fleet page"
