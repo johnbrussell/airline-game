@@ -393,7 +393,7 @@ RSpec.describe AirplaneRoute do
 
       expect(AirlineRouteRevenue.count).to eq 0
 
-      subject.recalculate_profits_and_block_time
+      expect(subject.recalculate_profits_and_block_time).to be true
       subject.reload
 
       expect(AirlineRouteRevenue.count).to eq 1

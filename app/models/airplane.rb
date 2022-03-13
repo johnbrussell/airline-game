@@ -245,7 +245,7 @@ class Airplane < ApplicationRecord
     errors.none? &&
       save &&
       operator.update!(cash_on_hand: operator.cash_on_hand - new_configuratin_cost) &&
-      airplane_routes.each(&:recalculate_profits_and_block_time)
+      airplane_routes.each(&:recalculate_profits_and_block_time) && true
   end
 
   def takeoff_distance(elevation, flight_distance)

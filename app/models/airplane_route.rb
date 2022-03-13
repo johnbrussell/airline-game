@@ -44,7 +44,7 @@ class AirplaneRoute < ApplicationRecord
     update!(
       block_time_mins: (airplane.round_trip_block_time(route.distance) * frequencies).round,
       flight_cost: one_way_single_frequency_flight_cost * 2,
-    ) && route.update_revenue
+    ) && route.update_revenue && true
   end
 
   def set_frequency(frequency)

@@ -2086,7 +2086,7 @@ RSpec.describe Airplane do
         Airplane::RECONFIGURATION_COST_PER_SEAT_BUSINESS * 3 +
         subject.send(:daily_profit)
 
-      subject.set_configuration(3, 2, 1)
+      expect(subject.set_configuration(3, 2, 1)).to be true
 
       subject.reload
       airline.reload
@@ -2157,7 +2157,7 @@ RSpec.describe Airplane do
       allow(GlobalDemand).to receive(:calculate).with(game.current_date, bos).and_return(bos_global_demand)
       allow(GlobalDemand).to receive(:calculate).with(game.current_date, lax).and_return(lax_global_demand)
 
-      subject.set_configuration(0, 0, 100)
+      expect(subject.set_configuration(0, 0, 100)).to be false
       subject.reload
 
       expect(airline.cash_on_hand).to eq initial_cash_on_hand
@@ -2179,7 +2179,7 @@ RSpec.describe Airplane do
       AirlineRouteRevenue.create!(airline_route: airline_route, revenue: 100, economy_pax: 50, business_pax: 0, premium_economy_pax: 0, exclusive_economy_revenue: 0, exclusive_business_revenue: 0, exclusive_premium_economy_revenue: 0)
       subject.reload
 
-      subject.set_configuration(0, 0, 100)
+      expect(subject.set_configuration(0, 0, 100)).to be false
 
       subject.reload
 
