@@ -38,6 +38,14 @@
     <% end %>
   </p>
 
+  <p>
+    <%= form_with url: game_airline_route_add_flights_path(@game, @route), method: :patch do |form| %>
+      <%= form.label "Service quality" %>
+      <%= form.number_field :service_quality, step: 1, min: AirlineRoute::MIN_SERVICE_QUALITY, value: @route.service_quality, max: AirlineRoute::MAX_SERVICE_QUALITY %>
+      <%= form.submit "Set service quality" %>
+    <% end %>
+  </p>
+
   <h3><%= "#{@game.user_airline.name} flights on #{@route.name}" %></h3>
   <% if @route.airplanes.count > 0 %>
     <p>
