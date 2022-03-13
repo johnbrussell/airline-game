@@ -69,7 +69,7 @@ class AirlineRoute < ApplicationRecord
               OR (destination_airports.market_id == #{origin.market_id} AND origin_airports.market_id == #{destination.market_id})")
       .where.not(origin_airport_id: origin.id, destination_airport_id: destination.id)
       .where("airlines.game_id == ?", game.id)
-      .order("airlines.name")
+      .order("origin_airports.iata", "destination_airports.iata")
       .uniq
   end
 
