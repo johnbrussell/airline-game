@@ -445,6 +445,15 @@ RSpec.describe "routes/view_route", type: :feature do
     expect(page).to have_content "#{other_airline.name} operates 1 weekly flight with #{aircraft_2.economy_seats} economy seats, #{aircraft_2.premium_economy_seats} premium economy seats, and #{aircraft_2.business_seats} business seats. Tickets sell for $1.00 in economy, $2.00 in premium economy, and $4000.00 in business"
     expect(page).to have_content "FUN - MAJ: #{airline.name} operates 1 weekly flight with #{aircraft_1.economy_seats} economy seats, #{aircraft_1.premium_economy_seats} premium economy seats, and #{aircraft_1.business_seats} business seats. Tickets sell for $2.00 in economy, $3.00 in premium economy, and $5.00 in business"
     expect(AirplaneRoute.count).to eq airplane_route_count
+
+    expect(page).to have_link "FUN - MAJ"
+    expect(page).not_to have_content "Add service on FUN - MAJ"
+
+    click_link "FUN - MAJ"
+
+    expect(page).to have_content "Add service on FUN - MAJ"
+    expect(page).not_to have_content "Add service on FUN - INU"
+    expect(page).to have_link "FUN - INU"
   end
 
   it "refreshing the page after adding flights works" do

@@ -1,6 +1,10 @@
-<p> <%= if include_name then "#{airline_route.name}: " else "" end %>
-    <%= "#{airline_route.airline.name} operates #{airline_route.total_frequencies} weekly" %> <%= 'flight'.pluralize(airline_route.total_frequencies) %>
-    <%= "with #{airline_route.total_economy_seats} economy seats, #{airline_route.total_premium_economy_seats} premium economy seats, and #{airline_route.total_business_seats} business seats." %>
-    <%= "Tickets sell for $#{number_with_precision(airline_route.economy_price, :precision => 2)} in economy,
-         $#{number_with_precision(airline_route.premium_economy_price, :precision => 2)} in premium economy,
-         and $#{number_with_precision(airline_route.business_price, :precision => 2)} in business" %></p>
+<p>
+  <% if include_name %>
+    <a href=<%=game_airline_route_add_flights_path(@game, airline_route)%>> <%= "#{airline_route.name}" %></a>:
+  <% end %>
+  <%= "#{airline_route.airline.name} operates #{airline_route.total_frequencies} weekly" %> <%= 'flight'.pluralize(airline_route.total_frequencies) %>
+  <%= "with #{airline_route.total_economy_seats} economy seats, #{airline_route.total_premium_economy_seats} premium economy seats, and #{airline_route.total_business_seats} business seats." %>
+  <%= "Tickets sell for $#{number_with_precision(airline_route.economy_price, :precision => 2)} in economy,
+       $#{number_with_precision(airline_route.premium_economy_price, :precision => 2)} in premium economy,
+       and $#{number_with_precision(airline_route.business_price, :precision => 2)} in business" %>
+</p>
