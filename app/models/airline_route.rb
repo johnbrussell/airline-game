@@ -1,4 +1,15 @@
 class AirlineRoute < ApplicationRecord
+  REPUTATION_WEIGHTS = {
+    fare: 0.3,
+    frequency: 0.3,
+    ifs: 0.1,
+    legroom: 0.3,
+  }
+  MIN_REPUTATION = 1
+  MAX_REPUTATION = 4
+  MIN_SERVICE_QUALITY = 1
+  MAX_SERVICE_QUALITY = 5
+
   validates :economy_price, presence: true
   validates :economy_price, numericality: { greater_than: 0 }
   validates :premium_economy_price, presence: true
@@ -8,7 +19,7 @@ class AirlineRoute < ApplicationRecord
   validates :origin_airport_id, presence: true
   validates :destination_airport_id, presence: true
   validates :service_quality, presence: true
-  validates :service_quality, numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 5 }
+  validates :service_quality, numericality: { greater_than_or_equal_to: MIN_SERVICE_QUALITY, less_than_or_equal_to: MAX_SERVICE_QUALITY }
   validate :airline_can_fly_route
   validate :airports_alphabetized
 
@@ -21,15 +32,6 @@ class AirlineRoute < ApplicationRecord
 
   delegate :iata, to: :origin_airport, prefix: true
   delegate :iata, to: :destination_airport, prefix: true
-
-  REPUTATION_WEIGHTS = {
-    fare: 0.3,
-    frequency: 0.3,
-    ifs: 0.1,
-    legroom: 0.3,
-  }
-  MIN_REPUTATION = 1
-  MAX_REPUTATION = 4
 
   def self.find_or_create_by_airline_and_route(airline, origin_airport, destination_airport)
     record = find_or_create_by(airline: airline, origin_airport: origin_airport, destination_airport: destination_airport)
