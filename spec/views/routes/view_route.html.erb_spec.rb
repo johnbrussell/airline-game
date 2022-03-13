@@ -194,7 +194,7 @@ RSpec.describe "routes/view_route", type: :feature do
     fun = Airport.find_by(iata: "FUN")
     airline = Fabricate(:airline, base_id: nauru.id, game_id: game.id, is_user_airline: true)
     family = Fabricate(:aircraft_family)
-    model = Fabricate(:aircraft_model, max_range: 13000, takeoff_distance: 100, family: family)
+    model = Fabricate(:aircraft_model, max_range: 13000, takeoff_distance: 100, speed: 1000, family: family)
     aircraft_1 = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, business_seats: 1)
     gates_inu = Gates.create!(airport: inu, game: game, current_gates: 100)
     Slot.create!(gates: gates_inu, lessee_id: airline.id)
