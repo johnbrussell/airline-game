@@ -78,11 +78,11 @@ RSpec.describe "airplanes/show", type: :feature do
       visit game_airline_airplane_path(game, airline, airplane)
 
       expect(page).to have_content "#{airline.name} has leased this airplane through #{date}"
-      expect(page).to have_content "FUN - INU: 1 weekly flight. $\n-1.00\ndaily profits"
+      expect(page).to have_content "FUN - INU: 1 weekly flight. $\n-0.43\ndaily profits"
       expect(page).to have_content "Leased for $10.00 daily"
       expect(page).to have_content "Constructed #{airplane.construction_date}"
       expect(page).to have_content "Daily maintenance costs: $#{airplane.maintenance_cost_per_day.round(2)}"
-      expect(page).to have_content "Including maintenance and ownership costs, this airplane earns $\n-11.08\nin profits per day"
+      expect(page).to have_content "Including maintenance and ownership costs, this airplane earns $\n-10.51\nin profits per day"
       expect(page).to have_content "Value: $1,000.00"
     end
   end
