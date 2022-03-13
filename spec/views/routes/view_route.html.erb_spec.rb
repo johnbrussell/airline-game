@@ -295,7 +295,7 @@ RSpec.describe "routes/view_route", type: :feature do
     fun = Airport.find_by(iata: "FUN")
     airline = Fabricate(:airline, base_id: nauru.id, game_id: game.id, is_user_airline: true)
     family = Fabricate(:aircraft_family)
-    model = Fabricate(:aircraft_model, max_range: 13000, takeoff_distance: 100, family: family)
+    model = Fabricate(:aircraft_model, max_range: 13000, takeoff_distance: 100, family: family, floor_space: 1000000)
     aircraft_1 = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, business_seats: 1)
     gates_inu = Gates.create!(airport: inu, game: game, current_gates: 100)
     Slot.create!(gates: gates_inu, lessee_id: airline.id)
@@ -323,15 +323,22 @@ RSpec.describe "routes/view_route", type: :feature do
     expect(page).to have_button "Set frequencies"
 
     arr = AirlineRouteRevenue.last
-    arr.assign_attributes(revenue: 10000.01)
-    arr.save(validate: false)
+    airline_route = arr.airline_route
+    original_revenue = arr.revenue
+    desired_revenue = 10000.01
+    ratio = desired_revenue / original_revenue
     apr = AirplaneRoute.last
     apr.assign_attributes(flight_cost: 10000.29)
     apr.save(validate: false)
 
+    airplane = apr.airplane
+    airplane.update!(business_seats: airplane.business_seats * ratio.ceil(), premium_economy_seats: airplane.premium_economy_seats * ratio.ceil(), economy_seats: airplane.economy_seats * ratio.ceil())
+    arr.update!(revenue: 10000.01, business_pax: arr.business_pax * ratio, premium_economy_pax: arr.premium_economy_pax * ratio, economy_pax: arr.economy_pax * ratio)
+
     visit game_airline_route_add_flights_path(game, -1, params: { origin_id: inu.id, destination_id: fun.id })
 
     expect(page).to have_content "#{airline.name} operates 1 weekly flight on FUN - INU. Profit: $\n-0.04\ndaily. Load factor: #{AirlineRouteRevenue.last.airline_route.load_factor.round(1)}%"
+    expect(page).to have_content "Daily profit: $\n-0.04"  # Checks that airplane's profit matches route's profit when it is the only airplane flying the route
   end
 
   it "allows users to add flights and then updates their profitability when other airlines start service on the same route" do
