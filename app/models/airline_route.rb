@@ -117,7 +117,11 @@ class AirlineRoute < ApplicationRecord
   def relative_demand_to(other_origin_airport, other_destination_airport, class_of_service)
     comparison_revenue = Calculation::MaximumRevenuePotential.new(other_origin_airport, other_destination_airport, game.current_date).send("max_#{class_of_service.to_s}_class_revenue_per_week".to_sym)
 
-    revenue_potential.send("max_#{class_of_service.to_s}_class_revenue_per_week".to_sym) / comparison_revenue
+    if comparison_revenue == 0
+      1
+    else
+      revenue_potential.send("max_#{class_of_service.to_s}_class_revenue_per_week".to_sym) / comparison_revenue
+    end
   end
 
   def reputation
@@ -126,6 +130,10 @@ class AirlineRoute < ApplicationRecord
 
   def set_price(economy, premium_economy, business)
     update(economy_price: economy, premium_economy_price: premium_economy, business_price: business) && update_revenue
+  end
+
+  def set_service_quality(new_quality)
+    update(service_quality: new_quality) && airplane_routes.each(&:update_costs) && update_revenue
   end
 
   def total_flight_costs

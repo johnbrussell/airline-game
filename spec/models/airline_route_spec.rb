@@ -368,7 +368,7 @@ RSpec.describe AirlineRoute do
 
     it "is 1 on itself" do
       allow(Calculation::MaximumRevenuePotential).to receive(:new).with(this_destination_airport, this_origin_airport, Game.find(airline.game_id).current_date).and_return(this_revenue)
-      
+
       subject = AirlineRoute.new(origin_airport: this_origin_airport, destination_airport: this_destination_airport, airline: airline)
 
       expect(subject.relative_demand_to(this_origin_airport, this_destination_airport, :economy)).to eq 1
@@ -528,6 +528,46 @@ RSpec.describe AirlineRoute do
       expect(subject.economy_price).to eq 1
       expect(subject.premium_economy_price).to eq 2
       expect(subject.business_price).to eq 3
+    end
+  end
+
+  context "set_service_quality" do
+    it "updates the service quality, the flight costs on the airplane routes, and the revenue" do
+      inu_market = Fabricate(:market, name: "Nauru", country: "Nauru")
+      fun_market = Fabricate(:market, name: "Funafuti", country: "Tuvalu")
+      inu = Fabricate(:airport, iata: "INU", market: inu_market)
+      fun = Fabricate(:airport, iata: "FUN", market: fun_market)
+      Population.create!(market_id: inu.market.id, year: 1999, population: 1000)
+      Tourists.create!(market_id: inu.market.id, year: 1999, volume: 10000)
+      Population.create!(market_id: fun.market.id, year: 1999, population: 1000)
+      Tourists.create!(market_id: fun.market.id, year: 1999, volume: 10000)
+
+      airline_a = Fabricate(:airline, base_id: inu.market.id, name: "A")
+      family = Fabricate(:aircraft_family)
+      super_model = Fabricate(:aircraft_model, takeoff_distance: 100, max_range: 13000, floor_space: 100000)
+      airplane = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model, business_seats: 1, premium_economy_seats: 5, economy_seats: 30)
+      game = Game.find(airline_a.game_id)
+
+      Gates.create!(airport: inu, game: game, current_gates: 10)
+      Slot.create!(gates_id: Gates.last.id, lessee_id: airline_a.id)
+      Gates.create!(airport: fun, game: game, current_gates: 10)
+      Slot.create!(gates_id: Gates.last.id, lessee_id: airline_a.id)
+
+      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, service_quality: 3, airline: airline_a)
+      block_time = airplane.round_trip_block_time(subject.distance).round
+      AirplaneRoute.new(airplane: airplane, route: subject, block_time_mins: block_time, frequencies: 1, flight_cost: 1).save(validate: false)
+      subject.reload
+      airplane_route = AirplaneRoute.last
+
+      expect(subject.revenue).to be nil
+
+      subject.set_service_quality(2)
+      subject.reload
+      airplane_route.reload
+
+      expect(airplane_route.flight_cost).to be > 1
+      expect(subject.service_quality).to eq 2
+      expect(subject.revenue).not_to be nil
     end
   end
 
