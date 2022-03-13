@@ -365,6 +365,53 @@ RSpec.describe AirplaneRoute do
     end
   end
 
+  context "recalculate_profits_and_block_time" do
+    it "updates the block time, flight cost, and route revenue" do
+      inu_market = Market.find_by(name: "Default")
+      inu_market.update(name: "Nauru", income: 10000, country: "Nauru", country_group: "Nauru")
+      inu_population = Population.create!(year: 2000, population: 10000, market_id: inu_market.id)
+      inu_tourists = Tourists.create!(year: 2000, volume: 1000, market_id: inu_market.id)
+      fun_market = Fabricate(:market, name: "Funafuti", income: 10000, country: "Tuvalu", country_group: "Tuvalu")
+      fun_population = Population.create!(year: 2000, population: 10000, market_id: fun_market.id)
+      fun_tourists = Tourists.create!(year: 2000, volume: 1000, market_id: fun_market.id)
+      airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: fun_market)
+      airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: inu_market)
+      family = Fabricate(:aircraft_family)
+      distance = Calculation::Distance.between_airports(airport_1, airport_2)
+      model = Fabricate(:aircraft_model, floor_space: Airplane::ECONOMY_SEAT_SIZE, takeoff_distance: 10000, max_range: distance + 1)
+      airplane = Fabricate(:airplane, aircraft_family: family, aircraft_model: model, economy_seats: 1, operator_id: Airline.last.id, base_country_group: Airline.last.base.country_group)
+      airline_route = AirlineRoute.create!(origin_airport_id: airport_1.id, destination_airport_id: airport_2.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 411, airline: Airline.last, service_quality: 4)
+      gates_1 = Gates.create!(airport: airport_1, game: airplane.game, current_gates: 100)
+      Slot.create!(gates: gates_1, lessee_id: Airline.last.id)
+      gates_2 = Gates.create!(airport: airport_2, game: airplane.game, current_gates: 100)
+      Slot.create!(gates: gates_2, lessee_id: Airline.last.id)
+      subject = AirplaneRoute.new(route: airline_route, airplane: airplane, block_time_mins: 1, flight_cost: 1, frequencies: 1)
+      subject.save(validate: false)
+      flight_cost_calculator = instance_double(Calculation::FlightCostCalculator, cost: 100.40)
+      allow(Calculation::FlightCostCalculator).to receive(:new).and_return(flight_cost_calculator)
+      airline_route.reload
+
+      expect(AirlineRouteRevenue.count).to eq 0
+
+      subject.recalculate_profits_and_block_time
+      subject.reload
+
+      expect(AirlineRouteRevenue.count).to eq 1
+      revenue = AirlineRouteRevenue.last
+      expect(revenue.revenue).to eq 2
+      expect(revenue.exclusive_economy_revenue).to eq 2
+      expect(revenue.exclusive_premium_economy_revenue).to eq 0
+      expect(revenue.exclusive_business_revenue).to eq 0
+      expect(revenue.business_pax).to eq 0
+      expect(revenue.premium_economy_pax).to eq 0
+      expect(revenue.economy_pax).to eq 1
+
+      expect(subject.block_time_mins).to be > 1
+      expect(subject.frequencies).to eq 1
+      expect(subject.flight_cost).to eq 200.80
+    end
+  end
+
   context "routes_connected" do
     it "is true if the airplane has no other routes" do
       family = Fabricate(:aircraft_family)
