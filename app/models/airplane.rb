@@ -68,6 +68,10 @@ class Airplane < ApplicationRecord
   MINUTES_PER_HOUR = 60.0
   NUM_IN_FAMILY_FOR_MIN_MAINTENANCE_RATE = 100.0
   PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE = 0.4
+  RECONFIGURATION_COST_PER_SEAT_ECONOMY = 4000
+  RECONFIGURATION_COST_PER_SEAT_PREMIUM_ECONOMY = 12500
+  RECONFIGURATION_COST_PER_SEAT_BUSINESS = 60000
+  RECONFIGURATION_DAYS_PER_SEAT = 1/50.0
   TAKEOFF_ELEVATION_MULTIPLIER = 1.15
   TURN_TIME_MINS_PER_SEAT = 1/3.5
 
@@ -218,6 +222,32 @@ class Airplane < ApplicationRecord
     origin_destination_pairs_connected?(routes.map { |r| [r.origin_airport.iata, r.destination_airport.iata] }.reject { |e| e.sort == [origin_iata, destination_iata].sort})
   end
 
+  def set_configuration(new_business, new_premium_economy, new_economy)
+    new_configuratin_cost = cost_to_reconfigure(new_economy, new_premium_economy, new_business)
+
+    assign_attributes(
+      business_seats: new_business,
+      premium_economy_seats: new_premium_economy,
+      economy_seats: new_economy,
+    )
+
+    airplane_routes.each do |airplane_route|
+      airplane_route.assign_attributes(
+        block_time_mins: (round_trip_block_time(airplane_route.route.distance) * airplane_route.frequencies).round,
+      )
+    end
+    validate
+
+    if operator.cash_on_hand < new_configuratin_cost
+      errors.add(:airline, "does not have enough cash on hand to reconfigure")
+    end
+
+    errors.none? &&
+      save &&
+      operator.update!(cash_on_hand: operator.cash_on_hand - new_configuratin_cost) &&
+      airplane_routes.each(&:recalculate_profits_and_block_time)
+  end
+
   def takeoff_distance(elevation, flight_distance)
     takeoff_elevation_multiplier(elevation) * 0.5 * aircraft_model.takeoff_distance * takeoff_seats_component * takeoff_flight_distance_component(flight_distance)
   end
@@ -266,8 +296,19 @@ class Airplane < ApplicationRecord
       end
     end
 
+    def cost_to_reconfigure(new_economy, new_premium_economy, new_business)
+      days_to_reconfigure(new_economy + new_premium_economy + new_business) * daily_profit +
+        new_economy * RECONFIGURATION_COST_PER_SEAT_ECONOMY +
+        new_premium_economy * RECONFIGURATION_COST_PER_SEAT_PREMIUM_ECONOMY +
+        new_business * RECONFIGURATION_COST_PER_SEAT_BUSINESS
+    end
+
     def daily_lease_expense
       lease_rate.nil? ? 0 : lease_rate
+    end
+
+    def days_to_reconfigure(new_total_seats)
+      (RECONFIGURATION_DAYS_PER_SEAT * new_total_seats).ceil()
     end
 
     def floor_space_used
@@ -294,6 +335,10 @@ class Airplane < ApplicationRecord
         where("construction_date <= ?", game.current_date).
         where("aircraft_families.id == ?", aircraft_model.family.id).
         count
+    end
+
+    def operator
+      Airline.find(operator_id)
     end
 
     def operator_changes_appropriately
