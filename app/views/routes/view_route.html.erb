@@ -1,17 +1,20 @@
 <h1>Airline Game</h1>
-<p><a href=<%=game_path(@game)%>>Return to game overview</a> <br/>
-<a href=<%= game_select_route_path(@game, params: { origin: @route.origin_airport.id, destination: @route.destination_airport.id }) %>> View a different route </a><br/>
-<a href=<%= game_airport_path(@game, @route.origin_airport) %>> View <%= @route.origin_airport.iata %> </a><br/>
-<a href=<%= game_airport_path(@game, @route.destination_airport) %>> View <%= @route.destination_airport.iata %> </a></p>
+<p>
+  <a href=<%= game_path(@game)%>>Return to game overview</a> <br/>
+  <a href=<%= game_airline_routes_path(@game, @game.user_airline) %>>View <%= @game.user_airline.name %> routes </a><br/>
+  <a href=<%= game_select_route_path(@game, params: { origin: @route.origin_airport.id, destination: @route.destination_airport.id }) %>> View a different route </a><br/>
+  <a href=<%= game_airport_path(@game, @route.origin_airport) %>> View <%= @route.origin_airport.iata %> </a><br/>
+  <a href=<%= game_airport_path(@game, @route.destination_airport) %>> View <%= @route.destination_airport.iata %> </a>
+</p>
 <h2><%= @route.name %></h2>
 <p><%= "#{Calculation::Distance.between_airports(@route.origin_airport, @route.destination_airport).round} miles" %></p>
 <p><%= "#{@game.user_airline.name} has #{@route.origin_airport.leased_unused_slots(@game.user_airline)} available #{"slot".pluralize(@route.origin_airport.leased_unused_slots(@game.user_airline))} at #{@route.origin_airport.iata}" %> <br/>
 <%= "#{@game.user_airline.name} has #{@route.destination_airport.leased_unused_slots(@game.user_airline)} available #{"slot".pluralize(@route.destination_airport.leased_unused_slots(@game.user_airline))} at #{@route.destination_airport.iata}" %></p>
 <p>At current demand levels, this route can support up to:
   <ul>
-    <li>$<%= number_with_precision(@revenue.max_economy_class_revenue_per_week, :precision => 2) %> per week in economy class revenue</li>
-    <li>$<%= number_with_precision(@revenue.max_premium_economy_class_revenue_per_week, :precision => 2) %> per week in premium economy class revenue</li>
-    <li>$<%= number_with_precision(@revenue.max_business_class_revenue_per_week, :precision => 2) %> per week in business class revenue</li>
+    <li>$<%= number_with_precision(@revenue.max_economy_class_revenue_per_week, :precision => 2, :delimiter => ",") %> per week in economy class revenue</li>
+    <li>$<%= number_with_precision(@revenue.max_premium_economy_class_revenue_per_week, :precision => 2, :delimiter => ",") %> per week in premium economy class revenue</li>
+    <li>$<%= number_with_precision(@revenue.max_business_class_revenue_per_week, :precision => 2, :delimiter => ",") %> per week in business class revenue</li>
   </ul>
 </p>
 <% if @game.user_airline.can_fly_between?(@route.origin_airport.market, @route.destination_airport.market) %>

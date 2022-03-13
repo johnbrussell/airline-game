@@ -25,6 +25,18 @@ RSpec.describe "routes/view_route", type: :feature do
     expect(page).to have_content "Airline Game Home"
   end
 
+  it "has a link to view all airline routes" do
+    game = Fabricate(:game)
+    Fabricate(:airline, is_user_airline: true, game_id: game.id, base_id: Market.last.id)
+    visit game_airline_route_add_flights_path(game, -1, params: { origin_id: Airport.find_by(iata: "FUN"), destination_id: Airport.find_by(iata: "INU")})
+
+    expect(page).to have_content "FUN - INU"
+
+    click_link "View #{game.user_airline.name} routes"
+
+    expect(page).to have_content "#{game.user_airline.name} routes"
+  end
+
   it "has a link to view a different route that remembers which route it was on" do
     game = Fabricate(:game)
     Fabricate(:airline, is_user_airline: true, game_id: game.id, name: "TIA", base_id: Market.last.id)
@@ -67,7 +79,7 @@ RSpec.describe "routes/view_route", type: :feature do
 
     revenue_calculator = instance_double(
       Calculation::MaximumRevenuePotential,
-      max_business_class_revenue_per_week: 100,
+      max_business_class_revenue_per_week: 1000,
       max_premium_economy_class_revenue_per_week: 200,
       max_economy_class_revenue_per_week: 400,
     )
@@ -80,7 +92,7 @@ RSpec.describe "routes/view_route", type: :feature do
     expect(page).to have_content "At current demand levels, this route can support up to:"
     expect(page).to have_content "$400.00 per week in economy class revenue"
     expect(page).to have_content "$200.00 per week in premium economy class revenue"
-    expect(page).to have_content "$100.00 per week in business class revenue"
+    expect(page).to have_content "$1,000.00 per week in business class revenue"
     expect(page).not_to have_content "#{airline.name} cannot fly this route due to political restrictions"
   end
 
@@ -194,7 +206,7 @@ RSpec.describe "routes/view_route", type: :feature do
     fun = Airport.find_by(iata: "FUN")
     airline = Fabricate(:airline, base_id: nauru.id, game_id: game.id, is_user_airline: true)
     family = Fabricate(:aircraft_family)
-    model = Fabricate(:aircraft_model, max_range: 13000, takeoff_distance: 100, family: family)
+    model = Fabricate(:aircraft_model, max_range: 13000, takeoff_distance: 100, speed: 1000, family: family)
     aircraft_1 = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, business_seats: 1)
     gates_inu = Gates.create!(airport: inu, game: game, current_gates: 100)
     Slot.create!(gates: gates_inu, lessee_id: airline.id)
@@ -445,6 +457,15 @@ RSpec.describe "routes/view_route", type: :feature do
     expect(page).to have_content "#{other_airline.name} operates 1 weekly flight with #{aircraft_2.economy_seats} economy seats, #{aircraft_2.premium_economy_seats} premium economy seats, and #{aircraft_2.business_seats} business seats. Tickets sell for $1.00 in economy, $2.00 in premium economy, and $4000.00 in business"
     expect(page).to have_content "FUN - MAJ: #{airline.name} operates 1 weekly flight with #{aircraft_1.economy_seats} economy seats, #{aircraft_1.premium_economy_seats} premium economy seats, and #{aircraft_1.business_seats} business seats. Tickets sell for $2.00 in economy, $3.00 in premium economy, and $5.00 in business"
     expect(AirplaneRoute.count).to eq airplane_route_count
+
+    expect(page).to have_link "FUN - MAJ"
+    expect(page).not_to have_content "Add service on FUN - MAJ"
+
+    click_link "FUN - MAJ"
+
+    expect(page).to have_content "Add service on FUN - MAJ"
+    expect(page).not_to have_content "Add service on FUN - INU"
+    expect(page).to have_link "FUN - INU"
   end
 
   it "refreshing the page after adding flights works" do
