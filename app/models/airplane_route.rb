@@ -107,7 +107,7 @@ class AirplaneRoute < ApplicationRecord
 
     def revenue_business
       if route.total_business_seats > 0
-        airplane.business_seats * frequencies / route.total_business_seats.to_f * route.business_price * route.revenue.business_pax
+        airplane.business_seats * frequencies / route.total_business_seats.to_f * route.business_price * route.revenue.business_pax * 2
       else
         0
       end
@@ -115,7 +115,7 @@ class AirplaneRoute < ApplicationRecord
 
     def revenue_economy
       if route.total_economy_seats > 0
-        airplane.economy_seats * frequencies / route.total_economy_seats.to_f * route.economy_price * route.revenue.economy_pax
+        airplane.economy_seats * frequencies / route.total_economy_seats.to_f * route.economy_price * route.revenue.economy_pax * 2
       else
         0
       end
@@ -123,7 +123,7 @@ class AirplaneRoute < ApplicationRecord
 
     def revenue_premium_economy
       if route.total_premium_economy_seats > 0
-        airplane.premium_economy_seats * frequencies / route.total_premium_economy_seats.to_f * route.premium_economy_price * route.revenue.premium_economy_pax
+        airplane.premium_economy_seats * frequencies / route.total_premium_economy_seats.to_f * route.premium_economy_price * route.revenue.premium_economy_pax * 2
       else
         0
       end

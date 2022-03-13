@@ -331,16 +331,16 @@ RSpec.describe AirplaneRoute do
       airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: airline.id, economy_seats: 100, business_seats: 10, premium_economy_seats: 20, base_country_group: airline.base.country_group)
       other_airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: airline.id, economy_seats: 100, business_seats: 10, premium_economy_seats: 20, base_country_group: airline.base.country_group)
       airline_route = AirlineRoute.create!(airline: airline, origin_airport: fun, destination_airport: inu, distance: 1, economy_price: 1, business_price: 2, premium_economy_price: 1.5)
-      AirplaneRoute.new(airplane: other_airplane, route: airline_route, frequencies: 1, flight_cost: 100, block_time_mins: 1).save(validate: false)
+      AirplaneRoute.new(airplane: other_airplane, route: airline_route, frequencies: 1, flight_cost: 150, block_time_mins: 1).save(validate: false)
       other_airplane_route = AirplaneRoute.last
-      AirplaneRoute.new(airplane: airplane, route: airline_route, frequencies: 1, flight_cost: 150, block_time_mins: 1).save(validate: false)
+      AirplaneRoute.new(airplane: airplane, route: airline_route, frequencies: 1, flight_cost: 300, block_time_mins: 1).save(validate: false)
       revenue = AirlineRouteRevenue.create!(business_pax: 20, premium_economy_pax: 40, economy_pax: 200, revenue: 600, exclusive_economy_revenue: 123.44, exclusive_business_revenue: 124.44, exclusive_premium_economy_revenue: 111.11, airline_route_id: airline_route.id)
       subject = AirplaneRoute.last
 
       expect(subject.daily_profit).to eq 0
 
       other_airplane_route.reload
-      expect(other_airplane_route.daily_profit).to eq 50 / 7.0
+      expect(other_airplane_route.daily_profit).to eq 150 / 7.0
     end
 
     it "can handle classes without service" do
@@ -352,16 +352,16 @@ RSpec.describe AirplaneRoute do
       airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: airline.id, economy_seats: 100, business_seats: 0, premium_economy_seats: 20, base_country_group: airline.base.country_group)
       other_airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: airline.id, economy_seats: 100, business_seats: 0, premium_economy_seats: 20, base_country_group: airline.base.country_group)
       airline_route = AirlineRoute.create!(airline: airline, origin_airport: fun, destination_airport: inu, distance: 1, economy_price: 1, business_price: 2, premium_economy_price: 1.5)
-      AirplaneRoute.new(airplane: other_airplane, route: airline_route, frequencies: 1, flight_cost: 100, block_time_mins: 1).save(validate: false)
+      AirplaneRoute.new(airplane: other_airplane, route: airline_route, frequencies: 1, flight_cost: 200, block_time_mins: 1).save(validate: false)
       other_airplane_route = AirplaneRoute.last
-      AirplaneRoute.new(airplane: airplane, route: airline_route, frequencies: 1, flight_cost: 150, block_time_mins: 1).save(validate: false)
+      AirplaneRoute.new(airplane: airplane, route: airline_route, frequencies: 1, flight_cost: 300, block_time_mins: 1).save(validate: false)
       revenue = AirlineRouteRevenue.create!(business_pax: 0, premium_economy_pax: 40, economy_pax: 200, revenue: 520, exclusive_economy_revenue: 1, exclusive_premium_economy_revenue: 1, exclusive_business_revenue: 1, airline_route_id: airline_route.id)
       subject = AirplaneRoute.last
 
-      expect(subject.daily_profit).to eq -20 / 7.0
+      expect(subject.daily_profit).to eq -40 / 7.0
 
       other_airplane_route.reload
-      expect(other_airplane_route.daily_profit).to eq 30 / 7.0
+      expect(other_airplane_route.daily_profit).to eq 60 / 7.0
     end
   end
 

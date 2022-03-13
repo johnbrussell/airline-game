@@ -71,9 +71,18 @@
   <% end %>
 
   <ul>
-    <% @route.airplanes.each do |airplane| %>
+    <% @route.airplane_routes.each do |airplane_route| %>
       <li>
-        <%= render partial: "user_airline_frequencies", locals: { airplane: airplane } %>
+        <%= render partial: "user_airline_frequencies", locals: { airplane: airplane_route.airplane } %>
+        <ul>
+          <li>Daily profit: $
+            <% if airplane_route.daily_profit >= 0 %>
+              <div class="inline profitable"> <%= number_with_precision(airplane_route.daily_profit, :precision => 2) %> </div>
+            <% else %>
+              <div class="inline unprofitable"> <%= number_with_precision(airplane_route.daily_profit, :precision => 2) %> </div>
+            <% end %>
+          </li>
+        </ul>
       </li>
     <% end %>
   </ul>
