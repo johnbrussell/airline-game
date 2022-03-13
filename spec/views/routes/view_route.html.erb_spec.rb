@@ -145,6 +145,7 @@ RSpec.describe "routes/view_route", type: :feature do
     visit game_airline_route_add_flights_path(game, -1, params: { origin_id: inu.id, destination_id: fun.id })
 
     expect(page).not_to have_content "#{airline.name} flights on FUN - INU"
+    expect(page).not_to have_content "Service quality"
     expect(page).not_to have_content "Add service on FUN - INU"
     expect(page).not_to have_button "Set frequencies"
     expect(page).to have_content "#{airline.name} cannot fly this route due to political restrictions"
@@ -197,6 +198,39 @@ RSpec.describe "routes/view_route", type: :feature do
     click_link "#{family.manufacturer} #{model.name}"
 
     expect(page).to have_content "Return to #{airline.name} fleet page"
+  end
+
+  it "allows users to adjust service quality" do
+    game = Fabricate(:game)
+    nauru = Market.find_by(name: "Nauru")
+    inu = Airport.find_by(iata: "INU")
+    fun = Airport.find_by(iata: "FUN")
+    airline = Fabricate(:airline, base_id: nauru.id, game_id: game.id, is_user_airline: true)
+    family = Fabricate(:aircraft_family)
+    model = Fabricate(:aircraft_model, max_range: 13000, takeoff_distance: 100, speed: 1000, family: family)
+    aircraft_1 = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, business_seats: 1)
+    gates_inu = Gates.create!(airport: inu, game: game, current_gates: 100)
+    Slot.create!(gates: gates_inu, lessee_id: airline.id)
+    Slot.create!(gates: gates_inu, lessee_id: airline.id)
+    Slot.create!(gates: gates_inu, lessee_id: airline.id)
+    gates_fun = Gates.create!(airport: fun, game: game, current_gates: 100)
+    Slot.create!(gates: gates_fun, lessee_id: airline.id)
+    Slot.create!(gates: gates_fun, lessee_id: airline.id)
+    Slot.create!(gates: gates_fun, lessee_id: airline.id)
+
+    frequencies = [1, 2, 3].sample
+    block_time = (aircraft_1.round_trip_block_time(Calculation::Distance.between_airports(inu, fun)) * frequencies / 60.0 / 7).round(1)
+
+    visit game_airline_route_add_flights_path(game, -1, params: { origin_id: inu.id, destination_id: fun.id })
+
+    expect(page).to have_content "No airline serves FUN - INU"
+    expect(page).to have_content "Service quality"
+
+    fill_in :service_quality, with: 5
+
+    click_on "Set service quality"
+
+    expect(AirlineRoute.last.service_quality).to eq 5
   end
 
   it "allows users to add and remove flights" do
