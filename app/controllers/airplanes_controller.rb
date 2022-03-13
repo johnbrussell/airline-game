@@ -1,4 +1,10 @@
 class AirplanesController < ApplicationController
+  def change_configuration
+    @game = Game.find(params[:game_id])
+    @airline = Airline.find(params[:airline_id])
+    @airplane = Airplane.find(params[:airplane_id])
+  end
+
   def index
     @game = Game.find(params[:game_id])
     @airline = Airline.find(params[:airline_id])
