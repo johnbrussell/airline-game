@@ -67,7 +67,7 @@ RSpec.describe "routes/view_route", type: :feature do
 
     revenue_calculator = instance_double(
       Calculation::MaximumRevenuePotential,
-      max_business_class_revenue_per_week: 100,
+      max_business_class_revenue_per_week: 1000,
       max_premium_economy_class_revenue_per_week: 200,
       max_economy_class_revenue_per_week: 400,
     )
@@ -80,7 +80,7 @@ RSpec.describe "routes/view_route", type: :feature do
     expect(page).to have_content "At current demand levels, this route can support up to:"
     expect(page).to have_content "$400.00 per week in economy class revenue"
     expect(page).to have_content "$200.00 per week in premium economy class revenue"
-    expect(page).to have_content "$100.00 per week in business class revenue"
+    expect(page).to have_content "$1,000.00 per week in business class revenue"
     expect(page).not_to have_content "#{airline.name} cannot fly this route due to political restrictions"
   end
 
