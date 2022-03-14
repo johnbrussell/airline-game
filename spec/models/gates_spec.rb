@@ -438,4 +438,43 @@ RSpec.describe Gates do
       expect(subject.num_available_slots).to eq 1
     end
   end
+
+  context "return a slot" do
+    it "shows an error if the airline does not have enough slots to return" do
+      game = Fabricate(:game)
+      airport = Fabricate(:airport)
+      other_airport = Fabricate(:airport, market: airport.market, iata: "ZZZ")
+      airline = Fabricate(:airline, base_id: airport.market.id)
+      subject = Gates.create!(airport: airport, game: game, current_gates: airport.start_gates)
+      used_slot = Slot.create!(gates_id: subject.id, lessee_id: airline.id)
+
+      airline_route = AirlineRoute.create!(airline: airline, distance: 1, economy_price: 1, business_price: 1, premium_economy_price: 1, origin_airport: airport, destination_airport: other_airport)
+      family = Fabricate(:aircraft_family)
+      airplane = Fabricate(:airplane, base_country_group: airline.base.country_group, aircraft_family: family)
+      AirplaneRoute.new(airplane: airplane, route: airline_route, frequencies: 1, flight_cost: 1, block_time_mins: 1).save(validate: false)
+
+      subject.reload
+      expect(Slot.num_leased(airline, airport)).to eq 1
+
+      subject.return_a_slot(airline)
+
+      expect(subject.errors.full_messages).to include "Slot cannot be returned while in use"
+      expect(Slot.num_leased(airline, airport)).to eq 1
+    end
+
+    it "returns the slot if the airline has returnable slots" do
+      game = Fabricate(:game)
+      airport = Fabricate(:airport)
+      other_airport = Fabricate(:airport, market: airport.market, iata: "ZZZ")
+      airline = Fabricate(:airline, base_id: airport.market.id)
+      subject = Gates.create!(airport: airport, game: game, current_gates: airport.start_gates)
+      unused_slot = Slot.create!(gates_id: subject.id, lessee_id: airline.id)
+
+      subject.reload
+      expect(Slot.num_leased(airline, airport)).to eq 1
+
+      expect(subject.return_a_slot(airline)).to be true
+      expect(Slot.num_leased(airline, airport)).to eq 0
+    end
+  end
 end
