@@ -23,6 +23,32 @@ RSpec.describe Slot do
     end
   end
 
+  context "leased" do
+    it "is zero when no slots are leased at the airport" do
+      airline = Fabricate(:airline, game_id: Game.last.id, base_id: Airport.last.market.id)
+
+      expect(Slot.leased(airline, Airport.last)).to eq []
+    end
+
+    it "accurately counts the number of slots leased" do
+      airline = Fabricate(:airline, game_id: Game.last.id, base_id: Airport.last.market.id)
+
+      slot = Slot.create!(gates_id: Gates.last.id, lessee_id: airline.id)
+
+      expect(Slot.leased(airline, Airport.last)).to eq [slot]
+    end
+
+    it "accurately counts the number of slots leased when there are multiple slots" do
+      airline = Fabricate(:airline, game_id: Game.last.id, base_id: Airport.last.market.id)
+
+      slot_1 = Slot.create!(gates_id: Gates.last.id, lessee_id: airline.id)
+      slot_2 = Slot.create!(gates_id: Gates.last.id, lessee_id: airline.id)
+      slot_3 = Slot.create!(gates_id: Gates.last.id, lessee_id: airline.id + 1)
+
+      expect(Slot.leased(airline, Airport.last)).to eq [slot_1, slot_2]
+    end
+  end
+
   context "num_leased" do
     it "is zero when no slots are leased at the airport" do
       airline = Fabricate(:airline, game_id: Game.last.id, base_id: Airport.last.market.id)
