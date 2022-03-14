@@ -127,4 +127,21 @@ RSpec.describe Slot do
       assert_in_epsilon Slot.percent_used(airline, maj), 100 / 3.0, 0.000001
     end
   end
+
+  context "return" do
+    it "sets the rent, lease expiry, and lessee to nil" do
+      airline = Fabricate(:airline, game_id: Game.last.id, base_id: Airport.last.market.id)
+
+      subject = Slot.create!(gates_id: Gates.last.id, lessee_id: airline.id, lease_expiry: Date.today, rent: 1)
+
+      expect(subject.return).to be true
+
+      subject.reload
+
+      expect(subject.lessee_id).to be nil
+      expect(subject.rent).to eq 0
+      expect(subject.lease_expiry).to be nil
+      expect(subject.gates_id).to eq Gates.last.id
+    end
+  end
 end

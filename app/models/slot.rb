@@ -32,4 +32,12 @@ class Slot < ApplicationRecord
   def self.percent_used(airline, airport)
     self.num_used(airline, airport) / self.num_leased(airline, airport).to_f * 100
   end
+
+  def return
+    update(
+      rent: 0,
+      lessee_id: nil,
+      lease_expiry: nil,
+    )
+  end
 end
