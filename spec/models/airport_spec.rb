@@ -53,4 +53,25 @@ RSpec.describe Airport do
       expect(subject.other_market_airports.first.iata).to eq "BOS"
     end
   end
+
+  context "with_slots" do
+    it "returns airports with slots for the specified airline" do
+      airline_1 = Fabricate(:airline)
+      airline_2 = Fabricate(:airline, name: "Different", base_id: airline_1.base.id)
+
+      bos = Fabricate(:airport, iata: "BOS", market: airline_1.base, municipality: "Boston")
+      sfo = Fabricate(:airport, iata: "SFO", market: airline_1.base, municipality: "San Francisco")
+
+      bos_gates = Gates.create!(airport_id: bos.id, current_gates: 5, game_id: airline_1.game_id)
+      sfo_gates = Gates.create!(airport_id: sfo.id, current_gates: 5, game_id: airline_1.game_id)
+
+      Slot.create!(lessee_id: airline_1.id, gates: sfo_gates)
+      Slot.create!(lessee_id: airline_1.id, gates: sfo_gates)
+      Slot.create!(lessee_id: airline_1.id, gates: bos_gates)
+      Slot.create!(lessee_id: airline_2.id, gates: sfo_gates)
+
+      expect(Airport.with_slots(airline_1)).to eq [bos, sfo]
+      expect(Airport.with_slots(airline_2)).to eq [sfo]
+    end
+  end
 end

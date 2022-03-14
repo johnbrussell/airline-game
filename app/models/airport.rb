@@ -27,6 +27,15 @@ class Airport < ApplicationRecord
     end
   end
 
+  def self.with_slots(airline)
+    Airport
+      .joins("INNER JOIN gates ON gates.airport_id == airports.id")
+      .joins("INNER JOIN slots ON slots.gates_id == gates.id")
+      .where("slots.lessee_id == ?", airline.id)
+      .order(:iata)
+      .uniq
+  end
+
   def display_name
     municipality || market.name
   end
