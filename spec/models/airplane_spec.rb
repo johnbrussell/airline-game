@@ -2086,6 +2086,8 @@ RSpec.describe Airplane do
         Airplane::RECONFIGURATION_COST_PER_SEAT_BUSINESS * 3 +
         subject.send(:daily_profit)
 
+      original_construction_date = subject.construction_date
+
       expect(subject.set_configuration(3, 2, 1)).to be true
 
       subject.reload
@@ -2097,8 +2099,43 @@ RSpec.describe Airplane do
       expect(subject.economy_seats).to eq 1
       expect(subject.premium_economy_seats).to eq 2
       expect(subject.business_seats).to eq 3
+      expect(subject.construction_date).to eq original_construction_date
       expect(airline_route.revenue.revenue).to eq 0
       expect(airplane_route.flight_cost).to be > 1
+    end
+
+    it "updates the configuration and delivery date while deducting no money from the airline if the new configuration is valid but the airplane is unbuilt" do
+      initial_cash_on_hand = 1000000
+      airline = Fabricate(:airline, cash_on_hand: initial_cash_on_hand)
+      game = Fabricate(:game)
+      queue = Fabricate(:aircraft_manufacturing_queue, aircraft_family_id: family.id, game: game)
+      subject = Fabricate(
+        :airplane,
+        aircraft_model: model,
+        aircraft_family: family,
+        base_country_group: airline.base.country_group,
+        operator_id: airline.id,
+        economy_seats: 50,
+        business_seats: 0,
+        premium_economy_seats: 0,
+        aircraft_manufacturing_queue: queue,
+        construction_date: game.current_date + 1.day,
+      )
+      subject.reload
+
+      cost_to_reconfigure = subject.send(:cost_to_reconfigure, 48, 2, 3)
+      expect(cost_to_reconfigure).to eq 0
+
+      expect(subject.set_configuration(3, 2, 48)).to be true
+
+      subject.reload
+      airline.reload
+
+      assert_in_epsilon airline.cash_on_hand, initial_cash_on_hand, 0.0000001
+      expect(subject.economy_seats).to eq 48
+      expect(subject.premium_economy_seats).to eq 2
+      expect(subject.business_seats).to eq 3
+      expect(subject.construction_date).to eq game.current_date + 2.days
     end
 
     it "does not update the configuration or deduct cash from the airline if the new configutation has too many seats" do

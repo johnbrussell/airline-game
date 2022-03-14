@@ -229,6 +229,7 @@ class Airplane < ApplicationRecord
       business_seats: new_business,
       premium_economy_seats: new_premium_economy,
       economy_seats: new_economy,
+      construction_date: if built? then construction_date else [construction_date, game.current_date + days_to_reconfigure(new_business + new_premium_economy + new_economy)].max end,
     )
 
     airplane_routes.each do |airplane_route|
@@ -297,10 +298,14 @@ class Airplane < ApplicationRecord
     end
 
     def cost_to_reconfigure(new_economy, new_premium_economy, new_business)
-      days_to_reconfigure(new_economy + new_premium_economy + new_business) * daily_profit +
-        new_economy * RECONFIGURATION_COST_PER_SEAT_ECONOMY +
-        new_premium_economy * RECONFIGURATION_COST_PER_SEAT_PREMIUM_ECONOMY +
-        new_business * RECONFIGURATION_COST_PER_SEAT_BUSINESS
+      if built?
+        days_to_reconfigure(new_economy + new_premium_economy + new_business) * daily_profit +
+          new_economy * RECONFIGURATION_COST_PER_SEAT_ECONOMY +
+          new_premium_economy * RECONFIGURATION_COST_PER_SEAT_PREMIUM_ECONOMY +
+          new_business * RECONFIGURATION_COST_PER_SEAT_BUSINESS
+      else
+        0
+      end
     end
 
     def daily_lease_expense
