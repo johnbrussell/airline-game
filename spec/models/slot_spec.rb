@@ -74,4 +74,57 @@ RSpec.describe Slot do
       expect(Slot.num_used(airline, maj)).to eq 1
     end
   end
+
+  context "percent used" do
+    it "accurately calculates the percentage of slots that are used" do
+      airline = Fabricate(:airline, game_id: Game.last.id, base_id: Airport.last.market.id)
+      other_airline = Fabricate(:airline, game_id: Game.last.id, base_id: Airport.last.market.id)
+
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, market: inu.market, iata: "FUN")
+      maj = Fabricate(:airport, market: inu.market, iata: "MAJ")
+
+      family = Fabricate(:aircraft_family)
+      airplane = Fabricate(:airplane, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group)
+      other_airplane = Fabricate(:airplane, aircraft_family: family, operator_id: other_airline.id, base_country_group: other_airline.base.country_group)
+
+      AirlineRoute.new(airline: airline, origin_airport: fun, destination_airport: inu, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 1).save(validate: false)
+      fun_inu = AirlineRoute.last
+      AirlineRoute.new(airline: airline, origin_airport: inu, destination_airport: maj, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 1).save(validate: false)
+      inu_maj = AirlineRoute.last
+      AirplaneRoute.new(airplane: airplane, route: fun_inu, frequencies: 3, block_time_mins: 1, flight_cost: 3).save(validate: false)
+      AirplaneRoute.new(airplane: airplane, route: inu_maj, frequencies: 1, block_time_mins: 1, flight_cost: 3).save(validate: false)
+
+      AirlineRoute.new(airline: other_airline, origin_airport: fun, destination_airport: maj, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 1).save(validate: false)
+      fun_maj = AirlineRoute.last
+      AirplaneRoute.new(airplane: other_airplane, route: fun_maj, frequencies: 5, block_time_mins: 1, flight_cost: 2).save(validate: false)
+
+      inu_gates = Gates.create!(airport: inu, current_gates: 5, game: Game.find(airline.game_id))
+      Slot.create!(gates: inu_gates, lessee_id: airline.id)
+      Slot.create!(gates: inu_gates, lessee_id: airline.id)
+      Slot.create!(gates: inu_gates, lessee_id: airline.id)
+      Slot.create!(gates: inu_gates, lessee_id: airline.id)
+      fun_gates = Gates.create!(airport: fun, current_gates: 5, game: Game.find(airline.game_id))
+      Slot.create!(gates: fun_gates, lessee_id: airline.id)
+      Slot.create!(gates: fun_gates, lessee_id: airline.id)
+      Slot.create!(gates: fun_gates, lessee_id: airline.id)
+      Slot.create!(gates: fun_gates, lessee_id: airline.id)
+      maj_gates = Gates.create!(airport: maj, current_gates: 5, game: Game.find(airline.game_id))
+      Slot.create!(gates: maj_gates, lessee_id: airline.id)
+      Slot.create!(gates: maj_gates, lessee_id: airline.id)
+      Slot.create!(gates: maj_gates, lessee_id: airline.id)
+
+      expect(Slot.num_leased(airline, inu)).to eq 4
+      expect(Slot.num_leased(airline, fun)).to eq 4
+      expect(Slot.num_leased(airline, maj)).to eq 3
+
+      expect(Slot.num_used(airline, inu)).to eq 4
+      expect(Slot.num_used(airline, fun)).to eq 3
+      expect(Slot.num_used(airline, maj)).to eq 1
+
+      expect(Slot.percent_used(airline, inu)).to eq 100
+      expect(Slot.percent_used(airline, fun)).to eq 75
+      assert_in_epsilon Slot.percent_used(airline, maj), 100 / 3.0, 0.000001
+    end
+  end
 end
