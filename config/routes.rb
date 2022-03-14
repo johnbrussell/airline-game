@@ -7,6 +7,8 @@ Rails.application.routes.draw do
         get "/change_configuration", to: "airplanes#change_configuration"
       end
 
+      resources :slots
+
       get "/routes", to: "routes#index"
     end
 

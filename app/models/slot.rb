@@ -28,4 +28,8 @@ class Slot < ApplicationRecord
       .joins(:airplane_routes)
       .sum("airplane_routes.frequencies")
   end
+
+  def self.percent_used(airline, airport)
+    self.num_used(airline, airport) / self.num_leased(airline, airport).to_f * 100
+  end
 end

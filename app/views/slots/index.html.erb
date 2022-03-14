@@ -1,0 +1,11 @@
+<h1>Airline Game</h1>
+
+<h2><%= "#{@airline.name} slot holdings" %></h2>
+
+<ul>
+  <% @airports.each do |airport| %>
+    <li>
+      <a href=<%= game_airport_path(@game, airport) %>> <%= airport.iata %></a>: <%= Slot.num_leased(@airline, airport) %> leased, <%= Slot.num_used(@airline, airport) %> used (<%= number_with_precision(Slot.percent_used(@airline, airport), :precision => 0) %>%)
+    </li>
+  <% end %>
+</ul>
