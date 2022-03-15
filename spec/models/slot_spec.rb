@@ -23,6 +23,32 @@ RSpec.describe Slot do
     end
   end
 
+  context "leased" do
+    it "is zero when no slots are leased at the airport" do
+      airline = Fabricate(:airline, game_id: Game.last.id, base_id: Airport.last.market.id)
+
+      expect(Slot.leased(airline, Airport.last)).to eq []
+    end
+
+    it "accurately counts the number of slots leased" do
+      airline = Fabricate(:airline, game_id: Game.last.id, base_id: Airport.last.market.id)
+
+      slot = Slot.create!(gates_id: Gates.last.id, lessee_id: airline.id)
+
+      expect(Slot.leased(airline, Airport.last)).to eq [slot]
+    end
+
+    it "accurately counts the number of slots leased when there are multiple slots" do
+      airline = Fabricate(:airline, game_id: Game.last.id, base_id: Airport.last.market.id)
+
+      slot_1 = Slot.create!(gates_id: Gates.last.id, lessee_id: airline.id)
+      slot_2 = Slot.create!(gates_id: Gates.last.id, lessee_id: airline.id)
+      slot_3 = Slot.create!(gates_id: Gates.last.id, lessee_id: airline.id + 1)
+
+      expect(Slot.leased(airline, Airport.last)).to eq [slot_1, slot_2]
+    end
+  end
+
   context "num_leased" do
     it "is zero when no slots are leased at the airport" do
       airline = Fabricate(:airline, game_id: Game.last.id, base_id: Airport.last.market.id)
@@ -125,6 +151,23 @@ RSpec.describe Slot do
       expect(Slot.percent_used(airline, inu)).to eq 100
       expect(Slot.percent_used(airline, fun)).to eq 75
       assert_in_epsilon Slot.percent_used(airline, maj), 100 / 3.0, 0.000001
+    end
+  end
+
+  context "return" do
+    it "sets the rent, lease expiry, and lessee to nil" do
+      airline = Fabricate(:airline, game_id: Game.last.id, base_id: Airport.last.market.id)
+
+      subject = Slot.create!(gates_id: Gates.last.id, lessee_id: airline.id, lease_expiry: Date.today, rent: 1)
+
+      expect(subject.return).to be true
+
+      subject.reload
+
+      expect(subject.lessee_id).to be nil
+      expect(subject.rent).to eq 0
+      expect(subject.lease_expiry).to be nil
+      expect(subject.gates_id).to eq Gates.last.id
     end
   end
 end

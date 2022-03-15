@@ -83,6 +83,14 @@ class Gates < ApplicationRecord
     slots.available.count
   end
 
+  def return_a_slot(airline)
+    if Slot.num_leased(airline, airport) <= Slot.num_used(airline, airport)
+      errors.add(:slot, "cannot be returned while in use")
+    else
+      Slot.leased(airline, airport).last.return
+    end
+  end
+
   private
 
     def current_gates_greater_than_start_gates

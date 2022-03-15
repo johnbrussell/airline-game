@@ -11,11 +11,16 @@ class Slot < ApplicationRecord
     insert_all!([{ "gates_id": gates_id, created_at: Time.now, updated_at: Time.now }] * num)
   end
 
-  def self.num_leased(airline, airport)
+  def self.leased(airline, airport)
     Slot
       .where(lessee_id: airline.id)
       .joins(:gates)
       .where("gates.airport_id == ?", airport.id)
+  end
+
+  def self.num_leased(airline, airport)
+    Slot
+      .leased(airline, airport)
       .count
   end
 
@@ -31,5 +36,13 @@ class Slot < ApplicationRecord
 
   def self.percent_used(airline, airport)
     self.num_used(airline, airport) / self.num_leased(airline, airport).to_f * 100
+  end
+
+  def return
+    update(
+      rent: 0,
+      lessee_id: nil,
+      lease_expiry: nil,
+    )
   end
 end

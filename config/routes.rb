@@ -8,6 +8,8 @@ Rails.application.routes.draw do
       end
 
       resources :slots
+      get "/return_a_slot", to: "slots#index"
+      patch "/return_a_slot", to: "slots#return"
 
       get "/routes", to: "routes#index"
     end
