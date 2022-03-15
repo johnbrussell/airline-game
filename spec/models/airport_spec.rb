@@ -54,6 +54,29 @@ RSpec.describe Airport do
     end
   end
 
+  context "slot_expenditures" do
+    it "calculates correctly" do
+      game = Fabricate(:game)
+      airport = Fabricate(:airport)
+      other_airport = Fabricate(:airport, market: airport.market, iata: "GBR")
+      airline = Fabricate(:airline, base_id: airport.market.id)
+      gates = Gates.create!(airport: airport, current_gates: airport.start_gates, game: game)
+      Slot.create!(gates: gates, lessee_id: airline.id, rent: 1)
+
+      airport.reload
+      other_airport.reload
+
+      expect(airport.slot_expenditures(airline)).to eq 1
+      expect(other_airport.slot_expenditures(airline)).to eq 0
+
+      Slot.create!(gates: gates, lessee_id: airline.id, rent: 1000)
+
+      airport.reload
+
+      expect(airport.slot_expenditures(airline)).to eq 1001
+    end
+  end
+
   context "with_slots" do
     it "returns airports with slots for the specified airline" do
       airline_1 = Fabricate(:airline)

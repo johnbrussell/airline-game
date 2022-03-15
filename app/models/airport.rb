@@ -51,4 +51,8 @@ class Airport < ApplicationRecord
   def other_market_airports
     market.airports.reject{ |airport| airport.iata == iata }
   end
+
+  def slot_expenditures(airline)
+    Slot.leased(airline, self).sum(&:rent)
+  end
 end
