@@ -43,9 +43,9 @@ RSpec.describe "slots/index", type: :feature do
     end
 
     it "shows information about all airports where the airline has slots" do
-      inu = Fabricate(:airport, iata: "INU")
-      fun = Fabricate(:airport, market: inu.market, iata: "FUN")
-      maj = Fabricate(:airport, market: inu.market, iata: "MAJ")
+      inu = Fabricate(:airport, iata: "INU", municipality: nil)
+      fun = Fabricate(:airport, market: inu.market, iata: "FUN", municipality: "Funafuti")
+      maj = Fabricate(:airport, market: inu.market, iata: "MAJ", municipality: "Majuro")
 
       Population.create!(market_id: inu.market.id, year: 2000, population: 10000)
       Tourists.create!(market_id: inu.market.id, year: 1999, volume: 1000)
@@ -85,9 +85,9 @@ RSpec.describe "slots/index", type: :feature do
       expect(page).to have_link "FUN"
       expect(page).to have_link "MAJ"
 
-      expect(page).to have_content "INU: 4 leased, 4 used (100%)"
-      expect(page).to have_content "FUN: 4 leased, 3 used (75%)"
-      expect(page).to have_content "MAJ: 3 leased, 1 used (33%)"
+      expect(page).to have_content "INU - #{inu.market.name}: 4 leased, 4 used (100%)"
+      expect(page).to have_content "FUN - Funafuti: 4 leased, 3 used (75%)"
+      expect(page).to have_content "MAJ - Majuro: 3 leased, 1 used (33%)"
 
       click_link "INU"
 
@@ -96,9 +96,8 @@ RSpec.describe "slots/index", type: :feature do
     end
 
     it "allows users to return a slot and refresh the page" do
-      inu = Fabricate(:airport, iata: "INU")
-      fun = Fabricate(:airport, market: inu.market, iata: "FUN")
-      maj = Fabricate(:airport, market: inu.market, iata: "MAJ")
+      inu = Fabricate(:airport, iata: "INU", municipality: nil)
+      fun = Fabricate(:airport, market: inu.market, iata: "FUN", municipality: "Funafuti")
 
       Population.create!(market_id: inu.market.id, year: 2000, population: 10000)
       Tourists.create!(market_id: inu.market.id, year: 1999, volume: 1000)
@@ -129,19 +128,19 @@ RSpec.describe "slots/index", type: :feature do
       expect(page).to have_link "INU"
       expect(page).to have_link "FUN"
 
-      expect(page).to have_content "INU: 3 leased, 3 used (100%)"
-      expect(page).to have_content "FUN: 4 leased, 3 used (75%)"
+      expect(page).to have_content "INU - #{inu.market.name}: 3 leased, 3 used (100%)"
+      expect(page).to have_content "FUN - Funafuti: 4 leased, 3 used (75%)"
 
       expect(page).to have_button "Return a slot"
 
       click_button "Return a slot"
 
-      expect(page).to have_content "FUN: 3 leased, 3 used (100%)"
+      expect(page).to have_content "FUN - Funafuti: 3 leased, 3 used (100%)"
       expect(page).not_to have_button "Return a slot"
 
       visit current_path
 
-      expect(page).to have_content "FUN: 3 leased, 3 used (100%)"
+      expect(page).to have_content "FUN - Funafuti: 3 leased, 3 used (100%)"
     end
   end
 end
