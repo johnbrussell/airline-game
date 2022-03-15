@@ -2,6 +2,19 @@ require "rails_helper"
 
 RSpec.describe "slots/index", type: :feature do
   context "viewing the page" do
+    it "has a link back to the game homepage" do
+      airline = Fabricate(:airline, is_user_airline: true)
+      game = Game.find(airline.game_id)
+
+      visit game_airline_slots_path(game, airline)
+
+      expect(page).to have_link "Return to game overview"
+
+      click_link "Return to game overview"
+
+      expect(page).to have_content "Airline Game Home"
+    end
+
     it "shows information about all airports where the airline has slots" do
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, market: inu.market, iata: "FUN")
