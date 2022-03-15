@@ -1,14 +1,28 @@
 <h1>Airline Game</h1>
 
+<p>
+  <a href=<%=game_path(@game)%> >Return to game overview</a> <br/>
+  <a href=<%=game_airline_path(@game, @airline)%>>Return to <%= @airline.name %></a><br/>
+  <a href=<%=game_airports_path(@game)%>>View a different airport</a>
+</p>
+
 <h2><%= "#{@airline.name} slot holdings" %></h2>
 
 <ul>
   <% @airports.each do |airport| %>
     <li>
-      <a href=<%= game_airport_path(@game, airport) %>> <%= airport.iata %></a>: <%= Slot.num_leased(@airline, airport) %> leased, <%= Slot.num_used(@airline, airport) %> used (<%= number_with_precision(Slot.percent_used(@airline, airport), :precision => 0) %>%)
-      <% if Slot.num_used(@airline, airport) < Slot.num_leased(@airline, airport) %>
-        <%= button_to "Return a slot", game_airline_return_a_slot_path(@game, @airline), params: { airport_id: airport.id }, method: :patch %>
-      <% end %>
+      <a href=<%= game_airport_path(@game, airport) %>> <%= airport.iata %></a> - <%= airport.display_name %>
+      <ul>
+        <li>
+          <%= Slot.num_leased(@airline, airport) %> leased, <%= Slot.num_used(@airline, airport) %> used (<%= number_with_precision(Slot.percent_used(@airline, airport), :precision => 0) %>%).
+          <% if Slot.num_used(@airline, airport) < Slot.num_leased(@airline, airport) %>
+            <%= button_to "Return a slot", game_airline_return_a_slot_path(@game, @airline), params: { airport_id: airport.id }, method: :patch %>
+          <% end %>
+        </li>
+        <li>
+          Rent $<%= number_with_precision(airport.slot_expenditures(@airline), :precision => 2) %> daily
+        </li>
+      </ul>
     </li>
   <% end %>
 </ul>
