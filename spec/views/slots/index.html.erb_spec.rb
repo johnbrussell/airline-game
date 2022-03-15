@@ -29,6 +29,19 @@ RSpec.describe "slots/index", type: :feature do
       expect(page).to have_content "View slot holdings"
     end
 
+    it "has a link back to the airport selection page" do
+      airline = Fabricate(:airline)
+      game = Game.find(airline.game_id)
+
+      visit game_airline_slots_path(game, airline)
+
+      expect(page).to have_link "View a different airport"
+
+      click_link "View a different airport"
+
+      expect(page).to have_content "Select an airport to view"
+    end
+
     it "shows information about all airports where the airline has slots" do
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, market: inu.market, iata: "FUN")
