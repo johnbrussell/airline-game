@@ -64,19 +64,19 @@ RSpec.describe "slots/index", type: :feature do
       AirplaneRoute.new(airplane: airplane, route: inu_maj, frequencies: 1, block_time_mins: 1, flight_cost: 3).save(validate: false)
 
       inu_gates = Gates.create!(airport: inu, current_gates: 5, game: game)
-      Slot.create!(gates: inu_gates, lessee_id: airline.id)
-      Slot.create!(gates: inu_gates, lessee_id: airline.id)
-      Slot.create!(gates: inu_gates, lessee_id: airline.id)
-      Slot.create!(gates: inu_gates, lessee_id: airline.id)
+      Slot.create!(gates: inu_gates, lessee_id: airline.id, rent: 2.51)
+      Slot.create!(gates: inu_gates, lessee_id: airline.id, rent: 2.51)
+      Slot.create!(gates: inu_gates, lessee_id: airline.id, rent: 2.51)
+      Slot.create!(gates: inu_gates, lessee_id: airline.id, rent: 2.51)
       fun_gates = Gates.create!(airport: fun, current_gates: 5, game: game)
-      Slot.create!(gates: fun_gates, lessee_id: airline.id)
-      Slot.create!(gates: fun_gates, lessee_id: airline.id)
-      Slot.create!(gates: fun_gates, lessee_id: airline.id)
-      Slot.create!(gates: fun_gates, lessee_id: airline.id)
+      Slot.create!(gates: fun_gates, lessee_id: airline.id, rent: 2)
+      Slot.create!(gates: fun_gates, lessee_id: airline.id, rent: 2)
+      Slot.create!(gates: fun_gates, lessee_id: airline.id, rent: 2)
+      Slot.create!(gates: fun_gates, lessee_id: airline.id, rent: 2)
       maj_gates = Gates.create!(airport: maj, current_gates: 5, game: game)
-      Slot.create!(gates: maj_gates, lessee_id: airline.id)
-      Slot.create!(gates: maj_gates, lessee_id: airline.id)
-      Slot.create!(gates: maj_gates, lessee_id: airline.id)
+      Slot.create!(gates: maj_gates, lessee_id: airline.id, rent: 1)
+      Slot.create!(gates: maj_gates, lessee_id: airline.id, rent: 1)
+      Slot.create!(gates: maj_gates, lessee_id: airline.id, rent: 1)
 
       visit game_airline_slots_path(game, airline)
 
@@ -85,9 +85,9 @@ RSpec.describe "slots/index", type: :feature do
       expect(page).to have_link "FUN"
       expect(page).to have_link "MAJ"
 
-      expect(page).to have_content "INU - #{inu.market.name}: 4 leased, 4 used (100%)"
-      expect(page).to have_content "FUN - Funafuti: 4 leased, 3 used (75%)"
-      expect(page).to have_content "MAJ - Majuro: 3 leased, 1 used (33%)"
+      expect(page).to have_content "INU - #{inu.market.name}\n4 leased, 4 used (100%). Rent $10.04 daily"
+      expect(page).to have_content "FUN - Funafuti\n4 leased, 3 used (75%).\nRent $8.00 daily"
+      expect(page).to have_content "MAJ - Majuro\n3 leased, 1 used (33%).\nRent $3.00 daily"
 
       click_link "INU"
 
@@ -113,14 +113,14 @@ RSpec.describe "slots/index", type: :feature do
       AirplaneRoute.new(airplane: airplane, route: fun_inu, frequencies: 3, block_time_mins: 1, flight_cost: 3).save(validate: false)
 
       inu_gates = Gates.create!(airport: inu, current_gates: 5, game: game)
-      Slot.create!(gates: inu_gates, lessee_id: airline.id)
-      Slot.create!(gates: inu_gates, lessee_id: airline.id)
-      Slot.create!(gates: inu_gates, lessee_id: airline.id)
+      Slot.create!(gates: inu_gates, lessee_id: airline.id, rent: 4.56)
+      Slot.create!(gates: inu_gates, lessee_id: airline.id, rent: 4.56)
+      Slot.create!(gates: inu_gates, lessee_id: airline.id, rent: 4.56)
       fun_gates = Gates.create!(airport: fun, current_gates: 5, game: game)
-      Slot.create!(gates: fun_gates, lessee_id: airline.id)
-      Slot.create!(gates: fun_gates, lessee_id: airline.id)
-      Slot.create!(gates: fun_gates, lessee_id: airline.id)
-      Slot.create!(gates: fun_gates, lessee_id: airline.id)
+      Slot.create!(gates: fun_gates, lessee_id: airline.id, rent: 1.23)
+      Slot.create!(gates: fun_gates, lessee_id: airline.id, rent: 1.23)
+      Slot.create!(gates: fun_gates, lessee_id: airline.id, rent: 1.23)
+      Slot.create!(gates: fun_gates, lessee_id: airline.id, rent: 1.23)
 
       visit game_airline_slots_path(game, airline)
 
@@ -128,19 +128,19 @@ RSpec.describe "slots/index", type: :feature do
       expect(page).to have_link "INU"
       expect(page).to have_link "FUN"
 
-      expect(page).to have_content "INU - #{inu.market.name}: 3 leased, 3 used (100%)"
-      expect(page).to have_content "FUN - Funafuti: 4 leased, 3 used (75%)"
+      expect(page).to have_content "INU - #{inu.market.name}\n3 leased, 3 used (100%). Rent $13.68 daily"
+      expect(page).to have_content "FUN - Funafuti\n4 leased, 3 used (75%).\nRent $4.92 daily"
 
       expect(page).to have_button "Return a slot"
 
       click_button "Return a slot"
 
-      expect(page).to have_content "FUN - Funafuti: 3 leased, 3 used (100%)"
+      expect(page).to have_content "FUN - Funafuti\n3 leased, 3 used (100%). Rent $3.69 daily"
       expect(page).not_to have_button "Return a slot"
 
       visit current_path
 
-      expect(page).to have_content "FUN - Funafuti: 3 leased, 3 used (100%)"
+      expect(page).to have_content "FUN - Funafuti\n3 leased, 3 used (100%). Rent $3.69 daily"
     end
   end
 end
