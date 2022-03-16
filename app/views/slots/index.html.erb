@@ -8,6 +8,10 @@
 
 <h2><%= "#{@airline.name} slot holdings" %></h2>
 
+<p>
+  Total expenditures: $<%= number_with_precision(Slot.total_expenditures(@airline), :precision => 2, :delimiter => ",") %> daily
+</p>
+
 <ul>
   <% @airports.each do |airport| %>
     <li>
