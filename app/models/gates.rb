@@ -37,7 +37,7 @@ class Gates < ApplicationRecord
           "gates_id": id,
           "lessee_id": airline.id,
           "lease_expiry": current_date + NEW_SLOT_LEASE_DURATION,
-          "rent": Calculation::SlotRent.calculate(airport, game),
+          "rent": Calculation::SlotRent.calculate(airport, game).to_f / Slot::LEASE_TERM_DAYS,
           "created_at": Time.now,
           "updated_at": Time.now,
         }
@@ -57,7 +57,7 @@ class Gates < ApplicationRecord
     if RivalCountryGroup.rivals?(airline.base.country_group, airport.market.country_group)
       errors.add(:airline, "cannot lease slots due to political restrictions")
     elsif num_available_slots > 0
-      rent = Calculation::SlotRent.calculate(airport, game) / Slot::LEASE_TERM_DAYS # Calculation::SlotRent assumes term is Slot::LEASE_TERM_DAYS
+      rent = Calculation::SlotRent.calculate(airport, game).to_f / Slot::LEASE_TERM_DAYS # Calculation::SlotRent assumes term is Slot::LEASE_TERM_DAYS
       slot = slots.available.first
       slot.assign_attributes(
         lessee_id: airline.id,

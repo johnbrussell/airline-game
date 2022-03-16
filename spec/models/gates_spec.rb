@@ -89,7 +89,7 @@ RSpec.describe Gates do
       old_slots = gates.slots.count
       old_cash_on_hand = airline.cash_on_hand
 
-      expect(Calculation::SlotRent).to receive(:calculate).with(airport, game).and_return 100
+      expect(Calculation::SlotRent).to receive(:calculate).with(airport, game).and_return 300
 
       gates.build_new_gate(airline, date)
       gates.reload
@@ -102,7 +102,7 @@ RSpec.describe Gates do
 
       expect(slot.lessee_id).to eq airline.id
       expect(slot.lease_expiry).to eq date + Gates::NEW_SLOT_LEASE_DURATION
-      expect(slot.rent).to eq 100
+      expect(slot.rent).to eq 10
 
       airline.reload
 
@@ -120,7 +120,7 @@ RSpec.describe Gates do
 
       expect(slot.lessee_id).to eq airline.id
       expect(slot.lease_expiry).to eq date + Gates::NEW_SLOT_LEASE_DURATION
-      expect(slot.rent).to eq 150
+      expect(slot.rent).to eq 5
     end
 
     it "adds an error if the airline does not have enough cash on hand" do

@@ -170,4 +170,34 @@ RSpec.describe Slot do
       expect(subject.gates_id).to eq Gates.last.id
     end
   end
+
+  context "total_expenditures" do
+    it "accurately calculates the total rent" do
+      airline = Fabricate(:airline, game_id: Game.last.id, base_id: Airport.last.market.id)
+      other_airline = Fabricate(:airline, game_id: Game.last.id, base_id: Airport.last.market.id)
+
+      inu = Fabricate(:airport, iata: "INU")
+      fun = Fabricate(:airport, market: inu.market, iata: "FUN")
+      maj = Fabricate(:airport, market: inu.market, iata: "MAJ")
+
+      inu_gates = Gates.create!(airport: inu, current_gates: 5, game: Game.find(airline.game_id))
+      Slot.create!(gates: inu_gates, lessee_id: airline.id, rent: 2)
+      Slot.create!(gates: inu_gates, lessee_id: airline.id, rent: 20)
+      Slot.create!(gates: inu_gates, lessee_id: airline.id, rent: 24)
+      Slot.create!(gates: inu_gates, lessee_id: airline.id, rent: 0.5)
+      fun_gates = Gates.create!(airport: fun, current_gates: 5, game: Game.find(airline.game_id))
+      Slot.create!(gates: fun_gates, lessee_id: airline.id, rent: 0.45)
+      Slot.create!(gates: fun_gates, lessee_id: airline.id, rent: 0.05)
+      Slot.create!(gates: fun_gates, lessee_id: airline.id, rent: 1)
+      Slot.create!(gates: fun_gates, lessee_id: airline.id, rent: 1)
+      maj_gates = Gates.create!(airport: maj, current_gates: 5, game: Game.find(airline.game_id))
+      Slot.create!(gates: maj_gates, lessee_id: airline.id, rent: 2)
+      Slot.create!(gates: maj_gates, lessee_id: airline.id, rent: 1)
+      Slot.create!(gates: maj_gates, lessee_id: airline.id, rent: 3)
+      Slot.create!(gates: maj_gates, lessee_id: other_airline.id, rent: 3)
+
+      expect(Slot.total_expenditures(airline)).to eq 55
+      expect(Slot.total_expenditures(other_airline)).to eq 3
+    end
+  end
 end

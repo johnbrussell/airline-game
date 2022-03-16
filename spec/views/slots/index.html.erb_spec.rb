@@ -88,6 +88,7 @@ RSpec.describe "slots/index", type: :feature do
       expect(page).to have_content "INU - #{inu.market.name}\n4 leased, 4 used (100%). Rent $10.04 daily"
       expect(page).to have_content "FUN - Funafuti\n4 leased, 3 used (75%).\nRent $8.00 daily"
       expect(page).to have_content "MAJ - Majuro\n3 leased, 1 used (33%).\nRent $3.00 daily"
+      expect(page).to have_content "Total expenditures: $21.04 daily"
 
       click_link "INU"
 
@@ -130,12 +131,14 @@ RSpec.describe "slots/index", type: :feature do
 
       expect(page).to have_content "INU - #{inu.market.name}\n3 leased, 3 used (100%). Rent $13.68 daily"
       expect(page).to have_content "FUN - Funafuti\n4 leased, 3 used (75%).\nRent $4.92 daily"
+      expect(page).to have_content "Total expenditures: $18.60 daily"
 
       expect(page).to have_button "Return a slot"
 
       click_button "Return a slot"
 
       expect(page).to have_content "FUN - Funafuti\n3 leased, 3 used (100%). Rent $3.69 daily"
+      expect(page).to have_content "Total expenditures: $17.37 daily"
       expect(page).not_to have_button "Return a slot"
 
       visit current_path
