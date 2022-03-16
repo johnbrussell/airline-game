@@ -38,6 +38,12 @@ class Slot < ApplicationRecord
     self.num_used(airline, airport) / self.num_leased(airline, airport).to_f * 100
   end
 
+  def self.total_expenditures(airline)
+    Slot
+      .where(lessee_id: airline.id)
+      .sum(&:rent)
+  end
+
   def return
     update(
       rent: 0,
