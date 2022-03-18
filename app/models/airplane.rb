@@ -223,30 +223,11 @@ class Airplane < ApplicationRecord
   end
 
   def set_configuration(new_business, new_premium_economy, new_economy)
-    new_configuratin_cost = cost_to_reconfigure(new_economy, new_premium_economy, new_business)
-
-    assign_attributes(
-      business_seats: new_business,
-      premium_economy_seats: new_premium_economy,
-      economy_seats: new_economy,
-      construction_date: if built? then construction_date else [construction_date, game.current_date + days_to_reconfigure(new_business + new_premium_economy + new_economy)].max end,
-    )
-
-    airplane_routes.each do |airplane_route|
-      airplane_route.assign_attributes(
-        block_time_mins: (round_trip_block_time(airplane_route.route.distance) * airplane_route.frequencies).round,
-      )
+    if is_same_configuration?(new_economy, new_premium_economy, new_business)
+      true
+    else
+      update_configuration(new_economy, new_premium_economy, new_business)
     end
-    validate
-
-    if operator.cash_on_hand < new_configuratin_cost
-      errors.add(:airline, "does not have enough cash on hand to reconfigure")
-    end
-
-    errors.none? &&
-      save &&
-      operator.update!(cash_on_hand: operator.cash_on_hand - new_configuratin_cost) &&
-      airplane_routes.each(&:recalculate_profits_and_block_time) && true
   end
 
   def takeoff_distance(elevation, flight_distance)
@@ -318,6 +299,10 @@ class Airplane < ApplicationRecord
 
     def floor_space_used
       ECONOMY_SEAT_SIZE * economy_seats + PREMIUM_ECONOMY_SEAT_SIZE * premium_economy_seats + BUSINESS_SEAT_SIZE * business_seats
+    end
+
+    def is_same_configuration?(economy, premium_economy, business)
+      economy == economy_seats && premium_economy == premium_economy_seats && business == business_seats
     end
 
     def is_transfer_while_utilized?
@@ -413,6 +398,33 @@ class Airplane < ApplicationRecord
 
     def total_flights
       airplane_routes.map{ |r| r.frequencies * 2 }.sum
+    end
+
+    def update_configuration(new_economy, new_premium_economy, new_business)
+      new_configuratin_cost = cost_to_reconfigure(new_economy, new_premium_economy, new_business)
+
+      assign_attributes(
+        business_seats: new_business,
+        premium_economy_seats: new_premium_economy,
+        economy_seats: new_economy,
+        construction_date: if built? then construction_date else [construction_date, game.current_date + days_to_reconfigure(new_business + new_premium_economy + new_economy)].max end,
+      )
+
+      airplane_routes.each do |airplane_route|
+        airplane_route.assign_attributes(
+          block_time_mins: (round_trip_block_time(airplane_route.route.distance) * airplane_route.frequencies).round,
+        )
+      end
+      validate
+
+      if operator.cash_on_hand < new_configuratin_cost
+        errors.add(:airline, "does not have enough cash on hand to reconfigure")
+      end
+
+      errors.none? &&
+        save &&
+        operator.update!(cash_on_hand: operator.cash_on_hand - new_configuratin_cost) &&
+        airplane_routes.each(&:recalculate_profits_and_block_time) && true
     end
 
     def update_downstream_block_times

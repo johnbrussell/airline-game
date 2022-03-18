@@ -2104,6 +2104,43 @@ RSpec.describe Airplane do
       expect(airplane_route.flight_cost).to be > 1
     end
 
+    it "does not update the configuration, deduct cash from the airline, update the flight costs, or adjust the revenue on affected routes if the new configuration is equal to the old" do
+      initial_cash_on_hand = 1000000
+      airline = Fabricate(:airline, cash_on_hand: initial_cash_on_hand)
+      subject = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, base_country_group: airline.base.country_group, operator_id: airline.id, economy_seats: 50, business_seats: 0, premium_economy_seats: 0)
+      game = Game.find(airline.game_id)
+      bos = Fabricate(:airport, iata: "BOS", market: airline.base, runway: 10000)
+      bos_gates = Gates.create!(airport: bos, game: game, current_gates: 5)
+      Slot.create!(lessee_id: airline.id, gates: bos_gates)
+      Population.create!(market_id: airline.base.id, year: 2000, population: 100)
+      Tourists.create!(market_id: airline.base.id, year: 2000, volume: 10)
+      lax = Fabricate(:airport, iata: "LAX", market: airline.base, runway: 10000)
+      lax_gates = Gates.create!(airport: lax, game: game, current_gates: 5)
+      Slot.create!(lessee_id: airline.id, gates: lax_gates)
+      airline_route = AirlineRoute.create!(airline: airline, origin_airport: bos, destination_airport: lax, distance: 2, economy_price: 1, business_price: 2, premium_economy_price: 2)
+      AirplaneRoute.new(airplane: subject, route: airline_route, flight_cost: 1, frequencies: 1, block_time_mins: 1).save(validate: false)
+      airplane_route = AirplaneRoute.last
+      AirlineRouteRevenue.create!(airline_route: airline_route, revenue: 100, economy_pax: 50, business_pax: 0, premium_economy_pax: 0, exclusive_economy_revenue: 0, exclusive_business_revenue: 0, exclusive_premium_economy_revenue: 0)
+      subject.reload
+
+      original_construction_date = subject.construction_date
+
+      expect(subject.set_configuration(0, 0, 50)).to be true
+
+      subject.reload
+      airline.reload
+      airline_route.reload
+      airplane_route.reload
+
+      assert_in_epsilon airline.cash_on_hand, initial_cash_on_hand, 0.0000001
+      expect(subject.economy_seats).to eq 50
+      expect(subject.premium_economy_seats).to eq 0
+      expect(subject.business_seats).to eq 0
+      expect(subject.construction_date).to eq original_construction_date
+      expect(airline_route.revenue.revenue).to eq 100
+      expect(airplane_route.flight_cost).to eq 1
+    end
+
     it "updates the configuration and delivery date while deducting no money from the airline if the new configuration is valid but the airplane is unbuilt" do
       initial_cash_on_hand = 1000000
       airline = Fabricate(:airline, cash_on_hand: initial_cash_on_hand)
