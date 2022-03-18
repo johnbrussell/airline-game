@@ -68,7 +68,7 @@ class AirplanesController < ApplicationController
   def update
     @game = Game.find(params[:game_id])
     @airline = Airline.find(params[:airline_id])
-    @airplane = Airplane.find(params[:id])
+    @airplane = Airplane.find(params[:airplane_id])
     if @airplane.set_configuration(params[:airplane][:business_seats].to_i, params[:airplane][:premium_economy_seats].to_i, params[:airplane][:economy_seats].to_i)
       render :show
     else

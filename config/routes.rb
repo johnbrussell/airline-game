@@ -5,6 +5,7 @@ Rails.application.routes.draw do
     resources :airlines do
       resources :airplanes do
         get "/change_configuration", to: "airplanes#change_configuration"
+        patch "/change_configuration", to: "airplanes#update"
       end
 
       resources :slots

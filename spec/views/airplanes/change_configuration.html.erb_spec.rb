@@ -41,6 +41,19 @@ RSpec.describe "airplanes/change_configuration", type: :feature do
       expect(page).not_to have_content "Takeoff length"
     end
 
+    it "can be refreshed after an unsuccessful change on the change configuation page" do
+      visit game_airline_airplane_change_configuration_path(game, airline, airplane)
+
+      fill_in :airplane_economy_seats, with: 1000000000
+      click_button "Change"
+
+      expect(page).to have_content "Seats require more total floor space than available on airplane"
+
+      visit current_path
+
+      expect(page).to have_content "Change aircraft configuration"
+    end
+
     it "returns to the airplane view page if the change is successful" do
       visit game_airline_airplane_change_configuration_path(game, airline, airplane)
 
