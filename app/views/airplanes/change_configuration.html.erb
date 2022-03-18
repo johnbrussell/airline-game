@@ -14,7 +14,7 @@
   <%= "#{@airline.name} has $#{number_with_precision(@airline.cash_on_hand, :precision => 0, :delimiter => ",")} on hand" %>
 </p>
 
-<%= form_with model: @airplane, url: game_airline_airplane_path(@game, @airline, @airplane), method: "patch" do |form| %>
+<%= form_with model: @airplane, url: game_airline_airplane_change_configuration_path(@game, @airline, @airplane), method: "patch" do |form| %>
   <div>
     <%= form.label :business_seats, "Business seats:" %>
     <%= form.number_field :business_seats, in: 0..(@airplane.aircraft_model.max_business_seats) %>
