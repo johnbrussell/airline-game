@@ -46,4 +46,20 @@ RSpec.describe "routes/select_route", type: :feature do
 
     expect(page).to have_content "FUN - INU"
   end
+
+  it "has a link to view the user airline routes" do
+    apia = Fabricate(:market, name: "Apia", country: "Samoa")
+
+    game = Fabricate(:game)
+    airline = Fabricate(:airline, is_user_airline: true, game_id: game.id, base_id: apia.id)
+
+    visit game_select_route_path(game)
+
+    expect(page).to have_link "View #{airline.name} routes"
+
+    click_link "View #{airline.name} routes"
+
+    expect(page).to have_content "#{airline.name} routes"
+    expect(page).not_to have_content "View #{airline.name} routes"
+  end
 end

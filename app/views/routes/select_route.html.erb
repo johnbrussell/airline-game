@@ -1,5 +1,8 @@
 <h1>Airline Game</h1>
-<p><a href=<%=game_path(@game)%>>Return to game overview</a></p>
+<p>
+  <a href=<%=game_path(@game)%>>Return to game overview</a><br/>
+  <a href=<%= game_airline_routes_path(@game, @game.user_airline) %>>View <%= @game.user_airline.name %> routes </a>
+</p>
 <h2>Select a route to view</h2>
 
 <p> Select an origin and destination </p>
