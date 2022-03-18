@@ -2,8 +2,10 @@ require "rails_helper"
 
 RSpec.describe Calculation::InertiaRouteService do
   context "frequencies and fares that evaluate to integers" do
-    let(:origin) { instance_double(Airport, market: instance_double(Market, country_group: "Foo")) }
-    let(:destination) { instance_double(Airport) }
+    let(:origin_market) { instance_double(Market, country_group: "Foo") }
+    let(:origin) { instance_double(Airport, market: origin_market) }
+    let(:destination_market) { instance_double(Market, country_group: "Foo") }
+    let(:destination) { instance_double(Airport, market: destination_market) }
     let(:date) { Date.today }
     let(:flight_cost) { 17442 }
     let(:flight_cost_calculator) { instance_double(Calculation::FlightCostCalculator, cost: flight_cost) }
@@ -25,6 +27,8 @@ RSpec.describe Calculation::InertiaRouteService do
       allow(Calculation::MaximumRevenuePotential).to receive(:new).with(origin, destination, date).and_return(revenue)
       allow(Calculation::FlightCostCalculator).to receive(:new).and_return(flight_cost_calculator)
       allow(Calculation::Distance).to receive(:between_airports).and_return(distance)
+      allow(origin_market).to receive(:airports).and_return([origin])
+      allow(destination_market).to receive(:airports).and_return([destination])
     end
 
     it "calculates frequencies correctly" do
@@ -65,8 +69,10 @@ RSpec.describe Calculation::InertiaRouteService do
   end
 
   context "frequencies and fares that do not evaluate to integers" do
-    let(:origin) { instance_double(Airport, market: instance_double(Market, country_group: "Foo")) }
-    let(:destination) { instance_double(Airport) }
+    let(:origin_market) { instance_double(Market, country_group: "Foo") }
+    let(:origin) { instance_double(Airport, market: origin_market) }
+    let(:destination_market) { instance_double(Market, country_group: "Foo") }
+    let(:destination) { instance_double(Airport, market: destination_market) }
     let(:date) { Date.today }
     let(:flight_cost) { 17442 }
     let(:flight_cost_calculator) { instance_double(Calculation::FlightCostCalculator, cost: flight_cost) }
@@ -88,6 +94,8 @@ RSpec.describe Calculation::InertiaRouteService do
       allow(Calculation::MaximumRevenuePotential).to receive(:new).with(origin, destination, date).and_return(revenue)
       allow(Calculation::FlightCostCalculator).to receive(:new).and_return(flight_cost_calculator)
       allow(Calculation::Distance).to receive(:between_airports).and_return(distance)
+      allow(origin_market).to receive(:airports).and_return([origin])
+      allow(destination_market).to receive(:airports).and_return([destination])
     end
 
     it "calculates frequencies correctly" do
@@ -122,6 +130,94 @@ RSpec.describe Calculation::InertiaRouteService do
       expect(subject.premium_economy_fare).to be < subject.send(:premium_economy_revenue) / Calculation::InertiaRouteService::LONG_DISTANCE_PREMIUM_ECONOMY_SEATS / 4 * Calculation::InertiaRouteService::MANAGEMENT_OVERHEAD
 
       expect(subject.send(:premium_economy_flight_cost)).to be <= subject.premium_economy_fare * subject.premium_economy_seats_per_flight
+    end
+  end
+
+  context "frequencies and fares in markets with multiple airports" do
+    let(:origin_market) { instance_double(Market, country_group: "Foo") }
+    let(:origin_1) { instance_double(Airport, market: origin_market) }
+    let(:origin_2) { instance_double(Airport, market: origin_market) }
+    let(:destination_market) { instance_double(Market, country_group: "Foo") }
+    let(:destination_1) { instance_double(Airport, market: destination_market) }
+    let(:destination_2) { instance_double(Airport, market: destination_market) }
+    let(:date) { Date.today }
+    let(:flight_cost) { 17442 }
+    let(:flight_cost_calculator) { instance_double(Calculation::FlightCostCalculator, cost: flight_cost) }
+    let(:business_revenue) { 36720 }
+    let(:economy_revenue) { 107100 }
+    let(:premium_economy_revenue) { 30600 }
+    let(:revenue) {
+      instance_double(
+        Calculation::MaximumRevenuePotential,
+        max_business_class_revenue_per_week: business_revenue,
+        max_economy_class_revenue_per_week: economy_revenue,
+        max_premium_economy_class_revenue_per_week: premium_economy_revenue,
+      )
+    }
+    let(:low_revenue) {
+      instance_double(
+        Calculation::MaximumRevenuePotential,
+        max_business_class_revenue_per_week: business_revenue / 2.0,
+        max_economy_class_revenue_per_week: economy_revenue / 2.0,
+        max_premium_economy_class_revenue_per_week: premium_economy_revenue / 2.0,
+      )
+    }
+    let(:distance) { Calculation::InertiaRouteService::LONG_DISTANCE }
+
+    before(:each) do
+      allow(Calculation::MaximumRevenuePotential).to receive(:new).with(origin_1, destination_1, date).and_return(low_revenue)
+      allow(Calculation::MaximumRevenuePotential).to receive(:new).with(origin_1, destination_2, date).and_return(low_revenue)
+      allow(Calculation::MaximumRevenuePotential).to receive(:new).with(origin_2, destination_1, date).and_return(revenue)
+      allow(Calculation::MaximumRevenuePotential).to receive(:new).with(origin_2, destination_2, date).and_return(low_revenue)
+      allow(Calculation::FlightCostCalculator).to receive(:new).and_return(flight_cost_calculator)
+      allow(Calculation::Distance).to receive(:between_airports).and_return(distance)
+      allow(origin_market).to receive(:airports).and_return([origin_1, origin_2])
+      allow(destination_market).to receive(:airports).and_return([destination_1, destination_2])
+    end
+
+    it "calculates frequencies correctly" do
+      subject_1 = Calculation::InertiaRouteService.new(origin_1, destination_1, date)
+      subject_2 = Calculation::InertiaRouteService.new(origin_2, destination_2, date)
+      subject_3 = Calculation::InertiaRouteService.new(origin_1, destination_2, date)
+      subject_4 = Calculation::InertiaRouteService.new(origin_2, destination_1, date)
+
+      [subject_1, subject_2, subject_3, subject_4].each do |subject|
+        expect(subject.send(:desired_business_frequencies)).to eq 2.5
+        expect(subject.business_frequencies).to eq 3
+
+        expect(subject.send(:desired_economy_frequencies)).to eq 2.5
+        expect(subject.economy_frequencies).to eq 3
+
+        expect(subject.send(:desired_premium_economy_frequencies)).to eq 2.5
+        expect(subject.premium_economy_frequencies).to eq 3
+      end
+    end
+
+    it "calculates fares correctly" do
+      subject_1 = Calculation::InertiaRouteService.new(origin_1, destination_1, date)
+      subject_2 = Calculation::InertiaRouteService.new(origin_2, destination_2, date)
+      subject_3 = Calculation::InertiaRouteService.new(origin_1, destination_2, date)
+      subject_4 = Calculation::InertiaRouteService.new(origin_2, destination_1, date)
+
+      frequency_desired_ratio = 3 / 2.5
+
+      [subject_1, subject_2, subject_3, subject_4].each do |subject|
+        expect(subject.send(:business_revenue)).to eq business_revenue * Calculation::InertiaRouteService::REVENUE_PERCENTAGE / 2.0
+
+        assert_in_epsilon subject.business_fare, frequency_desired_ratio * subject.send(:business_revenue) / Calculation::InertiaRouteService::LONG_DISTANCE_BUSINESS_SEATS / subject.send(:desired_business_frequencies) * Calculation::InertiaRouteService::MANAGEMENT_OVERHEAD, 0.000001
+
+        expect(subject.send(:business_flight_cost)).to be <= subject.business_fare * subject.business_seats_per_flight
+
+        expect(subject.send(:economy_revenue)).to eq economy_revenue * Calculation::InertiaRouteService::REVENUE_PERCENTAGE / 2.0
+        assert_in_epsilon subject.economy_fare, frequency_desired_ratio * subject.send(:economy_revenue) / Calculation::InertiaRouteService::LONG_DISTANCE_ECONOMY_SEATS / subject.send(:desired_economy_frequencies) * Calculation::InertiaRouteService::MANAGEMENT_OVERHEAD, 0.000001
+
+        expect(subject.send(:economy_flight_cost)).to be <= subject.economy_fare * subject.economy_seats_per_flight
+
+        expect(subject.send(:premium_economy_revenue)).to eq premium_economy_revenue * Calculation::InertiaRouteService::REVENUE_PERCENTAGE / 2.0
+        assert_in_epsilon subject.premium_economy_fare, frequency_desired_ratio * subject.send(:premium_economy_revenue) / Calculation::InertiaRouteService::LONG_DISTANCE_PREMIUM_ECONOMY_SEATS / subject.send(:desired_premium_economy_frequencies) * Calculation::InertiaRouteService::MANAGEMENT_OVERHEAD, 0.000001
+
+        expect(subject.send(:premium_economy_flight_cost)).to be <= subject.premium_economy_fare * subject.premium_economy_seats_per_flight
+      end
     end
   end
 

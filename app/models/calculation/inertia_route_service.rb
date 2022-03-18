@@ -133,6 +133,10 @@ class Calculation::InertiaRouteService
       premium_economy_revenue.to_f / premium_economy_flight_cost
     end
 
+    def destination_market_airports
+      @destination_market_airports ||= @destination.market.airports.to_a
+    end
+
     def economy_flight_cost
       flight_cost.to_f * economy_seats_per_flight * Airplane::ECONOMY_SEAT_SIZE / total_seat_area
     end
@@ -166,6 +170,10 @@ class Calculation::InertiaRouteService
       )
     end
 
+    def origin_market_airports
+      @origin_market_airports ||= @origin.market.airports.to_a
+    end
+
     def premium_economy_flight_cost
       flight_cost.to_f * premium_economy_seats_per_flight * Airplane::PREMIUM_ECONOMY_SEAT_SIZE / total_seat_area
     end
@@ -175,7 +183,9 @@ class Calculation::InertiaRouteService
     end
 
     def revenue
-      @revenue ||= Calculation::MaximumRevenuePotential.new(@origin, @destination, @current_date)
+      @revenue ||= origin_market_airports.product(destination_market_airports).map do |o, d|
+        Calculation::MaximumRevenuePotential.new(o, d, @current_date)
+      end.max_by(&:max_economy_class_revenue_per_week)
     end
 
     def total_seat_area
