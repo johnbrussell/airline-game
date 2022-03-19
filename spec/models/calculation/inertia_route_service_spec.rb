@@ -146,12 +146,16 @@ RSpec.describe Calculation::InertiaRouteService do
     let(:business_revenue) { 36720 }
     let(:economy_revenue) { 107100 }
     let(:premium_economy_revenue) { 30600 }
+    let(:shared_multiple) { 0.5 }
     let(:revenue) {
       instance_double(
         Calculation::MaximumRevenuePotential,
         max_business_class_revenue_per_week: business_revenue,
         max_economy_class_revenue_per_week: economy_revenue,
         max_premium_economy_class_revenue_per_week: premium_economy_revenue,
+        max_shared_business_class_revenue_per_week: business_revenue * shared_multiple,
+        max_shared_economy_class_revenue_per_week: economy_revenue * shared_multiple,
+        max_shared_premium_economy_class_revenue_per_week: premium_economy_revenue * shared_multiple,
       )
     }
     let(:low_revenue) {
@@ -160,6 +164,9 @@ RSpec.describe Calculation::InertiaRouteService do
         max_business_class_revenue_per_week: business_revenue / 2.0,
         max_economy_class_revenue_per_week: economy_revenue / 2.0,
         max_premium_economy_class_revenue_per_week: premium_economy_revenue / 2.0,
+        max_shared_business_class_revenue_per_week: business_revenue / 2.0 * shared_multiple,
+        max_shared_economy_class_revenue_per_week: economy_revenue / 2.0 * shared_multiple,
+        max_shared_premium_economy_class_revenue_per_week: premium_economy_revenue / 2.0 * shared_multiple,
       )
     }
     let(:distance) { Calculation::InertiaRouteService::LONG_DISTANCE }
@@ -185,11 +192,20 @@ RSpec.describe Calculation::InertiaRouteService do
         expect(subject.send(:desired_business_frequencies)).to eq 2.5
         expect(subject.business_frequencies).to eq 3
 
+        expect(subject.send(:desired_shared_business_frequencies)).to eq 1.25
+        expect(subject.shared_business_frequencies).to eq 2
+
         expect(subject.send(:desired_economy_frequencies)).to eq 2.5
         expect(subject.economy_frequencies).to eq 3
 
+        expect(subject.send(:desired_shared_economy_frequencies)).to eq 1.25
+        expect(subject.shared_economy_frequencies).to eq 2
+
         expect(subject.send(:desired_premium_economy_frequencies)).to eq 2.5
         expect(subject.premium_economy_frequencies).to eq 3
+
+        expect(subject.send(:desired_shared_premium_economy_frequencies)).to eq 1.25
+        expect(subject.shared_premium_economy_frequencies).to eq 2
       end
     end
 
@@ -200,21 +216,30 @@ RSpec.describe Calculation::InertiaRouteService do
       subject_4 = Calculation::InertiaRouteService.new(origin_2, destination_1, date)
 
       frequency_desired_ratio = 3 / 2.5
+      shared_frequency_desired_ratio = 2 / 1.25
 
       [subject_1, subject_2, subject_3, subject_4].each do |subject|
         expect(subject.send(:business_revenue)).to eq business_revenue * Calculation::InertiaRouteService::REVENUE_PERCENTAGE / 2.0
+        expect(subject.send(:shared_business_revenue)).to eq subject.send(:business_revenue) * shared_multiple
 
         assert_in_epsilon subject.business_fare, frequency_desired_ratio * subject.send(:business_revenue) / Calculation::InertiaRouteService::LONG_DISTANCE_BUSINESS_SEATS / subject.send(:desired_business_frequencies) * Calculation::InertiaRouteService::MANAGEMENT_OVERHEAD, 0.000001
+        assert_in_epsilon subject.shared_business_fare, shared_frequency_desired_ratio * subject.send(:shared_business_revenue) / Calculation::InertiaRouteService::LONG_DISTANCE_BUSINESS_SEATS / subject.send(:desired_shared_business_frequencies) * Calculation::InertiaRouteService::MANAGEMENT_OVERHEAD, 0.000001
 
         expect(subject.send(:business_flight_cost)).to be <= subject.business_fare * subject.business_seats_per_flight
 
         expect(subject.send(:economy_revenue)).to eq economy_revenue * Calculation::InertiaRouteService::REVENUE_PERCENTAGE / 2.0
         assert_in_epsilon subject.economy_fare, frequency_desired_ratio * subject.send(:economy_revenue) / Calculation::InertiaRouteService::LONG_DISTANCE_ECONOMY_SEATS / subject.send(:desired_economy_frequencies) * Calculation::InertiaRouteService::MANAGEMENT_OVERHEAD, 0.000001
 
+        expect(subject.send(:shared_economy_revenue)).to eq economy_revenue * Calculation::InertiaRouteService::REVENUE_PERCENTAGE / 2.0 * shared_multiple
+        assert_in_epsilon subject.shared_economy_fare, shared_frequency_desired_ratio * subject.send(:shared_economy_revenue) / Calculation::InertiaRouteService::LONG_DISTANCE_ECONOMY_SEATS / subject.send(:desired_shared_economy_frequencies) * Calculation::InertiaRouteService::MANAGEMENT_OVERHEAD, 0.00001
+
         expect(subject.send(:economy_flight_cost)).to be <= subject.economy_fare * subject.economy_seats_per_flight
 
         expect(subject.send(:premium_economy_revenue)).to eq premium_economy_revenue * Calculation::InertiaRouteService::REVENUE_PERCENTAGE / 2.0
         assert_in_epsilon subject.premium_economy_fare, frequency_desired_ratio * subject.send(:premium_economy_revenue) / Calculation::InertiaRouteService::LONG_DISTANCE_PREMIUM_ECONOMY_SEATS / subject.send(:desired_premium_economy_frequencies) * Calculation::InertiaRouteService::MANAGEMENT_OVERHEAD, 0.000001
+
+        expect(subject.send(:shared_premium_economy_revenue)).to eq premium_economy_revenue * Calculation::InertiaRouteService::REVENUE_PERCENTAGE / 2.0 * shared_multiple
+        assert_in_epsilon subject.shared_premium_economy_fare, shared_frequency_desired_ratio * subject.send(:shared_premium_economy_revenue) / Calculation::InertiaRouteService::LONG_DISTANCE_PREMIUM_ECONOMY_SEATS / subject.send(:desired_shared_premium_economy_frequencies) * Calculation::InertiaRouteService::MANAGEMENT_OVERHEAD, 0.00001
 
         expect(subject.send(:premium_economy_flight_cost)).to be <= subject.premium_economy_fare * subject.premium_economy_seats_per_flight
       end

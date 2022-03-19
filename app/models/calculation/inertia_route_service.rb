@@ -87,6 +87,42 @@ class Calculation::InertiaRouteService
     end
   end
 
+  def shared_business_fare
+    desired_shared_business_fare * MANAGEMENT_OVERHEAD
+  end
+
+  def shared_business_frequencies
+    if business_seats_per_flight == 0
+      0
+    else
+      desired_shared_business_frequencies.ceil()
+    end
+  end
+
+  def shared_economy_fare
+    desired_shared_economy_fare * MANAGEMENT_OVERHEAD
+  end
+
+  def shared_economy_frequencies
+    if economy_seats_per_flight == 0
+      0
+    else
+      desired_shared_economy_frequencies.ceil()
+    end
+  end
+
+  def shared_premium_economy_fare
+    desired_shared_premium_economy_fare * MANAGEMENT_OVERHEAD
+  end
+
+  def shared_premium_economy_frequencies
+    if premium_economy_seats_per_flight == 0
+      0
+    else
+      desired_shared_premium_economy_frequencies.ceil()
+    end
+  end
+
   private
 
     def business_flight_cost
@@ -131,6 +167,42 @@ class Calculation::InertiaRouteService
 
     def desired_premium_economy_frequencies
       premium_economy_revenue.to_f / premium_economy_flight_cost
+    end
+
+    def desired_shared_business_fare
+      if shared_business_frequencies == 0
+        0
+      else
+        (shared_business_frequencies / desired_shared_business_frequencies) * (shared_business_revenue / desired_shared_business_frequencies / business_seats_per_flight)
+      end
+    end
+
+    def desired_shared_business_frequencies
+      shared_business_revenue.to_f / business_flight_cost
+    end
+
+    def desired_shared_economy_fare
+      if shared_economy_frequencies == 0
+        0
+      else
+        (shared_economy_frequencies / desired_shared_economy_frequencies) * (shared_economy_revenue / desired_shared_economy_frequencies / economy_seats_per_flight)
+      end
+    end
+
+    def desired_shared_economy_frequencies
+      shared_economy_revenue.to_f / economy_flight_cost
+    end
+
+    def desired_shared_premium_economy_fare
+      if shared_premium_economy_frequencies == 0
+        0
+      else
+        (shared_premium_economy_frequencies / desired_shared_premium_economy_frequencies) * (shared_premium_economy_revenue / desired_shared_premium_economy_frequencies / premium_economy_seats_per_flight)
+      end
+    end
+
+    def desired_shared_premium_economy_frequencies
+      shared_premium_economy_revenue.to_f / premium_economy_flight_cost
     end
 
     def destination_market_airports
@@ -186,6 +258,24 @@ class Calculation::InertiaRouteService
       @revenue ||= origin_market_airports.product(destination_market_airports).map do |o, d|
         Calculation::MaximumRevenuePotential.new(o, d, @current_date)
       end.max_by(&:max_economy_class_revenue_per_week)
+    end
+
+    def shared_business_revenue
+      shared_revenue.max_shared_business_class_revenue_per_week * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
+    end
+
+    def shared_economy_revenue
+      shared_revenue.max_shared_economy_class_revenue_per_week * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
+    end
+
+    def shared_premium_economy_revenue
+      shared_revenue.max_shared_premium_economy_class_revenue_per_week * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
+    end
+
+    def shared_revenue
+      @shared_revenue ||= origin_market_airports.product(destination_market_airports).map do |o, d|
+        Calculation::MaximumRevenuePotential.new(o, d, @current_date)
+      end.max_by(&:max_shared_economy_class_revenue_per_week)
     end
 
     def total_seat_area
