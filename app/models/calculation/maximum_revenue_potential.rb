@@ -33,6 +33,18 @@ class Calculation::MaximumRevenuePotential
     (business_dollars_premium_economy + leisure_dollars_premium_economy) / WEEKS_PER_YEAR
   end
 
+  def max_shared_business_class_revenue_per_week
+    max_business_class_revenue_per_week - max_exclusive_business_class_revenue_per_week
+  end
+
+  def max_shared_economy_class_revenue_per_week
+    max_economy_class_revenue_per_week - max_exclusive_economy_class_revenue_per_week
+  end
+
+  def max_shared_premium_economy_class_revenue_per_week
+    max_premium_economy_class_revenue_per_week - max_exclusive_premium_economy_class_revenue_per_week
+  end
+
   private
 
     def business_distance
