@@ -117,12 +117,12 @@ class AirlineRoute < ApplicationRecord
   end
 
   def relative_demand_to(other_origin_airport, other_destination_airport, class_of_service)
-    comparison_revenue = Calculation::MaximumRevenuePotential.new(other_origin_airport, other_destination_airport, game.current_date).send("max_#{class_of_service.to_s}_class_revenue_per_week".to_sym)
+    comparison_revenue = Calculation::MaximumRevenuePotential.new(other_origin_airport, other_destination_airport, game.current_date).send("max_shared_#{class_of_service.to_s}_class_revenue_per_week".to_sym)
 
     if comparison_revenue == 0
       1
     else
-      revenue_potential.send("max_#{class_of_service.to_s}_class_revenue_per_week".to_sym) / comparison_revenue
+      revenue_potential.send("max_shared_#{class_of_service.to_s}_class_revenue_per_week".to_sym) / comparison_revenue.to_f
     end
   end
 

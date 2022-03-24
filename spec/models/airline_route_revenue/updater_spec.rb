@@ -53,6 +53,12 @@ RSpec.describe AirlineRouteRevenue::Updater do
         premium_economy_seats_per_flight: premium_economy_seats,
         premium_economy_fare: premium_economy_fare,
         premium_economy_frequencies: frequencies,
+        shared_business_fare: business_fare,
+        shared_business_frequencies: frequencies,
+        shared_economy_fare: economy_fare,
+        shared_economy_frequencies: frequencies,
+        shared_premium_economy_fare: premium_economy_fare,
+        shared_premium_economy_frequencies: frequencies,
       )
       allow(Calculation::InertiaRouteService).to receive(:new).and_return(inertia_route_service)
 
@@ -127,6 +133,12 @@ RSpec.describe AirlineRouteRevenue::Updater do
         premium_economy_seats_per_flight: premium_economy_seats,
         premium_economy_fare: premium_economy_fare,
         premium_economy_frequencies: frequencies,
+        shared_business_fare: business_fare,
+        shared_business_frequencies: frequencies,
+        shared_economy_fare: economy_fare,
+        shared_economy_frequencies: frequencies,
+        shared_premium_economy_fare: premium_economy_fare,
+        shared_premium_economy_frequencies: frequencies,
       )
       allow(Calculation::InertiaRouteService).to receive(:new).and_return(inertia_route_service)
 
@@ -202,6 +214,12 @@ RSpec.describe AirlineRouteRevenue::Updater do
         premium_economy_seats_per_flight: premium_economy_seats,
         premium_economy_fare: premium_economy_fare,
         premium_economy_frequencies: frequencies,
+        shared_business_fare: business_fare,
+        shared_business_frequencies: frequencies,
+        shared_economy_fare: economy_fare,
+        shared_economy_frequencies: frequencies,
+        shared_premium_economy_fare: premium_economy_fare,
+        shared_premium_economy_frequencies: frequencies,
       )
       allow(Calculation::InertiaRouteService).to receive(:new).and_return(inertia_route_service)
 
@@ -283,6 +301,12 @@ RSpec.describe AirlineRouteRevenue::Updater do
         premium_economy_seats_per_flight: premium_economy_seats,
         premium_economy_fare: premium_economy_fare,
         premium_economy_frequencies: frequencies,
+        shared_business_fare: business_fare,
+        shared_business_frequencies: frequencies,
+        shared_economy_fare: economy_fare,
+        shared_economy_frequencies: frequencies,
+        shared_premium_economy_fare: premium_economy_fare,
+        shared_premium_economy_frequencies: frequencies,
       )
       allow(Calculation::InertiaRouteService).to receive(:new).and_return(inertia_route_service)
 
@@ -359,6 +383,12 @@ RSpec.describe AirlineRouteRevenue::Updater do
         premium_economy_seats_per_flight: premium_economy_seats,
         premium_economy_fare: premium_economy_fare,
         premium_economy_frequencies: frequencies,
+        shared_business_fare: business_fare,
+        shared_business_frequencies: frequencies,
+        shared_economy_fare: economy_fare,
+        shared_economy_frequencies: frequencies,
+        shared_premium_economy_fare: premium_economy_fare,
+        shared_premium_economy_frequencies: frequencies,
       )
       allow(Calculation::InertiaRouteService).to receive(:new).and_return(inertia_route_service)
 
@@ -435,6 +465,12 @@ RSpec.describe AirlineRouteRevenue::Updater do
         premium_economy_seats_per_flight: premium_economy_seats,
         premium_economy_fare: premium_economy_fare,
         premium_economy_frequencies: frequencies,
+        shared_business_fare: business_fare,
+        shared_business_frequencies: frequencies,
+        shared_economy_fare: economy_fare,
+        shared_economy_frequencies: frequencies,
+        shared_premium_economy_fare: premium_economy_fare,
+        shared_premium_economy_frequencies: frequencies,
       )
       allow(Calculation::InertiaRouteService).to receive(:new).and_return(inertia_route_service)
 
@@ -511,6 +547,12 @@ RSpec.describe AirlineRouteRevenue::Updater do
         premium_economy_seats_per_flight: premium_economy_seats,
         premium_economy_fare: premium_economy_fare,
         premium_economy_frequencies: frequencies,
+        shared_business_fare: business_fare,
+        shared_business_frequencies: frequencies,
+        shared_economy_fare: economy_fare,
+        shared_economy_frequencies: frequencies,
+        shared_premium_economy_fare: premium_economy_fare,
+        shared_premium_economy_frequencies: frequencies,
       )
       allow(Calculation::InertiaRouteService).to receive(:new).and_return(inertia_route_service)
 
@@ -592,7 +634,6 @@ RSpec.describe AirlineRouteRevenue::Updater do
         block_time_mins: 1,
       ).save(validate: false)
 
-
       inertia_route_service = instance_double(
         Calculation::InertiaRouteService,
         business_seats_per_flight: business_seats,
@@ -604,6 +645,12 @@ RSpec.describe AirlineRouteRevenue::Updater do
         premium_economy_seats_per_flight: premium_economy_seats,
         premium_economy_fare: premium_economy_fare,
         premium_economy_frequencies: frequencies,
+        shared_business_fare: business_fare,
+        shared_business_frequencies: frequencies,
+        shared_economy_fare: economy_fare,
+        shared_economy_frequencies: frequencies,
+        shared_premium_economy_fare: premium_economy_fare,
+        shared_premium_economy_frequencies: frequencies,
       )
       allow(Calculation::InertiaRouteService).to receive(:new).and_return(inertia_route_service)
 
@@ -695,6 +742,12 @@ RSpec.describe AirlineRouteRevenue::Updater do
         premium_economy_seats_per_flight: premium_economy_seats,
         premium_economy_fare: premium_economy_fare,
         premium_economy_frequencies: frequencies,
+        shared_business_fare: business_fare,
+        shared_business_frequencies: frequencies,
+        shared_economy_fare: economy_fare,
+        shared_economy_frequencies: frequencies,
+        shared_premium_economy_fare: premium_economy_fare,
+        shared_premium_economy_frequencies: frequencies,
       )
       allow(Calculation::InertiaRouteService).to receive(:new).and_return(inertia_route_service)
 
@@ -771,6 +824,12 @@ RSpec.describe AirlineRouteRevenue::Updater do
         premium_economy_seats_per_flight: premium_economy_seats,
         premium_economy_fare: premium_economy_fare,
         premium_economy_frequencies: frequencies,
+        shared_business_fare: business_fare,
+        shared_business_frequencies: frequencies,
+        shared_economy_fare: economy_fare,
+        shared_economy_frequencies: frequencies,
+        shared_premium_economy_fare: premium_economy_fare,
+        shared_premium_economy_frequencies: frequencies,
       )
       allow(Calculation::InertiaRouteService).to receive(:new).and_return(inertia_route_service)
 
@@ -877,6 +936,12 @@ RSpec.describe AirlineRouteRevenue::Updater do
         premium_economy_seats_per_flight: premium_economy_seats,
         premium_economy_fare: premium_economy_fare,
         premium_economy_frequencies: frequencies,
+        shared_business_fare: business_fare,
+        shared_business_frequencies: frequencies,
+        shared_economy_fare: economy_fare,
+        shared_economy_frequencies: frequencies,
+        shared_premium_economy_fare: premium_economy_fare,
+        shared_premium_economy_frequencies: frequencies,
       )
       allow(Calculation::InertiaRouteService).to receive(:new).and_return(inertia_route_service)
 

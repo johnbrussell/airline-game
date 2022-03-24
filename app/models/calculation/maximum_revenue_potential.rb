@@ -9,6 +9,10 @@ class Calculation::MaximumRevenuePotential
   PREMIUM_ECONOMY_MAX_DISTANCE = 1625
   WEEKS_PER_YEAR = 365.25 / 7
 
+  def destination
+    @destination
+  end
+
   def max_business_class_revenue_per_week
     (business_dollars_business + leisure_dollars_business) / WEEKS_PER_YEAR
   end
@@ -43,6 +47,10 @@ class Calculation::MaximumRevenuePotential
 
   def max_shared_premium_economy_class_revenue_per_week
     max_premium_economy_class_revenue_per_week - max_exclusive_premium_economy_class_revenue_per_week
+  end
+
+  def origin
+    @origin
   end
 
   private

@@ -209,6 +209,15 @@ class Calculation::InertiaRouteService
       @destination_market_airports ||= @destination.market.airports.to_a
     end
 
+    def distance
+      origin_lat = @origin.market.airports.sum(&:latitude) / @origin.market.airports.count.to_f
+      origin_long = @origin.market.airports.sum(&:longitude) / @origin.market.airports.count.to_f
+      destination_lat = @origin.market.airports.sum(&:latitude) / @destination.market.airports.count.to_f
+      destination_long = @destination.market.airports.sum(&:longitude) / @destination.market.airports.count.to_f
+
+      Calculation::Distance.haversine(origin_lat, origin_long, destination_lat, destination_long)
+    end
+
     def economy_flight_cost
       flight_cost.to_f * economy_seats_per_flight * Airplane::ECONOMY_SEAT_SIZE / total_seat_area
     end

@@ -2,6 +2,7 @@ class AirlineRouteRevenue::Updater
   include Demandable
 
   def upsert(game)
+    arrs = []
     allocate_all(game).each do |airline_route, earned_revenue|
       arr = AirlineRouteRevenue.find_or_initialize_by(airline_route: airline_route)
 
@@ -31,8 +32,10 @@ class AirlineRouteRevenue::Updater
         premium_economy_pax: (total_premium_economy_revenue / airline_route.premium_economy_price.to_f / 2.0).round(7),
         business_pax: (total_business_revenue / airline_route.business_price.to_f / 2.0).round(7),
       )
+      arrs.append(arr)
       arr.save!
     end
+    pp arrs
   end
 
   private
@@ -54,11 +57,11 @@ class AirlineRouteRevenue::Updater
       )
       exclusive_business_revenue = exclusive_business_revenue.map { |ar, r| [ar, { :exclusive_business => r }] }.to_h
 
-      shared_economy_solicitations = other_shared_solicited_economy_market_dollars(game).merge(remaining_economy_solicitations)
+      shared_economy_solicitations = shared_economy_solicitations(remaining_economy_solicitations, game)
       remaining_economy_revenue = revenue_potential.max_economy_class_revenue_per_week - revenue_potential.max_exclusive_economy_class_revenue_per_week
-      shared_premium_economy_solicitations = other_shared_solicited_premium_economy_market_dollars(game).merge(remaining_premium_economy_solicitations)
+      shared_premium_economy_solicitations = shared_premium_economy_solicitations(remaining_premium_economy_solicitations, game)
       remaining_premium_economy_revenue = revenue_potential.max_premium_economy_class_revenue_per_week - revenue_potential.max_exclusive_premium_economy_class_revenue_per_week
-      shared_business_solicitations = other_shared_solicited_business_market_dollars(game).merge(remaining_business_solicitations)
+      shared_business_solicitations = shared_business_solicitations(remaining_business_solicitations, game)
       remaining_business_revenue = revenue_potential.max_business_class_revenue_per_week - revenue_potential.max_exclusive_business_class_revenue_per_week
 
       shared_economy_revenue = AirlineRouteRevenue::Allocator.allocate(shared_economy_solicitations, remaining_economy_revenue)
@@ -67,6 +70,9 @@ class AirlineRouteRevenue::Updater
       shared_premium_economy_revenue = shared_premium_economy_revenue.map { |ar, r| [ar, { :shared_premium_economy => r }] }.to_h
       shared_business_revenue = AirlineRouteRevenue::Allocator.allocate(shared_business_solicitations, remaining_business_revenue)
       shared_business_revenue = shared_business_revenue.map { |ar, r| [ar, { :shared_business => r }] }.to_h
+
+      pp shared_economy_solicitations
+      pp remaining_economy_revenue
 
       exclusive_economy_revenue.merge(exclusive_premium_economy_revenue, exclusive_business_revenue, shared_economy_revenue, shared_premium_economy_revenue, shared_business_revenue) { |key, hash1, hash2| hash1.merge(hash2) }.select { |ar, _| ar.airline_id.present? }
     end
@@ -97,20 +103,65 @@ class AirlineRouteRevenue::Updater
       )
     end
 
+    def inertia_airline_route_shared(frequencies, game)
+      AirlineRoute.new(
+        airline: Airline.new(game_id: game.id),
+        origin_airport: Airport.new(market: @origin.market, latitude: ),
+        destination_airport: @destination,
+        business_price: inertia_calculator.shared_business_fare,
+        economy_price: inertia_calculator.shared_economy_fare,
+        premium_economy_price: inertia_calculator.shared_premium_economy_fare,
+        airplane_routes: [
+          AirplaneRoute.new(
+            frequencies: frequencies,
+            airplane: Airplane.new(
+              business_seats: inertia_calculator.business_seats_per_flight,
+              economy_seats: inertia_calculator.economy_seats_per_flight,
+              premium_economy_seats: inertia_calculator.premium_economy_seats_per_flight,
+              aircraft_model: AircraftModel.new(
+                floor_space: inertia_calculator.business_seats_per_flight * Airplane::BUSINESS_SEAT_SIZE \
+                  + inertia_calculator.premium_economy_seats_per_flight * Airplane::PREMIUM_ECONOMY_SEAT_SIZE \
+                  + inertia_calculator.economy_seats_per_flight * Airplane::ECONOMY_SEAT_SIZE,
+              ),
+            ),
+          ),
+        ],
+      )
+    end
+
     def inertia_airline_route_business(game)
       inertia_airline_route(inertia_calculator.business_frequencies, game)
+    end
+
+    def inertia_airline_route_business_shared(game)
+      inertia_airline_route_shared(inertia_calculator.shared_business_frequencies, game)
     end
 
     def inertia_airline_route_economy(game)
       inertia_airline_route(inertia_calculator.economy_frequencies, game)
     end
 
+    def inertia_airline_route_economy_shared(game)
+      inertia_airline_route_shared(inertia_calculator.shared_economy_frequencies, game)
+    end
+
     def inertia_airline_route_premium_economy(game)
       inertia_airline_route(inertia_calculator.premium_economy_frequencies, game)
     end
 
+    def inertia_airline_route_premium_economy_shared(game)
+      inertia_airline_route_shared(inertia_calculator.shared_premium_economy_frequencies, game)
+    end
+
     def inertia_calculator
       @inertia_calculator ||= Calculation::InertiaRouteService.new(@origin, @destination, @current_date)
+    end
+
+    def market_latitude
+      
+    end
+
+    def market_longitude
     end
 
     def operators_of_other_market_routes(game)
@@ -196,6 +247,36 @@ class AirlineRouteRevenue::Updater
 
     def revenue_potential
       @revenue_potential ||= Calculation::MaximumRevenuePotential.new(@origin, @destination, @current_date)
+    end
+
+    def shared_business_solicitations(remaining_business_solicitations, game)
+      inertia_route = inertia_airline_route_business_shared(game)
+      inertia_airplane_route = inertia_route.airplane_routes.first
+
+      remaining_business_solicitations
+        .reject{ |ar, _| ar.airline.id.nil? }
+        .merge(other_shared_solicited_business_market_dollars(game))
+        .merge({ inertia_route => [inertia_airplane_route.airplane.business_seats * inertia_route.business_price * 2.0 / inertia_route.relative_demand_to(@origin, @destination, :business)] * inertia_airplane_route.frequencies })
+    end
+
+    def shared_economy_solicitations(remaining_economy_solicitations, game)
+      inertia_route = inertia_airline_route_economy_shared(game)
+      inertia_airplane_route = inertia_route.airplane_routes.first
+
+      remaining_economy_solicitations
+        .reject{ |ar, _| ar.airline.id.nil? }
+        .merge(other_shared_solicited_economy_market_dollars(game))
+        .merge({ inertia_route => [inertia_airplane_route.airplane.economy_seats * inertia_route.economy_price * 2.0 / inertia_route.relative_demand_to(@origin, @destination, :economy)] * inertia_airplane_route.frequencies })
+    end
+
+    def shared_premium_economy_solicitations(remaining_premium_economy_solicitations, game)
+      inertia_route = inertia_airline_route_premium_economy_shared(game)
+      inertia_airplane_route = inertia_route.airplane_routes.first
+
+      remaining_premium_economy_solicitations
+        .reject{ |ar, _| ar.airline.id.nil? }
+        .merge(other_shared_solicited_premium_economy_market_dollars(game))
+        .merge({ inertia_route => [inertia_airplane_route.airplane.premium_economy_seats * inertia_route.premium_economy_price * 2.0 / inertia_route.relative_demand_to(@origin, @destination, :premium_economy)] * inertia_airplane_route.frequencies })
     end
 
     def solicited_business_market_dollars_by_airline_flight(game)
