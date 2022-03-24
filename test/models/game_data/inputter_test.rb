@@ -2,7 +2,7 @@ require "test_helper"
 
 class GameData::InputterTest < ActiveSupport::TestCase
   def setup
-    Market.new(name: "Yaren", income: 100000, is_island: true, is_national_capital: true, country: "Nauru", country_group: "Nauru").save!
+    Market.new(name: "Yaren", income: 100000, is_island: true, is_national_capital: true, country: "Nauru", country_group: "Nauru", latitude: -19, longitude: 1).save!
   end
 
   test "new Markets created" do
@@ -13,6 +13,8 @@ class GameData::InputterTest < ActiveSupport::TestCase
       "Income" => 40000,
       "isNationalCapital" => "yes",
       "isIsland" => "yes",
+      "Latitude" => 1,
+      "Longitude" => -19,
     }
 
     GameData::Inputter.send(:create_or_update_market, data_point)
@@ -27,6 +29,8 @@ class GameData::InputterTest < ActiveSupport::TestCase
     assert_equal(last_market.income, 40000)
     assert_equal(last_market.is_national_capital, true)
     assert_equal(last_market.is_island, true)
+    assert_equal(last_market.latitude, 1)
+    assert_equal(last_market.longitude, -19)
   end
 
   test "extant Markets updated" do
@@ -37,6 +41,8 @@ class GameData::InputterTest < ActiveSupport::TestCase
       "Income" => 100001,
       "isNationalCapital" => "no",
       "isIsland" => "no",
+      "Latitude" => 1,
+      "Longitude" => -19,
     }
 
     GameData::Inputter.send(:create_or_update_market, data_point)
@@ -51,5 +57,7 @@ class GameData::InputterTest < ActiveSupport::TestCase
     assert_equal(last_market.income, 100001)
     assert_equal(last_market.is_national_capital, false)
     assert_equal(last_market.is_island, false)
+    assert_equal(last_market.latitude, 1)
+    assert_equal(last_market.longitude, -19)
   end
 end

@@ -8,7 +8,8 @@ RSpec.describe "airlines/index", type: :feature do
       end_date: Date.tomorrow,
       current_date: Date.tomorrow,
     )
-    market = Market.create!(
+    market = Fabricate(
+      :market, 
       name: "Nauru",
       country: "Nauru",
       country_group: "A",

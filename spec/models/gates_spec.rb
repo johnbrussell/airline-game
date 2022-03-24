@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe Gates do
   context "at_airport" do
     it "returns an extant gates when one exists" do
-      market = Market.create!(name: "Bar", country: "Baz", country_group: "BarBaz", income: 1)
+      market = Fabricate(:market, name: "Bar", country: "Baz", country_group: "BarBaz", income: 1)
       airport = Airport.create!(start_gates: 1, easy_gates: 1, latitude: 1, longitude: 1, runway: 1, elevation: 1, iata: "Foo", market: market)
       game = Game.create!(current_date: Date.today, start_date: Date.today, end_date: Date.today)
       Gates.create!(airport: airport, game: game, current_gates: 1)
@@ -15,7 +15,7 @@ RSpec.describe Gates do
     end
 
     it "creates a gates and slots when none exists" do
-      market = Market.create!(name: "Bar", country: "Baz", country_group: "BarBaz", income: 1)
+      market = Fabricate(:market, name: "Bar", country: "Baz", country_group: "BarBaz", income: 1)
       airport = Airport.create!(start_gates: 1, easy_gates: 1, latitude: 1, longitude: 1, runway: 1, elevation: 1, iata: "Foo", market: market)
       game = Game.create!(current_date: Date.today, start_date: Date.today, end_date: Date.today)
 
@@ -58,7 +58,7 @@ RSpec.describe Gates do
 
   context "build_new_gate" do
     it "creates new slots for the appropriate airline and updates the number of gates on the Airport and charges the airline" do
-      market = Market.create!(
+      market = Fabricate(:market,
         name: "Bar",
         country: "Baz",
         country_group: "Foobar",
@@ -124,7 +124,7 @@ RSpec.describe Gates do
     end
 
     it "adds an error if the airline does not have enough cash on hand" do
-      market = Market.create!(
+      market = Fabricate(:market,
         name: "Bar",
         country: "Baz",
         country_group: "Foobar",
@@ -170,13 +170,13 @@ RSpec.describe Gates do
     end
 
     it "adds an error if the airline is politically disallowed from building the gate" do
-      market = Market.create!(
+      market = Fabricate(:market,
         name: "Nauru",
         country: "Nauru",
         country_group: "Nauru",
         income: 1000,
       )
-      Market.create!(
+      Fabricate(:market,
         name: "Bar",
         country: "Baz",
         country_group: "Foobar",
@@ -313,13 +313,13 @@ RSpec.describe Gates do
     end
 
     it "adds an error if the airline is politically disallowed from leasing slots" do
-      market = Market.create!(
+      market = Fabricate(:market,
         name: "Nauru",
         country: "Nauru",
         country_group: "Nauru",
         income: 1000,
       )
-      Market.create!(
+      Fabricate(:market,
         name: "Bar",
         country: "Baz",
         country_group: "Foobar",
@@ -368,7 +368,7 @@ RSpec.describe Gates do
 
   context "validate current_gates_greater_than_start_gates" do
     before(:each) do
-      market = Market.create!(
+      market = Fabricate(:market,
         name: "City",
         country: "County",
         country_group: "Country",

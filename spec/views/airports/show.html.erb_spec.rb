@@ -8,7 +8,8 @@ RSpec.describe "airports/show", type: :feature do
       start_date: Date.yesterday,
       end_date: Date.tomorrow,
     )
-    boston = Market.create!(
+    boston = Fabricate(
+      :market,
       name: "Boston",
       country: "United States",
       country_group: "United States",
@@ -21,7 +22,8 @@ RSpec.describe "airports/show", type: :feature do
       base_id: boston.id,
       is_user_airline: true,
     )
-    nauru = Market.create!(
+    nauru = Fabricate(
+      :market, 
       name: "Nauru",
       country: "Nauru",
       country_group: "Nauru",

@@ -3,7 +3,7 @@ require 'application_system_test_case'
 
 class IndexTest < ApplicationSystemTestCase
   game_id = Game.last&.id || 1
-  market = Market.new(name: "Nauru", country: "Nauru", country_group: "Nauru", income: 1)
+  market = Market.new(name: "Nauru", country: "Nauru", country_group: "Nauru", income: 1, latitude: 10, longitude: 179)
   airline = Airline.new(name: "Nauru Airlines", cash_on_hand: 1234.56, is_user_airline: true, game_id: game_id)
   today = Date.today
   tomorrow = today + 1

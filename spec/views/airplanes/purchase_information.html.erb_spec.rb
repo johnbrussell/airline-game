@@ -8,7 +8,8 @@ RSpec.describe "airplanes/purchase_information", type: :feature do
       end_date: Date.tomorrow,
       current_date: Date.tomorrow,
     )
-    market = Market.create!(
+    market = Fabricate(
+      :market, 
       name: "AB",
       country: "AB",
       country_group: "AB",
@@ -228,7 +229,7 @@ RSpec.describe "airplanes/purchase_information", type: :feature do
       it "does not redirect to the airline fleet page when a validation error occurs" do
         game = Game.last
         airplane = Airplane.last
-        base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+        base = Fabricate(:market, name: "A", country: "B", country_group: "United States", income: 100)
         other_airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
         airplane.update(operator_id: other_airline.id)
 

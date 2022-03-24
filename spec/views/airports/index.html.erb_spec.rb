@@ -15,7 +15,8 @@ RSpec.describe "airports/index", type: :feature do
       base_id: 1,
       is_user_airline: true,
     )
-    Market.create!(
+    Fabricate(
+      :market,
       name: "Boston",
       country: "United States",
       country_group: "Nauru",
