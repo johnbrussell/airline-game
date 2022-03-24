@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_24_174827) do
+ActiveRecord::Schema.define(version: 2022_03_24_184051) do
 
   create_table "aircraft_families", force: :cascade do |t|
     t.string "name", null: false
@@ -211,8 +211,8 @@ ActiveRecord::Schema.define(version: 2022_03_24_174827) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "country_group", null: false
     t.string "territory_of"
-    t.float "latitude"
-    t.float "longitude"
+    t.float "latitude", null: false
+    t.float "longitude", null: false
     t.index ["name"], name: "index_markets_on_name", unique: true
   end
 
