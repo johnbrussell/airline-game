@@ -30,7 +30,8 @@ RSpec.describe Airport do
 
   context "other_market_airports" do
     before(:each) do
-      boston = Market.create!(
+      boston = Fabricate(
+        :market, 
         name: "Boston",
         country: "United States",
         country_group: "United States",

@@ -34,7 +34,7 @@ RSpec.describe Airplane do
       queue = AircraftManufacturingQueue.last
       other_game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
       other_queue = AircraftManufacturingQueue.create!(game: other_game, aircraft_family_id: 1, production_rate: 1)
-      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      base = Fabricate(:market, name: "A", country: "B", country_group: "United States", income: 100)
       airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
 
       valid_airplane = Airplane.create!(
@@ -105,7 +105,7 @@ RSpec.describe Airplane do
       queue = AircraftManufacturingQueue.last
       other_game = Game.create!(start_date: Date.yesterday, current_date: Date.today, end_date: Date.tomorrow + 10.years)
       other_queue = AircraftManufacturingQueue.create!(game: other_game, aircraft_family_id: 1, production_rate: 1)
-      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      base = Fabricate(:market, name: "A", country: "B", country_group: "United States", income: 100)
       airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
 
       valid_airplane = Airplane.create!(
@@ -175,7 +175,7 @@ RSpec.describe Airplane do
         useful_life: 30,
         family: family,
       )
-      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      base = Fabricate(:market, name: "A", country: "B", country_group: "United States", income: 100)
       airline_1 = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
       airline_2 = Airline.create!(base_id: base.id, name: "American Aviators", game_id: game.id, cash_on_hand: 100)
       Airplane.create!(aircraft_model_id: model.id, aircraft_manufacturing_queue_id: queue.id, base_country_group: "United States", operator_id: airline_2.id, construction_date: Date.tomorrow, end_of_useful_life: Date.tomorrow + 2.days)
@@ -522,7 +522,7 @@ RSpec.describe Airplane do
 
     it "is true when the airplane is owned" do
       game = Game.last
-      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      base = Fabricate(:market, name: "A", country: "B", country_group: "United States", income: 100)
       airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
       subject = Airplane.create!(
         base_country_group: "United States",
@@ -734,7 +734,7 @@ RSpec.describe Airplane do
 
     it "is true when buying an airplane" do
       game = Game.last
-      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      base = Fabricate(:market, name: "A", country: "B", country_group: "United States", income: 100)
       airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
       subject = Airplane.last
       expect(subject.update(operator_id: airline.id)).to be true
@@ -742,7 +742,7 @@ RSpec.describe Airplane do
 
     it "is true when selling an airplane" do
       game = Game.last
-      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      base = Fabricate(:market, name: "A", country: "B", country_group: "United States", income: 100)
       airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
       subject = Airplane.last
       subject.update(operator_id: airline.id)
@@ -757,7 +757,7 @@ RSpec.describe Airplane do
 
     it "is true when updating an owned airplane" do
       game = Game.last
-      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      base = Fabricate(:market, name: "A", country: "B", country_group: "United States", income: 100)
       airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
       subject = Airplane.last
       subject.update(operator_id: airline.id)
@@ -767,7 +767,7 @@ RSpec.describe Airplane do
 
     it "is false when selling an airplane from one airline to another" do
       game = Game.last
-      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      base = Fabricate(:market, name: "A", country: "B", country_group: "United States", income: 100)
       airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
       other_airline = Airline.create!(base_id: base.id, name: "American Aviators", game_id: game.id, cash_on_hand: 100)
       subject = Airplane.last
@@ -779,7 +779,7 @@ RSpec.describe Airplane do
 
     it "is false when selling an airplane that has routes" do
       game = Game.last
-      base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+      base = Fabricate(:market, name: "A", country: "B", country_group: "United States", income: 100)
       airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
       subject = Airplane.last
       subject.update(operator_id: airline.id)

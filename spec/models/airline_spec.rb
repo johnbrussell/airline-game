@@ -48,16 +48,16 @@ RSpec.describe Airline do
   context "can_fly_between?" do
     it "is true when flying a route within its home country group" do
       origins = [
-        Market.create!(name: "New York", income: 1, country: "United States", country_group: "USA"),
-        Market.create!(name: "Pohnpei", income: 1, country: "Micronesia", country_group: "USA"),
-        Market.create!(name: "Pago Pago", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States"),
+        Fabricate(:market, name: "New York", income: 1, country: "United States", country_group: "USA"),
+        Fabricate(:market, name: "Pohnpei", income: 1, country: "Micronesia", country_group: "USA"),
+        Fabricate(:market, name: "Pago Pago", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States"),
       ]
       destinations = [
-        Market.create!(name: "Boston", income: 1, country: "United States", country_group: "USA"),
-        Market.create!(name: "Majuro", income: 1, country: "Marshall Islands", country_group: "USA"),
-        Market.create!(name: "Yap", income: 1, country: "Micronesia", country_group: "USA"),
-        Market.create!(name: "Saipan", income: 1, country: "Northern Mariana Islands", country_group: "USA", territory_of: "United States"),
-        Market.create!(name: "Fitiuta", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States"),
+        Fabricate(:market, name: "Boston", income: 1, country: "United States", country_group: "USA"),
+        Fabricate(:market, name: "Majuro", income: 1, country: "Marshall Islands", country_group: "USA"),
+        Fabricate(:market, name: "Yap", income: 1, country: "Micronesia", country_group: "USA"),
+        Fabricate(:market, name: "Saipan", income: 1, country: "Northern Mariana Islands", country_group: "USA", territory_of: "United States"),
+        Fabricate(:market, name: "Fitiuta", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States"),
       ]
 
       subject = Fabricate(:airline, base_id: (origins + destinations).sample.id)
@@ -66,9 +66,9 @@ RSpec.describe Airline do
     end
 
     it "is true when flying between country groups" do
-      origin = Market.create!(name: "Nauru", income: 1, country: "Nauru", country_group: "Nauru")
-      destination = Market.create!(name: "Funafuti", income: 1, country: "Tuvalu", country_group: "Tuvalu")
-      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+      origin = Fabricate(:market, name: "Nauru", income: 1, country: "Nauru", country_group: "Nauru")
+      destination = Fabricate(:market, name: "Funafuti", income: 1, country: "Tuvalu", country_group: "Tuvalu")
+      base = Fabricate(:market, name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
 
       subject = Fabricate(:airline, base_id: base.id)
 
@@ -77,9 +77,9 @@ RSpec.describe Airline do
     end
 
     it "is true when flying between countries within another country group" do
-      origin = Market.create!(name: "Nauru", income: 1, country: "Nauru", country_group: "Nauru and Tuvalu")
-      destination = Market.create!(name: "Funafuti", income: 1, country: "Tuvalu", country_group: "Nauru and Tuvalu")
-      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+      origin = Fabricate(:market, name: "Nauru", income: 1, country: "Nauru", country_group: "Nauru and Tuvalu")
+      destination = Fabricate(:market, name: "Funafuti", income: 1, country: "Tuvalu", country_group: "Nauru and Tuvalu")
+      base = Fabricate(:market, name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
 
       subject = Fabricate(:airline, base_id: base.id)
 
@@ -88,9 +88,9 @@ RSpec.describe Airline do
     end
 
     it "is false when flying between rival countries" do
-      origin = Market.create!(name: "Nauru", income: 1, country: "Nauru", country_group: "Nauru")
-      destination = Market.create!(name: "Funafuti", income: 1, country: "Tuvalu", country_group: "Tuvalu")
-      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+      origin = Fabricate(:market, name: "Nauru", income: 1, country: "Nauru", country_group: "Nauru")
+      destination = Fabricate(:market, name: "Funafuti", income: 1, country: "Tuvalu", country_group: "Tuvalu")
+      base = Fabricate(:market, name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
       RivalCountryGroup.create!(country_one: "Nauru", country_two: "Tuvalu")
 
       subject = Fabricate(:airline, base_id: base.id)
@@ -100,9 +100,9 @@ RSpec.describe Airline do
     end
 
     it "is false when flying to a country that is rivals with the airline's home country" do
-      origin = Market.create!(name: "Nauru", income: 1, country: "Nauru", country_group: "Nauru")
-      destination = Market.create!(name: "Funafuti", income: 1, country: "Tuvalu", country_group: "Tuvalu")
-      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+      origin = Fabricate(:market, name: "Nauru", income: 1, country: "Nauru", country_group: "Nauru")
+      destination = Fabricate(:market, name: "Funafuti", income: 1, country: "Tuvalu", country_group: "Tuvalu")
+      base = Fabricate(:market, name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
       RivalCountryGroup.create!(country_one: "Kiribati", country_two: "Nauru")
 
       subject = Fabricate(:airline, base_id: base.id)
@@ -112,9 +112,9 @@ RSpec.describe Airline do
     end
 
     it "is false flying within a foreign country" do
-      origin = Market.create!(name: "Nauru", income: 1, country: "Nauru and Tuvalu", country_group: "Nauru and Tuvalu")
-      destination = Market.create!(name: "Funafuti", income: 1, country: "Nauru and Tuvalu", country_group: "Nauru and Tuvalu")
-      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+      origin = Fabricate(:market, name: "Nauru", income: 1, country: "Nauru and Tuvalu", country_group: "Nauru and Tuvalu")
+      destination = Fabricate(:market, name: "Funafuti", income: 1, country: "Nauru and Tuvalu", country_group: "Nauru and Tuvalu")
+      base = Fabricate(:market, name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
 
       subject = Fabricate(:airline, base_id: base.id)
 
@@ -123,9 +123,9 @@ RSpec.describe Airline do
     end
 
     it "is false flying from a foreign country to one of its territories" do
-      origin = Market.create!(name: "Ponce", income: 1, country: "Puerto Rico", country_group: "USA", territory_of: "United States")
-      destination = Market.create!(name: "Adak", income: 1, country: "United States", country_group: "USA")
-      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+      origin = Fabricate(:market, name: "Ponce", income: 1, country: "Puerto Rico", country_group: "USA", territory_of: "United States")
+      destination = Fabricate(:market, name: "Adak", income: 1, country: "United States", country_group: "USA")
+      base = Fabricate(:market, name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
 
       subject = Fabricate(:airline, base_id: base.id)
 
@@ -134,9 +134,9 @@ RSpec.describe Airline do
     end
 
     it "is false flying between territories of a foreign country" do
-      origin = Market.create!(name: "Ponce", income: 1, country: "Puerto Rico", country_group: "USA", territory_of: "United States")
-      destination = Market.create!(name: "Pago Pago", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States")
-      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+      origin = Fabricate(:market, name: "Ponce", income: 1, country: "Puerto Rico", country_group: "USA", territory_of: "United States")
+      destination = Fabricate(:market, name: "Pago Pago", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States")
+      base = Fabricate(:market, name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
 
       subject = Fabricate(:airline, base_id: base.id)
 
@@ -146,9 +146,9 @@ RSpec.describe Airline do
 
     it "is true flying within a foreign country in the presence of a general exception" do
       CabotageException.create!(country: "Nauru and Tuvalu")
-      origin = Market.create!(name: "Nauru", income: 1, country: "Nauru and Tuvalu", country_group: "Nauru and Tuvalu")
-      destination = Market.create!(name: "Funafuti", income: 1, country: "Nauru and Tuvalu", country_group: "Nauru and Tuvalu")
-      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+      origin = Fabricate(:market, name: "Nauru", income: 1, country: "Nauru and Tuvalu", country_group: "Nauru and Tuvalu")
+      destination = Fabricate(:market, name: "Funafuti", income: 1, country: "Nauru and Tuvalu", country_group: "Nauru and Tuvalu")
+      base = Fabricate(:market, name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
 
       subject = Fabricate(:airline, base_id: base.id)
 
@@ -158,9 +158,9 @@ RSpec.describe Airline do
 
     it "is true flying within a foreign country in the presence of a specific exception" do
       CabotageException.create!(country: "Nauru and Tuvalu", excepted_country_group: "Kiribati")
-      origin = Market.create!(name: "Nauru", income: 1, country: "Nauru and Tuvalu", country_group: "Nauru and Tuvalu")
-      destination = Market.create!(name: "Funafuti", income: 1, country: "Nauru and Tuvalu", country_group: "Nauru and Tuvalu")
-      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+      origin = Fabricate(:market, name: "Nauru", income: 1, country: "Nauru and Tuvalu", country_group: "Nauru and Tuvalu")
+      destination = Fabricate(:market, name: "Funafuti", income: 1, country: "Nauru and Tuvalu", country_group: "Nauru and Tuvalu")
+      base = Fabricate(:market, name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
 
       subject = Fabricate(:airline, base_id: base.id)
 
@@ -170,9 +170,9 @@ RSpec.describe Airline do
 
     it "is true flying from a foreign country to one of its territories in the presence of a general exception" do
       CabotageException.create!(country: "United States")
-      origin = Market.create!(name: "Ponce", income: 1, country: "Puerto Rico", country_group: "USA", territory_of: "United States")
-      destination = Market.create!(name: "Adak", income: 1, country: "United States", country_group: "USA")
-      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+      origin = Fabricate(:market, name: "Ponce", income: 1, country: "Puerto Rico", country_group: "USA", territory_of: "United States")
+      destination = Fabricate(:market, name: "Adak", income: 1, country: "United States", country_group: "USA")
+      base = Fabricate(:market, name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
 
       subject = Fabricate(:airline, base_id: base.id)
 
@@ -182,9 +182,9 @@ RSpec.describe Airline do
 
     it "is true flying from a foreign country to one of its territories in the presence of a specific exception" do
       CabotageException.create!(country: "United States", excepted_country_group: "Kiribati")
-      origin = Market.create!(name: "Ponce", income: 1, country: "Puerto Rico", country_group: "USA", territory_of: "United States")
-      destination = Market.create!(name: "Adak", income: 1, country: "United States", country_group: "USA")
-      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+      origin = Fabricate(:market, name: "Ponce", income: 1, country: "Puerto Rico", country_group: "USA", territory_of: "United States")
+      destination = Fabricate(:market, name: "Adak", income: 1, country: "United States", country_group: "USA")
+      base = Fabricate(:market, name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
 
       subject = Fabricate(:airline, base_id: base.id)
 
@@ -194,9 +194,9 @@ RSpec.describe Airline do
 
     it "is true flying between territories of a foreign country in the presence of a general exception" do
       CabotageException.create!(country: "United States")
-      origin = Market.create!(name: "Ponce", income: 1, country: "Puerto Rico", country_group: "USA", territory_of: "United States")
-      destination = Market.create!(name: "Pago Pago", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States")
-      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+      origin = Fabricate(:market, name: "Ponce", income: 1, country: "Puerto Rico", country_group: "USA", territory_of: "United States")
+      destination = Fabricate(:market, name: "Pago Pago", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States")
+      base = Fabricate(:market, name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
 
       subject = Fabricate(:airline, base_id: base.id)
 
@@ -206,9 +206,9 @@ RSpec.describe Airline do
 
     it "is true flying between territories of a foreign country in the presence of a specific exception" do
       CabotageException.create!(country: "United States", excepted_country_group: "Kiribati")
-      origin = Market.create!(name: "Ponce", income: 1, country: "Puerto Rico", country_group: "USA", territory_of: "United States")
-      destination = Market.create!(name: "Pago Pago", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States")
-      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+      origin = Fabricate(:market, name: "Ponce", income: 1, country: "Puerto Rico", country_group: "USA", territory_of: "United States")
+      destination = Fabricate(:market, name: "Pago Pago", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States")
+      base = Fabricate(:market, name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
 
       subject = Fabricate(:airline, base_id: base.id)
 
@@ -218,10 +218,10 @@ RSpec.describe Airline do
 
     it "is true flying within the territory of a foreign country but false flying within the foreign country in the presence of a general exception" do
       CabotageException.create!(country: "American Samoa")
-      origin = Market.create!(name: "Fitiuta", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States")
-      destination = Market.create!(name: "Pago Pago", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States")
-      other_destination = Market.create!(name: "Guam", income: 1, country: "Guam", country_group: "USA", territory_of: "United States")
-      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+      origin = Fabricate(:market, name: "Fitiuta", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States")
+      destination = Fabricate(:market, name: "Pago Pago", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States")
+      other_destination = Fabricate(:market, name: "Guam", income: 1, country: "Guam", country_group: "USA", territory_of: "United States")
+      base = Fabricate(:market, name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
 
       subject = Fabricate(:airline, base_id: base.id)
 
@@ -233,10 +233,10 @@ RSpec.describe Airline do
 
     it "is true flying within the territory of a foreign country but false flying within the foreign country in the presence of a specific exception" do
       CabotageException.create!(country: "American Samoa", excepted_country_group: "Kiribati")
-      origin = Market.create!(name: "Fitiuta", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States")
-      destination = Market.create!(name: "Pago Pago", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States")
-      other_destination = Market.create!(name: "Guam", income: 1, country: "Guam", country_group: "USA", territory_of: "United States")
-      base = Market.create!(name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
+      origin = Fabricate(:market, name: "Fitiuta", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States")
+      destination = Fabricate(:market, name: "Pago Pago", income: 1, country: "American Samoa", country_group: "USA", territory_of: "United States")
+      other_destination = Fabricate(:market, name: "Guam", income: 1, country: "Guam", country_group: "USA", territory_of: "United States")
+      base = Fabricate(:market, name: "Tarawa", income: 1, country: "Kiribati", country_group: "Kiribati")
 
       subject = Fabricate(:airline, base_id: base.id)
 

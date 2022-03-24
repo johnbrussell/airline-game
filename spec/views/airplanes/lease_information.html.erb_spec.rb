@@ -8,7 +8,8 @@ RSpec.describe "airplanes/lease_information", type: :feature do
       end_date: Date.today + 1.day,
       current_date: Date.today + 1.day,
     )
-    market = Market.create!(
+    market = Fabricate(
+      :market, 
       name: "AB",
       country: "AB",
       country_group: "AB",

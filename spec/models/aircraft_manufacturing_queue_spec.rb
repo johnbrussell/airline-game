@@ -262,7 +262,7 @@ RSpec.describe AircraftManufacturingQueue do
       it "does not increase when the production rate is 0" do
         queue = AircraftManufacturingQueue.last
         game = queue.game
-        base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+        base = Fabricate(:market, name: "A", country: "B", country_group: "United States", income: 100)
         airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
         Airplane.create!(
           base_country_group: "United States",
@@ -287,7 +287,7 @@ RSpec.describe AircraftManufacturingQueue do
         min_rate = AircraftManufacturingQueue::LOW_PRODUCTION_RATES.min
         queue.update!(production_rate: min_rate)
         game = queue.game
-        base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+        base = Fabricate(:market, name: "A", country: "B", country_group: "United States", income: 100)
         airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
         Airplane.create!(
           base_country_group: "United States",
@@ -312,7 +312,7 @@ RSpec.describe AircraftManufacturingQueue do
         max_rate = AircraftManufacturingQueue::LOW_PRODUCTION_RATES.max
         queue.update!(production_rate: max_rate)
         game = queue.game
-        base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+        base = Fabricate(:market, name: "A", country: "B", country_group: "United States", income: 100)
         airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
         Airplane.create!(
           base_country_group: "United States",
@@ -337,7 +337,7 @@ RSpec.describe AircraftManufacturingQueue do
         initial_rate = 345.432745
         queue.update!(production_rate: initial_rate)
         game = queue.game
-        base = Market.create!(name: "A", country: "B", country_group: "United States", income: 100)
+        base = Fabricate(:market, name: "A", country: "B", country_group: "United States", income: 100)
         airline = Airline.create!(base_id: base.id, name: "American Aviation", game_id: game.id, cash_on_hand: 100)
         Airplane.create!(
           base_country_group: "United States",
