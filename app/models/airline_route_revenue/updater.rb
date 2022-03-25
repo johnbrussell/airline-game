@@ -8,9 +8,9 @@ class AirlineRouteRevenue::Updater
       exclusive_economy_revenue = earned_revenue.fetch(:exclusive_economy, arr.exclusive_economy_revenue)
       exclusive_premium_economy_revenue = earned_revenue.fetch(:exclusive_premium_economy, arr.exclusive_premium_economy_revenue)
       exclusive_business_revenue = earned_revenue.fetch(:exclusive_business, arr.exclusive_business_revenue)
-      shared_economy_revenue = earned_revenue.fetch(:shared_economy, 0) * airline_route.relative_demand_to(@origin, @destination, :economy)
-      shared_premium_economy_revenue = earned_revenue.fetch(:shared_premium_economy, 0) * airline_route.relative_demand_to(@origin, @destination, :premium_economy)
-      shared_business_revenue = earned_revenue.fetch(:shared_business, 0) * airline_route.relative_demand_to(@origin, @destination, :business)
+      shared_economy_revenue = earned_revenue.fetch(:shared_economy, 0)
+      shared_premium_economy_revenue = earned_revenue.fetch(:shared_premium_economy, 0)
+      shared_business_revenue = earned_revenue.fetch(:shared_business, 0)
       total_revenue = exclusive_economy_revenue +
         exclusive_premium_economy_revenue +
         exclusive_business_revenue +
@@ -27,9 +27,9 @@ class AirlineRouteRevenue::Updater
         exclusive_economy_revenue: exclusive_economy_revenue.round(2),
         exclusive_premium_economy_revenue: exclusive_premium_economy_revenue.round(2),
         exclusive_business_revenue: exclusive_business_revenue.round(2),
-        economy_pax: (total_economy_revenue / airline_route.economy_price.to_f / 2.0).round(7),
-        premium_economy_pax: (total_premium_economy_revenue / airline_route.premium_economy_price.to_f / 2.0).round(7),
-        business_pax: (total_business_revenue / airline_route.business_price.to_f / 2.0).round(7),
+        economy_pax: (total_economy_revenue / airline_route.economy_price.to_f / 2.0),
+        premium_economy_pax: (total_premium_economy_revenue / airline_route.premium_economy_price.to_f / 2.0),
+        business_pax: (total_business_revenue / airline_route.business_price.to_f / 2.0),
       )
       arr.save!
     end
@@ -121,9 +121,7 @@ class AirlineRouteRevenue::Updater
       other_solicited_business_market_dollars(game).map do |airline_route, flights|
         [
           airline_route,
-          AirlineRouteRevenue::Allocator.subtract_exclusive_allocations( { airline_route => flights }, airline_route.revenue.exclusive_business_revenue).fetch(airline_route, [0]).map do |amt|
-            amt / airline_route.relative_demand_to(@origin, @destination, :business)
-          end,
+          AirlineRouteRevenue::Allocator.subtract_exclusive_allocations( { airline_route => flights }, airline_route.revenue.exclusive_business_revenue).fetch(airline_route, [0]),
         ]
       end.to_h
     end
@@ -132,9 +130,7 @@ class AirlineRouteRevenue::Updater
       other_solicited_economy_market_dollars(game).map do |airline_route, flights|
         [
           airline_route,
-          AirlineRouteRevenue::Allocator.subtract_exclusive_allocations( { airline_route => flights }, airline_route.revenue.exclusive_economy_revenue).fetch(airline_route, [0]).map do |amt|
-            amt / airline_route.relative_demand_to(@origin, @destination, :economy)
-          end,
+          AirlineRouteRevenue::Allocator.subtract_exclusive_allocations( { airline_route => flights }, airline_route.revenue.exclusive_economy_revenue).fetch(airline_route, [0]),
         ]
       end.to_h
     end
@@ -143,9 +139,7 @@ class AirlineRouteRevenue::Updater
       other_solicited_premium_economy_market_dollars(game).map do |airline_route, flights|
         [
           airline_route,
-          AirlineRouteRevenue::Allocator.subtract_exclusive_allocations( { airline_route => flights }, airline_route.revenue.exclusive_premium_economy_revenue).fetch(airline_route, [0]).map do |amt|
-            amt / airline_route.relative_demand_to(@origin, @destination, :premium_economy)
-          end,
+          AirlineRouteRevenue::Allocator.subtract_exclusive_allocations( { airline_route => flights }, airline_route.revenue.exclusive_premium_economy_revenue).fetch(airline_route, [0]),
         ]
       end.to_h
     end
