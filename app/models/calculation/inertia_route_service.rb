@@ -30,12 +30,12 @@ class Calculation::InertiaRouteService
   end
 
   def business_seats_per_flight
-    if distance >= LONG_DISTANCE
+    if market_distance >= LONG_DISTANCE
       LONG_DISTANCE_BUSINESS_SEATS
-    elsif distance >= SHORT_DISTANCE
-      SHORT_DISTANCE_BUSINESS_SEATS + ((LONG_DISTANCE_BUSINESS_SEATS - SHORT_DISTANCE_BUSINESS_SEATS) * (distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
+    elsif market_distance >= SHORT_DISTANCE
+      SHORT_DISTANCE_BUSINESS_SEATS + ((LONG_DISTANCE_BUSINESS_SEATS - SHORT_DISTANCE_BUSINESS_SEATS) * (market_distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
     else
-      (SHORT_DISTANCE_BUSINESS_SEATS * distance / SHORT_DISTANCE).ceil()
+      (SHORT_DISTANCE_BUSINESS_SEATS * market_distance / SHORT_DISTANCE).ceil()
     end
   end
 
@@ -52,17 +52,17 @@ class Calculation::InertiaRouteService
   end
 
   def economy_seats_per_flight
-    if distance >= LONG_DISTANCE
+    if market_distance >= LONG_DISTANCE
       LONG_DISTANCE_ECONOMY_SEATS
-    elsif distance >= SHORT_DISTANCE
-      SHORT_DISTANCE_ECONOMY_SEATS + ((LONG_DISTANCE_ECONOMY_SEATS - SHORT_DISTANCE_ECONOMY_SEATS) * (distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
+    elsif market_distance >= SHORT_DISTANCE
+      SHORT_DISTANCE_ECONOMY_SEATS + ((LONG_DISTANCE_ECONOMY_SEATS - SHORT_DISTANCE_ECONOMY_SEATS) * (market_distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
     else
-      (SHORT_DISTANCE_ECONOMY_SEATS * distance / SHORT_DISTANCE).ceil()
+      (SHORT_DISTANCE_ECONOMY_SEATS * market_distance / SHORT_DISTANCE).ceil()
     end
   end
 
   def flight_cost
-    @flight_cost ||= Calculation::FlightCostCalculator.new(inertia_airplane, distance, INERTIA_SERVICE_QUALITY).cost
+    @flight_cost ||= Calculation::FlightCostCalculator.new(inertia_airplane, flight_distance, INERTIA_SERVICE_QUALITY).cost
   end
 
   def premium_economy_fare
@@ -78,12 +78,12 @@ class Calculation::InertiaRouteService
   end
 
   def premium_economy_seats_per_flight
-    if distance >= LONG_DISTANCE
+    if market_distance >= LONG_DISTANCE
       LONG_DISTANCE_PREMIUM_ECONOMY_SEATS
-    elsif distance >= SHORT_DISTANCE
-      SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS + ((LONG_DISTANCE_PREMIUM_ECONOMY_SEATS - SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS) * (distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
+    elsif market_distance >= SHORT_DISTANCE
+      SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS + ((LONG_DISTANCE_PREMIUM_ECONOMY_SEATS - SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS) * (market_distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
     else
-      (SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS * distance / SHORT_DISTANCE).ceil()
+      (SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS * market_distance / SHORT_DISTANCE).ceil()
     end
   end
 
@@ -153,7 +153,7 @@ class Calculation::InertiaRouteService
           name: "foo",
           production_start_year: Date.today.year,
           floor_space: business_seats_per_flight * Airplane::BUSINESS_SEAT_SIZE + premium_economy_seats_per_flight * Airplane::PREMIUM_ECONOMY_SEAT_SIZE + economy_seats_per_flight * Airplane::ECONOMY_SEAT_SIZE,
-          max_range: distance.ceil(),
+          max_range: flight_distance.ceil(),
           fuel_burn: (Math.sqrt(total_seats) * INERTIA_PLANE_FUEL_BURN_CONSTANT).ceil(),
           speed: INERTIA_PLANE_SPEED,
           num_aisles: total_seats > INERTIA_PLANE_MAX_NARROWBODY_SEATS ? 2 : 1,

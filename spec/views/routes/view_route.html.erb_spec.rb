@@ -326,7 +326,7 @@ RSpec.describe "routes/view_route", type: :feature do
     airline_route = arr.airline_route
     original_revenue = arr.revenue
     desired_revenue = 10000.01
-    ratio = desired_revenue / original_revenue
+    ratio = desired_revenue / original_revenue.to_f
     apr = AirplaneRoute.last
     apr.assign_attributes(flight_cost: 10000.29)
     apr.save(validate: false)
