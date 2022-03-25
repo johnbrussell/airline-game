@@ -130,7 +130,7 @@ RSpec.describe Calculation::TouristDemand do
 
     it "is equivalent to the destination population when domestic and the demand-maximizing distance" do
       pohnpei = Market.find_by!(name: "Pohnpei")
-      micronesia = Market.find_by!(name: "Micronesia")
+      micronesia = Market.find_by!(name: "Micronesia").tap { |m| m.update!(latitude: 6, longitude: 164) }
 
       actual = Calculation::TouristDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).demand
       expected = micronesia.populations.first.population
@@ -139,7 +139,7 @@ RSpec.describe Calculation::TouristDemand do
     end
 
     it "is reduced by a factor of 3 when the destination is international" do
-      Market.find_by!(name: "Micronesia").update!(country: "Federated States of Micronesia", country_group: "Federated States of Micronesia")
+      Market.find_by!(name: "Micronesia").update!(country: "Federated States of Micronesia", country_group: "Federated States of Micronesia", latitude: 6, longitude: 164)
 
       pohnpei = Market.find_by!(name: "Pohnpei")
       micronesia = Market.find_by!(name: "Micronesia")
@@ -151,7 +151,7 @@ RSpec.describe Calculation::TouristDemand do
     end
 
     it "is reduced by a factor of 3/2s when the destination is international but in the same country group" do
-      Market.find_by!(name: "Micronesia").update!(country: "Federated States of Micronesia")
+      Market.find_by!(name: "Micronesia").update!(country: "Federated States of Micronesia", latitude: 6, longitude: 164)
 
       pohnpei = Market.find_by!(name: "Pohnpei")
       micronesia = Market.find_by!(name: "Micronesia")

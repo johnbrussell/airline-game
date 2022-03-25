@@ -36,7 +36,7 @@ class Calculation::MaximumRevenuePotential
   private
 
     def business_distance
-      [BUSINESS_MAX_DISTANCE, distance].min
+      [BUSINESS_MAX_DISTANCE, market_distance].min
     end
 
     def business_dollars_business
@@ -112,7 +112,7 @@ class Calculation::MaximumRevenuePotential
     end
 
     def premium_economy_distance
-      [PREMIUM_ECONOMY_MAX_DISTANCE, distance].min
+      [PREMIUM_ECONOMY_MAX_DISTANCE, market_distance].min
     end
 
     def ratio_business_dollars_business
