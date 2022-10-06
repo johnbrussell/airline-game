@@ -23,7 +23,6 @@ class PopulatableTest < ActiveSupport::TestCase
           longitude: -165,
           start_gates: 1,
           easy_gates: 2,
-          exclusive_catchment: 0,
         )
       ],
       populations: [

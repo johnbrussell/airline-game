@@ -16,7 +16,7 @@ RSpec.describe Calculation::GovernmentDemand do
       iata: "PNI",
       elevation: 10,
       runway: 6000,
-      exclusive_catchment: 0,
+      exclusive_catchment: 5,
       start_gates: 1,
       easy_gates: 1,
     )
@@ -47,7 +47,6 @@ RSpec.describe Calculation::GovernmentDemand do
       iata: "KSA",
       elevation: 10,
       runway: 6000,
-      exclusive_catchment: 0,
       start_gates: 1,
       easy_gates: 1,
     )
@@ -77,7 +76,6 @@ RSpec.describe Calculation::GovernmentDemand do
       iata: "KSA2",
       elevation: 10,
       runway: 6000,
-      exclusive_catchment: 0,
       start_gates: 1,
       easy_gates: 1,
     )
@@ -87,7 +85,6 @@ RSpec.describe Calculation::GovernmentDemand do
       iata: "southwest of KWA",
       elevation: 10,
       runway: 6000,
-      exclusive_catchment: 0,
       start_gates: 1,
       easy_gates: 1,
     )

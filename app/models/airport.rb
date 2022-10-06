@@ -3,7 +3,7 @@ class Airport < ApplicationRecord
 
   validates :iata, presence: true
   validates :exclusive_catchment, presence: true
-  validates :exclusive_catchment, numericality: { greater_than_or_equal_to: 0, less_than: 100 }
+  validates :exclusive_catchment, numericality: { greater_than: 0, less_than_or_equal_to: 100 }
   validates :runway, presence: true
   validates :runway, numericality: { greater_than: 0 }
   validates :elevation, presence: true

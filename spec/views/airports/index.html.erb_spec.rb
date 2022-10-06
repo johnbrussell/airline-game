@@ -36,8 +36,8 @@ RSpec.describe "airports/index", type: :feature do
   end
 
   it "has a dropdown of airports and redirects to the selected airport" do
-    boston = Airport.create!(iata: "BOS", market: Market.last, runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1)
-    nauru = Airport.create!(iata: "INU", market: Market.last, runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1)
+    boston = Airport.create!(iata: "BOS", market: Market.last, runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1, exclusive_catchment: 1)
+    nauru = Airport.create!(iata: "INU", market: Market.last, runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1, exclusive_catchment: 1)
     Population.create!(population: 1000000, year: 2000, market_id: boston.id)
     Population.create!(population: 100000, year: 2000, market_id: nauru.id)
     Tourists.create!(volume: 100000, year: 2000, market_id: boston.id)

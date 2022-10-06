@@ -20,7 +20,7 @@ RSpec.describe Calculation::AirportPopulation do
           longitude: -165,
           start_gates: 1,
           easy_gates: 2,
-          exclusive_catchment: 0,
+          exclusive_catchment: 5,
         )
       ],
       populations: [
@@ -39,25 +39,12 @@ RSpec.describe Calculation::AirportPopulation do
   end
 
   context "available_catchment" do
-    destination_market = Market.new(airports: [Airport.new(exclusive_catchment: 10), Airport.new(exclusive_catchment: 0)])
-
-    it "is 100 when no airports have exclusive_catchment" do
-      market = Market.new(airports: [Airport.new(exclusive_catchment: 0), Airport.new(exclusive_catchment: 0)])
-      subject = described_class.new(market.airports.last, Date.today)
-
-      expect(subject.send(:available_catchment)).to eq 100
-    end
-
-    it "is 100 when no other airports have exclusive_catchment" do
-      subject = described_class.new(destination_market.airports.first, Date.today)
-
-      assert subject.send(:available_catchment) == 100
-    end
+    destination_market = Market.new(airports: [Airport.new(exclusive_catchment: 15), Airport.new(exclusive_catchment: 10)])
 
     it "is the catchment available to the airport" do
       subject = described_class.new(destination_market.airports.last, Date.today)
 
-      assert subject.send(:available_catchment) == 90
+      expect(subject.send(:available_catchment)).to eq 85
     end
   end
 
@@ -88,7 +75,7 @@ RSpec.describe Calculation::AirportPopulation do
       subject_foo = described_class.new(nauru.airports.last, Date.today)
 
       expect(subject_inu.government_workers).to eq 8000
-      expect(subject_foo.government_workers).to eq 10000
+      expect(subject_foo.government_workers).to eq 9500
     end
   end
 

@@ -23,14 +23,14 @@ RSpec.describe "airports/show", type: :feature do
       is_user_airline: true,
     )
     nauru = Fabricate(
-      :market, 
+      :market,
       name: "Nauru",
       country: "Nauru",
       country_group: "Nauru",
       income: 100,
     )
-    Airport.create!(iata: "BOS", market: boston, runway: 10000, elevation: 2, start_gates: 2, easy_gates: 100, latitude: 1, longitude: 1)
-    Airport.create!(iata: "INU", market: nauru, runway: 10000, elevation: 1, start_gates: 1, easy_gates: 1, latitude: 1, longitude: 1)
+    Airport.create!(iata: "BOS", market: boston, runway: 10000, elevation: 2, start_gates: 2, easy_gates: 100, latitude: 1, longitude: 1, exclusive_catchment: 1)
+    Airport.create!(iata: "INU", market: nauru, runway: 10000, elevation: 1, start_gates: 1, easy_gates: 1, latitude: 1, longitude: 1, exclusive_catchment: 1)
     Population.create!(population: 1000000, year: 2000, market_id: boston.id)
     Population.create!(population: 100000, year: 2000, market_id: nauru.id)
     Tourists.create!(volume: 100000, year: 2000, market_id: boston.id)
@@ -96,7 +96,7 @@ RSpec.describe "airports/show", type: :feature do
   end
 
   it "has a link to other market airports" do
-    pvd = Airport.create!(iata: "PVD", market: Market.find_by(name: "Boston"), runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1)
+    pvd = Airport.create!(iata: "PVD", market: Market.find_by(name: "Boston"), runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1, exclusive_catchment: 1)
     visit game_airport_path(Game.last, pvd)
 
     expect(page).to have_content "Boston (PVD)"
@@ -108,8 +108,8 @@ RSpec.describe "airports/show", type: :feature do
   end
 
   it "the link to other market airports pluralizes correctly" do
-    pvd = Airport.create!(iata: "PVD", market: Market.find_by(name: "Boston"), runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1)
-    Airport.create!(iata: "MHT", market: Market.find_by(name: "Boston"), runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1)
+    pvd = Airport.create!(iata: "PVD", market: Market.find_by(name: "Boston"), runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1, exclusive_catchment: 1)
+    Airport.create!(iata: "MHT", market: Market.find_by(name: "Boston"), runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1, exclusive_catchment: 1)
     visit game_airport_path(Game.last, pvd)
 
     expect(page).to have_content "Boston (PVD)"
@@ -221,7 +221,7 @@ RSpec.describe "airports/show", type: :feature do
     Slot.create!(gates_id: gates.id, lessee_id: other_airline.id)
 
     inu = Airport.find_by(iata: "INU")
-    fun = Fabricate(:airport, market: Market.find_by(name: "Boston"), iata: "FUN")
+    fun = Fabricate(:airport, market: Market.find_by(name: "Boston"), iata: "FUN", exclusive_catchment: 1)
     bos = Airport.find_by(iata: "BOS")
 
     family = Fabricate(:aircraft_family)

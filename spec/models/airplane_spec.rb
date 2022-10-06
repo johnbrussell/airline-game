@@ -2059,14 +2059,15 @@ RSpec.describe Airplane do
     it "updates the configuration, deducts cash from the airline, updates the flight costs, and adjusts the revenue on affected routes if the new configuration is valid" do
       initial_cash_on_hand = 1000000
       airline = Fabricate(:airline, cash_on_hand: initial_cash_on_hand)
+      airline.base.airports.each{ |a| a.update!(exclusive_catchment: 1) }
       subject = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, base_country_group: airline.base.country_group, operator_id: airline.id, economy_seats: 50, business_seats: 0, premium_economy_seats: 0)
       game = Game.find(airline.game_id)
-      bos = Fabricate(:airport, iata: "BOS", market: airline.base, runway: 10000)
+      bos = Fabricate(:airport, iata: "BOS", market: airline.base, runway: 10000, exclusive_catchment: 1)
       bos_gates = Gates.create!(airport: bos, game: game, current_gates: 5)
       Slot.create!(lessee_id: airline.id, gates: bos_gates)
       Population.create!(market_id: airline.base.id, year: 2000, population: 100)
       Tourists.create!(market_id: airline.base.id, year: 2000, volume: 10)
-      lax = Fabricate(:airport, iata: "LAX", market: airline.base, runway: 10000)
+      lax = Fabricate(:airport, iata: "LAX", market: airline.base, runway: 10000, exclusive_catchment: 1)
       lax_gates = Gates.create!(airport: lax, game: game, current_gates: 5)
       Slot.create!(lessee_id: airline.id, gates: lax_gates)
       airline_route = AirlineRoute.create!(airline: airline, origin_airport: bos, destination_airport: lax, distance: 2, economy_price: 1, business_price: 2, premium_economy_price: 2)
