@@ -43,9 +43,9 @@ RSpec.describe "slots/index", type: :feature do
     end
 
     it "shows information about all airports where the airline has slots" do
-      inu = Fabricate(:airport, iata: "INU", municipality: nil)
-      fun = Fabricate(:airport, market: inu.market, iata: "FUN", municipality: "Funafuti")
-      maj = Fabricate(:airport, market: inu.market, iata: "MAJ", municipality: "Majuro")
+      inu = Fabricate(:airport, iata: "INU", municipality: nil, exclusive_catchment: 1)
+      fun = Fabricate(:airport, market: inu.market, iata: "FUN", municipality: "Funafuti", exclusive_catchment: 1)
+      maj = Fabricate(:airport, market: inu.market, iata: "MAJ", municipality: "Majuro", exclusive_catchment: 1)
 
       Population.create!(market_id: inu.market.id, year: 2000, population: 10000)
       Tourists.create!(market_id: inu.market.id, year: 1999, volume: 1000)
@@ -97,9 +97,9 @@ RSpec.describe "slots/index", type: :feature do
     end
 
     it "shows all non-financial information about all airports where the airline has slots for non-user airlines" do
-      inu = Fabricate(:airport, iata: "INU", municipality: nil)
-      fun = Fabricate(:airport, market: inu.market, iata: "FUN", municipality: "Funafuti")
-      maj = Fabricate(:airport, market: inu.market, iata: "MAJ", municipality: "Majuro")
+      inu = Fabricate(:airport, iata: "INU", municipality: nil, exclusive_catchment: 1)
+      fun = Fabricate(:airport, market: inu.market, iata: "FUN", municipality: "Funafuti", exclusive_catchment: 1)
+      maj = Fabricate(:airport, market: inu.market, iata: "MAJ", municipality: "Majuro", exclusive_catchment: 1)
 
       Population.create!(market_id: inu.market.id, year: 2000, population: 10000)
       Tourists.create!(market_id: inu.market.id, year: 1999, volume: 1000)
@@ -156,8 +156,8 @@ RSpec.describe "slots/index", type: :feature do
     end
 
     it "allows users to return a slot and refresh the page" do
-      inu = Fabricate(:airport, iata: "INU", municipality: nil)
-      fun = Fabricate(:airport, market: inu.market, iata: "FUN", municipality: "Funafuti")
+      inu = Fabricate(:airport, iata: "INU", municipality: nil, exclusive_catchment: 1)
+      fun = Fabricate(:airport, market: inu.market, iata: "FUN", municipality: "Funafuti", exclusive_catchment: 1)
 
       Population.create!(market_id: inu.market.id, year: 2000, population: 10000)
       Tourists.create!(market_id: inu.market.id, year: 1999, volume: 1000)

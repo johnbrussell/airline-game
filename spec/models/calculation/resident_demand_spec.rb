@@ -20,7 +20,7 @@ RSpec.describe Calculation::ResidentDemand do
       iata: "PNI",
       elevation: 10,
       runway: 6000,
-      exclusive_catchment: 0,
+      exclusive_catchment: 0.1,
       start_gates: 1,
       easy_gates: 1,
     )
@@ -44,7 +44,7 @@ RSpec.describe Calculation::ResidentDemand do
       iata: "KSA",
       elevation: 10,
       runway: 6000,
-      exclusive_catchment: 0,
+      exclusive_catchment: 0.1,
       start_gates: 1,
       easy_gates: 1,
     )
@@ -68,7 +68,7 @@ RSpec.describe Calculation::ResidentDemand do
       iata: "KSA2",
       elevation: 10,
       runway: 6000,
-      exclusive_catchment: 0,
+      exclusive_catchment: 0.1,
       start_gates: 1,
       easy_gates: 1,
     )
@@ -80,7 +80,31 @@ RSpec.describe Calculation::ResidentDemand do
       iata: "southwest of KWA",
       elevation: 10,
       runway: 6000,
-      exclusive_catchment: 0,
+      exclusive_catchment: 0.1,
+      start_gates: 1,
+      easy_gates: 1,
+    )
+  }
+  let(:population_4) {
+    Population.new(
+      year: 2020,
+      population: 3000,
+    )
+  }
+  let(:tourists_4) {
+    Tourists.new(
+      year: 2020,
+      volume: 300,
+    )
+  }
+  let(:airport_4) {
+    Airport.new(
+      latitude: 6,
+      longitude: 164,
+      iata: "YAP",
+      elevation: 10,
+      runway: 6000,
+      exclusive_catchment: 0.1,
       start_gates: 1,
       easy_gates: 1,
     )
@@ -123,6 +147,18 @@ RSpec.describe Calculation::ResidentDemand do
       airports: [airport_2],
       populations: [population_2],
       tourists: [tourists_2],
+    ).save!
+    Market.new(
+      name: "Yap",
+      is_island: true,
+      country: "Micronesia",
+      country_group: "United States",
+      income: 100,
+      latitude: 5.35698,
+      longitude: 162.957993,
+      airports: [airport_4],
+      populations: [population_4],
+      tourists: [tourists_4],
     ).save!
     allow(Calculation::InertiaRouteService).to receive(:new).and_return(inertia_route_service)
   end
@@ -177,22 +213,22 @@ RSpec.describe Calculation::ResidentDemand do
 
     it "leisure demand is equivalent to the island demand curve when between islands, domestic, and the demand-maximizing distance" do
       pohnpei = Market.find_by!(name: "Pohnpei")
-      micronesia = Market.find_by!(name: "Micronesia").tap { |m| m.update(latitude: 6, longitude: 164) }
+      yap = Market.find_by!(name: "Yap").tap { |m| m.update(latitude: 6, longitude: 164) }
 
-      actual = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
-      expected = Calculation::DemandCurve.new(:leisure).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, micronesia.airports.last)) / 100.0 * micronesia.populations.first.population
+      actual = Calculation::ResidentDemand.new(pohnpei.airports.first, yap.airports.last, Date.today).leisure_demand
+      expected = Calculation::DemandCurve.new(:leisure).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, yap.airports.last)) / 100.0 * yap.populations.first.population
 
       assert_in_epsilon actual, expected, 0.000001
     end
 
     it "leisure demand is equivalent to the normal demand curve when between islands, domestic, and the demand-maximizing distance and an island exception exists" do
       pohnpei = Market.find_by!(name: "Pohnpei")
-      micronesia = Market.find_by!(name: "Micronesia").tap { |m| m.update(latitude: 6, longitude: 164) }
+      yap = Market.find_by!(name: "Yap").tap { |m| m.update(latitude: 6, longitude: 164) }
 
-      IslandException.create!(market_one: "Pohnpei", market_two: "Micronesia")
+      IslandException.create!(market_one: "Pohnpei", market_two: "Yap")
 
-      actual = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
-      expected = Calculation::DemandCurve.new(:leisure).relative_demand(Calculation::Distance.between_airports(pohnpei.airports.first, micronesia.airports.last)) / 100.0 * micronesia.populations.first.population / 2.0
+      actual = Calculation::ResidentDemand.new(pohnpei.airports.first, yap.airports.last, Date.today).leisure_demand
+      expected = Calculation::DemandCurve.new(:leisure).relative_demand(Calculation::Distance.between_airports(pohnpei.airports.first, yap.airports.last)) / 100.0 * yap.populations.first.population / 2.0
 
       assert_in_epsilon actual, expected, 0.000001
     end
@@ -210,13 +246,13 @@ RSpec.describe Calculation::ResidentDemand do
     end
 
     it "leisure demand is halved when the destination is not an island" do
-      Market.find_by!(name: "Micronesia").update!(is_island: false)
+      Market.find_by!(name: "Yap").update!(is_island: false)
 
       pohnpei = Market.find_by!(name: "Pohnpei")
-      micronesia = Market.find_by!(name: "Micronesia").tap { |m| m.update(latitude: 6, longitude: 164) }
+      yap = Market.find_by!(name: "Yap").tap { |m| m.update(latitude: 6, longitude: 164) }
 
-      actual = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
-      expected = Calculation::DemandCurve.new(:leisure).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, micronesia.airports.last)) / 100.0 * micronesia.populations.first.population / 2.0
+      actual = Calculation::ResidentDemand.new(pohnpei.airports.first, yap.airports.last, Date.today).leisure_demand
+      expected = Calculation::DemandCurve.new(:leisure).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, yap.airports.last)) / 100.0 * yap.populations.first.population / 2.0
 
       assert_in_epsilon actual, expected, 0.000001
     end
@@ -226,13 +262,13 @@ RSpec.describe Calculation::ResidentDemand do
 
       pohnpei = Market.find_by!(name: "Pohnpei")
       kosrae = Market.find_by!(name: "Kosrae")
-      micronesia = Market.find_by!(name: "Micronesia").tap { |m| m.update(latitude: 6, longitude: 164) }
+      yap = Market.find_by!(name: "Yap").tap { |m| m.update(latitude: 6, longitude: 164) }
 
       actual_business = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).business_demand
       expected_business = kosrae.populations.first.population / 2.0
 
-      actual_leisure = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
-      expected_leisure = micronesia.populations.first.population / 2.0
+      actual_leisure = Calculation::ResidentDemand.new(pohnpei.airports.first, yap.airports.last, Date.today).leisure_demand
+      expected_leisure = yap.populations.first.population / 2.0
 
       assert actual_business == expected_business
       assert actual_leisure == expected_leisure
@@ -263,25 +299,25 @@ RSpec.describe Calculation::ResidentDemand do
     end
 
     it "leisure demand is reduced by a factor of 12 when the origin is an island and the destination is international" do
-      Market.find_by!(name: "Micronesia").update!(country: "Federated States of Micronesia", country_group: "Federated States of Micronesia")
+      Market.find_by!(name: "Yap").update!(country: "Federated States of Micronesia", country_group: "Federated States of Micronesia")
 
       pohnpei = Market.find_by!(name: "Pohnpei")
-      micronesia = Market.find_by!(name: "Micronesia").tap { |m| m.update(latitude: 6, longitude: 164) }
+      yap = Market.find_by!(name: "Yap").tap { |m| m.update(latitude: 6, longitude: 164) }
 
-      actual = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
-      expected = Calculation::DemandCurve.new(:leisure).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, micronesia.airports.last)) / 100.0 * micronesia.populations.first.population / 12.0
+      actual = Calculation::ResidentDemand.new(pohnpei.airports.first, yap.airports.last, Date.today).leisure_demand
+      expected = Calculation::DemandCurve.new(:leisure).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, yap.airports.last)) / 100.0 * yap.populations.first.population / 12.0
 
       assert_in_epsilon actual, expected, 0.000001
     end
 
     it "leisure demand is reduced by a factor of 4/3rds when the origin is an island and the destination is international but in the same country group" do
-      Market.find_by!(name: "Micronesia").update!(country: "Federated States of Micronesia")
+      Market.find_by!(name: "Yap").update!(country: "Federated States of Micronesia")
 
       pohnpei = Market.find_by!(name: "Pohnpei")
-      micronesia = Market.find_by!(name: "Micronesia").tap { |m| m.update(latitude: 6, longitude: 164) }
+      yap = Market.find_by!(name: "Yap").tap { |m| m.update(latitude: 6, longitude: 164) }
 
-      actual = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
-      expected = Calculation::DemandCurve.new(:leisure).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, micronesia.airports.last)) / 100.0 * micronesia.populations.first.population / 12.0 * 9
+      actual = Calculation::ResidentDemand.new(pohnpei.airports.first, yap.airports.last, Date.today).leisure_demand
+      expected = Calculation::DemandCurve.new(:leisure).relative_demand_island(Calculation::Distance.between_airports(pohnpei.airports.first, yap.airports.last)) / 100.0 * yap.populations.first.population / 12.0 * 9
 
       assert_in_epsilon actual, expected, 0.000001
     end
@@ -291,13 +327,13 @@ RSpec.describe Calculation::ResidentDemand do
 
       pohnpei = Market.find_by!(name: "Pohnpei")
       kosrae = Market.find_by!(name: "Kosrae")
-      micronesia = Market.find_by!(name: "Micronesia").tap { |m| m.update(latitude: 6, longitude: 164) }
+      yap = Market.find_by!(name: "Yap").tap { |m| m.update(latitude: 6, longitude: 164) }
 
       actual_business = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).business_demand
       expected_business = 1000 / 8.0
 
-      actual_leisure = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
-      expected_leisure = micronesia.populations.first.population / 8.0
+      actual_leisure = Calculation::ResidentDemand.new(pohnpei.airports.first, yap.airports.last, Date.today).leisure_demand
+      expected_leisure = yap.populations.first.population / 8.0
 
       assert actual_business == expected_business
       assert actual_leisure == expected_leisure
@@ -308,13 +344,13 @@ RSpec.describe Calculation::ResidentDemand do
 
       pohnpei = Market.find_by!(name: "Pohnpei")
       kosrae = Market.find_by!(name: "Kosrae")
-      micronesia = Market.find_by!(name: "Micronesia").tap { |m| m.update(latitude: 6, longitude: 164) }
+      yap = Market.find_by!(name: "Yap").tap { |m| m.update(latitude: 6, longitude: 164) }
 
       actual_business = Calculation::ResidentDemand.new(pohnpei.airports.first, kosrae.airports.first, Date.today).business_demand
       expected_business = 1000 / 8.0 * 3
 
-      actual_leisure = Calculation::ResidentDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).leisure_demand
-      expected_leisure = micronesia.populations.first.population / 8.0 * 3
+      actual_leisure = Calculation::ResidentDemand.new(pohnpei.airports.first, yap.airports.last, Date.today).leisure_demand
+      expected_leisure = yap.populations.first.population / 8.0 * 3
 
       assert actual_business == expected_business
       assert actual_leisure == expected_leisure

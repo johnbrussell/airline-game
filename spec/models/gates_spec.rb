@@ -66,7 +66,6 @@ RSpec.describe Gates do
       )
       airport = Airport.create!(
         iata: "DCA",
-        exclusive_catchment: 0,
         runway: 1000,
         elevation: 10,
         start_gates: 1,
@@ -132,7 +131,6 @@ RSpec.describe Gates do
       )
       airport = Airport.create!(
         iata: "DCA",
-        exclusive_catchment: 0,
         runway: 1000,
         elevation: 10,
         start_gates: 1,
@@ -184,7 +182,6 @@ RSpec.describe Gates do
       )
       airport = Airport.create!(
         iata: "DCA",
-        exclusive_catchment: 0,
         runway: 1000,
         elevation: 10,
         start_gates: 1,
@@ -327,7 +324,6 @@ RSpec.describe Gates do
       )
       airport = Airport.create!(
         iata: "DCA",
-        exclusive_catchment: 0,
         runway: 1000,
         elevation: 10,
         start_gates: 1,
@@ -376,7 +372,6 @@ RSpec.describe Gates do
       )
       Airport.create!(
         iata: "ABC",
-        exclusive_catchment: 0,
         runway: 1000,
         elevation: 1000,
         start_gates: 2,

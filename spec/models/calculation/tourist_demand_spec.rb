@@ -16,7 +16,7 @@ RSpec.describe Calculation::TouristDemand do
       iata: "PNI",
       elevation: 10,
       runway: 6000,
-      exclusive_catchment: 0,
+      exclusive_catchment: 100,
       start_gates: 1,
       easy_gates: 1,
     )
@@ -46,7 +46,7 @@ RSpec.describe Calculation::TouristDemand do
       iata: "KSA",
       elevation: 10,
       runway: 6000,
-      exclusive_catchment: 0,
+      exclusive_catchment: 100,
       start_gates: 1,
       easy_gates: 1,
     )
@@ -76,7 +76,7 @@ RSpec.describe Calculation::TouristDemand do
       iata: "KSA2",
       elevation: 10,
       runway: 6000,
-      exclusive_catchment: 0,
+      exclusive_catchment: 50,
       start_gates: 1,
       easy_gates: 1,
     )
@@ -86,7 +86,7 @@ RSpec.describe Calculation::TouristDemand do
       iata: "southwest of KWA",
       elevation: 10,
       runway: 6000,
-      exclusive_catchment: 0,
+      exclusive_catchment: 50,
       start_gates: 1,
       easy_gates: 1,
     )
@@ -101,6 +101,36 @@ RSpec.describe Calculation::TouristDemand do
       airports: [airport_3a, airport_3b],
       populations: [population_3],
       tourists: [tourists_3],
+    ).save!
+    population_4 = Population.new(
+      year: 2020,
+      population: 3000,
+    )
+    tourists_4 = Tourists.new(
+      year: 2020,
+      volume: 300,
+    )
+    airport_4 = Airport.new(
+      latitude: 6,
+      longitude: 164,
+      iata: "KSA3",
+      elevation: 10,
+      runway: 6000,
+      exclusive_catchment: 100,
+      start_gates: 1,
+      easy_gates: 1,
+    )
+    Market.new(
+      name: "Yap",
+      is_island: false,
+      country: "Micronesia",
+      country_group: "United States",
+      income: 100,
+      latitude: 5.35698,
+      longitude: 162.957993,
+      airports: [airport_4],
+      populations: [population_4],
+      tourists: [tourists_4],
     ).save!
     inertia_route_service = instance_double(Calculation::InertiaRouteService, flight_cost: 10000)
     allow(Calculation::InertiaRouteService).to receive(:new).and_return(inertia_route_service)
@@ -130,36 +160,36 @@ RSpec.describe Calculation::TouristDemand do
 
     it "is equivalent to the destination population when domestic and the demand-maximizing distance" do
       pohnpei = Market.find_by!(name: "Pohnpei")
-      micronesia = Market.find_by!(name: "Micronesia").tap { |m| m.update!(latitude: 6, longitude: 164) }
+      yap = Market.find_by!(name: "Yap").tap { |m| m.update!(latitude: 6, longitude: 164) }
 
-      actual = Calculation::TouristDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).demand
-      expected = micronesia.populations.first.population
+      actual = Calculation::TouristDemand.new(pohnpei.airports.first, yap.airports.last, Date.today).demand
+      expected = yap.populations.first.population
 
-      assert actual == expected
+      expect(actual).to eq expected
     end
 
     it "is reduced by a factor of 3 when the destination is international" do
-      Market.find_by!(name: "Micronesia").update!(country: "Federated States of Micronesia", country_group: "Federated States of Micronesia", latitude: 6, longitude: 164)
+      Market.find_by!(name: "Yap").update!(country: "Federated States of Micronesia", country_group: "Federated States of Micronesia", latitude: 6, longitude: 164)
 
       pohnpei = Market.find_by!(name: "Pohnpei")
-      micronesia = Market.find_by!(name: "Micronesia")
+      yap = Market.find_by!(name: "Yap")
 
-      actual = Calculation::TouristDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).demand
-      expected = micronesia.populations.first.population / 3.0
+      actual = Calculation::TouristDemand.new(pohnpei.airports.first, yap.airports.last, Date.today).demand
+      expected = yap.populations.first.population / 3.0
 
-      assert actual == expected
+      expect(actual).to eq expected
     end
 
     it "is reduced by a factor of 3/2s when the destination is international but in the same country group" do
-      Market.find_by!(name: "Micronesia").update!(country: "Federated States of Micronesia", latitude: 6, longitude: 164)
+      Market.find_by!(name: "Yap").update!(country: "Federated States of Micronesia", latitude: 6, longitude: 164)
 
       pohnpei = Market.find_by!(name: "Pohnpei")
-      micronesia = Market.find_by!(name: "Micronesia")
+      yap = Market.find_by!(name: "Yap")
 
-      actual = Calculation::TouristDemand.new(pohnpei.airports.first, micronesia.airports.last, Date.today).demand
-      expected = micronesia.populations.first.population / 3.0 * 2
+      actual = Calculation::TouristDemand.new(pohnpei.airports.first, yap.airports.last, Date.today).demand
+      expected = yap.populations.first.population / 3.0 * 2
 
-      assert actual == expected
+      expect(actual).to eq expected
     end
 
     it "uses the island demand curve when the origin is an island" do
