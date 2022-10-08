@@ -78,6 +78,7 @@ RSpec.describe Calculation::GovernmentDemand do
       runway: 6000,
       start_gates: 1,
       easy_gates: 1,
+      exclusive_catchment: 1,
     )
     airport_3b = Airport.new(
       latitude: 6,
@@ -87,6 +88,7 @@ RSpec.describe Calculation::GovernmentDemand do
       runway: 6000,
       start_gates: 1,
       easy_gates: 1,
+      exclusive_catchment: 1
     )
     Market.new(
       name: "Micronesia",

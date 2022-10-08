@@ -19,6 +19,8 @@ class Airport < ApplicationRecord
 
   validates_uniqueness_of :iata
 
+  validate :logical_exclusive_catchments
+
   has_many :global_demands
 
   def self.select_options
@@ -55,4 +57,12 @@ class Airport < ApplicationRecord
   def slot_expenditures(airline)
     Slot.leased(airline, self).sum(&:rent)
   end
+
+  private
+
+    def logical_exclusive_catchments
+      if other_market_airports.sum(&:exclusive_catchment) + exclusive_catchment > 100
+        errors.add(:exclusive_catchment, "cannot exceed 100% between all airports in a market")
+      end
+    end
 end
