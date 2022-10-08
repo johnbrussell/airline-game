@@ -28,16 +28,37 @@ RSpec.describe Airport do
     end
   end
 
+  context "logical_exclusive_catchments" do
+    let(:other_airport) { Fabricate(:airport, exclusive_catchment: 90.0) }
+    let(:market) { other_airport.market.reload }
+
+    it "is valid when the sum of airports' catchments is less than 100" do
+      subject = Airport.new(exclusive_catchment: 0.1, iata: "ISN", runway: 1000, elevation: 1000, start_gates: 1, easy_gates: 1, latitude: 1, longitude: 1, market: market)
+      expect(subject.save).to be true
+    end
+
+    it "is valid when the sum of airports' catchments is equal to 100" do
+      subject = Airport.new(exclusive_catchment: 100 - other_airport.exclusive_catchment, iata: "ISN", runway: 1000, elevation: 1000, start_gates: 1, easy_gates: 1, latitude: 1, longitude: 1, market: market)
+      expect(subject.save).to be true
+    end
+
+    it "is invalid when the sum of airports' catchments is greater than 100" do
+      subject = Airport.new(exclusive_catchment: 100.1 - other_airport.exclusive_catchment, iata: "ISN", runway: 1000, elevation: 1000, start_gates: 1, easy_gates: 1, latitude: 1, longitude: 1, market: market)
+      expect(subject.save).to be false
+      expect(subject.errors.full_messages).to include "Exclusive catchment cannot exceed 100% between all airports in a market"
+    end
+  end
+
   context "other_market_airports" do
     before(:each) do
       boston = Fabricate(
-        :market, 
+        :market,
         name: "Boston",
         country: "United States",
         country_group: "United States",
         income: 100,
       )
-      Airport.create!(iata: "BOS", market: boston, runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1)
+      Airport.create!(iata: "BOS", market: boston, runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 1, longitude: 1, exclusive_catchment: 1)
     end
 
     it "is an empty array when there are no other airports in the market" do
@@ -47,7 +68,7 @@ RSpec.describe Airport do
     end
 
     it "includes the other airports in the market when there are other airports in the market" do
-      subject = Airport.create!(iata: "MHT", market: Market.last, runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 10, longitude: 1)
+      subject = Airport.create!(iata: "MHT", market: Market.last, runway: 10000, elevation: 1, start_gates: 1, easy_gates: 100, latitude: 10, longitude: 1, exclusive_catchment: 1)
 
       expect(subject.other_market_airports.empty?).to eq false
       expect(subject.other_market_airports.length).to eq 1
