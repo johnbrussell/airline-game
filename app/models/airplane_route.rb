@@ -16,6 +16,8 @@ class AirplaneRoute < ApplicationRecord
   validate :routes_connected
   validate :slots_sufficient
 
+  after_save :reload_airplane
+
   before_destroy :validate_remaining_routes_connected
 
   belongs_to :airplane
