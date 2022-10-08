@@ -21,6 +21,8 @@ class Airport < ApplicationRecord
 
   validate :logical_exclusive_catchments
 
+  after_save :reload_market
+
   has_many :global_demands
 
   def self.select_options
