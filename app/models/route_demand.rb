@@ -25,7 +25,7 @@ class RouteDemand < ApplicationRecord
       government = government_demand(origin_airport, destination_airport, date)
       leisure = leisure_demand(origin_airport, destination_airport, date)
       tourist = tourist_demand(origin_airport, destination_airport, date)
-      exclusive_ratio = destination_airport.exclusive_catchment > 0 ? destination_airport.exclusive_catchment / (destination_airport.exclusive_catchment + destination_airport.market.shared_catchment).to_f : 1
+      exclusive_ratio = destination_airport.exclusive_catchment / (destination_airport.exclusive_catchment + destination_airport.market.shared_catchment).to_f
       create!(
         year: date.year,
         origin_iata: origin_airport.iata,
