@@ -15,32 +15,35 @@ RSpec.describe RelativeDemand do
         pct_economy: 1,
         pct_premium_economy: 1,
         pct_business: 1,
-        last_measured: Date.today,
       }
 
-      RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_2.id, **shared_inputs)
-      RelativeDemand.create!(origin_market_id: market_2.id, destination_market_id: market_1.id, **shared_inputs)
-      RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_3.id, **shared_inputs)
-      RelativeDemand.create!(origin_market_id: market_3.id, destination_market_id: market_2.id, **shared_inputs)
-      expect(RelativeDemand.new(origin_market_id: market_1.id, destination_market_id: market_2.id, **shared_inputs).save).to be false
+      RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_2.id, last_measured: Date.today, **shared_inputs)
+      RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_2.id, last_measured: Date.today + 1, **shared_inputs)
+      RelativeDemand.create!(origin_market_id: market_2.id, destination_market_id: market_1.id, last_measured: Date.today, **shared_inputs)
+      RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_3.id, last_measured: Date.today, **shared_inputs)
+      RelativeDemand.create!(origin_market_id: market_3.id, destination_market_id: market_2.id, last_measured: Date.today, **shared_inputs)
+      expect(RelativeDemand.new(origin_market_id: market_1.id, destination_market_id: market_2.id, last_measured: Date.today, **shared_inputs).save).to be false
 
-      RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_2.id, origin_airport_iata: "INU", **shared_inputs)
-      RelativeDemand.create!(origin_market_id: market_2.id, destination_market_id: market_1.id, origin_airport_iata: "INU", **shared_inputs)
-      RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_3.id, origin_airport_iata: "INU", **shared_inputs)
-      RelativeDemand.create!(origin_market_id: market_3.id, destination_market_id: market_2.id, origin_airport_iata: "INU", **shared_inputs)
-      expect(RelativeDemand.new(origin_market_id: market_1.id, destination_market_id: market_2.id, origin_airport_iata: "INU", **shared_inputs).save).to be false
+      RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_2.id, origin_airport_iata: "INU", last_measured: Date.today, **shared_inputs)
+      RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_2.id, origin_airport_iata: "INU", last_measured: Date.today + 1, **shared_inputs)
+      RelativeDemand.create!(origin_market_id: market_2.id, destination_market_id: market_1.id, origin_airport_iata: "INU", last_measured: Date.today, **shared_inputs)
+      RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_3.id, origin_airport_iata: "INU", last_measured: Date.today, **shared_inputs)
+      RelativeDemand.create!(origin_market_id: market_3.id, destination_market_id: market_2.id, origin_airport_iata: "INU", last_measured: Date.today, **shared_inputs)
+      expect(RelativeDemand.new(origin_market_id: market_1.id, destination_market_id: market_2.id, origin_airport_iata: "INU", last_measured: Date.today, **shared_inputs).save).to be false
 
-      RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_2.id, origin_airport_iata: "INU", destination_airport_iata: "FUN", **shared_inputs)
-      RelativeDemand.create!(origin_market_id: market_2.id, destination_market_id: market_1.id, origin_airport_iata: "INU", destination_airport_iata: "FUN", **shared_inputs)
-      RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_3.id, origin_airport_iata: "INU", destination_airport_iata: "FUN", **shared_inputs)
-      RelativeDemand.create!(origin_market_id: market_3.id, destination_market_id: market_2.id, origin_airport_iata: "INU", destination_airport_iata: "FUN", **shared_inputs)
-      expect(RelativeDemand.new(origin_market_id: market_1.id, destination_market_id: market_2.id, origin_airport_iata: "INU", destination_airport_iata: "FUN", **shared_inputs).save).to be false
+      RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_2.id, origin_airport_iata: "INU", destination_airport_iata: "FUN", last_measured: Date.today, **shared_inputs)
+      RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_2.id, origin_airport_iata: "INU", destination_airport_iata: "FUN", last_measured: Date.today + 1, **shared_inputs)
+      RelativeDemand.create!(origin_market_id: market_2.id, destination_market_id: market_1.id, origin_airport_iata: "INU", destination_airport_iata: "FUN", last_measured: Date.today, **shared_inputs)
+      RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_3.id, origin_airport_iata: "INU", destination_airport_iata: "FUN", last_measured: Date.today, **shared_inputs)
+      RelativeDemand.create!(origin_market_id: market_3.id, destination_market_id: market_2.id, origin_airport_iata: "INU", destination_airport_iata: "FUN", last_measured: Date.today, **shared_inputs)
+      expect(RelativeDemand.new(origin_market_id: market_1.id, destination_market_id: market_2.id, origin_airport_iata: "INU", destination_airport_iata: "FUN", last_measured: Date.today, **shared_inputs).save).to be false
 
-      RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_2.id, destination_airport_iata: "FUN", **shared_inputs)
-      RelativeDemand.create!(origin_market_id: market_2.id, destination_market_id: market_1.id, destination_airport_iata: "FUN", **shared_inputs)
-      RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_3.id, destination_airport_iata: "FUN", **shared_inputs)
-      RelativeDemand.create!(origin_market_id: market_3.id, destination_market_id: market_2.id, destination_airport_iata: "FUN", **shared_inputs)
-      expect(RelativeDemand.new(origin_market_id: market_1.id, destination_market_id: market_2.id, destination_airport_iata: "FUN", **shared_inputs).save).to be false
+      RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_2.id, destination_airport_iata: "FUN", last_measured: Date.today, **shared_inputs)
+      RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_2.id, destination_airport_iata: "FUN", last_measured: Date.today + 1, **shared_inputs)
+      RelativeDemand.create!(origin_market_id: market_2.id, destination_market_id: market_1.id, destination_airport_iata: "FUN", last_measured: Date.today, **shared_inputs)
+      RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_3.id, destination_airport_iata: "FUN", last_measured: Date.today, **shared_inputs)
+      RelativeDemand.create!(origin_market_id: market_3.id, destination_market_id: market_2.id, destination_airport_iata: "FUN", last_measured: Date.today, **shared_inputs)
+      expect(RelativeDemand.new(origin_market_id: market_1.id, destination_market_id: market_2.id, destination_airport_iata: "FUN", last_measured: Date.today, **shared_inputs).save).to be false
     end
 
     it "has nil origin_airport and destination_airport when they are not specified" do
