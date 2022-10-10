@@ -6,20 +6,24 @@ class Calculation::RelativeDemand
   end
 
   def calculate
-    RelativeDemand.create!(
+    RelativeDemand.find_or_initialize_by(
       origin_market_id: @origin_airport.market.id,
       destination_market_id: @destination_airport.market.id,
       origin_airport_iata: @origin_airport.iata,
       destination_airport_iata: @destination_airport.iata,
-      business: relative_business_demand * exclusivity_percentage,
-      government: relative_government_demand * exclusivity_percentage,
-      leisure: relative_leisure_demand * exclusivity_percentage,
-      tourist: relative_tourist_demand * exclusivity_percentage,
-      pct_business: pct_business,
-      pct_economy: pct_economy,
-      pct_premium_economy: pct_premium_economy,
       last_measured: @date,
-    )
+    ).tap do |relative_demand|
+      relative_demand.assign_attributes(
+        business: relative_business_demand * exclusivity_percentage,
+        government: relative_government_demand * exclusivity_percentage,
+        leisure: relative_leisure_demand * exclusivity_percentage,
+        tourist: relative_tourist_demand * exclusivity_percentage,
+        pct_business: pct_business,
+        pct_economy: pct_economy,
+        pct_premium_economy: pct_premium_economy,
+      )
+      relative_demand.save!
+    end
   end
 
   private

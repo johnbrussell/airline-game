@@ -17,6 +17,42 @@ RSpec.describe Calculation::RelativeDemand do
       Fabricate(:airport, iata: "JFK", market: destination_market, exclusive_catchment: 10)
     end
 
+    it "correctly updates but does not create a new record" do
+      relative_demand = RelativeDemand.create!(
+        origin_market_id: origin_market.id,
+        destination_market_id: destination_market.id,
+        origin_airport_iata: "HVN",
+        destination_airport_iata: "LGA",
+        business: 1,
+        leisure: 1,
+        government: 1,
+        tourist: 1,
+        pct_economy: 1,
+        pct_premium_economy: 0,
+        pct_business: 0,
+        last_measured: today,
+      )
+
+      relative_demand_count = RelativeDemand.count
+
+      allow(Calculation::ResidentDemand).to receive(:new).with(hvn, lga, today).and_return resident_demand
+      allow(Calculation::GovernmentDemand).to receive(:new).with(hvn, lga, today).and_return government_demand
+      allow(Calculation::TouristDemand).to receive(:new).with(hvn, lga, today).and_return tourist_demand
+
+      described_class.new(today, hvn, lga).calculate
+      relative_demand.reload
+
+      expect(relative_demand.origin_market_id).to eq origin_market.id
+      expect(relative_demand.origin_airport_iata).to eq "HVN"
+      expect(relative_demand.destination_market_id).to eq destination_market.id
+      expect(relative_demand.destination_airport_iata).to eq "LGA"
+      expect(relative_demand.business).to eq 5
+      expect(relative_demand.leisure).to eq 10
+      expect(relative_demand.government).to eq 1
+      expect(relative_demand.tourist).to eq 12
+      expect(RelativeDemand.count).to eq relative_demand_count
+    end
+
     it "correctly calculates when both airports are real" do
       allow(Calculation::ResidentDemand).to receive(:new).with(hvn, lga, today).and_return resident_demand
       allow(Calculation::GovernmentDemand).to receive(:new).with(hvn, lga, today).and_return government_demand
