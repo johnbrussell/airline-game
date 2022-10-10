@@ -14,7 +14,7 @@ class RelativeDemand < ApplicationRecord
   validates :pct_premium_economy, numericality: { greater_than_or_equal_to: 0 }
   validates :tourist, presence: true
   validates :tourist, numericality: { greater_than_or_equal_to: 0 }
-  validates :origin_market_id, uniqueness: { scope: [:destination_market_id, :origin_airport_iata, :destination_airport_iata] }
+  validates :last_measured, uniqueness: { scope: [:origin_market_id, :destination_market_id, :origin_airport_iata, :destination_airport_iata] }
 
   belongs_to :origin_market, class_name: "Market"
   belongs_to :destination_market, class_name: "Market"
