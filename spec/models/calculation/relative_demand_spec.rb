@@ -5,9 +5,9 @@ RSpec.describe Calculation::RelativeDemand do
     let(:origin_market) { Fabricate(:market, name: "New Haven") }
     let(:destination_market) { Fabricate(:market, name: "New York City") }
     let(:hvn) { Fabricate(:airport, iata: "HVN", market: origin_market, exclusive_catchment: 50) }
-    let(:not_hvn) { Airport.new(market: origin_market, iata: "") }
+    let(:not_hvn) { nil }
     let(:lga) { Fabricate(:airport, iata: "LGA", market: destination_market, exclusive_catchment: 10) }
-    let(:not_lga) { Airport.new(market: destination_market, iata: "") }
+    let(:not_lga) { nil }
     let(:today) { Date.today }
     let(:resident_demand) { instance_double(Calculation::ResidentDemand, business_demand: 100, leisure_demand: 200) }
     let(:government_demand) { instance_double(Calculation::GovernmentDemand, demand: 20) }
@@ -39,7 +39,7 @@ RSpec.describe Calculation::RelativeDemand do
       allow(Calculation::GovernmentDemand).to receive(:new).with(hvn, lga, today).and_return government_demand
       allow(Calculation::TouristDemand).to receive(:new).with(hvn, lga, today).and_return tourist_demand
 
-      described_class.new(today, hvn, lga).calculate
+      described_class.new(today, hvn, lga, origin_market, destination_market).calculate
       relative_demand.reload
 
       expect(relative_demand.origin_market_id).to eq origin_market.id
@@ -58,7 +58,7 @@ RSpec.describe Calculation::RelativeDemand do
       allow(Calculation::GovernmentDemand).to receive(:new).with(hvn, lga, today).and_return government_demand
       allow(Calculation::TouristDemand).to receive(:new).with(hvn, lga, today).and_return tourist_demand
 
-      described_class.new(today, hvn, lga).calculate
+      described_class.new(today, hvn, lga, origin_market, destination_market).calculate
       actual = RelativeDemand.last
 
       expect(actual.origin_market_id).to eq origin_market.id
@@ -84,7 +84,7 @@ RSpec.describe Calculation::RelativeDemand do
       origin_market.reload
       destination_market.reload
 
-      described_class.new(today, hvn, not_lga).calculate
+      described_class.new(today, hvn, not_lga, origin_market, destination_market).calculate
       actual = RelativeDemand.last
 
       expect(actual.origin_market_id).to eq origin_market.id
@@ -110,7 +110,7 @@ RSpec.describe Calculation::RelativeDemand do
       origin_market.reload
       destination_market.reload
 
-      described_class.new(today, not_lga, hvn).calculate
+      described_class.new(today, not_lga, hvn, destination_market, origin_market).calculate
       actual = RelativeDemand.last
 
       expect(actual.origin_market_id).to eq destination_market.id
@@ -143,7 +143,7 @@ RSpec.describe Calculation::RelativeDemand do
       origin_market.reload
       destination_market.reload
 
-      described_class.new(today, not_lga, not_hvn).calculate
+      described_class.new(today, not_lga, not_hvn, destination_market, origin_market).calculate
       actual = RelativeDemand.last
 
       expect(actual.origin_market_id).to eq destination_market.id
@@ -176,7 +176,7 @@ RSpec.describe Calculation::RelativeDemand do
       origin_market.reload
       destination_market.reload
 
-      described_class.new(today, not_hvn, lga).calculate
+      described_class.new(today, not_hvn, lga, origin_market, destination_market).calculate
       actual = RelativeDemand.last
 
       expect(actual.origin_market_id).to eq origin_market.id
@@ -209,7 +209,7 @@ RSpec.describe Calculation::RelativeDemand do
       origin_market.reload
       destination_market.reload
 
-      described_class.new(today, not_lga, not_hvn).calculate
+      described_class.new(today, not_lga, not_hvn, destination_market, origin_market).calculate
       actual = RelativeDemand.last
 
       expect(actual.origin_market_id).to eq destination_market.id
