@@ -173,6 +173,10 @@ class GameData::Inputter < ApplicationRecord
       GlobalDemand.all.destroy_all
       RouteDemand.all.destroy_all
       AirportPopulation.all.destroy_all
+      MarketPopulation.all.destroy_all
+      RelativeDemand.all.destroy_all
+      RouteDollars.all.destroy_all
+      MarketDollars.all.destroy_all
 
       data = CSV.parse(File.read("data/populations.csv"), headers: true)
       data.by_row.each do |data_point|
