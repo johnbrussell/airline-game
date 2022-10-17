@@ -17,7 +17,7 @@ RSpec.describe RelativeDemand do
       Fabricate(:airport, iata: "JFK", market: destination_market, exclusive_catchment: 10)
     end
 
-    it "correctly updates but does not create a new record" do
+    it "correctly updates does not create a new record if one exists" do
       relative_demand = RelativeDemand.create!(
         origin_market_id: origin_market.id,
         destination_market_id: destination_market.id,
@@ -46,10 +46,10 @@ RSpec.describe RelativeDemand do
       expect(relative_demand.origin_airport_iata).to eq "HVN"
       expect(relative_demand.destination_market_id).to eq destination_market.id
       expect(relative_demand.destination_airport_iata).to eq "LGA"
-      expect(relative_demand.business).to eq 5
-      expect(relative_demand.leisure).to eq 10
+      expect(relative_demand.business).to eq 1
+      expect(relative_demand.leisure).to eq 1
       expect(relative_demand.government).to eq 1
-      expect(relative_demand.tourist).to eq 12
+      expect(relative_demand.tourist).to eq 1
       expect(RelativeDemand.count).to eq relative_demand_count
     end
 
@@ -222,7 +222,7 @@ RSpec.describe RelativeDemand do
       expect(actual.tourist).to eq 0
     end
   end
-  
+
   context "uniqueness validations" do
     let(:market_1) { Fabricate(:market, name: "Boston") }
     let(:market_2) { Fabricate(:market, name: "Hartford") }
