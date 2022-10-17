@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_10_17_172435) do
+ActiveRecord::Schema.define(version: 2022_10_17_183326) do
 
   create_table "aircraft_families", force: :cascade do |t|
     t.string "name", null: false
@@ -314,6 +314,19 @@ ActiveRecord::Schema.define(version: 2022_10_17_172435) do
     t.integer "gates_id"
     t.float "rent", default: 0.0, null: false
     t.index ["gates_id"], name: "index_slots_on_gates_id"
+  end
+
+  create_table "total_market_demands", force: :cascade do |t|
+    t.integer "market_id"
+    t.integer "year", null: false
+    t.integer "business", limit: 8, null: false
+    t.integer "government", limit: 8, null: false
+    t.integer "leisure", limit: 8, null: false
+    t.integer "tourist", limit: 8, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["market_id", "year"], name: "index_total_market_demand_on_market_and_year", unique: true
+    t.index ["market_id"], name: "index_total_market_demands_on_market_id"
   end
 
   create_table "tourists", force: :cascade do |t|
