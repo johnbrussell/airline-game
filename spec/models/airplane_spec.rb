@@ -432,9 +432,9 @@ RSpec.describe Airplane do
 
     it "is false when the airplane cannot fly at least one of its routes" do
       market = Fabricate(:market, name: "Pacific")
-      airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market)
-      airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: market)
-      airport_3 = Fabricate(:airport, iata: "TRW", latitude: 10, longitude: 12, runway: 11000, elevation: 0, market: market)
+      airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: market, exclusive_catchment: 32)
+      airport_2 = Fabricate(:airport, iata: "INU", latitude: 11, longitude: 14, runway: 9997, elevation: 0, market: market, exclusive_catchment: 32)
+      airport_3 = Fabricate(:airport, iata: "TRW", latitude: 10, longitude: 12, runway: 11000, elevation: 0, market: market, exclusive_catchment: 32)
       CabotageException.create!(country: market.country)
       family = Fabricate(:aircraft_family)
       distance = Calculation::Distance.between_airports(airport_1, airport_2)
