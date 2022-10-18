@@ -284,4 +284,103 @@ RSpec.describe RelativeDemand do
       expect(subject.destination_airport).to be nil
     end
   end
+
+  context "most_recent" do
+    let(:market_1) { Fabricate(:market, name: "Boston") }
+    let(:market_2) { Fabricate(:market, name: "Worcester") }
+    let(:airport_1) { Fabricate(:airport, market: market_1) }
+    let(:date) { Date.today }
+
+    it "does not find RelativeDemands that are too old" do
+      RelativeDemand.create!(
+        last_measured: date - 1.year,
+        origin_market: market_1,
+        destination_market: market_2,
+        origin_airport: airport_1,
+        destination_airport_iata: "",
+        business: 0,
+        government: 0,
+        leisure: 0,
+        tourist: 0,
+        pct_business: 0,
+        pct_economy: 0,
+        pct_premium_economy: 0,
+      )
+
+      expect(RelativeDemand.most_recent(date, airport_1, nil, market_1, market_2)).to be nil
+    end
+
+    it "does not find RelativeDemands that are too new" do
+      RelativeDemand.create!(
+        last_measured: date + 1.day,
+        origin_market: market_1,
+        destination_market: market_2,
+        origin_airport: airport_1,
+        destination_airport_iata: "",
+        business: 0,
+        government: 0,
+        leisure: 0,
+        tourist: 0,
+        pct_business: 0,
+        pct_economy: 0,
+        pct_premium_economy: 0,
+      )
+
+      expect(RelativeDemand.most_recent(date, airport_1, nil, market_1, market_2)).to be nil
+    end
+
+    it "finds only RelativeDemands that meets the correct markets and airports" do
+      expected = RelativeDemand.create!(
+        last_measured: date,
+        origin_market: market_1,
+        destination_market: market_2,
+        origin_airport: airport_1,
+        destination_airport_iata: "",
+        business: 0,
+        government: 0,
+        leisure: 0,
+        tourist: 0,
+        pct_business: 0,
+        pct_economy: 0,
+        pct_premium_economy: 0,
+      )
+
+      expect(RelativeDemand.most_recent(date, nil, airport_1, market_1, market_2)).to be nil
+      expect(RelativeDemand.most_recent(date, airport_1, nil, market_2, market_1)).to be nil
+      expect(RelativeDemand.most_recent(date, airport_1, nil, market_1, market_2)).to eq expected
+    end
+
+    it "maximizes by date" do
+      relative_demand_1 = RelativeDemand.create!(
+        last_measured: date,
+        origin_market: market_1,
+        destination_market: market_2,
+        origin_airport: airport_1,
+        destination_airport_iata: "",
+        business: 0,
+        government: 0,
+        leisure: 0,
+        tourist: 0,
+        pct_business: 0,
+        pct_economy: 0,
+        pct_premium_economy: 0,
+      )
+      relative_demand_2 = RelativeDemand.create!(
+        last_measured: date - 1.day,
+        origin_market: market_1,
+        destination_market: market_2,
+        origin_airport: airport_1,
+        destination_airport_iata: "",
+        business: 0,
+        government: 0,
+        leisure: 0,
+        tourist: 0,
+        pct_business: 0,
+        pct_economy: 0,
+        pct_premium_economy: 0,
+      )
+
+      expect(RelativeDemand.most_recent(date, airport_1, nil, market_1, market_2)).to eq relative_demand_1
+    end
+  end
 end
