@@ -21,6 +21,8 @@ class RelativeDemand < ApplicationRecord
   belongs_to :origin_airport, class_name: "Airport", foreign_key: :origin_airport_iata, primary_key: :iata, optional: true
   belongs_to :destination_airport, class_name: "Airport", foreign_key: :destination_airport_iata, primary_key: :iata, optional: true
 
+  MAXIMUM_AGE_OF_VALID_RELATIVE_DEMAND = 1.year
+
   def self.calculate(date, origin_airport, destination_airport, origin_market, destination_market)
     relative_demand = RelativeDemand.find_by(
       origin_market_id: origin_market.id,
@@ -47,6 +49,28 @@ class RelativeDemand < ApplicationRecord
       )
     else
       relative_demand
+    end
+  end
+
+  def self.most_recent(date, origin_airport, destination_airport, origin_market, destination_market)
+    RelativeDemand
+      .where('last_measured <= ?', date)
+      .where('last_measured > ?', date - MAXIMUM_AGE_OF_VALID_RELATIVE_DEMAND)
+      .where(
+        origin_market: origin_market,
+        destination_market: destination_market,
+        origin_airport_iata: origin_airport&.iata || "",
+        destination_airport_iata: destination_airport&.iata || ""
+      )
+      .max_by(&:last_measured)
+  end
+
+  def self.most_recent_or_new(date, origin_airport, destination_airport, origin_market, destination_market)
+    most_recent = self.most_recent(date, origin_airport, destination_airport, origin_market, destination_market)
+    if most_recent.nil?
+      self.calculate(date, origin_airport, destination_airport, origin_market, destination_market)
+    else
+      most_recent
     end
   end
 end
