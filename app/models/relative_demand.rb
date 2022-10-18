@@ -64,4 +64,13 @@ class RelativeDemand < ApplicationRecord
       )
       .max_by(&:last_measured)
   end
+
+  def self.most_recent_or_new(date, origin_airport, destination_airport, origin_market, destination_market)
+    most_recent = self.most_recent(date, origin_airport, destination_airport, origin_market, destination_market)
+    if most_recent.nil?
+      self.calculate(date, origin_airport, destination_airport, origin_market, destination_market)
+    else
+      most_recent
+    end
+  end
 end
