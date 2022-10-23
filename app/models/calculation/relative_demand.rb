@@ -8,19 +8,19 @@ class Calculation::RelativeDemand
   end
 
   def business
-    relative_demands[:business] * exclusivity_percentage
+    relative_business_demand * exclusivity_percentage
   end
 
   def government
-    relative_demands[:government] * exclusivity_percentage
+    relative_government_demand * exclusivity_percentage
   end
 
   def leisure
-    relative_demands[:leisure] * exclusivity_percentage
+    relative_leisure_demand * exclusivity_percentage
   end
 
   def tourist
-    relative_demands[:tourist] * exclusivity_percentage
+    relative_tourist_demand * exclusivity_percentage
   end
 
   private
@@ -93,26 +93,18 @@ class Calculation::RelativeDemand
     end
 
     def relative_business_demand
-      origin_airports_with_demand.product(destination_airports_with_demand).sum do |origin, destination|
-        Calculation::ResidentDemand.new(origin, destination, @date).business_demand * origin.exclusive_catchment / origin_airports_with_demand.sum(&:exclusive_catchment) * destination.exclusive_catchment / destination_airports_with_demand.sum(&:exclusive_catchment)
-      end
+      relative_demands[:business]
     end
 
     def relative_government_demand
-      origin_airports_with_demand.product(destination_airports_with_demand).sum do |origin, destination|
-        Calculation::GovernmentDemand.new(origin, destination, @date).demand * origin.exclusive_catchment / origin_airports_with_demand.sum(&:exclusive_catchment) * destination.exclusive_catchment / destination_airports_with_demand.sum(&:exclusive_catchment)
-      end
+      relative_demands[:government]
     end
 
     def relative_leisure_demand
-      origin_airports_with_demand.product(destination_airports_with_demand).sum do |origin, destination|
-        Calculation::ResidentDemand.new(origin, destination, @date).leisure_demand * origin.exclusive_catchment / origin_airports_with_demand.sum(&:exclusive_catchment) * destination.exclusive_catchment / destination_airports_with_demand.sum(&:exclusive_catchment)
-      end
+      relative_demands[:leisure]
     end
 
     def relative_tourist_demand
-      origin_airports_with_demand.product(destination_airports_with_demand).sum do |origin, destination|
-        Calculation::TouristDemand.new(origin, destination, @date).demand * origin.exclusive_catchment / origin_airports_with_demand.sum(&:exclusive_catchment) * destination.exclusive_catchment / destination_airports_with_demand.sum(&:exclusive_catchment)
-      end
+      relative_demands[:tourist]
     end
 end
