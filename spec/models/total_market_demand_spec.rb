@@ -30,24 +30,24 @@ RSpec.describe TotalMarketDemand do
       airport_2 = Fabricate(:airport, market: market_1, iata: "PSM")
       airport_3 = Fabricate(:airport, market: market_2, iata: "ORH")
       airport_4 = Fabricate(:airport, market: market_2, iata: "PVD")
-      expect(RelativeDemand).to receive(:most_recent_or_create).with(date, airport_1, airport_3, market_1, market_2).and_return mock_relative_demand
-      expect(RelativeDemand).to receive(:most_recent_or_create).with(date, airport_1, airport_4, market_1, market_2).and_return mock_relative_demand
-      expect(RelativeDemand).to receive(:most_recent_or_create).with(date, airport_1, nil, market_1, market_2).and_return mock_relative_demand
-      expect(RelativeDemand).to receive(:most_recent_or_create).with(date, airport_2, airport_3, market_1, market_2).and_return mock_relative_demand
-      expect(RelativeDemand).to receive(:most_recent_or_create).with(date, airport_2, airport_4, market_1, market_2).and_return mock_relative_demand
-      expect(RelativeDemand).to receive(:most_recent_or_create).with(date, airport_2, nil, market_1, market_2).and_return mock_relative_demand
-      expect(RelativeDemand).to receive(:most_recent_or_create).with(date, nil, airport_3, market_1, market_2).and_return mock_relative_demand
-      expect(RelativeDemand).to receive(:most_recent_or_create).with(date, nil, airport_4, market_1, market_2).and_return mock_relative_demand
-      expect(RelativeDemand).to receive(:most_recent_or_create).with(date, nil, nil, market_1, market_2).and_return mock_relative_demand
-      allow(RelativeDemand).to receive(:most_recent_or_create).with(date, airport_1, airport_1, market_1, market_1).and_return mock_zero_demand
-      allow(RelativeDemand).to receive(:most_recent_or_create).with(date, airport_1, airport_2, market_1, market_1).and_return mock_zero_demand
-      allow(RelativeDemand).to receive(:most_recent_or_create).with(date, airport_1, nil, market_1, market_1).and_return mock_zero_demand
-      allow(RelativeDemand).to receive(:most_recent_or_create).with(date, airport_2, airport_1, market_1, market_1).and_return mock_zero_demand
-      allow(RelativeDemand).to receive(:most_recent_or_create).with(date, airport_2, airport_2, market_1, market_1).and_return mock_zero_demand
-      allow(RelativeDemand).to receive(:most_recent_or_create).with(date, airport_2, nil, market_1, market_1).and_return mock_zero_demand
-      allow(RelativeDemand).to receive(:most_recent_or_create).with(date, nil, airport_1, market_1, market_1).and_return mock_zero_demand
-      allow(RelativeDemand).to receive(:most_recent_or_create).with(date, nil, airport_2, market_1, market_1).and_return mock_zero_demand
-      allow(RelativeDemand).to receive(:most_recent_or_create).with(date, nil, nil, market_1, market_1).and_return mock_zero_demand
+      expect(RelativeDemand).to receive(:most_recent_or_initialize).with(date, airport_1, airport_3, market_1, market_2).and_return mock_relative_demand
+      expect(RelativeDemand).to receive(:most_recent_or_initialize).with(date, airport_1, airport_4, market_1, market_2).and_return mock_relative_demand
+      expect(RelativeDemand).to receive(:most_recent_or_initialize).with(date, airport_1, nil, market_1, market_2).and_return mock_relative_demand
+      expect(RelativeDemand).to receive(:most_recent_or_initialize).with(date, airport_2, airport_3, market_1, market_2).and_return mock_relative_demand
+      expect(RelativeDemand).to receive(:most_recent_or_initialize).with(date, airport_2, airport_4, market_1, market_2).and_return mock_relative_demand
+      expect(RelativeDemand).to receive(:most_recent_or_initialize).with(date, airport_2, nil, market_1, market_2).and_return mock_relative_demand
+      expect(RelativeDemand).to receive(:most_recent_or_initialize).with(date, nil, airport_3, market_1, market_2).and_return mock_relative_demand
+      expect(RelativeDemand).to receive(:most_recent_or_initialize).with(date, nil, airport_4, market_1, market_2).and_return mock_relative_demand
+      expect(RelativeDemand).to receive(:most_recent_or_initialize).with(date, nil, nil, market_1, market_2).and_return mock_relative_demand
+      allow(RelativeDemand).to receive(:most_recent_or_initialize).with(date, airport_1, airport_1, market_1, market_1).and_return mock_zero_demand
+      allow(RelativeDemand).to receive(:most_recent_or_initialize).with(date, airport_1, airport_2, market_1, market_1).and_return mock_zero_demand
+      allow(RelativeDemand).to receive(:most_recent_or_initialize).with(date, airport_1, nil, market_1, market_1).and_return mock_zero_demand
+      allow(RelativeDemand).to receive(:most_recent_or_initialize).with(date, airport_2, airport_1, market_1, market_1).and_return mock_zero_demand
+      allow(RelativeDemand).to receive(:most_recent_or_initialize).with(date, airport_2, airport_2, market_1, market_1).and_return mock_zero_demand
+      allow(RelativeDemand).to receive(:most_recent_or_initialize).with(date, airport_2, nil, market_1, market_1).and_return mock_zero_demand
+      allow(RelativeDemand).to receive(:most_recent_or_initialize).with(date, nil, airport_1, market_1, market_1).and_return mock_zero_demand
+      allow(RelativeDemand).to receive(:most_recent_or_initialize).with(date, nil, airport_2, market_1, market_1).and_return mock_zero_demand
+      allow(RelativeDemand).to receive(:most_recent_or_initialize).with(date, nil, nil, market_1, market_1).and_return mock_zero_demand
       market_1.reload
 
       expected_business = 9
@@ -84,15 +84,15 @@ RSpec.describe TotalMarketDemand do
       airport_2 = Fabricate(:airport, market: market_1, iata: "PSM")
       airport_3 = Fabricate(:airport, market: market_2, iata: "ORH")
       airport_4 = Fabricate(:airport, market: market_2, iata: "PVD")
-      allow(RelativeDemand).to receive(:most_recent_or_create).with(date, airport_1, airport_1, market_1, market_1).and_return mock_zero_demand
-      allow(RelativeDemand).to receive(:most_recent_or_create).with(date, airport_1, airport_2, market_1, market_1).and_return mock_zero_demand
-      allow(RelativeDemand).to receive(:most_recent_or_create).with(date, airport_1, nil, market_1, market_1).and_return mock_zero_demand
-      allow(RelativeDemand).to receive(:most_recent_or_create).with(date, airport_2, airport_1, market_1, market_1).and_return mock_zero_demand
-      allow(RelativeDemand).to receive(:most_recent_or_create).with(date, airport_2, airport_2, market_1, market_1).and_return mock_zero_demand
-      allow(RelativeDemand).to receive(:most_recent_or_create).with(date, airport_2, nil, market_1, market_1).and_return mock_zero_demand
-      allow(RelativeDemand).to receive(:most_recent_or_create).with(date, nil, airport_1, market_1, market_1).and_return mock_zero_demand
-      allow(RelativeDemand).to receive(:most_recent_or_create).with(date, nil, airport_2, market_1, market_1).and_return mock_zero_demand
-      allow(RelativeDemand).to receive(:most_recent_or_create).with(date, nil, nil, market_1, market_1).and_return mock_zero_demand
+      allow(RelativeDemand).to receive(:most_recent_or_initialize).with(date, airport_1, airport_1, market_1, market_1).and_return mock_zero_demand
+      allow(RelativeDemand).to receive(:most_recent_or_initialize).with(date, airport_1, airport_2, market_1, market_1).and_return mock_zero_demand
+      allow(RelativeDemand).to receive(:most_recent_or_initialize).with(date, airport_1, nil, market_1, market_1).and_return mock_zero_demand
+      allow(RelativeDemand).to receive(:most_recent_or_initialize).with(date, airport_2, airport_1, market_1, market_1).and_return mock_zero_demand
+      allow(RelativeDemand).to receive(:most_recent_or_initialize).with(date, airport_2, airport_2, market_1, market_1).and_return mock_zero_demand
+      allow(RelativeDemand).to receive(:most_recent_or_initialize).with(date, airport_2, nil, market_1, market_1).and_return mock_zero_demand
+      allow(RelativeDemand).to receive(:most_recent_or_initialize).with(date, nil, airport_1, market_1, market_1).and_return mock_zero_demand
+      allow(RelativeDemand).to receive(:most_recent_or_initialize).with(date, nil, airport_2, market_1, market_1).and_return mock_zero_demand
+      allow(RelativeDemand).to receive(:most_recent_or_initialize).with(date, nil, nil, market_1, market_1).and_return mock_zero_demand
       market_1.reload
 
       expected_business = 1
