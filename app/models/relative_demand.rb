@@ -51,7 +51,7 @@ class RelativeDemand < ApplicationRecord
       .max_by(&:last_measured)
   end
 
-  def self.most_recent_or_new(date, origin_airport, destination_airport, origin_market, destination_market)
+  def self.most_recent_or_create(date, origin_airport, destination_airport, origin_market, destination_market)
     most_recent = self.most_recent(date, origin_airport, destination_airport, origin_market, destination_market)
     if most_recent.nil?
       self.create_new(date, origin_airport, destination_airport, origin_market, destination_market)
@@ -60,11 +60,24 @@ class RelativeDemand < ApplicationRecord
     end
   end
 
+  def self.most_recent_or_initialize(date, origin_airport, destination_airport, origin_market, destination_market)
+    most_recent = self.most_recent(date, origin_airport, destination_airport, origin_market, destination_market)
+    if most_recent.nil?
+      self.initialize_new(date, origin_airport, destination_airport, origin_market, destination_market)
+    else
+      most_recent
+    end
+  end
+
   private
 
     def self.create_new(date, origin_airport, destination_airport, origin_market, destination_market)
+      self.initialize_new(date, origin_airport, destination_airport, origin_market, destination_market).tap(&:save)
+    end
+
+    def self.initialize_new(date, origin_airport, destination_airport, origin_market, destination_market)
       calculator = Calculation::RelativeDemand.new(date, origin_airport, destination_airport, origin_market, destination_market)
-      RelativeDemand.create!(
+      RelativeDemand.new(
         origin_market_id: origin_market.id,
         destination_market_id: destination_market.id,
         origin_airport_iata: origin_airport ? origin_airport.iata : "",

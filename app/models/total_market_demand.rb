@@ -38,25 +38,31 @@ class TotalMarketDemand < ApplicationRecord
     end
 
     def self.total_relative_demands(origin_market, date)
-      totals = {
-        business: 0,
-        government: 0,
-        leisure: 0,
-        tourist: 0,
-      }
-      Market.find_in_batches do |batch|
-        batch.each do |destination_market|
-          self.market_airports(destination_market).each do |destination_airport|
-            self.market_airports(origin_market).each do |origin_airport|
-              relative_demand = RelativeDemand.most_recent_or_new(date, origin_airport, destination_airport, origin_market, destination_market)
-              totals[:business] += relative_demand.business
-              totals[:government] += relative_demand.government
-              totals[:leisure] += relative_demand.leisure
-              totals[:tourist] += relative_demand.tourist
+      known_relative_demands = RelativeDemand
+        .where(origin_market: origin_market)
+        .where('last_measured <= ?', date)
+        .where('last_measured > ?', date - RelativeDemand::MAXIMUM_AGE_OF_VALID_RELATIVE_DEMAND)
+      {
+        business: known_relative_demands.sum(:business),
+        government: known_relative_demands.sum(:government),
+        leisure: known_relative_demands.sum(:leisure),
+        tourist: known_relative_demands.sum(:tourist),
+      }.tap do |t|
+        Market
+          .where("id not in (?)", known_relative_demands.pluck(:destination_market_id).uniq + [0])  # Need + [0] because where not in always returns empty for an empty list
+          .find_in_batches do |batch|
+            batch.each do |destination_market|
+              self.market_airports(destination_market).each do |destination_airport|
+                self.market_airports(origin_market).each do |origin_airport|
+                  relative_demand = RelativeDemand.most_recent_or_initialize(date, origin_airport, destination_airport, origin_market, destination_market)
+                  t[:business] += relative_demand.business
+                  t[:government] += relative_demand.government
+                  t[:leisure] += relative_demand.leisure
+                  t[:tourist] += relative_demand.tourist
+                end
+              end
             end
           end
         end
-      end
-      totals
     end
 end

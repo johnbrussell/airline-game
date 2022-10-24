@@ -402,7 +402,7 @@ RSpec.describe RelativeDemand do
     end
   end
 
-  context "most_recent_or_new" do
+  context "most_recent_or_create" do
     let(:market_1) { Fabricate(:market, name: "Boston") }
     let(:market_2) { Fabricate(:market, name: "Worcester") }
     let(:airport_1) { Fabricate(:airport, market: market_1) }
@@ -411,7 +411,7 @@ RSpec.describe RelativeDemand do
     it "creates a new RelativeDemand if there is none sufficiently recent" do
       relative_demand_count = RelativeDemand.count
 
-      actual = RelativeDemand.most_recent_or_new(date, airport_1, nil, market_1, market_2)
+      actual = RelativeDemand.most_recent_or_create(date, airport_1, nil, market_1, market_2)
 
       expect(RelativeDemand.count).to eq relative_demand_count + 1
       expect(RelativeDemand.last).to eq actual
@@ -433,7 +433,44 @@ RSpec.describe RelativeDemand do
         pct_premium_economy: 0,
       )
       relative_demand_count = RelativeDemand.count
-      actual = RelativeDemand.most_recent_or_new(date, airport_1, nil, market_1, market_2)
+      actual = RelativeDemand.most_recent_or_create(date, airport_1, nil, market_1, market_2)
+
+      expect(actual).to eq expected
+      expect(RelativeDemand.count).to eq relative_demand_count
+    end
+  end
+
+  context "most_recent_or_initialize" do
+    let(:market_1) { Fabricate(:market, name: "Boston") }
+    let(:market_2) { Fabricate(:market, name: "Worcester") }
+    let(:airport_1) { Fabricate(:airport, market: market_1) }
+    let(:date) { Date.today }
+
+    it "does not create a new RelativeDemand" do
+      relative_demand_count = RelativeDemand.count
+
+      actual = RelativeDemand.most_recent_or_initialize(date, airport_1, nil, market_1, market_2)
+
+      expect(RelativeDemand.count).to eq relative_demand_count
+    end
+
+    it "returns the most recent RelativeDemand if one qualifies" do
+      expected = RelativeDemand.create!(
+        last_measured: date - 1.day,
+        origin_market: market_1,
+        destination_market: market_2,
+        origin_airport: airport_1,
+        destination_airport_iata: "",
+        business: 0,
+        government: 0,
+        leisure: 0,
+        tourist: 0,
+        pct_business: 0,
+        pct_economy: 0,
+        pct_premium_economy: 0,
+      )
+      relative_demand_count = RelativeDemand.count
+      actual = RelativeDemand.most_recent_or_initialize(date, airport_1, nil, market_1, market_2)
 
       expect(actual).to eq expected
       expect(RelativeDemand.count).to eq relative_demand_count
