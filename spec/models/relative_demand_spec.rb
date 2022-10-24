@@ -402,7 +402,7 @@ RSpec.describe RelativeDemand do
     end
   end
 
-  context "most_recent_or_new" do
+  context "most_recent_or_create" do
     let(:market_1) { Fabricate(:market, name: "Boston") }
     let(:market_2) { Fabricate(:market, name: "Worcester") }
     let(:airport_1) { Fabricate(:airport, market: market_1) }
@@ -411,7 +411,7 @@ RSpec.describe RelativeDemand do
     it "creates a new RelativeDemand if there is none sufficiently recent" do
       relative_demand_count = RelativeDemand.count
 
-      actual = RelativeDemand.most_recent_or_new(date, airport_1, nil, market_1, market_2)
+      actual = RelativeDemand.most_recent_or_create(date, airport_1, nil, market_1, market_2)
 
       expect(RelativeDemand.count).to eq relative_demand_count + 1
       expect(RelativeDemand.last).to eq actual
@@ -433,7 +433,7 @@ RSpec.describe RelativeDemand do
         pct_premium_economy: 0,
       )
       relative_demand_count = RelativeDemand.count
-      actual = RelativeDemand.most_recent_or_new(date, airport_1, nil, market_1, market_2)
+      actual = RelativeDemand.most_recent_or_create(date, airport_1, nil, market_1, market_2)
 
       expect(actual).to eq expected
       expect(RelativeDemand.count).to eq relative_demand_count

@@ -48,7 +48,7 @@ class TotalMarketDemand < ApplicationRecord
         batch.each do |destination_market|
           self.market_airports(destination_market).each do |destination_airport|
             self.market_airports(origin_market).each do |origin_airport|
-              relative_demand = RelativeDemand.most_recent_or_new(date, origin_airport, destination_airport, origin_market, destination_market)
+              relative_demand = RelativeDemand.most_recent_or_create(date, origin_airport, destination_airport, origin_market, destination_market)
               totals[:business] += relative_demand.business
               totals[:government] += relative_demand.government
               totals[:leisure] += relative_demand.leisure
