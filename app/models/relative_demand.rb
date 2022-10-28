@@ -34,6 +34,14 @@ class RelativeDemand < ApplicationRecord
     end
   end
 
+  def self.calculate_between_markets(date, origin_market, destination_market)
+    self.market_airports(origin_market).each do |origin_airport|
+      self.market_airports(destination_market).each do |destination_airport|
+        self.calculate(date, origin_airport, destination_airport, origin_market, destination_market)
+      end
+    end
+  end
+
   def self.most_recent(date, origin_airport, destination_airport, origin_market, destination_market)
     RelativeDemand
       .where('last_measured <= ?', date)
@@ -85,5 +93,9 @@ class RelativeDemand < ApplicationRecord
         tourist: calculator.tourist,
         distance: calculator.distance,
       )
+    end
+
+    def self.market_airports(market)
+      market.airports + [nil]
     end
 end

@@ -240,6 +240,42 @@ RSpec.describe RelativeDemand do
     end
   end
 
+  context "calculate_between_markets" do
+    let(:market_1) { Fabricate(:market, name: "Boston") }
+    let(:market_2) { Fabricate(:market, name: "Worcester") }
+    let(:relative_demand_calculator) { instance_double(Calculation::RelativeDemand, business: 1, government: 2, leisure: 3, tourist: 4) }
+
+    it "saves a RelativeDemand for each airport pair between the markets" do
+      airport_1 = Fabricate(:airport, market: market_1, iata: "BOS")
+      airport_2 = Fabricate(:airport, market: market_1, iata: "PSM")
+      airport_3 = Fabricate(:airport, market: market_2, iata: "ORH")
+      airport_4 = Fabricate(:airport, market: market_2, iata: "PVD")
+      market_1.reload
+      market_2.reload
+
+      allow(Calculation::RelativeDemand).to receive(:new).and_return relative_demand_calculator
+
+      original_relative_demand_count = RelativeDemand.count
+      expected_new_relative_demands = 9
+
+      RelativeDemand.calculate_between_markets(today, market_1, market_2)
+
+      expect(RelativeDemand.count).to eq original_relative_demand_count + expected_new_relative_demands
+
+      RelativeDemand.calculate_between_markets(today, market_1, market_2)  # try again to test idempotence
+
+      expect(RelativeDemand.count).to eq original_relative_demand_count + expected_new_relative_demands
+
+      RelativeDemand.calculate_between_markets(today, market_2, market_1)
+
+      expect(RelativeDemand.count).to eq original_relative_demand_count + expected_new_relative_demands * 2
+
+      RelativeDemand.calculate_between_markets(today, market_2, market_1)
+
+      expect(RelativeDemand.count).to eq original_relative_demand_count + expected_new_relative_demands * 2
+    end
+  end
+
   context "uniqueness validations" do
     let(:market_1) { Fabricate(:market, name: "Boston") }
     let(:market_2) { Fabricate(:market, name: "Hartford") }
