@@ -5,8 +5,9 @@ class Calculation::MarketDollars
   PERCENT_INCOME_SPENT_ON_TRAVEL_ISLAND = 10
   PERCENT_RESIDENT_TRAVEL_LEISURE = 88
 
-  def initialize(airport, current_date)
+  def initialize(airport, current_date, market = nil)
     @airport = airport
+    @market = market
     @current_date = current_date
   end
 
