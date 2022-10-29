@@ -10,4 +10,24 @@ class MarketDollars < ApplicationRecord
   validates :year, presence: true
 
   belongs_to :market
+
+  def self.calculate(market, date)
+    existing = find_by(
+      market: market,
+      year: date.year,
+    )
+    if existing.nil?
+      calculator = Calculation::MarketDollars.new(market.airports.first, date, market)
+      create!(
+        market: market,
+        year: date.year,
+        business: calculator.business,
+        government: calculator.government,
+        leisure: calculator.leisure,
+        tourist: calculator.tourist,
+      )
+    else
+      existing
+    end
+  end
 end
