@@ -148,7 +148,7 @@ class Calculation::MaximumRevenuePotential
     end
 
     def route_dollars
-      @route_dollars ||= Calculation::RouteDollars.new(@current_date, @origin, @destination)
+      @route_dollars ||= Calculation::RouteDollars.new(@current_date, @origin.market, @destination.market, @origin, @destination)
     end
 
     def total_business_dollars

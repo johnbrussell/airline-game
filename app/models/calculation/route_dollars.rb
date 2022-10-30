@@ -1,5 +1,5 @@
 class Calculation::RouteDollars
-  def initialize(date, origin_airport, destination_airport)
+  def initialize(date, origin_market, destination_market, origin_airport, destination_airport)
     @date = date
     @origin_airport = origin_airport
     @destination_airport = destination_airport

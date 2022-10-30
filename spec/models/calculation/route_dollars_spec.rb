@@ -19,7 +19,7 @@ RSpec.describe Calculation::RouteDollars do
       date = Date.today
       origin = Fabricate(:airport, iata: "XWA")
       destination = Fabricate(:airport, market: origin.market, iata: "DIK")
-      subject = Calculation::RouteDollars.new(date, origin, destination)
+      subject = Calculation::RouteDollars.new(date, origin.market, destination.market, origin, destination)
 
       expect(subject.business).to eq 1000
     end
@@ -30,7 +30,7 @@ RSpec.describe Calculation::RouteDollars do
       date = Date.today
       origin = Fabricate(:airport, iata: "XWA")
       destination = Fabricate(:airport, market: origin.market, iata: "DIK")
-      subject = Calculation::RouteDollars.new(date, origin, destination)
+      subject = Calculation::RouteDollars.new(date, origin.market, destination.market, origin, destination)
 
       expect(subject.exclusive_business).to eq 100
     end
@@ -41,7 +41,7 @@ RSpec.describe Calculation::RouteDollars do
       date = Date.today
       origin = Fabricate(:airport, iata: "XWA")
       destination = Fabricate(:airport, market: origin.market, iata: "DIK")
-      subject = Calculation::RouteDollars.new(date, origin, destination)
+      subject = Calculation::RouteDollars.new(date, origin.market, destination.market, origin, destination)
 
       expect(subject.exclusive_government).to eq 20
     end
@@ -52,7 +52,7 @@ RSpec.describe Calculation::RouteDollars do
       date = Date.today
       origin = Fabricate(:airport, iata: "XWA")
       destination = Fabricate(:airport, market: origin.market, iata: "DIK")
-      subject = Calculation::RouteDollars.new(date, origin, destination)
+      subject = Calculation::RouteDollars.new(date, origin.market, destination.market, origin, destination)
 
       expect(subject.exclusive_leisure).to eq 200
     end
@@ -63,7 +63,7 @@ RSpec.describe Calculation::RouteDollars do
       date = Date.today
       origin = Fabricate(:airport, iata: "XWA")
       destination = Fabricate(:airport, market: origin.market, iata: "DIK")
-      subject = Calculation::RouteDollars.new(date, origin, destination)
+      subject = Calculation::RouteDollars.new(date, origin.market, destination.market, origin, destination)
 
       expect(subject.exclusive_tourist).to eq 1
     end
@@ -74,7 +74,7 @@ RSpec.describe Calculation::RouteDollars do
       date = Date.today
       origin = Fabricate(:airport, iata: "XWA")
       destination = Fabricate(:airport, market: origin.market, iata: "DIK")
-      subject = Calculation::RouteDollars.new(date, origin, destination)
+      subject = Calculation::RouteDollars.new(date, origin.market, destination.market, origin, destination)
 
       expect(subject.government).to eq 200
     end
@@ -85,7 +85,7 @@ RSpec.describe Calculation::RouteDollars do
       date = Date.today
       origin = Fabricate(:airport, iata: "XWA")
       destination = Fabricate(:airport, market: origin.market, iata: "DIK")
-      subject = Calculation::RouteDollars.new(date, origin, destination)
+      subject = Calculation::RouteDollars.new(date, origin.market, destination.market, origin, destination)
 
       expect(subject.leisure).to eq 2000
     end
@@ -96,7 +96,7 @@ RSpec.describe Calculation::RouteDollars do
       date = Date.today
       origin = Fabricate(:airport, iata: "XWA")
       destination = Fabricate(:airport, market: origin.market, iata: "DIK")
-      subject = Calculation::RouteDollars.new(date, origin, destination)
+      subject = Calculation::RouteDollars.new(date, origin.market, destination.market, origin, destination)
 
       expect(subject.tourist).to eq 10
     end
@@ -108,7 +108,7 @@ RSpec.describe Calculation::RouteDollars do
       date = Date.today
       origin = Fabricate(:airport, iata: "XWA")
       destination = Fabricate(:airport, market: origin.market, iata: "DIK")
-      subject = Calculation::RouteDollars.new(date, origin, destination)
+      subject = Calculation::RouteDollars.new(date, origin.market, destination.market, origin, destination)
 
       zero_global_demand = instance_double(GlobalDemand, business: 0, government: 0, leisure: 0, tourist: 0, airport: origin)
       allow(GlobalDemand).to receive(:calculate).and_return(zero_global_demand)
