@@ -76,9 +76,7 @@ RSpec.describe TotalMarketDemand do
         government: 2,
         leisure: 3,
         tourist: 4,
-        pct_business: 1 / 3.0,
-        pct_economy: 1 / 3.0,
-        pct_premium_economy: 1 / 3.0,
+        distance: 1,
       )
       airport_1 = Fabricate(:airport, market: market_1, iata: "BOS")
       airport_2 = Fabricate(:airport, market: market_1, iata: "PSM")

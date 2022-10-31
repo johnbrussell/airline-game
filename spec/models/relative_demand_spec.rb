@@ -27,9 +27,7 @@ RSpec.describe RelativeDemand do
         leisure: 1,
         government: 1,
         tourist: 1,
-        pct_economy: 1,
-        pct_premium_economy: 0,
-        pct_business: 0,
+        distance: 1,
         last_measured: today,
       )
 
@@ -252,9 +250,7 @@ RSpec.describe RelativeDemand do
         government: 1,
         leisure: 1,
         tourist: 1,
-        pct_economy: 1,
-        pct_premium_economy: 1,
-        pct_business: 1,
+        distance: 1,
       }
 
       RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_2.id, last_measured: Date.today, **shared_inputs)
@@ -292,9 +288,7 @@ RSpec.describe RelativeDemand do
         government: 1,
         leisure: 1,
         tourist: 1,
-        pct_economy: 1,
-        pct_premium_economy: 1,
-        pct_business: 1,
+        distance: 1,
         last_measured: Date.today,
       }
       subject = RelativeDemand.create!(origin_market_id: market_1.id, destination_market_id: market_2.id, **shared_inputs)
@@ -320,9 +314,7 @@ RSpec.describe RelativeDemand do
         government: 0,
         leisure: 0,
         tourist: 0,
-        pct_business: 0,
-        pct_economy: 0,
-        pct_premium_economy: 0,
+        distance: 1,
       )
 
       expect(RelativeDemand.most_recent(date, airport_1, nil, market_1, market_2)).to be nil
@@ -339,9 +331,7 @@ RSpec.describe RelativeDemand do
         government: 0,
         leisure: 0,
         tourist: 0,
-        pct_business: 0,
-        pct_economy: 0,
-        pct_premium_economy: 0,
+        distance: 1,
       )
 
       expect(RelativeDemand.most_recent(date, airport_1, nil, market_1, market_2)).to be nil
@@ -358,9 +348,7 @@ RSpec.describe RelativeDemand do
         government: 0,
         leisure: 0,
         tourist: 0,
-        pct_business: 0,
-        pct_economy: 0,
-        pct_premium_economy: 0,
+        distance: 1,
       )
 
       expect(RelativeDemand.most_recent(date, nil, airport_1, market_1, market_2)).to be nil
@@ -379,9 +367,7 @@ RSpec.describe RelativeDemand do
         government: 0,
         leisure: 0,
         tourist: 0,
-        pct_business: 0,
-        pct_economy: 0,
-        pct_premium_economy: 0,
+        distance: 1,
       )
       relative_demand_2 = RelativeDemand.create!(
         last_measured: date - 1.day,
@@ -393,9 +379,7 @@ RSpec.describe RelativeDemand do
         government: 0,
         leisure: 0,
         tourist: 0,
-        pct_business: 0,
-        pct_economy: 0,
-        pct_premium_economy: 0,
+        distance: 1,
       )
 
       expect(RelativeDemand.most_recent(date, airport_1, nil, market_1, market_2)).to eq relative_demand_1
@@ -428,9 +412,7 @@ RSpec.describe RelativeDemand do
         government: 0,
         leisure: 0,
         tourist: 0,
-        pct_business: 0,
-        pct_economy: 0,
-        pct_premium_economy: 0,
+        distance: 1,
       )
       relative_demand_count = RelativeDemand.count
       actual = RelativeDemand.most_recent_or_create(date, airport_1, nil, market_1, market_2)
@@ -465,9 +447,7 @@ RSpec.describe RelativeDemand do
         government: 0,
         leisure: 0,
         tourist: 0,
-        pct_business: 0,
-        pct_economy: 0,
-        pct_premium_economy: 0,
+        distance: 1,
       )
       relative_demand_count = RelativeDemand.count
       actual = RelativeDemand.most_recent_or_initialize(date, airport_1, nil, market_1, market_2)

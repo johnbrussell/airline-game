@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_10_17_183326) do
+ActiveRecord::Schema.define(version: 2022_10_30_191058) do
 
   create_table "aircraft_families", force: :cascade do |t|
     t.string "name", null: false
@@ -260,12 +260,10 @@ ActiveRecord::Schema.define(version: 2022_10_17_183326) do
     t.float "government", null: false
     t.float "leisure", null: false
     t.float "tourist", null: false
-    t.float "pct_economy", null: false
-    t.float "pct_premium_economy", null: false
-    t.float "pct_business", null: false
     t.date "last_measured", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.float "distance", null: false
     t.index ["origin_market_id", "destination_market_id", "origin_airport_iata", "destination_airport_iata", "last_measured"], name: "index_relative_demand_for_uniqueness_between_airports", unique: true
   end
 

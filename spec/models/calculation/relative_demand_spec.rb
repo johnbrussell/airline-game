@@ -23,9 +23,11 @@ RSpec.describe Calculation::RelativeDemand do
       allow(Calculation::ResidentDemand).to receive(:new).with(hvn, lga, today, airport_population).and_return resident_demand
       allow(Calculation::GovernmentDemand).to receive(:new).with(hvn, lga, today, airport_population).and_return government_demand
       allow(Calculation::TouristDemand).to receive(:new).with(hvn, lga, today, airport_population).and_return tourist_demand
+      allow(Calculation::Distance).to receive(:between_airports).with(hvn, lga).and_return 50
 
       subject = described_class.new(today, hvn, lga, origin_market, destination_market)
       expect(subject.business).to eq 5
+      expect(subject.distance).to eq 50
       expect(subject.government).to eq 1
       expect(subject.leisure).to eq 10
       expect(subject.tourist).to eq 12
@@ -40,6 +42,8 @@ RSpec.describe Calculation::RelativeDemand do
       allow(Calculation::GovernmentDemand).to receive(:new).with(hvn, jfk, today, airport_population).and_return government_demand
       allow(Calculation::TouristDemand).to receive(:new).with(hvn, lga, today, airport_population).and_return tourist_demand
       allow(Calculation::TouristDemand).to receive(:new).with(hvn, jfk, today, airport_population).and_return tourist_demand
+      allow(Calculation::Distance).to receive(:between_airports).with(hvn, lga).and_return 50
+      allow(Calculation::Distance).to receive(:between_airports).with(hvn, jfk).and_return 70
 
       origin_market.reload
       destination_market.reload
@@ -47,6 +51,7 @@ RSpec.describe Calculation::RelativeDemand do
       subject = described_class.new(today, hvn, not_lga, origin_market, destination_market)
 
       expect(subject.business).to eq 40
+      expect(subject.distance).to eq 60
       expect(subject.government).to eq 8
       expect(subject.leisure).to eq 80
       expect(subject.tourist).to eq 96
@@ -61,12 +66,15 @@ RSpec.describe Calculation::RelativeDemand do
       allow(Calculation::GovernmentDemand).to receive(:new).with(jfk, hvn, today, airport_population).and_return government_demand
       allow(Calculation::TouristDemand).to receive(:new).with(lga, hvn, today, airport_population).and_return tourist_demand
       allow(Calculation::TouristDemand).to receive(:new).with(jfk, hvn, today, airport_population).and_return tourist_demand
+      allow(Calculation::Distance).to receive(:between_airports).with(lga, hvn).and_return 50
+      allow(Calculation::Distance).to receive(:between_airports).with(jfk, hvn).and_return 70
 
       origin_market.reload
       destination_market.reload
 
       subject = described_class.new(today, not_lga, hvn, destination_market, origin_market)
       expect(subject.business).to eq 40
+      expect(subject.distance).to eq 60
       expect(subject.government).to eq 8
       expect(subject.leisure).to eq 80
       expect(subject.tourist).to eq 96
@@ -88,12 +96,17 @@ RSpec.describe Calculation::RelativeDemand do
       allow(Calculation::TouristDemand).to receive(:new).with(jfk, hvn, today, airport_population).and_return tourist_demand
       allow(Calculation::TouristDemand).to receive(:new).with(lga, bdr, today, airport_population).and_return tourist_demand
       allow(Calculation::TouristDemand).to receive(:new).with(jfk, bdr, today, airport_population).and_return tourist_demand
+      allow(Calculation::Distance).to receive(:between_airports).with(lga, hvn).and_return 50
+      allow(Calculation::Distance).to receive(:between_airports).with(jfk, hvn).and_return 70
+      allow(Calculation::Distance).to receive(:between_airports).with(lga, bdr).and_return 20
+      allow(Calculation::Distance).to receive(:between_airports).with(jfk, bdr).and_return 40
 
       origin_market.reload
       destination_market.reload
 
       subject = described_class.new(today, not_lga, not_hvn, destination_market, origin_market)
       expect(subject.business).to eq 20
+      expect(subject.distance).to eq 50
       expect(subject.government).to eq 4
       expect(subject.leisure).to eq 40
       expect(subject.tourist).to eq 48
@@ -115,12 +128,17 @@ RSpec.describe Calculation::RelativeDemand do
       allow(Calculation::TouristDemand).to receive(:new).with(hvn, jfk, today, airport_population).and_return tourist_demand
       allow(Calculation::TouristDemand).to receive(:new).with(bdr, lga, today, airport_population).and_return tourist_demand
       allow(Calculation::TouristDemand).to receive(:new).with(bdr, jfk, today, airport_population).and_return tourist_demand
+      allow(Calculation::Distance).to receive(:between_airports).with(hvn, lga).and_return 50
+      allow(Calculation::Distance).to receive(:between_airports).with(hvn, jfk).and_return 70
+      allow(Calculation::Distance).to receive(:between_airports).with(bdr, lga).and_return 20
+      allow(Calculation::Distance).to receive(:between_airports).with(bdr, jfk).and_return 40
 
       origin_market.reload
       destination_market.reload
 
       subject = described_class.new(today, not_hvn, lga, origin_market, destination_market)
       expect(subject.business).to eq 0
+      expect(subject.distance).to eq 35
       expect(subject.government).to eq 0
       expect(subject.leisure).to eq 0
       expect(subject.tourist).to eq 0
@@ -142,12 +160,17 @@ RSpec.describe Calculation::RelativeDemand do
       allow(Calculation::TouristDemand).to receive(:new).with(jfk, hvn, today, airport_population).and_return tourist_demand
       allow(Calculation::TouristDemand).to receive(:new).with(lga, bdr, today, airport_population).and_return tourist_demand
       allow(Calculation::TouristDemand).to receive(:new).with(jfk, bdr, today, airport_population).and_return tourist_demand
+      allow(Calculation::Distance).to receive(:between_airports).with(lga, hvn).and_return 50
+      allow(Calculation::Distance).to receive(:between_airports).with(jfk, hvn).and_return 70
+      allow(Calculation::Distance).to receive(:between_airports).with(lga, bdr).and_return 20
+      allow(Calculation::Distance).to receive(:between_airports).with(jfk, bdr).and_return 40
 
       origin_market.reload
       destination_market.reload
 
       subject = described_class.new(today, not_lga, not_hvn, destination_market, origin_market)
       expect(subject.business).to eq 0
+      expect(subject.distance).to eq 45
       expect(subject.government).to eq 0
       expect(subject.leisure).to eq 0
       expect(subject.tourist).to eq 0
