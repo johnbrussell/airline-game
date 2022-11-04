@@ -53,12 +53,9 @@ RSpec.describe RelativeDemand do
     end
 
     it "correctly calculates when both airports are real" do
-      market_population = instance_double(MarketPopulation)
-      allow(MarketPopulation).to receive(:calculate).and_return(market_population)
-
-      allow(Calculation::ResidentDemand).to receive(:new).with(hvn, lga, today, market_population).and_return resident_demand
-      allow(Calculation::GovernmentDemand).to receive(:new).with(hvn, lga, today, market_population).and_return government_demand
-      allow(Calculation::TouristDemand).to receive(:new).with(hvn, lga, today, market_population).and_return tourist_demand
+      allow(Calculation::ResidentDemand).to receive(:new).with(hvn, lga, today).and_return resident_demand
+      allow(Calculation::GovernmentDemand).to receive(:new).with(hvn, lga, today).and_return government_demand
+      allow(Calculation::TouristDemand).to receive(:new).with(hvn, lga, today).and_return tourist_demand
 
       described_class.calculate(today, hvn, lga, origin_market, destination_market)
       actual = RelativeDemand.last
@@ -76,15 +73,12 @@ RSpec.describe RelativeDemand do
     it "correctly calculates when only the origin airport is real" do
       jfk = Airport.find_by(iata: "JFK")
 
-      market_population = instance_double(MarketPopulation)
-      allow(MarketPopulation).to receive(:calculate).and_return(market_population)
-
-      allow(Calculation::ResidentDemand).to receive(:new).with(hvn, lga, today, market_population).and_return resident_demand
-      allow(Calculation::GovernmentDemand).to receive(:new).with(hvn, lga, today, market_population).and_return government_demand
-      allow(Calculation::TouristDemand).to receive(:new).with(hvn, lga, today, market_population).and_return tourist_demand
-      allow(Calculation::ResidentDemand).to receive(:new).with(hvn, jfk, today, market_population).and_return resident_demand
-      allow(Calculation::GovernmentDemand).to receive(:new).with(hvn, jfk, today, market_population).and_return government_demand
-      allow(Calculation::TouristDemand).to receive(:new).with(hvn, jfk, today, market_population).and_return tourist_demand
+      allow(Calculation::ResidentDemand).to receive(:new).with(hvn, lga, today).and_return resident_demand
+      allow(Calculation::GovernmentDemand).to receive(:new).with(hvn, lga, today).and_return government_demand
+      allow(Calculation::TouristDemand).to receive(:new).with(hvn, lga, today).and_return tourist_demand
+      allow(Calculation::ResidentDemand).to receive(:new).with(hvn, jfk, today).and_return resident_demand
+      allow(Calculation::GovernmentDemand).to receive(:new).with(hvn, jfk, today).and_return government_demand
+      allow(Calculation::TouristDemand).to receive(:new).with(hvn, jfk, today).and_return tourist_demand
 
       origin_market.reload
       destination_market.reload
@@ -105,15 +99,12 @@ RSpec.describe RelativeDemand do
     it "correctly calculates when only the destination airport is real" do
       jfk = Airport.find_by(iata: "JFK")
 
-      market_population = instance_double(MarketPopulation)
-      allow(MarketPopulation).to receive(:calculate).and_return(market_population)
-
-      allow(Calculation::ResidentDemand).to receive(:new).with(lga, hvn, today, market_population).and_return resident_demand
-      allow(Calculation::GovernmentDemand).to receive(:new).with(lga, hvn, today, market_population).and_return government_demand
-      allow(Calculation::TouristDemand).to receive(:new).with(lga, hvn, today, market_population).and_return tourist_demand
-      allow(Calculation::ResidentDemand).to receive(:new).with(jfk, hvn, today, market_population).and_return resident_demand
-      allow(Calculation::GovernmentDemand).to receive(:new).with(jfk, hvn, today, market_population).and_return government_demand
-      allow(Calculation::TouristDemand).to receive(:new).with(jfk, hvn, today, market_population).and_return tourist_demand
+      allow(Calculation::ResidentDemand).to receive(:new).with(lga, hvn, today).and_return resident_demand
+      allow(Calculation::GovernmentDemand).to receive(:new).with(lga, hvn, today).and_return government_demand
+      allow(Calculation::TouristDemand).to receive(:new).with(lga, hvn, today).and_return tourist_demand
+      allow(Calculation::ResidentDemand).to receive(:new).with(jfk, hvn, today).and_return resident_demand
+      allow(Calculation::GovernmentDemand).to receive(:new).with(jfk, hvn, today).and_return government_demand
+      allow(Calculation::TouristDemand).to receive(:new).with(jfk, hvn, today).and_return tourist_demand
 
       origin_market.reload
       destination_market.reload
@@ -135,21 +126,18 @@ RSpec.describe RelativeDemand do
       bdr = Airport.create!(market: origin_market, iata: "BDR", exclusive_catchment: 25, latitude: 9, longitude: 9, elevation: 1, runway: 1000, start_gates: 1, easy_gates: 1)
       jfk = Airport.find_by(iata: "JFK")
 
-      market_population = instance_double(MarketPopulation)
-      allow(MarketPopulation).to receive(:calculate).and_return(market_population)
-
-      allow(Calculation::ResidentDemand).to receive(:new).with(lga, hvn, today, market_population).and_return resident_demand
-      allow(Calculation::GovernmentDemand).to receive(:new).with(lga, hvn, today, market_population).and_return government_demand
-      allow(Calculation::TouristDemand).to receive(:new).with(lga, hvn, today, market_population).and_return tourist_demand
-      allow(Calculation::ResidentDemand).to receive(:new).with(jfk, hvn, today, market_population).and_return resident_demand
-      allow(Calculation::GovernmentDemand).to receive(:new).with(jfk, hvn, today, market_population).and_return government_demand
-      allow(Calculation::TouristDemand).to receive(:new).with(jfk, hvn, today, market_population).and_return tourist_demand
-      allow(Calculation::ResidentDemand).to receive(:new).with(lga, bdr, today, market_population).and_return resident_demand
-      allow(Calculation::GovernmentDemand).to receive(:new).with(lga, bdr, today, market_population).and_return government_demand
-      allow(Calculation::TouristDemand).to receive(:new).with(lga, bdr, today, market_population).and_return tourist_demand
-      allow(Calculation::ResidentDemand).to receive(:new).with(jfk, bdr, today, market_population).and_return resident_demand
-      allow(Calculation::GovernmentDemand).to receive(:new).with(jfk, bdr, today, market_population).and_return government_demand
-      allow(Calculation::TouristDemand).to receive(:new).with(jfk, bdr, today, market_population).and_return tourist_demand
+      allow(Calculation::ResidentDemand).to receive(:new).with(lga, hvn, today).and_return resident_demand
+      allow(Calculation::GovernmentDemand).to receive(:new).with(lga, hvn, today).and_return government_demand
+      allow(Calculation::TouristDemand).to receive(:new).with(lga, hvn, today).and_return tourist_demand
+      allow(Calculation::ResidentDemand).to receive(:new).with(jfk, hvn, today).and_return resident_demand
+      allow(Calculation::GovernmentDemand).to receive(:new).with(jfk, hvn, today).and_return government_demand
+      allow(Calculation::TouristDemand).to receive(:new).with(jfk, hvn, today).and_return tourist_demand
+      allow(Calculation::ResidentDemand).to receive(:new).with(lga, bdr, today).and_return resident_demand
+      allow(Calculation::GovernmentDemand).to receive(:new).with(lga, bdr, today).and_return government_demand
+      allow(Calculation::TouristDemand).to receive(:new).with(lga, bdr, today).and_return tourist_demand
+      allow(Calculation::ResidentDemand).to receive(:new).with(jfk, bdr, today).and_return resident_demand
+      allow(Calculation::GovernmentDemand).to receive(:new).with(jfk, bdr, today).and_return government_demand
+      allow(Calculation::TouristDemand).to receive(:new).with(jfk, bdr, today).and_return tourist_demand
 
       origin_market.reload
       destination_market.reload
@@ -171,21 +159,18 @@ RSpec.describe RelativeDemand do
       bdr = Airport.create!(market: origin_market, iata: "BDR", exclusive_catchment: 50, latitude: 9, longitude: 9, elevation: 1, runway: 1000, start_gates: 1, easy_gates: 1)
       jfk = Airport.find_by(iata: "JFK")
 
-      market_population = instance_double(MarketPopulation)
-      allow(MarketPopulation).to receive(:calculate).and_return(market_population)
-
-      allow(Calculation::ResidentDemand).to receive(:new).with(hvn, lga, today, market_population).and_return resident_demand
-      allow(Calculation::GovernmentDemand).to receive(:new).with(hvn, lga, today, market_population).and_return government_demand
-      allow(Calculation::TouristDemand).to receive(:new).with(hvn, lga, today, market_population).and_return tourist_demand
-      allow(Calculation::ResidentDemand).to receive(:new).with(hvn, jfk, today, market_population).and_return resident_demand
-      allow(Calculation::GovernmentDemand).to receive(:new).with(hvn, jfk, today, market_population).and_return government_demand
-      allow(Calculation::TouristDemand).to receive(:new).with(hvn, jfk, today, market_population).and_return tourist_demand
-      allow(Calculation::ResidentDemand).to receive(:new).with(bdr, lga, today, market_population).and_return resident_demand
-      allow(Calculation::GovernmentDemand).to receive(:new).with(bdr, lga, today, market_population).and_return government_demand
-      allow(Calculation::TouristDemand).to receive(:new).with(bdr, lga, today, market_population).and_return tourist_demand
-      allow(Calculation::ResidentDemand).to receive(:new).with(bdr, jfk, today, market_population).and_return resident_demand
-      allow(Calculation::GovernmentDemand).to receive(:new).with(bdr, jfk, today, market_population).and_return government_demand
-      allow(Calculation::TouristDemand).to receive(:new).with(bdr, jfk, today, market_population).and_return tourist_demand
+      allow(Calculation::ResidentDemand).to receive(:new).with(hvn, lga, today).and_return resident_demand
+      allow(Calculation::GovernmentDemand).to receive(:new).with(hvn, lga, today).and_return government_demand
+      allow(Calculation::TouristDemand).to receive(:new).with(hvn, lga, today).and_return tourist_demand
+      allow(Calculation::ResidentDemand).to receive(:new).with(hvn, jfk, today).and_return resident_demand
+      allow(Calculation::GovernmentDemand).to receive(:new).with(hvn, jfk, today).and_return government_demand
+      allow(Calculation::TouristDemand).to receive(:new).with(hvn, jfk, today).and_return tourist_demand
+      allow(Calculation::ResidentDemand).to receive(:new).with(bdr, lga, today).and_return resident_demand
+      allow(Calculation::GovernmentDemand).to receive(:new).with(bdr, lga, today).and_return government_demand
+      allow(Calculation::TouristDemand).to receive(:new).with(bdr, lga, today).and_return tourist_demand
+      allow(Calculation::ResidentDemand).to receive(:new).with(bdr, jfk, today).and_return resident_demand
+      allow(Calculation::GovernmentDemand).to receive(:new).with(bdr, jfk, today).and_return government_demand
+      allow(Calculation::TouristDemand).to receive(:new).with(bdr, jfk, today).and_return tourist_demand
 
       origin_market.reload
       destination_market.reload
@@ -207,21 +192,18 @@ RSpec.describe RelativeDemand do
       bdr = Airport.create!(market: origin_market, iata: "BDR", exclusive_catchment: 50, latitude: 9, longitude: 9, elevation: 1, runway: 1000, start_gates: 1, easy_gates: 1)
       jfk = Airport.find_by(iata: "JFK")
 
-      market_population = instance_double(MarketPopulation)
-      allow(MarketPopulation).to receive(:calculate).and_return(market_population)
-
-      allow(Calculation::ResidentDemand).to receive(:new).with(lga, hvn, today, market_population).and_return resident_demand
-      allow(Calculation::GovernmentDemand).to receive(:new).with(lga, hvn, today, market_population).and_return government_demand
-      allow(Calculation::TouristDemand).to receive(:new).with(lga, hvn, today, market_population).and_return tourist_demand
-      allow(Calculation::ResidentDemand).to receive(:new).with(jfk, hvn, today, market_population).and_return resident_demand
-      allow(Calculation::GovernmentDemand).to receive(:new).with(jfk, hvn, today, market_population).and_return government_demand
-      allow(Calculation::TouristDemand).to receive(:new).with(jfk, hvn, today, market_population).and_return tourist_demand
-      allow(Calculation::ResidentDemand).to receive(:new).with(lga, bdr, today, market_population).and_return resident_demand
-      allow(Calculation::GovernmentDemand).to receive(:new).with(lga, bdr, today, market_population).and_return government_demand
-      allow(Calculation::TouristDemand).to receive(:new).with(lga, bdr, today, market_population).and_return tourist_demand
-      allow(Calculation::ResidentDemand).to receive(:new).with(jfk, bdr, today, market_population).and_return resident_demand
-      allow(Calculation::GovernmentDemand).to receive(:new).with(jfk, bdr, today, market_population).and_return government_demand
-      allow(Calculation::TouristDemand).to receive(:new).with(jfk, bdr, today, market_population).and_return tourist_demand
+      allow(Calculation::ResidentDemand).to receive(:new).with(lga, hvn, today).and_return resident_demand
+      allow(Calculation::GovernmentDemand).to receive(:new).with(lga, hvn, today).and_return government_demand
+      allow(Calculation::TouristDemand).to receive(:new).with(lga, hvn, today).and_return tourist_demand
+      allow(Calculation::ResidentDemand).to receive(:new).with(jfk, hvn, today).and_return resident_demand
+      allow(Calculation::GovernmentDemand).to receive(:new).with(jfk, hvn, today).and_return government_demand
+      allow(Calculation::TouristDemand).to receive(:new).with(jfk, hvn, today).and_return tourist_demand
+      allow(Calculation::ResidentDemand).to receive(:new).with(lga, bdr, today).and_return resident_demand
+      allow(Calculation::GovernmentDemand).to receive(:new).with(lga, bdr, today).and_return government_demand
+      allow(Calculation::TouristDemand).to receive(:new).with(lga, bdr, today).and_return tourist_demand
+      allow(Calculation::ResidentDemand).to receive(:new).with(jfk, bdr, today).and_return resident_demand
+      allow(Calculation::GovernmentDemand).to receive(:new).with(jfk, bdr, today).and_return government_demand
+      allow(Calculation::TouristDemand).to receive(:new).with(jfk, bdr, today).and_return tourist_demand
 
       origin_market.reload
       destination_market.reload
@@ -428,9 +410,6 @@ RSpec.describe RelativeDemand do
     let(:airport_1) { Fabricate(:airport, market: market_1) }
 
     it "creates a new RelativeDemand if there is none sufficiently recent" do
-      market_population = instance_double(MarketPopulation)
-      allow(MarketPopulation).to receive(:calculate).and_return(market_population)
-      
       relative_demand_count = RelativeDemand.count
 
       actual = RelativeDemand.most_recent_or_create(today, airport_1, nil, market_1, market_2)
@@ -466,9 +445,6 @@ RSpec.describe RelativeDemand do
     let(:airport_1) { Fabricate(:airport, market: market_1) }
 
     it "does not create a new RelativeDemand" do
-      market_population = instance_double(MarketPopulation)
-      allow(MarketPopulation).to receive(:calculate).and_return(market_population)
-
       relative_demand_count = RelativeDemand.count
 
       actual = RelativeDemand.most_recent_or_initialize(today, airport_1, nil, market_1, market_2)
