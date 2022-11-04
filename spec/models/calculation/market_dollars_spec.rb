@@ -5,17 +5,17 @@ RSpec.describe Calculation::MarketDollars do
   island_airport = Airport.new(market: Market.new(is_island: true, income: 10000))
   mainland_airport = Airport.new(market: Market.new(is_island: false, income: 10000))
 
-  let(:airport_population_calculator) { instance_double(Calculation::AirportPopulation) }
+  let(:market_population_calculator) { instance_double(Calculation::MarketPopulation) }
 
   before(:each) do
-    allow(airport_population_calculator).to receive(:government_workers).and_return 10
-    allow(airport_population_calculator).to receive(:population).and_return 100
-    allow(airport_population_calculator).to receive(:tourists).and_return 20
+    allow(market_population_calculator).to receive(:government_workers).and_return 10
+    allow(market_population_calculator).to receive(:population).and_return 100
+    allow(market_population_calculator).to receive(:tourists).and_return 20
   end
 
   context "business" do
     it "calculates correctly" do
-      expect(Calculation::AirportPopulation).to receive(:new).with(mainland_airport, date).and_return(airport_population_calculator)
+      expect(Calculation::MarketPopulation).to receive(:new).with(mainland_airport.market, date).and_return(market_population_calculator)
 
       subject = described_class.new(mainland_airport, date)
 
@@ -23,7 +23,7 @@ RSpec.describe Calculation::MarketDollars do
     end
 
     it "calculates islands correctly" do
-      expect(Calculation::AirportPopulation).to receive(:new).with(island_airport, date).and_return(airport_population_calculator)
+      expect(Calculation::MarketPopulation).to receive(:new).with(island_airport.market, date).and_return(market_population_calculator)
 
       subject = described_class.new(island_airport, date)
 
@@ -33,7 +33,7 @@ RSpec.describe Calculation::MarketDollars do
 
   context "government" do
     it "calculates correctly" do
-      expect(Calculation::AirportPopulation).to receive(:new).with(mainland_airport, date).and_return(airport_population_calculator)
+      expect(Calculation::MarketPopulation).to receive(:new).with(mainland_airport.market, date).and_return(market_population_calculator)
 
       subject = described_class.new(mainland_airport, date)
 
@@ -41,7 +41,7 @@ RSpec.describe Calculation::MarketDollars do
     end
 
     it "calculates islands correctly" do
-      expect(Calculation::AirportPopulation).to receive(:new).with(island_airport, date).and_return(airport_population_calculator)
+      expect(Calculation::MarketPopulation).to receive(:new).with(island_airport.market, date).and_return(market_population_calculator)
 
       subject = described_class.new(island_airport, date)
 
@@ -51,7 +51,7 @@ RSpec.describe Calculation::MarketDollars do
 
   context "leisure" do
     it "calculates correctly" do
-      expect(Calculation::AirportPopulation).to receive(:new).with(mainland_airport, date).and_return(airport_population_calculator)
+      expect(Calculation::MarketPopulation).to receive(:new).with(mainland_airport.market, date).and_return(market_population_calculator)
 
       subject = described_class.new(mainland_airport, date)
 
@@ -59,7 +59,7 @@ RSpec.describe Calculation::MarketDollars do
     end
 
     it "calculates islands correctly" do
-      expect(Calculation::AirportPopulation).to receive(:new).with(island_airport, date).and_return(airport_population_calculator)
+      expect(Calculation::MarketPopulation).to receive(:new).with(island_airport.market, date).and_return(market_population_calculator)
 
       subject = described_class.new(island_airport, date)
 
@@ -69,7 +69,7 @@ RSpec.describe Calculation::MarketDollars do
 
   context "tourist" do
     it "calculates correctly" do
-      expect(Calculation::AirportPopulation).to receive(:new).with(mainland_airport, date).and_return(airport_population_calculator)
+      expect(Calculation::MarketPopulation).to receive(:new).with(mainland_airport.market, date).and_return(market_population_calculator)
 
       subject = described_class.new(mainland_airport, date)
 
@@ -77,7 +77,7 @@ RSpec.describe Calculation::MarketDollars do
     end
 
     it "calculates islands correctly" do
-      expect(Calculation::AirportPopulation).to receive(:new).with(island_airport, date).and_return(airport_population_calculator)
+      expect(Calculation::MarketPopulation).to receive(:new).with(island_airport.market, date).and_return(market_population_calculator)
 
       subject = described_class.new(island_airport, date)
 

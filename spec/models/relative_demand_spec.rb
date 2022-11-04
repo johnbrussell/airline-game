@@ -243,7 +243,7 @@ RSpec.describe RelativeDemand do
   context "calculate_between_markets" do
     let(:market_1) { Fabricate(:market, name: "Boston") }
     let(:market_2) { Fabricate(:market, name: "Worcester") }
-    let(:relative_demand_calculator) { instance_double(Calculation::RelativeDemand, business: 1, government: 2, leisure: 3, tourist: 4) }
+    let(:relative_demand_calculator) { instance_double(Calculation::RelativeDemand, business: 1, government: 2, leisure: 3, tourist: 4, distance: 5) }
 
     it "saves a RelativeDemand for each airport pair between the markets" do
       airport_1 = Fabricate(:airport, market: market_1, iata: "BOS")
