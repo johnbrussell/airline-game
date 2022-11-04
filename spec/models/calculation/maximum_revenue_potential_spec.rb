@@ -20,7 +20,7 @@ RSpec.describe Calculation::MaximumRevenuePotential do
       airport_2 = Airport.find_by(iata: "BOS")
       date = Date.today
       distance = 0
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance)
       subject = described_class.new(airport_1, airport_2, date)
 
       assert_in_epsilon subject.max_economy_class_revenue_per_week, 4000 * week_multiplier, 0.0000001
@@ -31,7 +31,7 @@ RSpec.describe Calculation::MaximumRevenuePotential do
       airport_2 = Airport.find_by(iata: "BOS")
       date = Date.today
       distance = 1
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance)
       subject = described_class.new(airport_1, airport_2, date)
 
       expect(subject.max_economy_class_revenue_per_week).to be < 4000 * week_multiplier
@@ -42,23 +42,23 @@ RSpec.describe Calculation::MaximumRevenuePotential do
       airport_2 = Airport.find_by(iata: "BOS")
       date = Date.today
       distance = Calculation::MaximumRevenuePotential::PREMIUM_ECONOMY_MAX_DISTANCE
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance)
       subject = described_class.new(airport_1, airport_2, date)
 
       original_dollars_pe = subject.max_economy_class_revenue_per_week
 
       subject = described_class.new(airport_1, airport_2, date)
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance + 1)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance + 1)
 
       expect(subject.max_economy_class_revenue_per_week).to be < original_dollars_pe
 
       distance = Calculation::MaximumRevenuePotential::BUSINESS_MAX_DISTANCE
       subject = described_class.new(airport_1, airport_2, date)
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance + 1)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance + 1)
 
       original_dollars_bus = subject.max_economy_class_revenue_per_week
 
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance + 1)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance + 1)
 
       expect(subject.max_economy_class_revenue_per_week).to eq original_dollars_bus
       expect(original_dollars_bus).to be < original_dollars_pe
@@ -71,7 +71,7 @@ RSpec.describe Calculation::MaximumRevenuePotential do
       airport_2 = Airport.find_by(iata: "BOS")
       date = Date.today
       distance = 0
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance)
       subject = described_class.new(airport_1, airport_2, date)
 
       assert_in_epsilon subject.max_premium_economy_class_revenue_per_week, 0, 0.0000001
@@ -82,7 +82,7 @@ RSpec.describe Calculation::MaximumRevenuePotential do
       airport_2 = Airport.find_by(iata: "BOS")
       date = Date.today
       distance = 1
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance)
       subject = described_class.new(airport_1, airport_2, date)
 
       expect(subject.max_premium_economy_class_revenue_per_week).to be > 0
@@ -93,7 +93,7 @@ RSpec.describe Calculation::MaximumRevenuePotential do
       airport_2 = Airport.find_by(iata: "BOS")
       date = Date.today
       distance = Calculation::MaximumRevenuePotential::PREMIUM_ECONOMY_MAX_DISTANCE
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance)
       subject = described_class.new(airport_1, airport_2, date)
 
       original_ratio_business = subject.send(:ratio_business_dollars_premium_economy)
@@ -101,7 +101,7 @@ RSpec.describe Calculation::MaximumRevenuePotential do
       original_dollars = subject.max_premium_economy_class_revenue_per_week
 
       subject = described_class.new(airport_1, airport_2, date)
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance + 1)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance + 1)
 
       expect(subject.max_premium_economy_class_revenue_per_week).to be < original_dollars
       expect(subject.send(:ratio_business_dollars_premium_economy)).to eq original_ratio_business
@@ -115,7 +115,7 @@ RSpec.describe Calculation::MaximumRevenuePotential do
       airport_2 = Airport.find_by(iata: "BOS")
       date = Date.today
       distance = 0
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance)
       subject = described_class.new(airport_1, airport_2, date)
 
       assert_in_epsilon subject.max_exclusive_economy_class_revenue_per_week, 400 * week_multiplier, 0.0000001
@@ -126,7 +126,7 @@ RSpec.describe Calculation::MaximumRevenuePotential do
       airport_2 = Airport.find_by(iata: "BOS")
       date = Date.today
       distance = 1
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance)
       subject = described_class.new(airport_1, airport_2, date)
 
       expect(subject.max_exclusive_economy_class_revenue_per_week).to be < 400 * week_multiplier
@@ -137,24 +137,24 @@ RSpec.describe Calculation::MaximumRevenuePotential do
       airport_2 = Airport.find_by(iata: "BOS")
       date = Date.today
       distance = Calculation::MaximumRevenuePotential::PREMIUM_ECONOMY_MAX_DISTANCE
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance)
       subject = described_class.new(airport_1, airport_2, date)
 
       original_dollars_pe = subject.max_exclusive_economy_class_revenue_per_week
 
       subject = described_class.new(airport_1, airport_2, date)
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance + 1)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance + 1)
 
       expect(subject.max_exclusive_economy_class_revenue_per_week).to be < original_dollars_pe
 
       distance = Calculation::MaximumRevenuePotential::BUSINESS_MAX_DISTANCE
       subject = described_class.new(airport_1, airport_2, date)
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance + 1)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance + 1)
 
       original_dollars_bus = subject.max_exclusive_economy_class_revenue_per_week
 
       subject = described_class.new(airport_1, airport_2, date)
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance + 1)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance + 1)
 
       expect(subject.max_exclusive_economy_class_revenue_per_week).to eq original_dollars_bus
     end
@@ -166,7 +166,7 @@ RSpec.describe Calculation::MaximumRevenuePotential do
       airport_2 = Airport.find_by(iata: "BOS")
       date = Date.today
       distance = 0
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance)
       subject = described_class.new(airport_1, airport_2, date)
 
       assert_in_epsilon subject.max_exclusive_premium_economy_class_revenue_per_week, 0, 0.0000001
@@ -177,7 +177,7 @@ RSpec.describe Calculation::MaximumRevenuePotential do
       airport_2 = Airport.find_by(iata: "BOS")
       date = Date.today
       distance = 1
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance)
       subject = described_class.new(airport_1, airport_2, date)
 
       expect(subject.max_exclusive_premium_economy_class_revenue_per_week).to be > 0
@@ -188,7 +188,7 @@ RSpec.describe Calculation::MaximumRevenuePotential do
       airport_2 = Airport.find_by(iata: "BOS")
       date = Date.today
       distance = Calculation::MaximumRevenuePotential::PREMIUM_ECONOMY_MAX_DISTANCE
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance)
       subject = described_class.new(airport_1, airport_2, date)
 
       original_ratio_business = subject.send(:ratio_business_dollars_premium_economy)
@@ -196,7 +196,7 @@ RSpec.describe Calculation::MaximumRevenuePotential do
       original_dollars = subject.max_exclusive_premium_economy_class_revenue_per_week
 
       subject = described_class.new(airport_1, airport_2, date)
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance + 1)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance + 1)
 
       expect(subject.max_exclusive_premium_economy_class_revenue_per_week).to be < original_dollars
       expect(subject.send(:ratio_business_dollars_premium_economy)).to eq original_ratio_business
@@ -210,7 +210,7 @@ RSpec.describe Calculation::MaximumRevenuePotential do
       airport_2 = Airport.find_by(iata: "BOS")
       date = Date.today
       distance = 0
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance)
       subject = described_class.new(airport_1, airport_2, date)
 
       assert_in_epsilon subject.max_exclusive_business_class_revenue_per_week, 0, 0.0000001
@@ -221,7 +221,7 @@ RSpec.describe Calculation::MaximumRevenuePotential do
       airport_2 = Airport.find_by(iata: "BOS")
       date = Date.today
       distance = 1
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance)
       subject = described_class.new(airport_1, airport_2, date)
 
       expect(subject.max_exclusive_business_class_revenue_per_week).to be > 0
@@ -232,14 +232,14 @@ RSpec.describe Calculation::MaximumRevenuePotential do
       airport_2 = Airport.find_by(iata: "BOS")
       date = Date.today
       distance = Calculation::MaximumRevenuePotential::BUSINESS_MAX_DISTANCE
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance)
       subject = described_class.new(airport_1, airport_2, date)
 
       original_ratio_business = subject.send(:ratio_business_dollars_business)
       original_ratio_leisure = subject.send(:ratio_leisure_dollars_business)
       original_dollars = subject.max_exclusive_business_class_revenue_per_week
 
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance + 1)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance + 1)
 
       expect(subject.max_exclusive_business_class_revenue_per_week).to eq original_dollars
       expect(subject.send(:ratio_business_dollars_business)).to eq original_ratio_business
@@ -253,7 +253,7 @@ RSpec.describe Calculation::MaximumRevenuePotential do
       airport_2 = Airport.find_by(iata: "BOS")
       date = Date.today
       distance = 0
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance)
       subject = described_class.new(airport_1, airport_2, date)
 
       assert_in_epsilon subject.max_business_class_revenue_per_week, 0, 0.0000001
@@ -264,7 +264,7 @@ RSpec.describe Calculation::MaximumRevenuePotential do
       airport_2 = Airport.find_by(iata: "BOS")
       date = Date.today
       distance = 1
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance)
       subject = described_class.new(airport_1, airport_2, date)
 
       expect(subject.max_business_class_revenue_per_week).to be > 0
@@ -275,14 +275,14 @@ RSpec.describe Calculation::MaximumRevenuePotential do
       airport_2 = Airport.find_by(iata: "BOS")
       date = Date.today
       distance = Calculation::MaximumRevenuePotential::BUSINESS_MAX_DISTANCE
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance)
       subject = described_class.new(airport_1, airport_2, date)
 
       original_ratio_business = subject.send(:ratio_business_dollars_business)
       original_ratio_leisure = subject.send(:ratio_leisure_dollars_business)
       original_dollars = subject.max_business_class_revenue_per_week
 
-      allow(Calculation::Distance).to receive(:between_markets).with(market_1, market_2).and_return(distance + 1)
+      allow(Calculation::Distance).to receive(:between_airports).with(airport_1, airport_2).and_return(distance + 1)
 
       expect(subject.max_business_class_revenue_per_week).to eq original_dollars
       expect(subject.send(:ratio_business_dollars_business)).to eq original_ratio_business

@@ -5,10 +5,6 @@ class Calculation::Distance
     self.haversine(airport1.latitude, airport1.longitude, airport2.latitude, airport2.longitude)
   end
 
-  def self.between_markets(market1, market2)
-    self.haversine(market1.latitude, market1.longitude, market2.latitude, market2.longitude)
-  end
-
   private
 
     def self.haversine(lat1, long1, lat2, long2)

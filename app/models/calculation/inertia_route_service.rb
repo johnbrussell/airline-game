@@ -30,12 +30,12 @@ class Calculation::InertiaRouteService
   end
 
   def business_seats_per_flight
-    if market_distance >= LONG_DISTANCE
+    if flight_distance >= LONG_DISTANCE
       LONG_DISTANCE_BUSINESS_SEATS
-    elsif market_distance >= SHORT_DISTANCE
-      SHORT_DISTANCE_BUSINESS_SEATS + ((LONG_DISTANCE_BUSINESS_SEATS - SHORT_DISTANCE_BUSINESS_SEATS) * (market_distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
+    elsif flight_distance >= SHORT_DISTANCE
+      SHORT_DISTANCE_BUSINESS_SEATS + ((LONG_DISTANCE_BUSINESS_SEATS - SHORT_DISTANCE_BUSINESS_SEATS) * (flight_distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
     else
-      (SHORT_DISTANCE_BUSINESS_SEATS * market_distance / SHORT_DISTANCE).ceil()
+      (SHORT_DISTANCE_BUSINESS_SEATS * flight_distance / SHORT_DISTANCE).ceil()
     end
   end
 
@@ -52,12 +52,12 @@ class Calculation::InertiaRouteService
   end
 
   def economy_seats_per_flight
-    if market_distance >= LONG_DISTANCE
+    if flight_distance >= LONG_DISTANCE
       LONG_DISTANCE_ECONOMY_SEATS
-    elsif market_distance >= SHORT_DISTANCE
-      SHORT_DISTANCE_ECONOMY_SEATS + ((LONG_DISTANCE_ECONOMY_SEATS - SHORT_DISTANCE_ECONOMY_SEATS) * (market_distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
+    elsif flight_distance >= SHORT_DISTANCE
+      SHORT_DISTANCE_ECONOMY_SEATS + ((LONG_DISTANCE_ECONOMY_SEATS - SHORT_DISTANCE_ECONOMY_SEATS) * (flight_distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
     else
-      (SHORT_DISTANCE_ECONOMY_SEATS * market_distance / SHORT_DISTANCE).ceil()
+      (SHORT_DISTANCE_ECONOMY_SEATS * flight_distance / SHORT_DISTANCE).ceil()
     end
   end
 
@@ -78,12 +78,12 @@ class Calculation::InertiaRouteService
   end
 
   def premium_economy_seats_per_flight
-    if market_distance >= LONG_DISTANCE
+    if flight_distance >= LONG_DISTANCE
       LONG_DISTANCE_PREMIUM_ECONOMY_SEATS
-    elsif market_distance >= SHORT_DISTANCE
-      SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS + ((LONG_DISTANCE_PREMIUM_ECONOMY_SEATS - SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS) * (market_distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
+    elsif flight_distance >= SHORT_DISTANCE
+      SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS + ((LONG_DISTANCE_PREMIUM_ECONOMY_SEATS - SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS) * (flight_distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
     else
-      (SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS * market_distance / SHORT_DISTANCE).ceil()
+      (SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS * flight_distance / SHORT_DISTANCE).ceil()
     end
   end
 

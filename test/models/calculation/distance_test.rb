@@ -11,21 +11,17 @@ class Calculation::DistanceTest < ActiveSupport::TestCase
   test "test equivalent points yield zero distance" do
     assert Calculation::Distance.between_airports(airport1, airport1) == 0
     assert Calculation::Distance.between_airports(airport2, airport2) == 0
-    assert Calculation::Distance.between_markets(market1, market1) == 0
-    assert Calculation::Distance.between_markets(market2, market2) == 0
   end
 
   test "test a moderate example" do
     expected = 2812
 
     assert (Calculation::Distance.between_airports(airport1, airport2) - expected).abs < 1
-    assert (Calculation::Distance.between_markets(market1, market2) - expected).abs < 1
   end
 
   test "test a long example" do
     expected = 8843
 
     assert (Calculation::Distance.between_airports(airport1, airport3) - expected).abs < 1
-    assert (Calculation::Distance.between_markets(market1, market3) - expected).abs < 1
   end
 end
