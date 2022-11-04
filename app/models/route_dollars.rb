@@ -11,4 +11,24 @@ class RouteDollars < ApplicationRecord
   belongs_to :destination_market, class_name: "Market"
   belongs_to :origin_airport, class_name: "Airport", foreign_key: :origin_airport_iata, primary_key: :iata, optional: true
   belongs_to :destination_airport, class_name: "Airport", foreign_key: :destination_airport_iata, primary_key: :iata, optional: true
+
+  def self.calculate(date, origin_market, destination_market, origin_airport, destination_airport)
+    existing = find_by(date: date, origin_market: origin_market, destination_market: destination_market, origin_airport: origin_airport || "", destination_airport: destination_airport || "")
+    if existing.nil?
+      RelativeDemand.calculate_between_markets(date, origin_market, destination_market)
+      calculator = Calculation::RouteDollars.new(date, origin_market, destination_market, origin_airport, destination_airport)
+      create!(
+        origin_market: origin_market,
+        destination_market: destination_market,
+        origin_airport_iata: origin_airport&.iata || "",
+        destination_airport_iata: destination_airport&.iata || "",
+        date: date,
+        business: calculator.business_class_dollars,
+        economy: calculator.economy_class_dollars,
+        premium_economy: calculator.premium_economy_class_dollars,
+      )
+    else
+      existing
+    end
+  end
 end
