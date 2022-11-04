@@ -9,7 +9,7 @@ RSpec.describe Calculation::MaximumRevenuePotential do
   let(:route_dollars) { instance_double(Calculation::RouteDollars, business: 1000, exclusive_business: 100, exclusive_government: 100, exclusive_leisure: 100, exclusive_tourist: 100, government: 1000, leisure: 1000, tourist: 1000) }
 
   before(:each) do
-    allow(Calculation::RouteDollars).to receive(:new).with(date, airport_1, airport_2).and_return(route_dollars)
+    allow(Calculation::RouteDollars).to receive(:new).with(date, market_1, market_2, airport_1, airport_2).and_return(route_dollars)
   end
 
   week_multiplier = 1.0 / Calculation::MaximumRevenuePotential::WEEKS_PER_YEAR
