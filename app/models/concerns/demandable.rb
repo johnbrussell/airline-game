@@ -21,10 +21,6 @@ module Demandable
       @flight_distance ||= Calculation::Distance.between_airports(@origin, @destination)
     end
 
-    def market_distance
-      @market_distance ||= Calculation::Distance.between_markets(origin_market, destination_market)
-    end
-
     def origin_market
       @origin_market ||= @origin.market
     end
