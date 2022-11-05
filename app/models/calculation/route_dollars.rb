@@ -16,6 +16,10 @@ class Calculation::RouteDollars
     business_dollars * class_calculator.pct_business_dollars_business + leisure_dollars * class_calculator.pct_leisure_dollars_business
   end
 
+  def distance
+    relative_demand.distance
+  end
+
   def economy_class_dollars
     business_dollars * class_calculator.pct_business_dollars_economy + leisure_dollars * class_calculator.pct_leisure_dollars_economy
   end

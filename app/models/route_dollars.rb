@@ -25,6 +25,7 @@ class RouteDollars < ApplicationRecord
         origin_airport_iata: origin_airport&.iata || "",
         destination_airport_iata: destination_airport&.iata || "",
         date: date,
+        distance: calculator.distance,
         business: calculator.business_class_dollars,
         economy: calculator.economy_class_dollars,
         premium_economy: calculator.premium_economy_class_dollars,

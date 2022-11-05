@@ -9,7 +9,7 @@ RSpec.describe RouteDollars do
     it "calcuates a new RouteDollars if none exists" do
       route_dollars_count = RouteDollars.count
 
-      route_dollars_calculator = instance_double(Calculation::RouteDollars, business_class_dollars: 1, economy_class_dollars: 2, premium_economy_class_dollars: 3)
+      route_dollars_calculator = instance_double(Calculation::RouteDollars, business_class_dollars: 1, economy_class_dollars: 2, premium_economy_class_dollars: 3, distance: 4)
       allow(Calculation::RouteDollars).to receive(:new).with(date, market_1, market_2, nil, nil).and_return(route_dollars_calculator)
 
       expect(RelativeDemand).to receive(:calculate_between_markets).with(date, market_1, market_2)
@@ -18,6 +18,7 @@ RSpec.describe RouteDollars do
 
       expect(RouteDollars.count).to eq route_dollars_count + 1
       expect(actual.date).to eq date
+      expect(actual.distance).to eq 4
       expect(actual.business).to eq 1
       expect(actual.economy).to eq 2
       expect(actual.premium_economy).to eq 3
@@ -32,6 +33,7 @@ RSpec.describe RouteDollars do
         origin_airport_iata: "",
         destination_airport_iata: "",
         date: date,
+        distance: 0,
         business: 1,
         economy: 2,
         premium_economy: 3,
@@ -45,6 +47,7 @@ RSpec.describe RouteDollars do
 
       expect(RouteDollars.count).to eq route_dollars_count
       expect(actual.date).to eq date
+      expect(actual.distance).to eq 0
       expect(actual.business).to eq 1
       expect(actual.economy).to eq 2
       expect(actual.premium_economy).to eq 3
