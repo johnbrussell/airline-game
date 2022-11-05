@@ -125,8 +125,6 @@ class GameData::Inputter < ApplicationRecord
           income: data_point["Income"],
           is_national_capital: data_point["isNationalCapital"].downcase == "yes",
           is_island: data_point["isIsland"].downcase == "yes",
-          latitude: data_point["Latitude"],
-          longitude: data_point["Longitude"],
         )
       else
         Market.new(
@@ -137,8 +135,6 @@ class GameData::Inputter < ApplicationRecord
           income: data_point["Income"],
           is_national_capital: data_point["isNationalCapital"].downcase == "yes",
           is_island: data_point["isIsland"].downcase == "yes",
-          latitude: data_point["Latitude"],
-          longitude: data_point["Longitude"],
         ).save!
       end
     end
