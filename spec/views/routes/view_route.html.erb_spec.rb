@@ -5,12 +5,36 @@ RSpec.describe "routes/view_route", type: :feature do
   before(:each) do
     nauru = Fabricate(:market, name: "Nauru", country: "Nauru", country_group: "Nauru")
     funafuti = Fabricate(:market, name: "Funafuti", country: "Tuvalu", country_group: "Tuvalu")
-    Fabricate(:airport, market: nauru, iata: "INU", municipality: nil, runway: 100, exclusive_catchment: 1)
-    Fabricate(:airport, market: funafuti, iata: "FUN", municipality: nil, runway: 10000, exclusive_catchment: 1)
+    inu = Fabricate(:airport, market: nauru, iata: "INU", municipality: nil, runway: 100, exclusive_catchment: 1)
+    fun = Fabricate(:airport, market: funafuti, iata: "FUN", municipality: nil, runway: 10000, exclusive_catchment: 1)
+    maj = Fabricate(:airport, iata: "MAJ", market: nauru, runway: 10000, exclusive_catchment: 1)
     Population.create!(market_id: funafuti.id, year: 2020, population: 10000)
     Population.create!(market_id: nauru.id, year: 2000, population: 14000)
     Tourists.create!(market_id: nauru.id, year: 1999, volume: 100)
     Tourists.create!(market_id: funafuti.id, year: 2020, volume: 2700)
+    date = Date.today
+    RouteDollars.create!(
+      origin_market: funafuti,
+      destination_market: nauru,
+      date: date,
+      origin_airport_iata: "FUN",
+      destination_airport_iata: "INU",
+      distance: Calculation::Distance.between_airports(inu, fun),
+      economy: 100,
+      business: 50,
+      premium_economy: 75,
+    )
+    RouteDollars.create!(
+      origin_market: funafuti,
+      destination_market: nauru,
+      date: date,
+      origin_airport_iata: "FUN",
+      destination_airport_iata: "MAJ",
+      distance: Calculation::Distance.between_airports(maj, fun),
+      economy: 100,
+      business: 50,
+      premium_economy: 75,
+    )
   end
 
   it "has a link back to the game homepage" do
@@ -417,7 +441,7 @@ RSpec.describe "routes/view_route", type: :feature do
     funafuti = Market.find_by(name: "Funafuti")
     inu = Airport.find_by(iata: "INU")
     fun = Airport.find_by(iata: "FUN")
-    maj = Fabricate(:airport, iata: "MAJ", market: nauru, runway: 10000, exclusive_catchment: 1)
+    maj = Airport.find_by(iata: "MAJ")
     airline = Fabricate(:airline, base_id: nauru.id, game_id: game.id, is_user_airline: true)
     other_airline = Fabricate(:airline, base_id: funafuti.id, game_id: game.id, name: "TIA")
     family = Fabricate(:aircraft_family)

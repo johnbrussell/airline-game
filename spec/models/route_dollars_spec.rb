@@ -5,7 +5,7 @@ RSpec.describe RouteDollars do
     let(:market_1) { Fabricate(:market, name: "Fiji") }
     let(:market_2) { Fabricate(:market, name: "Nauru") }
     let(:date) { Date.today }
-    let(:route_dollars_calculator) { instance_double(Calculation::RouteDollars, business_class_dollars: 10, economy_class_dollars: 20, premium_economy_class_dollars: 5) }
+    let(:route_dollars_calculator) { instance_double(Calculation::RouteDollars, business_class_dollars: 10, economy_class_dollars: 20, premium_economy_class_dollars: 5, distance: 1000) }
 
     let(:airport_1) { Fabricate(:airport, iata: "NAN", market: market_1, exclusive_catchment: 10) }
     let(:airport_2) { Fabricate(:airport, iata: "SUV", market: market_1, exclusive_catchment: 10) }

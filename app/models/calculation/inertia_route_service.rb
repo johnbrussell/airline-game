@@ -17,6 +17,8 @@ class Calculation::InertiaRouteService
   SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS = 8
   SHORT_DISTANCE_ECONOMY_SEATS = 57
 
+  delegate :distance, to: :revenue
+
   def business_fare
     desired_business_fare * MANAGEMENT_OVERHEAD
   end
@@ -30,12 +32,12 @@ class Calculation::InertiaRouteService
   end
 
   def business_seats_per_flight
-    if flight_distance >= LONG_DISTANCE
+    if distance >= LONG_DISTANCE
       LONG_DISTANCE_BUSINESS_SEATS
-    elsif flight_distance >= SHORT_DISTANCE
-      SHORT_DISTANCE_BUSINESS_SEATS + ((LONG_DISTANCE_BUSINESS_SEATS - SHORT_DISTANCE_BUSINESS_SEATS) * (flight_distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
+    elsif distance >= SHORT_DISTANCE
+      SHORT_DISTANCE_BUSINESS_SEATS + ((LONG_DISTANCE_BUSINESS_SEATS - SHORT_DISTANCE_BUSINESS_SEATS) * (distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
     else
-      (SHORT_DISTANCE_BUSINESS_SEATS * flight_distance / SHORT_DISTANCE).ceil()
+      (SHORT_DISTANCE_BUSINESS_SEATS * distance / SHORT_DISTANCE).ceil()
     end
   end
 
@@ -52,17 +54,17 @@ class Calculation::InertiaRouteService
   end
 
   def economy_seats_per_flight
-    if flight_distance >= LONG_DISTANCE
+    if distance >= LONG_DISTANCE
       LONG_DISTANCE_ECONOMY_SEATS
-    elsif flight_distance >= SHORT_DISTANCE
-      SHORT_DISTANCE_ECONOMY_SEATS + ((LONG_DISTANCE_ECONOMY_SEATS - SHORT_DISTANCE_ECONOMY_SEATS) * (flight_distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
+    elsif distance >= SHORT_DISTANCE
+      SHORT_DISTANCE_ECONOMY_SEATS + ((LONG_DISTANCE_ECONOMY_SEATS - SHORT_DISTANCE_ECONOMY_SEATS) * (distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
     else
-      (SHORT_DISTANCE_ECONOMY_SEATS * flight_distance / SHORT_DISTANCE).ceil()
+      (SHORT_DISTANCE_ECONOMY_SEATS * distance / SHORT_DISTANCE).ceil()
     end
   end
 
   def flight_cost
-    @flight_cost ||= Calculation::FlightCostCalculator.new(inertia_airplane, flight_distance, INERTIA_SERVICE_QUALITY).cost
+    @flight_cost ||= Calculation::FlightCostCalculator.new(inertia_airplane, distance, INERTIA_SERVICE_QUALITY).cost
   end
 
   def premium_economy_fare
@@ -78,12 +80,12 @@ class Calculation::InertiaRouteService
   end
 
   def premium_economy_seats_per_flight
-    if flight_distance >= LONG_DISTANCE
+    if distance >= LONG_DISTANCE
       LONG_DISTANCE_PREMIUM_ECONOMY_SEATS
-    elsif flight_distance >= SHORT_DISTANCE
-      SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS + ((LONG_DISTANCE_PREMIUM_ECONOMY_SEATS - SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS) * (flight_distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
+    elsif distance >= SHORT_DISTANCE
+      SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS + ((LONG_DISTANCE_PREMIUM_ECONOMY_SEATS - SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS) * (distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
     else
-      (SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS * flight_distance / SHORT_DISTANCE).ceil()
+      (SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS * distance / SHORT_DISTANCE).ceil()
     end
   end
 
@@ -94,7 +96,7 @@ class Calculation::InertiaRouteService
     end
 
     def business_revenue
-      revenue.max_business_class_revenue_per_week * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
+      revenue.business * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
     end
 
     def desired_business_fare
@@ -138,7 +140,7 @@ class Calculation::InertiaRouteService
     end
 
     def economy_revenue
-      revenue.max_economy_class_revenue_per_week * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
+      revenue.economy * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
     end
 
     def inertia_airplane
@@ -153,7 +155,7 @@ class Calculation::InertiaRouteService
           name: "foo",
           production_start_year: Date.today.year,
           floor_space: business_seats_per_flight * Airplane::BUSINESS_SEAT_SIZE + premium_economy_seats_per_flight * Airplane::PREMIUM_ECONOMY_SEAT_SIZE + economy_seats_per_flight * Airplane::ECONOMY_SEAT_SIZE,
-          max_range: flight_distance.ceil(),
+          max_range: distance.ceil(),
           fuel_burn: (Math.sqrt(total_seats) * INERTIA_PLANE_FUEL_BURN_CONSTANT).ceil(),
           speed: INERTIA_PLANE_SPEED,
           num_aisles: total_seats > INERTIA_PLANE_MAX_NARROWBODY_SEATS ? 2 : 1,
@@ -171,11 +173,12 @@ class Calculation::InertiaRouteService
     end
 
     def premium_economy_revenue
-      revenue.max_premium_economy_class_revenue_per_week * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
+      revenue.premium_economy * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
     end
 
     def revenue
-      @revenue ||= Calculation::MaximumRevenuePotential.new(@origin, @destination, @current_date)
+      # Note RouteDollars is directional.  InertiaRouteService is bidirectional.  So need to merge
+      @revenue ||= RouteDollars.find_by(origin_airport_iata: @origin.iata, destination_airport_iata: @destination.iata, date: @current_date)
     end
 
     def total_seat_area

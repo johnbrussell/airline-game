@@ -486,6 +486,7 @@ RSpec.describe AirlineRoute do
       airplane = Fabricate(:airplane, operator_id: airline.id, base_country_group: airline.base.country_group, business_seats: 1, economy_seats: 1, premium_economy_seats: 1, aircraft_family: family)
       AirplaneRoute.new(airplane: airplane, route: subject, frequencies: 1, flight_cost: 1, block_time_mins: 1).save(validate: false)
       AirlineRouteRevenue.create!(airline_route: subject, revenue: 12, exclusive_economy_revenue: 2, exclusive_business_revenue: 3, exclusive_premium_economy_revenue: 1, business_pax: 1, economy_pax: 1, premium_economy_pax: 1)
+      RouteDollars.create!(origin_market: fun_market, destination_market: inu_market, origin_airport_iata: "FUN", destination_airport_iata: "INU", date: Date.today, distance: 1000, business: 100, economy: 100, premium_economy: 100)
       subject.reload
 
       expect(subject.revenue.revenue).to eq 12
@@ -547,6 +548,7 @@ RSpec.describe AirlineRoute do
       super_model = Fabricate(:aircraft_model, takeoff_distance: 100, max_range: 13000, floor_space: 100000)
       airplane = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model, business_seats: 1, premium_economy_seats: 5, economy_seats: 30)
       game = Game.find(airline_a.game_id)
+      RouteDollars.create!(origin_market: fun_market, destination_market: inu_market, origin_airport_iata: "FUN", destination_airport_iata: "INU", date: Date.today, distance: 1000, business: 100, economy: 100, premium_economy: 100)
 
       Gates.create!(airport: inu, game: game, current_gates: 10)
       Slot.create!(gates_id: Gates.last.id, lessee_id: airline_a.id)
@@ -732,6 +734,7 @@ RSpec.describe AirlineRoute do
       airplane = Fabricate(:airplane, operator_id: airline.id, base_country_group: airline.base.country_group, business_seats: 1, economy_seats: 1, premium_economy_seats: 1, aircraft_family: family)
       AirplaneRoute.new(airplane: airplane, route: subject, frequencies: 1, flight_cost: 1, block_time_mins: 1).save(validate: false)
       AirlineRouteRevenue.new(airline_route: subject, revenue: 106, exclusive_economy_revenue: 105, exclusive_premium_economy_revenue: 100, exclusive_business_revenue: 1, business_pax: 10, economy_pax: 21, premium_economy_pax: 0).save(validate: false)
+      RouteDollars.create!(origin_market: fun_market, destination_market: inu_market, origin_airport_iata: "FUN", destination_airport_iata: "INU", date: Date.today, distance: 1000, business: 100, economy: 100, premium_economy: 100)
       subject.reload
 
       subject.update_revenue
