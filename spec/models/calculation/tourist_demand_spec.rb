@@ -26,8 +26,6 @@ RSpec.describe Calculation::TouristDemand do
       country: "Micronesia",
       country_group: "United States",
       income: 100,
-      latitude: 6.9851,
-      longitude: 158.209,
       airports: [airport_1],
       populations: [population_1],
       tourists: [tourists_1],
@@ -56,8 +54,6 @@ RSpec.describe Calculation::TouristDemand do
       country: "Micronesia",
       country_group: "United States",
       income: 100,
-      latitude: 5.35698,
-      longitude: 162.957993,
       airports: [airport_2],
       populations: [population_2],
       tourists: [tourists_2],
@@ -96,8 +92,6 @@ RSpec.describe Calculation::TouristDemand do
       country: "Micronesia",
       country_group: "United States",
       income: 100,
-      latitude: 5.35698,
-      longitude: 162.957993,
       airports: [airport_3a, airport_3b],
       populations: [population_3],
       tourists: [tourists_3],
@@ -126,8 +120,6 @@ RSpec.describe Calculation::TouristDemand do
       country: "Micronesia",
       country_group: "United States",
       income: 100,
-      latitude: 5.35698,
-      longitude: 162.957993,
       airports: [airport_4],
       populations: [population_4],
       tourists: [tourists_4],
@@ -160,7 +152,7 @@ RSpec.describe Calculation::TouristDemand do
 
     it "is equivalent to the destination population when domestic and the demand-maximizing distance" do
       pohnpei = Market.find_by!(name: "Pohnpei")
-      yap = Market.find_by!(name: "Yap").tap { |m| m.update!(latitude: 6, longitude: 164) }
+      yap = Market.find_by!(name: "Yap")
 
       actual = Calculation::TouristDemand.new(pohnpei.airports.first, yap.airports.last, Date.today).demand
       expected = yap.populations.first.population
@@ -169,7 +161,7 @@ RSpec.describe Calculation::TouristDemand do
     end
 
     it "is reduced by a factor of 3 when the destination is international" do
-      Market.find_by!(name: "Yap").update!(country: "Federated States of Micronesia", country_group: "Federated States of Micronesia", latitude: 6, longitude: 164)
+      Market.find_by!(name: "Yap").update!(country: "Federated States of Micronesia", country_group: "Federated States of Micronesia")
 
       pohnpei = Market.find_by!(name: "Pohnpei")
       yap = Market.find_by!(name: "Yap")
@@ -181,7 +173,7 @@ RSpec.describe Calculation::TouristDemand do
     end
 
     it "is reduced by a factor of 3/2s when the destination is international but in the same country group" do
-      Market.find_by!(name: "Yap").update!(country: "Federated States of Micronesia", latitude: 6, longitude: 164)
+      Market.find_by!(name: "Yap").update!(country: "Federated States of Micronesia")
 
       pohnpei = Market.find_by!(name: "Pohnpei")
       yap = Market.find_by!(name: "Yap")

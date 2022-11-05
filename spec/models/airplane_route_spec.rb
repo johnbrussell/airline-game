@@ -368,10 +368,10 @@ RSpec.describe AirplaneRoute do
   context "recalculate_profits_and_block_time" do
     it "updates the block time, flight cost, and route revenue" do
       inu_market = Market.find_by(name: "Default")
-      inu_market.update(name: "Nauru", income: 10000, country: "Nauru", country_group: "Nauru", latitude: 11, longitude: 14)
+      inu_market.update(name: "Nauru", income: 10000, country: "Nauru", country_group: "Nauru")
       inu_population = Population.create!(year: 2000, population: 10000, market_id: inu_market.id)
       inu_tourists = Tourists.create!(year: 2000, volume: 1000, market_id: inu_market.id)
-      fun_market = Fabricate(:market, name: "Funafuti", income: 10000, country: "Tuvalu", country_group: "Tuvalu", latitude: 10, longitude: 13)
+      fun_market = Fabricate(:market, name: "Funafuti", income: 10000, country: "Tuvalu", country_group: "Tuvalu")
       fun_population = Population.create!(year: 2000, population: 10000, market_id: fun_market.id)
       fun_tourists = Tourists.create!(year: 2000, volume: 1000, market_id: fun_market.id)
       airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: fun_market)
@@ -555,10 +555,10 @@ RSpec.describe AirplaneRoute do
   context "set_frequency" do
     it "updates the frequency when the airplane can add the requested service" do
       inu_market = Market.find_by(name: "Default")
-      inu_market.update(name: "Nauru", income: 10000, country: "Nauru", country_group: "Nauru", latitude: 11, longitude: 14)
+      inu_market.update(name: "Nauru", income: 10000, country: "Nauru", country_group: "Nauru")
       inu_population = Population.create!(year: 2000, population: 10000, market_id: inu_market.id)
       inu_tourists = Tourists.create!(year: 2000, volume: 1000, market_id: inu_market.id)
-      fun_market = Fabricate(:market, name: "Funafuti", income: 10000, country: "Tuvalu", country_group: "Tuvalu", latitude: 10, longitude: 13)
+      fun_market = Fabricate(:market, name: "Funafuti", income: 10000, country: "Tuvalu", country_group: "Tuvalu")
       fun_population = Population.create!(year: 2000, population: 10000, market_id: fun_market.id)
       fun_tourists = Tourists.create!(year: 2000, volume: 1000, market_id: fun_market.id)
       airport_1 = Fabricate(:airport, iata: "FUN", latitude: 10, longitude: 13, runway: 11000, elevation: 0, market: fun_market)

@@ -4,9 +4,6 @@ class Calculation::DistanceTest < ActiveSupport::TestCase
   airport1 = Airport.new(latitude: -0.547458, longitude: 166.919006)
   airport2 = Airport.new(latitude: 21.317817, longitude: -157.920227)
   airport3 = Airport.new(latitude: 51.4706, longitude: -0.461941)
-  market1 = Market.new(latitude: -0.547458, longitude: 166.919006)
-  market2 = Market.new(latitude: 21.317817, longitude: -157.920227)
-  market3 = Market.new(latitude: 51.4706, longitude: -0.461941)
 
   test "test equivalent points yield zero distance" do
     assert Calculation::Distance.between_airports(airport1, airport1) == 0
