@@ -1,101 +1,101 @@
-Metro Area,Income,Country,Territory,Country group,isNationalCapital,isIsland,Latitude,Longitude
-Los Angeles,75629,United States,,United States,No,No,33.989101,-118.162822
-New York City,78039,United States,,United States,No,No,40.712578,-74.006126
-Chicago,70009,United States,,United States,No,No,41.879267,-87.636054
-Boston,118453,United States,,United States,No,No,42.376818,-71.161876
-Provincetown,212306,United States,,United States,No,Yes,42.0718994141,-70.2213973999
-Portsmouth,82210,United States,,United States,No,No,43.0778999329,-70.8233032227
-Hyannis,148042,United States,,United States,No,No,41.66930008,-70.28040314
-Nauru,19000,Nauru,,Nauru,Yes,Yes,-0.547458,166.919006
-Funafuti,30495,Tuvalu,,Tuvalu,Yes,Yes,-8.525,179.195999
-Majuro,12011,Marshall Islands,,United States,Yes,Yes,7.06476020812988,171.272003173828
-Pohnpei,18736,Federated States of Micronesia,,United States,Yes,Yes,6.98509979248047,158.208999633789
-Kwajalien,14956,Marshall Islands,,United States,No,Yes,8.72012042999268,167.731994628906
-Kosrae,24025,Federated States of Micronesia,,United States,No,Yes,5.35698,162.957993
-Chuuk,15613,Federated States of Micronesia,,United States,No,Yes,7.46187019348145,151.843002319336
-Yap,20789,Federated States of Micronesia,,United States,No,Yes,9.49891,138.082993
-Danbury,74420,United States,,United States,No,No,41.3714981079,-73.4822006226
-Bridgeport,109317,United States,,United States,No,No,41.163501739502,-73.1261978149414
-Waterbury,63082,United States,,United States,No,No,41.47859954834,-73.135200500488
-New Haven,80496,United States,,United States,No,No,41.26369858,-72.88680267
-Hartford,73487,United States,,United States,No,No,41.955853,-72.612417
-Providence,65715,United States,,United States,No,No,41.732601,-71.420403
-New London,82886,United States,,United States,No,No,41.350774,-71.963298
-Newport,82477,United States,,United States,No,No,41.531242,-71.281455
-Block Island,143457,United States,,United States,No,Yes,41.1680984497,-71.577796936
-Nantucket,168864,United States,,United States,No,Yes,41.25310135,-70.06020355
-Martha’s Vineyard,177071,United States,,United States,No,Yes,41.3931007385,-70.6143035889
-New Bedford,70161,United States,,United States,No,No,41.6761016845703,-70.956901550293
-Pittsfield,64783,United States,,United States,No,No,42.426336,-73.291722
-Worcester,79121,United States,,United States,No,No,42.2672996520996,-71.8757019042969
-Keene,63256,United States,,United States,No,No,42.8983993530273,-72.2707977294922
-Lebanon,64415,United States,,United States,No,No,43.6260986328,-72.3041992188
-Rutland,58790,United States,,United States,No,No,43.52939987,-72.94960022
-Montpelier,65076,United States,,United States,No,No,44.20349884,-72.56230164
-Burlington (VT),74887,United States,,United States,No,No,44.4719009399,-73.1532974243
-Manchester (NH),83116,United States,,United States,No,No,42.986756,-71.468295
-Portland (ME),67994,United States,,United States,No,No,43.64619827,-70.30930328
-Augusta (ME),56853,United States,,United States,No,No,44.3205986023,-69.7973022461
-Rockland,53028,United States,,United States,No,No,44.06010056,-69.09919739
-Bangor,53233,United States,,United States,No,No,44.8073997497559,-68.8281021118164
-Bar Harbor,60092,United States,,United States,No,No,44.45000076,-68.3615036
-Auburn/Lewiston,55045,United States,,United States,No,No,44.048500061,-70.2835006714
-Presque Isle,47114,United States,,United States,No,No,46.68899918,-68.0447998
-Stowe,55421,United States,,United States,No,No,44.5345993042,-72.6139984131
-Pittsburgh,88000,United States,,United States,No,No,40.441845,-80.013048
-Erie,66226,United States,,United States,No,No,42.0831270134,-80.1738667488
-Cumberland,53419,United States,,United States,No,No,39.615398407,-78.7609024048
-Hagerstown,72092,United States,,United States,No,No,39.599744,-77.821352
-Frederick,95036,United States,,United States,No,No,39.416749,-77.378694
-Salisbury,60306,United States,,United States,No,No,38.3404998779297,-75.5102996826172
-Baltimore/Washington,107456,United States,,United States,Yes,No,38.951065,-76.940206
-Richmond,93770,United States,,United States,No,No,37.505199432373,-77.3197021484375
-Norfolk,81751,United States,,United States,No,No,36.952013,-76.297444
-Pyongyang,960,North Korea,,North Korea,Yes,No,39.224098,125.669998
-Chongjin,480,North Korea,,North Korea,No,No,41.428538,129.647555
-Havana,502,Cuba,,Cuba,Yes,Yes,22.989200592041,-82.4091033935547
-Roanoke,79166,United States,,United States,No,No,37.3255,-79.975403
-Lynchburg,71416,United States,,United States,No,No,37.3266983032227,-79.2004013061523
-Charlottesville,85135,United States,,United States,No,No,38.138599395752,-78.4529037475586
-Staunton,69357,United States,,United States,No,No,38.2638015747,-78.8964004517
-Charleston (WV),56479,United States,,United States,No,No,38.3731002807617,-81.5932006835937
-Morgantown,53314,United States,,United States,No,No,39.48715,-80.147485
-Bloomington (IN),60845,United States,,United States,No,No,39.1459999084473,-86.61669921875
-South Bend,55881,United States,,United States,No,No,41.7086982727051,-86.3172988891602
-Fort Wayne,60228,United States,,United States,No,No,40.97850037,-85.19509888
-Terre Haute,50903,United States,,United States,No,No,39.4515,-87.307602
-Lafayette (IN),60367,United States,,United States,No,No,40.4123001098633,-86.936897277832
-Indianapolis,67505,United States,,United States,No,No,39.7173,-86.294403
-Huntington,50978,United States,,United States,No,No,38.36669922,-82.55799866
-Lewisburg/Beckley,45641,United States,,United States,No,No,37.770445,-80.869972
-Wheeling,49264,United States,,United States,No,No,40.1749992371,-80.6463012695
-Parkersburg,52053,United States,,United States,No,No,39.345100402832,-81.4392013549805
-Evansville/Owensboro,55786,United States,,United States,No,No,37.887585,-87.361561
-Bluefield,47310,United States,,United States,No,No,37.2957992553711,-81.2077026367188
-Islip,84767,United States,,United States,No,No,40.79520035,-73.10019684
-Pago Pago,24131,American Samoa,United States,United States,Yes,Yes,-14.3310003281,-170.710006714
-Fitiuta,17344,American Samoa,United States,United States,No,Yes,-14.2172,-169.425003
-Ofu,18438,American Samoa,United States,United States,No,Yes,-14.184394,-169.669673
-Newburgh,84065,United States,,United States,No,No,41.595051,-73.974477
-Albany (NY),64396,United States,,United States,No,No,42.7482986450195,-73.8016967773438
-Plattsburgh,78004,United States,,United States,No,No,44.6509017944336,-73.4681015014648
-Saranac Lake,64388,United States,,United States,No,No,44.3852996826172,-74.2061996459961
-Massena,55561,United States,,United States,No,No,44.9357986450195,-74.8455963134766
-Ogdensburg,55561,United States,,United States,No,No,44.6819000244,-75.4654998779
-Watertown,65378,United States,,United States,No,No,43.9919013977051,-76.0216979980469
-Utica,74515,United States,,United States,No,No,43.23379898,-75.40699768
-Syracuse,79499,United States,,United States,No,No,43.111198425293,-76.1063003540039
-Binghamton,69767,United States,,United States,No,No,42.20869827,-75.97979736
-Elmira,69138,United States,,United States,No,No,42.1599006652832,-76.8916015625
-Ithaca,82518,United States,,United States,No,No,42.4910011291504,-76.4583969116211
-Rochester (NY),82058,United States,,United States,No,No,43.1189002990723,-77.6724014282227
-Buffalo,79244,United States,,United States,No,No,42.9682985924479,-78.7678667682943
-Jamestown (NY),62403,United States,,United States,No,No,42.15340042,-79.25800323
-Philadelphia,95065,United States,,United States,No,No,39.899638089215,-75.2142391783082
-Atlantic City,81226,United States,,United States,No,No,39.4575996398926,-74.5772018432617
-Dover,70383,United States,,United States,No,No,39.12950134,-75.46600342
-Allentown,83331,United States,,United States,No,No,40.652099609375,-75.440803527832
-Reading,81425,United States,,United States,No,No,40.3785018920898,-75.965202331543
-Lancaster,82568,United States,,United States,No,No,40.1217002868652,-76.2960968017578
-Scranton,69926,United States,,United States,No,No,41.3385009766,-75.7233963013
-Harrisburg,83612,United States,,United States,No,No,40.1935005188,-76.7633972168
+Metro Area,Income,Country,Territory,Country group,isNationalCapital,isIsland
+Los Angeles,75629,United States,,United States,No,No
+New York City,78039,United States,,United States,No,No
+Chicago,70009,United States,,United States,No,No
+Boston,118453,United States,,United States,No,No
+Provincetown,212306,United States,,United States,No,Yes
+Portsmouth,82210,United States,,United States,No,No
+Hyannis,148042,United States,,United States,No,No
+Nauru,19000,Nauru,,Nauru,Yes,Yes
+Funafuti,30495,Tuvalu,,Tuvalu,Yes,Yes
+Majuro,12011,Marshall Islands,,United States,Yes,Yes
+Pohnpei,18736,Federated States of Micronesia,,United States,Yes,Yes
+Kwajalien,14956,Marshall Islands,,United States,No,Yes
+Kosrae,24025,Federated States of Micronesia,,United States,No,Yes
+Chuuk,15613,Federated States of Micronesia,,United States,No,Yes
+Yap,20789,Federated States of Micronesia,,United States,No,Yes
+Danbury,74420,United States,,United States,No,No
+Bridgeport,109317,United States,,United States,No,No
+Waterbury,63082,United States,,United States,No,No
+New Haven,80496,United States,,United States,No,No
+Hartford,73487,United States,,United States,No,No
+Providence,65715,United States,,United States,No,No
+New London,82886,United States,,United States,No,No
+Newport,82477,United States,,United States,No,No
+Block Island,143457,United States,,United States,No,Yes
+Nantucket,168864,United States,,United States,No,Yes
+Martha’s Vineyard,177071,United States,,United States,No,Yes
+New Bedford,70161,United States,,United States,No,No
+Pittsfield,64783,United States,,United States,No,No
+Worcester,79121,United States,,United States,No,No
+Keene,63256,United States,,United States,No,No
+Lebanon,64415,United States,,United States,No,No
+Rutland,58790,United States,,United States,No,No
+Montpelier,65076,United States,,United States,No,No
+Burlington (VT),74887,United States,,United States,No,No
+Manchester (NH),83116,United States,,United States,No,No
+Portland (ME),67994,United States,,United States,No,No
+Augusta (ME),56853,United States,,United States,No,No
+Rockland,53028,United States,,United States,No,No
+Bangor,53233,United States,,United States,No,No
+Bar Harbor,60092,United States,,United States,No,No
+Auburn/Lewiston,55045,United States,,United States,No,No
+Presque Isle,47114,United States,,United States,No,No
+Stowe,55421,United States,,United States,No,No
+Pittsburgh,88000,United States,,United States,No,No
+Erie,66226,United States,,United States,No,No
+Cumberland,53419,United States,,United States,No,No
+Hagerstown,72092,United States,,United States,No,No
+Frederick,95036,United States,,United States,No,No
+Salisbury,60306,United States,,United States,No,No
+Baltimore/Washington,107456,United States,,United States,Yes,No
+Richmond,93770,United States,,United States,No,No
+Norfolk,81751,United States,,United States,No,No
+Pyongyang,960,North Korea,,North Korea,Yes,No
+Chongjin,480,North Korea,,North Korea,No,No
+Havana,502,Cuba,,Cuba,Yes,Yes
+Roanoke,79166,United States,,United States,No,No
+Lynchburg,71416,United States,,United States,No,No
+Charlottesville,85135,United States,,United States,No,No
+Staunton,69357,United States,,United States,No,No
+Charleston (WV),56479,United States,,United States,No,No
+Morgantown,53314,United States,,United States,No,No
+Bloomington (IN),60845,United States,,United States,No,No
+South Bend,55881,United States,,United States,No,No
+Fort Wayne,60228,United States,,United States,No,No
+Terre Haute,50903,United States,,United States,No,No
+Lafayette (IN),60367,United States,,United States,No,No
+Indianapolis,67505,United States,,United States,No,No
+Huntington,50978,United States,,United States,No,No
+Lewisburg/Beckley,45641,United States,,United States,No,No
+Wheeling,49264,United States,,United States,No,No
+Parkersburg,52053,United States,,United States,No,No
+Evansville/Owensboro,55786,United States,,United States,No,No
+Bluefield,47310,United States,,United States,No,No
+Islip,84767,United States,,United States,No,No
+Pago Pago,24131,American Samoa,United States,United States,Yes,Yes
+Fitiuta,17344,American Samoa,United States,United States,No,Yes
+Ofu,18438,American Samoa,United States,United States,No,Yes
+Newburgh,84065,United States,,United States,No,No
+Albany (NY),64396,United States,,United States,No,No
+Plattsburgh,78004,United States,,United States,No,No
+Saranac Lake,64388,United States,,United States,No,No
+Massena,55561,United States,,United States,No,No
+Ogdensburg,55561,United States,,United States,No,No
+Watertown,65378,United States,,United States,No,No
+Utica,74515,United States,,United States,No,No
+Syracuse,79499,United States,,United States,No,No
+Binghamton,69767,United States,,United States,No,No
+Elmira,69138,United States,,United States,No,No
+Ithaca,82518,United States,,United States,No,No
+Rochester (NY),82058,United States,,United States,No,No
+Buffalo,79244,United States,,United States,No,No
+Jamestown (NY),62403,United States,,United States,No,No
+Philadelphia,95065,United States,,United States,No,No
+Atlantic City,81226,United States,,United States,No,No
+Dover,70383,United States,,United States,No,No
+Allentown,83331,United States,,United States,No,No
+Reading,81425,United States,,United States,No,No
+Lancaster,82568,United States,,United States,No,No
+Scranton,69926,United States,,United States,No,No
+Harrisburg,83612,United States,,United States,No,No
