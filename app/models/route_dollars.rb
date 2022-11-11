@@ -30,6 +30,10 @@ class RouteDollars < ApplicationRecord
     end
   end
 
+  def inertia_service
+    @inertia_service ||= Calculation::InertiaRouteService.new(self)
+  end
+
   private
 
     def self.calculate_with_alphabetical_markets(date, origin_market, destination_market, origin_airport, destination_airport)

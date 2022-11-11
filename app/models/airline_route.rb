@@ -36,7 +36,7 @@ class AirlineRoute < ApplicationRecord
   def self.find_or_create_by_airline_and_route(airline, origin_airport, destination_airport)
     record = find_or_create_by(airline: airline, origin_airport: origin_airport, destination_airport: destination_airport)
     if record.new_record?
-      inertia = Calculation::InertiaRouteService.new(origin_airport, destination_airport, Game.find(airline.game_id).current_date)
+      inertia = Calculation::InertiaRouteService.new(RouteDollars.calculate(Game.find(airline.game_id).current_date, origin_airport.market, destination_airport.market, nil, nil))
       record.assign_attributes(
         economy_price: inertia.economy_fare.round(2),
         premium_economy_price: inertia.premium_economy_fare.round(2),
@@ -215,7 +215,7 @@ class AirlineRoute < ApplicationRecord
     end
 
     def inertia_route
-      @inertia_route ||= Calculation::InertiaRouteService.new(origin_airport, destination_airport, game.current_date)
+      @inertia_route ||= Calculation::InertiaRouteService.new(RouteDollars.calculate(game.current_date, origin_airport.market, destination_airport.market, nil, nil))
     end
 
     def legroom_reputation

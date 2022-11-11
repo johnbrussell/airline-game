@@ -1,6 +1,4 @@
 class Calculation::InertiaRouteService
-  include Demandable
-
   INERTIA_PLANE_FUEL_BURN_CONSTANT = 118.4
   INERTIA_PLANE_MAX_NARROWBODY_SEATS = 199
   INERTIA_PLANE_SPEED = 556
@@ -17,7 +15,11 @@ class Calculation::InertiaRouteService
   SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS = 8
   SHORT_DISTANCE_ECONOMY_SEATS = 57
 
-  delegate :distance, to: :revenue
+  delegate :distance, to: :@route_dollars
+
+  def initialize(route_dollars)
+    @route_dollars = route_dollars
+  end
 
   def business_fare
     desired_business_fare * MANAGEMENT_OVERHEAD
@@ -96,7 +98,7 @@ class Calculation::InertiaRouteService
     end
 
     def business_revenue
-      revenue.business * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
+      @route_dollars.business * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
     end
 
     def desired_business_fare
@@ -140,7 +142,7 @@ class Calculation::InertiaRouteService
     end
 
     def economy_revenue
-      revenue.economy * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
+      @route_dollars.economy * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
     end
 
     def inertia_airplane
@@ -173,12 +175,7 @@ class Calculation::InertiaRouteService
     end
 
     def premium_economy_revenue
-      revenue.premium_economy * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
-    end
-
-    def revenue
-      # Note RouteDollars is directional.  InertiaRouteService is bidirectional.  So need to merge
-      @revenue ||= RouteDollars.find_by(origin_airport_iata: @origin.iata, destination_airport_iata: @destination.iata, date: @current_date)
+      @route_dollars.premium_economy * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
     end
 
     def total_seat_area

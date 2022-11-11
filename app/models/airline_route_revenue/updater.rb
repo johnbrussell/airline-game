@@ -110,7 +110,7 @@ class AirlineRouteRevenue::Updater
     end
 
     def inertia_calculator
-      @inertia_calculator ||= Calculation::InertiaRouteService.new(@origin, @destination, @current_date)
+      @inertia_calculator ||= Calculation::InertiaRouteService.new(RouteDollars.calculate(@current_date, origin_market, destination_market, nil, nil))
     end
 
     def operators_of_other_market_routes(game)

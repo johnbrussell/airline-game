@@ -12,6 +12,10 @@ RSpec.describe AirlineRouteRevenue::Updater do
   let(:other_destination_airport) { Fabricate(:airport, iata: "NRU", market: inu_market) }
   let(:family) { Fabricate(:aircraft_family) }
 
+  before(:each) do
+    allow(RouteDollars).to receive(:calculate).and_return(double)
+  end
+
   context "upsert" do
     it "creates the right AirlineRouteRevenues when they are new" do
       economy_seats = 100

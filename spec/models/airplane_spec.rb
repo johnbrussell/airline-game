@@ -2074,7 +2074,8 @@ RSpec.describe Airplane do
       AirplaneRoute.new(airplane: subject, route: airline_route, flight_cost: 1, frequencies: 1, block_time_mins: 1).save(validate: false)
       airplane_route = AirplaneRoute.last
       AirlineRouteRevenue.create!(airline_route: airline_route, revenue: 100, economy_pax: 50, business_pax: 0, premium_economy_pax: 0, exclusive_economy_revenue: 0, exclusive_business_revenue: 0, exclusive_premium_economy_revenue: 0)
-      RouteDollars.create!(origin_market: airline.base, destination_market: airline.base, origin_airport_iata: "BOS", destination_airport_iata: "LAX", date: Date.today, distance: 1000, business: 100, economy: 100, premium_economy: 100)
+      route_dollars = instance_double(RouteDollars, origin_market: airline.base, destination_market: airline.base, origin_airport_iata: "BOS", destination_airport_iata: "LAX", date: Date.today, distance: 1000, business: 100, economy: 100, premium_economy: 100)
+      allow(RouteDollars).to receive(:calculate).with(Date.today, airline.base, airline.base, nil, nil).and_return(route_dollars)
       subject.reload
 
       bos_global_demand = instance_double(GlobalDemand, business: 10, government: 10, leisure: 10, tourist: 10, airport: bos)

@@ -2,17 +2,14 @@ require "rails_helper"
 require "capybara/rspec"
 
 RSpec.describe "routes/view_route", type: :feature do
-  before(:each) do
-    nauru = Fabricate(:market, name: "Nauru", country: "Nauru", country_group: "Nauru")
-    funafuti = Fabricate(:market, name: "Funafuti", country: "Tuvalu", country_group: "Tuvalu")
-    inu = Fabricate(:airport, market: nauru, iata: "INU", municipality: nil, runway: 100, exclusive_catchment: 1)
-    fun = Fabricate(:airport, market: funafuti, iata: "FUN", municipality: nil, runway: 10000, exclusive_catchment: 1)
-    maj = Fabricate(:airport, iata: "MAJ", market: nauru, runway: 10000, exclusive_catchment: 1)
-    Population.create!(market_id: funafuti.id, year: 2020, population: 10000)
-    Population.create!(market_id: nauru.id, year: 2000, population: 14000)
-    Tourists.create!(market_id: nauru.id, year: 1999, volume: 100)
-    Tourists.create!(market_id: funafuti.id, year: 2020, volume: 2700)
-    date = Date.today
+  let(:nauru) { Fabricate(:market, name: "Nauru", country: "Nauru", country_group: "Nauru") }
+  let(:funafuti) { Fabricate(:market, name: "Funafuti", country: "Tuvalu", country_group: "Tuvalu") }
+  let(:inu) { Fabricate(:airport, market: nauru, iata: "INU", municipality: nil, runway: 100, exclusive_catchment: 1) }
+  let(:fun) { Fabricate(:airport, market: funafuti, iata: "FUN", municipality: nil, runway: 10000, exclusive_catchment: 1) }
+  let(:maj) { Fabricate(:airport, iata: "MAJ", market: nauru, runway: 10000, exclusive_catchment: 1) }
+  let(:date) { Date.today }
+
+  let(:route_dollars_fun_inu) {
     RouteDollars.create!(
       origin_market: funafuti,
       destination_market: nauru,
@@ -24,6 +21,8 @@ RSpec.describe "routes/view_route", type: :feature do
       business: 50,
       premium_economy: 75,
     )
+  }
+  let(:route_dollars_inu_fun) {
     RouteDollars.create!(
       origin_market: funafuti,
       destination_market: nauru,
@@ -35,6 +34,16 @@ RSpec.describe "routes/view_route", type: :feature do
       business: 50,
       premium_economy: 75,
     )
+  }
+
+  before(:each) do
+    Population.create!(market_id: funafuti.id, year: 2020, population: 10000)
+    Population.create!(market_id: nauru.id, year: 2000, population: 14000)
+    Tourists.create!(market_id: nauru.id, year: 1999, volume: 100)
+    Tourists.create!(market_id: funafuti.id, year: 2020, volume: 2700)
+
+    allow(RouteDollars).to receive(:calculate).with(date, funafuti, nauru, nil, nil).and_return(route_dollars_fun_inu)
+    allow(RouteDollars).to receive(:calculate).with(date, nauru, funafuti, nil, nil).and_return(route_dollars_inu_fun)
   end
 
   it "has a link back to the game homepage" do
