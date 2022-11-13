@@ -391,6 +391,7 @@ RSpec.describe AirplaneRoute do
       allow(Calculation::FlightCostCalculator).to receive(:new).and_return(flight_cost_calculator)
       route_dollars = instance_double(RouteDollars, origin_market: fun_market, destination_market: inu_market, origin_airport_iata: "FUN", destination_airport_iata: "INU", date: Date.today, distance: 1000, business: 100, economy: 100, premium_economy: 100)
       allow(RouteDollars).to receive(:calculate).with(Date.today, fun_market, inu_market, nil, nil).and_return(route_dollars)
+      allow(RouteDollars).to receive(:between_markets).with(fun_market, inu_market, Date.today).and_return([route_dollars])
       airline_route.reload
 
       expect(AirlineRouteRevenue.count).to eq 0
@@ -580,6 +581,7 @@ RSpec.describe AirplaneRoute do
       allow(Calculation::FlightCostCalculator).to receive(:new).and_return(flight_cost_calculator)
       route_dollars = instance_double(RouteDollars, origin_market: fun_market, destination_market: inu_market, origin_airport_iata: "FUN", destination_airport_iata: "INU", date: Date.today, distance: 1000, business: 100, economy: 100, premium_economy: 100)
       allow(RouteDollars).to receive(:calculate).with(Date.today, fun_market, inu_market, nil, nil).and_return(route_dollars)
+      allow(RouteDollars).to receive(:between_markets).with(fun_market, inu_market, Date.today).and_return([route_dollars])
       airline_route.reload
 
       airplane_route_count = AirplaneRoute.count

@@ -8,22 +8,14 @@ RSpec.describe Calculation::InertiaRouteService do
     let(:economy_revenue) { 107100 * 2 }
     let(:premium_economy_revenue) { 30600 * 2 }
     let(:distance) { Calculation::InertiaRouteService::LONG_DISTANCE }
-    let(:route_dollars) { instance_double(RouteDollars, distance: distance, business: business_revenue, economy: economy_revenue, premium_economy: premium_economy_revenue) }
-    let(:subject) { Calculation::InertiaRouteService.new(route_dollars) }
+    let(:subject) { Calculation::InertiaRouteService.new(distance, business_revenue, economy_revenue, premium_economy_revenue) }
 
     before(:each) do
       allow(Calculation::FlightCostCalculator).to receive(:new).and_return(flight_cost_calculator)
     end
 
     it "calculates frequencies correctly" do
-      other_route_dollars = instance_double(
-        RouteDollars,
-        distance: distance,
-        business: 36720,
-        economy: 107100,
-        premium_economy: 30600
-      )
-      subject = Calculation::InertiaRouteService.new(other_route_dollars)
+      subject = Calculation::InertiaRouteService.new(distance, 36720, 107100, 30600)
 
       expect(subject.send(:desired_business_frequencies)).to eq 2.5
       expect(subject.business_frequencies).to eq 3
@@ -60,8 +52,7 @@ RSpec.describe Calculation::InertiaRouteService do
     let(:economy_revenue) { 107000 * 2 }
     let(:premium_economy_revenue) { 30000 * 2 }
     let(:distance) { Calculation::InertiaRouteService::LONG_DISTANCE }
-    let(:route_dollars) { instance_double(RouteDollars, distance: distance, business: business_revenue, economy: economy_revenue, premium_economy: premium_economy_revenue) }
-    let(:subject) { Calculation::InertiaRouteService.new(route_dollars) }
+    let(:subject) { Calculation::InertiaRouteService.new(distance, business_revenue, economy_revenue, premium_economy_revenue) }
 
     before(:each) do
       allow(Calculation::FlightCostCalculator).to receive(:new).and_return(flight_cost_calculator)
@@ -108,35 +99,30 @@ RSpec.describe Calculation::InertiaRouteService do
 
   context "business_seats_per_flight" do
     it "is less than SHORT_DISTANCE_BUSINESS_SEATS for a flight of less than SHORT_DISTANCE" do
-      route_dollars = instance_double(RouteDollars, distance: Calculation::InertiaRouteService::SHORT_DISTANCE / 2)
-      subject = Calculation::InertiaRouteService.new(route_dollars)
+      subject = Calculation::InertiaRouteService.new(Calculation::InertiaRouteService::SHORT_DISTANCE / 2, 0, 0, 0)
 
       assert subject.business_seats_per_flight == 0 || subject.business_seats_per_flight < Calculation::InertiaRouteService::SHORT_DISTANCE_BUSINESS_SEATS
     end
 
     it "is SHORT_DISTANCE_BUSINESS_SEATS for a flight of SHORT_DISTANCE" do
-      route_dollars = instance_double(RouteDollars, distance: Calculation::InertiaRouteService::SHORT_DISTANCE)
-      subject = Calculation::InertiaRouteService.new(route_dollars)
+      subject = Calculation::InertiaRouteService.new(Calculation::InertiaRouteService::SHORT_DISTANCE, 0, 0, 0)
 
       assert subject.business_seats_per_flight == Calculation::InertiaRouteService::SHORT_DISTANCE_BUSINESS_SEATS
     end
 
     it "is between SHORT_DISTANCE_BUSINESS_SEATS and LONG_DISTANCE_BUSINESS_SEATS for a flight between SHORT_DISTANCE and LONG_DISTANCE" do
-      route_dollars = instance_double(RouteDollars, distance: (Calculation::InertiaRouteService::SHORT_DISTANCE + Calculation::InertiaRouteService::LONG_DISTANCE) / 2)
-      subject = Calculation::InertiaRouteService.new(route_dollars)
+      subject = Calculation::InertiaRouteService.new((Calculation::InertiaRouteService::SHORT_DISTANCE + Calculation::InertiaRouteService::LONG_DISTANCE) / 2, 0, 0, 0)
 
       assert subject.business_seats_per_flight > Calculation::InertiaRouteService::SHORT_DISTANCE_BUSINESS_SEATS
       assert subject.business_seats_per_flight < Calculation::InertiaRouteService::LONG_DISTANCE_BUSINESS_SEATS
     end
 
     it "is LONG_DISTANCE_BUSINESS_SEATS for a flight of LONG_DISTANCE or more" do
-      route_dollars = instance_double(RouteDollars, distance: Calculation::InertiaRouteService::LONG_DISTANCE)
-      subject = Calculation::InertiaRouteService.new(route_dollars)
+      subject = Calculation::InertiaRouteService.new(Calculation::InertiaRouteService::LONG_DISTANCE, 0, 0, 0)
 
       assert subject.business_seats_per_flight == Calculation::InertiaRouteService::LONG_DISTANCE_BUSINESS_SEATS
 
-      route_dollars = instance_double(RouteDollars, distance: Calculation::InertiaRouteService::LONG_DISTANCE * 2)
-      subject = Calculation::InertiaRouteService.new(route_dollars)
+      subject = Calculation::InertiaRouteService.new(Calculation::InertiaRouteService::LONG_DISTANCE * 2, 0, 0, 0)
 
       assert subject.business_seats_per_flight == Calculation::InertiaRouteService::LONG_DISTANCE_BUSINESS_SEATS
     end
@@ -144,35 +130,30 @@ RSpec.describe Calculation::InertiaRouteService do
 
   context "economy_seats_per_flight" do
     it "is less than SHORT_DISTANCE_ECONOMY_SEATS for a flight of less than SHORT_DISTANCE" do
-      route_dollars = instance_double(RouteDollars, distance: Calculation::InertiaRouteService::SHORT_DISTANCE / 2)
-      subject = Calculation::InertiaRouteService.new(route_dollars)
+      subject = Calculation::InertiaRouteService.new(Calculation::InertiaRouteService::SHORT_DISTANCE / 2, 0, 0, 0)
 
       assert subject.economy_seats_per_flight == 0 || subject.economy_seats_per_flight < Calculation::InertiaRouteService::SHORT_DISTANCE_ECONOMY_SEATS
     end
 
     it "is SHORT_DISTANCE_ECONOMY_SEATS for a flight of SHORT_DISTANCE" do
-      route_dollars = instance_double(RouteDollars, distance: Calculation::InertiaRouteService::SHORT_DISTANCE)
-      subject = Calculation::InertiaRouteService.new(route_dollars)
+      subject = Calculation::InertiaRouteService.new(Calculation::InertiaRouteService::SHORT_DISTANCE, 0, 0, 0)
 
       assert subject.economy_seats_per_flight == Calculation::InertiaRouteService::SHORT_DISTANCE_ECONOMY_SEATS
     end
 
     it "is between SHORT_DISTANCE_ECONOMY_SEATS and LONG_DISTANCE_ECONOMY_SEATS for a flight between SHORT_DISTANCE and LONG_DISTANCE" do
-      route_dollars = instance_double(RouteDollars, distance: (Calculation::InertiaRouteService::SHORT_DISTANCE + Calculation::InertiaRouteService::LONG_DISTANCE) / 2)
-      subject = Calculation::InertiaRouteService.new(route_dollars)
+      subject = Calculation::InertiaRouteService.new((Calculation::InertiaRouteService::SHORT_DISTANCE + Calculation::InertiaRouteService::LONG_DISTANCE) / 2, 0, 0, 0)
 
       assert subject.economy_seats_per_flight > Calculation::InertiaRouteService::SHORT_DISTANCE_ECONOMY_SEATS
       assert subject.economy_seats_per_flight < Calculation::InertiaRouteService::LONG_DISTANCE_ECONOMY_SEATS
     end
 
     it "is LONG_DISTANCE_ECONOMY_SEATS for a flight of LONG_DISTANCE or more" do
-      route_dollars = instance_double(RouteDollars, distance: Calculation::InertiaRouteService::LONG_DISTANCE)
-      subject = Calculation::InertiaRouteService.new(route_dollars)
+      subject = Calculation::InertiaRouteService.new(Calculation::InertiaRouteService::LONG_DISTANCE, 0, 0, 0)
 
       assert subject.economy_seats_per_flight == Calculation::InertiaRouteService::LONG_DISTANCE_ECONOMY_SEATS
 
-      route_dollars = instance_double(RouteDollars, distance: Calculation::InertiaRouteService::LONG_DISTANCE * 2)
-      subject = Calculation::InertiaRouteService.new(route_dollars)
+      subject = Calculation::InertiaRouteService.new(Calculation::InertiaRouteService::LONG_DISTANCE * 2, 0, 0, 0)
 
       assert subject.economy_seats_per_flight == Calculation::InertiaRouteService::LONG_DISTANCE_ECONOMY_SEATS
     end
@@ -180,35 +161,30 @@ RSpec.describe Calculation::InertiaRouteService do
 
   context "premium_economy_seats_per_flight" do
     it "is less than SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS for a flight of less than SHORT_DISTANCE" do
-      route_dollars = instance_double(RouteDollars, distance: Calculation::InertiaRouteService::SHORT_DISTANCE / 2)
-      subject = Calculation::InertiaRouteService.new(route_dollars)
+      subject = Calculation::InertiaRouteService.new(Calculation::InertiaRouteService::SHORT_DISTANCE / 2, 0, 0, 0)
 
       assert subject.premium_economy_seats_per_flight == 0 || subject.premium_economy_seats_per_flight < Calculation::InertiaRouteService::SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS
     end
 
     it "is SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS for a flight of SHORT_DISTANCE" do
-      route_dollars = instance_double(RouteDollars, distance: Calculation::InertiaRouteService::SHORT_DISTANCE)
-      subject = Calculation::InertiaRouteService.new(route_dollars)
+      subject = Calculation::InertiaRouteService.new(Calculation::InertiaRouteService::SHORT_DISTANCE, 0, 0, 0)
 
       assert subject.premium_economy_seats_per_flight == Calculation::InertiaRouteService::SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS
     end
 
     it "is between SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS and LONG_DISTANCE_PREMIUM_ECONOMY_SEATS for a flight between SHORT_DISTANCE and LONG_DISTANCE" do
-      route_dollars = instance_double(RouteDollars, distance: (Calculation::InertiaRouteService::SHORT_DISTANCE + Calculation::InertiaRouteService::LONG_DISTANCE) / 2)
-      subject = Calculation::InertiaRouteService.new(route_dollars)
+      subject = Calculation::InertiaRouteService.new((Calculation::InertiaRouteService::SHORT_DISTANCE + Calculation::InertiaRouteService::LONG_DISTANCE) / 2, 0, 0, 0)
 
       assert subject.premium_economy_seats_per_flight > Calculation::InertiaRouteService::SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS
       assert subject.premium_economy_seats_per_flight < Calculation::InertiaRouteService::LONG_DISTANCE_PREMIUM_ECONOMY_SEATS
     end
 
     it "is LONG_DISTANCE_PREMIUM_ECONOMY_SEATS for a flight of LONG_DISTANCE or more" do
-      route_dollars = instance_double(RouteDollars, distance: Calculation::InertiaRouteService::LONG_DISTANCE)
-      subject = Calculation::InertiaRouteService.new(route_dollars)
+      subject = Calculation::InertiaRouteService.new(Calculation::InertiaRouteService::LONG_DISTANCE, 0, 0, 0)
 
       assert subject.premium_economy_seats_per_flight == Calculation::InertiaRouteService::LONG_DISTANCE_PREMIUM_ECONOMY_SEATS
 
-      route_dollars = instance_double(RouteDollars, distance: Calculation::InertiaRouteService::LONG_DISTANCE * 2)
-      subject = Calculation::InertiaRouteService.new(route_dollars)
+      subject = Calculation::InertiaRouteService.new(Calculation::InertiaRouteService::LONG_DISTANCE * 2, 0, 0, 0)
 
       assert subject.premium_economy_seats_per_flight == Calculation::InertiaRouteService::LONG_DISTANCE_PREMIUM_ECONOMY_SEATS
     end

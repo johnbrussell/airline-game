@@ -13,7 +13,7 @@ RSpec.describe AirlineRouteRevenue::Updater do
   let(:family) { Fabricate(:aircraft_family) }
 
   before(:each) do
-    allow(RouteDollars).to receive(:calculate).and_return(double)
+    allow(RouteDollars).to receive(:calculate).and_return(instance_double(RouteDollars, distance: 1, business: 2, economy: 3, premium_economy: 4))
   end
 
   context "upsert" do

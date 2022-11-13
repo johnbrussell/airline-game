@@ -36,7 +36,10 @@ class AirlineRoute < ApplicationRecord
   def self.find_or_create_by_airline_and_route(airline, origin_airport, destination_airport)
     record = find_or_create_by(airline: airline, origin_airport: origin_airport, destination_airport: destination_airport)
     if record.new_record?
-      inertia = Calculation::InertiaRouteService.new(RouteDollars.calculate(Game.find(airline.game_id).current_date, origin_airport.market, destination_airport.market, nil, nil))
+      route_dollars_in_market = RouteDollars.between_markets(origin_airport.market, destination_airport.market, Game.find(airline.game_id).current_date)
+      total_dollars_in_market = route_dollars_in_market.sum { |rd| rd.business + rd.economy + rd.premium_economy }
+      distance = route_dollars_in_market.sum { |rd| (rd.business.to_f / total_dollars_in_market + rd.economy.to_f / total_dollars_in_market + rd.premium_economy.to_f / total_dollars_in_market) * rd.distance }
+      inertia = Calculation::InertiaRouteService.new(distance, route_dollars_in_market.sum(&:business), route_dollars_in_market.sum(&:economy), route_dollars_in_market.sum(&:premium_economy))
       record.assign_attributes(
         economy_price: inertia.economy_fare.round(2),
         premium_economy_price: inertia.premium_economy_fare.round(2),
@@ -194,6 +197,13 @@ class AirlineRoute < ApplicationRecord
       1 - (business_price / max_route_business_fare.to_f)
     end
 
+    def calculate_inertia_route
+      route_dollars_in_market = RouteDollars.between_markets(origin_airport.market, destination_airport.market, game.current_date)
+      total_dollars_in_market = route_dollars_in_market.sum { |rd| rd.business + rd.economy + rd.premium_economy }
+      distance = route_dollars_in_market.sum { |rd| (rd.business.to_f / total_dollars_in_market + rd.economy.to_f / total_dollars_in_market + rd.premium_economy.to_f / total_dollars_in_market) * rd.distance }
+      @inertia_route ||= Calculation::InertiaRouteService.new(distance, route_dollars_in_market.sum(&:business), route_dollars_in_market.sum(&:economy), route_dollars_in_market.sum(&:premium_economy))
+    end
+
     def economy_fare_reputation
       1 - (economy_price / max_route_economy_fare.to_f)
     end
@@ -215,7 +225,7 @@ class AirlineRoute < ApplicationRecord
     end
 
     def inertia_route
-      @inertia_route ||= Calculation::InertiaRouteService.new(RouteDollars.calculate(game.current_date, origin_airport.market, destination_airport.market, nil, nil))
+      @inertia_route ||= calculate_inertia_route
     end
 
     def legroom_reputation

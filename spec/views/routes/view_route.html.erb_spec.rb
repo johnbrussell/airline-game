@@ -44,6 +44,8 @@ RSpec.describe "routes/view_route", type: :feature do
 
     allow(RouteDollars).to receive(:calculate).with(date, funafuti, nauru, nil, nil).and_return(route_dollars_fun_inu)
     allow(RouteDollars).to receive(:calculate).with(date, nauru, funafuti, nil, nil).and_return(route_dollars_inu_fun)
+    allow(RouteDollars).to receive(:between_markets).with(funafuti, nauru, date).and_return([route_dollars_fun_inu, route_dollars_inu_fun])
+    allow(RouteDollars).to receive(:between_markets).with(nauru, funafuti, date).and_return([route_dollars_fun_inu, route_dollars_inu_fun])
   end
 
   it "has a link back to the game homepage" do

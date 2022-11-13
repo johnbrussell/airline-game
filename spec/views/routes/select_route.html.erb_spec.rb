@@ -44,6 +44,7 @@ RSpec.describe "routes/select_route", type: :feature do
       premium_economy: 75,
     )
     allow(RouteDollars).to receive(:calculate).with(Date.today, funafuti, nauru, nil, nil).and_return(route_dollars)
+    allow(RouteDollars).to receive(:between_markets).with(funafuti, nauru, Date.today).and_return([route_dollars])
 
     game = Fabricate(:game)
     Fabricate(:airline, is_user_airline: true, game_id: game.id, base_id: apia.id)
