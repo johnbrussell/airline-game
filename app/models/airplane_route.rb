@@ -23,8 +23,15 @@ class AirplaneRoute < ApplicationRecord
   belongs_to :airplane
   belongs_to :route, class_name: "AirlineRoute", foreign_key: :airline_route_id
 
-  delegate :distance,
+  delegate :legroom_reputation,
+           to: :airplane
+
+  delegate :airline,
+           :business_price,
+           :distance,
+           :economy_price,
            :name,
+           :premium_economy_price,
            :service_quality,
            to: :route
 
@@ -38,8 +45,20 @@ class AirplaneRoute < ApplicationRecord
       .where("airlines.game_id == ?", game.id)
   end
 
+  def business_reputation_data
+    Calculation::ReputationData.new(airline, business_price, frequencies, service_quality, legroom_reputation)
+  end
+
   def daily_profit
     (revenue - expenses) / DAYS_PER_WEEK
+  end
+
+  def economy_reputation_data
+    Calculation::ReputationData.new(airline, economy_price, frequencies, service_quality, legroom_reputation)
+  end
+
+  def premium_economy_reputation_data
+    Calculation::ReputationData.new(airline, premium_economy_price, frequencies, service_quality, legroom_reputation)
   end
 
   def recalculate_profits_and_block_time
