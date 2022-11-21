@@ -34,6 +34,10 @@ class Calculation::InertiaRouteService
     end
   end
 
+  def business_reputation_data
+    Calculation::ReputationData.new(nil, business_fare, business_frequencies, AirlineRoute::MIN_SERVICE_QUALITY, 0)
+  end
+
   def business_seats_per_flight
     if @distance >= LONG_DISTANCE
       LONG_DISTANCE_BUSINESS_SEATS
@@ -54,6 +58,10 @@ class Calculation::InertiaRouteService
     else
       desired_economy_frequencies.ceil()
     end
+  end
+
+  def economy_reputation_data
+    Calculation::ReputationData.new(nil, economy_fare, economy_frequencies, AirlineRoute::MIN_SERVICE_QUALITY, 0)
   end
 
   def economy_seats_per_flight
@@ -80,6 +88,10 @@ class Calculation::InertiaRouteService
     else
       desired_premium_economy_frequencies.ceil()
     end
+  end
+
+  def premium_economy_reputation_data
+    Calculation::ReputationData.new(nil, premium_economy_fare, premium_economy_frequencies, AirlineRoute::MIN_SERVICE_QUALITY, 0)
   end
 
   def premium_economy_seats_per_flight
