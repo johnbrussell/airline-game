@@ -23,14 +23,19 @@ class AirplaneRoute < ApplicationRecord
   belongs_to :airplane
   belongs_to :route, class_name: "AirlineRoute", foreign_key: :airline_route_id
 
-  delegate :legroom_reputation,
+  delegate :business_seats,
+           :economy_seats,
+           :legroom_reputation,
+           :premium_economy_seats,
            to: :airplane
 
   delegate :airline,
            :business_price,
+           :destination_airport_iata,
            :distance,
            :economy_price,
            :name,
+           :origin_airport_iata,
            :premium_economy_price,
            :service_quality,
            to: :route
