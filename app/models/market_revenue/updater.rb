@@ -68,21 +68,21 @@ class MarketRevenue::Updater
 
     def initial_business_capacity
       [
-        airplane_routes.map { |ar| MarketRevenue::Capacity.new(ar, ar.business_reputation_data, ar.frequencies * ar.business_seats, ar.origin_airport_iata, ar.destination_airport_iata, nil, nil) },
+        airplane_routes.map { |ar| MarketRevenue::Capacity.new(ar, ar.business_reputation_data, ar.frequencies * ar.business_seats, ar.origin_market_airport_iata, ar.destination_market_airport_iata, nil, nil) },
         inertia_business_route_service.map { |ibrs| MarketRevenue::Capacity.new(nil, ibrs.reputation_data, ibrs.frequencies * ibrs.seats_per_flight, ibrs.origin_iata, ibrs.destination_iata, nil, nil) }
       ].flatten.select { |capacity| capacity.available_seats > 0 }
     end
 
     def initial_economy_capacity
       [
-        airplane_routes.map { |ar| MarketRevenue::Capacity.new(ar, ar.economy_reputation_data, ar.frequencies * ar.economy_seats, ar.origin_airport_iata, ar.destination_airport_iata, nil, nil) },
+        airplane_routes.map { |ar| MarketRevenue::Capacity.new(ar, ar.economy_reputation_data, ar.frequencies * ar.economy_seats, ar.origin_market_airport_iata, ar.destination_market_airport_iata, nil, nil) },
         inertia_economy_route_service.map { |iers| MarketRevenue::Capacity.new(nil, iers.reputation_data, iers.frequencies * iers.seats_per_flight, iers.origin_iata, iers.destination_iata, nil, nil) }
       ].flatten.select { |capacity| capacity.available_seats > 0 }
     end
 
     def initial_premium_economy_capacity
       [
-        airplane_routes.map { |ar| MarketRevenue::Capacity.new(ar, ar.premium_economy_reputation_data, ar.frequencies * ar.premium_economy_seats, ar.origin_airport_iata, ar.destination_airport_iata, nil, nil) },
+        airplane_routes.map { |ar| MarketRevenue::Capacity.new(ar, ar.premium_economy_reputation_data, ar.frequencies * ar.premium_economy_seats, ar.origin_market_airport_iata, ar.destination_market_airport_iata, nil, nil) },
         inertia_premium_economy_route_service.map { |ipers| MarketRevenue::Capacity.new(nil, ipers.reputation_data, ipers.frequencies * ipers.seats_per_flight, ipers.origin_iata, ipers.destination_iata, nil, nil) }
       ].flatten.select { |capacity| capacity.available_seats > 0 }
     end
