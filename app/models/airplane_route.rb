@@ -31,10 +31,12 @@ class AirplaneRoute < ApplicationRecord
 
   delegate :airline,
            :business_price,
+           :destination_airport,
            :destination_airport_iata,
            :distance,
            :economy_price,
            :name,
+           :origin_airport,
            :origin_airport_iata,
            :premium_economy_price,
            :service_quality,
@@ -58,8 +60,24 @@ class AirplaneRoute < ApplicationRecord
     (revenue - expenses) / DAYS_PER_WEEK
   end
 
+  def destination_market_airport_iata
+    if origin_airport.market.name < destination_airport.market.name
+      destination_airport_iata
+    else
+      origin_airport_iata
+    end
+  end
+
   def economy_reputation_data
     Calculation::ReputationData.new(airline, economy_price, frequencies, service_quality, legroom_reputation)
+  end
+
+  def origin_market_airport_iata
+    if origin_airport.market.name < destination_airport.market.name
+      origin_airport_iata
+    else
+      destination_airport_iata
+    end
   end
 
   def premium_economy_reputation_data

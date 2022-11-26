@@ -365,6 +365,46 @@ RSpec.describe AirplaneRoute do
     end
   end
 
+  context "destination_market_airport_iata" do
+    let(:other_market) { Fabricate(:market, name: "Alphabetically first") }
+    let(:destination_airport) { Airport.new(iata: "DEF", market: Market.find_by(name: "Default")) }
+    let(:origin_airport) { Airport.new(iata: "ABC", market: other_market) }
+
+    it "uses the destination_airport_iata when the markets are alphabetized" do
+      airline_route = AirlineRoute.new(origin_airport: origin_airport, destination_airport: destination_airport)
+      subject = AirplaneRoute.new(route: airline_route)
+
+      expect(subject.destination_market_airport_iata).to eq "DEF"
+    end
+
+    it "uses the origin_airport_iata when the markets are not alphabetized" do
+      airline_route = AirlineRoute.new(origin_airport: destination_airport, destination_airport: origin_airport)
+      subject = AirplaneRoute.new(route: airline_route)
+
+      expect(subject.destination_market_airport_iata).to eq "DEF"
+    end
+  end
+
+  context "origin_market_airport_iata" do
+    let(:other_market) { Fabricate(:market, name: "Alphabetically first") }
+    let(:destination_airport) { Airport.new(iata: "DEF", market: Market.find_by(name: "Default")) }
+    let(:origin_airport) { Airport.new(iata: "ABC", market: other_market) }
+
+    it "uses the origin_airport_iata when the markets are alphabetized" do
+      airline_route = AirlineRoute.new(origin_airport: origin_airport, destination_airport: destination_airport)
+      subject = AirplaneRoute.new(route: airline_route)
+
+      expect(subject.origin_market_airport_iata).to eq "ABC"
+    end
+
+    it "uses the destination_airport_iata when the markets are not alphabetized" do
+      airline_route = AirlineRoute.new(origin_airport: destination_airport, destination_airport: origin_airport)
+      subject = AirplaneRoute.new(route: airline_route)
+
+      expect(subject.origin_market_airport_iata).to eq "ABC"
+    end
+  end
+
   context "recalculate_profits_and_block_time" do
     it "updates the block time, flight cost, and route revenue" do
       inu_market = Market.find_by(name: "Default")
