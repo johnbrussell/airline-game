@@ -402,9 +402,6 @@ RSpec.describe AirplaneRoute do
       expect(AirlineRouteRevenue.count).to eq 1
       revenue = AirlineRouteRevenue.last
       expect(revenue.revenue).to eq 2
-      expect(revenue.exclusive_economy_revenue).to eq 2
-      expect(revenue.exclusive_premium_economy_revenue).to eq 0
-      expect(revenue.exclusive_business_revenue).to eq 0
       expect(revenue.business_pax).to eq 0
       expect(revenue.premium_economy_pax).to eq 0
       expect(revenue.economy_pax).to eq 1
@@ -595,9 +592,6 @@ RSpec.describe AirplaneRoute do
       expect(AirlineRouteRevenue.count).to eq 1
       revenue = AirlineRouteRevenue.last
       expect(revenue.revenue).to eq 2
-      expect(revenue.exclusive_economy_revenue).to eq 2
-      expect(revenue.exclusive_premium_economy_revenue).to eq 0
-      expect(revenue.exclusive_business_revenue).to eq 0
       expect(revenue.business_pax).to eq 0
       expect(revenue.premium_economy_pax).to eq 0
       expect(revenue.economy_pax).to eq 1
@@ -615,9 +609,6 @@ RSpec.describe AirplaneRoute do
       expect(AirlineRouteRevenue.count).to eq 1
       revenue = AirlineRouteRevenue.last
       expect(revenue.revenue).to eq 0
-      expect(revenue.exclusive_economy_revenue).to eq 0
-      expect(revenue.exclusive_premium_economy_revenue).to eq 0
-      expect(revenue.exclusive_business_revenue).to eq 0
       expect(revenue.business_pax).to eq 0
       expect(revenue.premium_economy_pax).to eq 0
       expect(revenue.economy_pax).to eq 0

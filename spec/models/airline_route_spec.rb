@@ -515,9 +515,6 @@ RSpec.describe AirlineRoute do
       expect(subject.premium_economy_price).to eq 5
       expect(subject.business_price).to eq 6
       expect(subject.revenue.revenue).to eq 30
-      expect(subject.revenue.exclusive_economy_revenue).to eq 8
-      expect(subject.revenue.exclusive_premium_economy_revenue).to eq 10
-      expect(subject.revenue.exclusive_business_revenue).to eq 12
       expect(subject.revenue.business_pax).to eq 1
       expect(subject.revenue.economy_pax).to eq 1
       expect(subject.revenue.premium_economy_pax).to eq 1
@@ -754,9 +751,6 @@ RSpec.describe AirlineRoute do
       result = subject.revenue
 
       expect(result.revenue).to eq 12
-      expect(result.exclusive_business_revenue).to eq 6
-      expect(result.exclusive_economy_revenue).to eq 2
-      expect(result.exclusive_premium_economy_revenue).to eq 4
       expect(result.business_pax).to eq 1
       expect(result.economy_pax).to eq 1
       expect(result.premium_economy_pax).to eq 1

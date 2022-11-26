@@ -2073,9 +2073,9 @@ RSpec.describe Airplane do
       airline_route = AirlineRoute.create!(airline: airline, origin_airport: bos, destination_airport: lax, distance: 2, economy_price: 1, business_price: 2, premium_economy_price: 2)
       AirplaneRoute.new(airplane: subject, route: airline_route, flight_cost: 1, frequencies: 1, block_time_mins: 1).save(validate: false)
       airplane_route = AirplaneRoute.last
-      AirlineRouteRevenue.create!(airline_route: airline_route, revenue: 100, economy_pax: 50, business_pax: 0, premium_economy_pax: 0, exclusive_economy_revenue: 0, exclusive_business_revenue: 0, exclusive_premium_economy_revenue: 0)
+      AirlineRouteRevenue.create!(airline_route: airline_route, revenue: 0, economy_pax: 0, business_pax: 0, premium_economy_pax: 0, exclusive_economy_revenue: 0, exclusive_business_revenue: 0, exclusive_premium_economy_revenue: 0)
       route_dollars = instance_double(RouteDollars, origin_market: airline.base, destination_market: airline.base, origin_airport_iata: "BOS", destination_airport_iata: "LAX", date: Date.today, distance: 1000, business: 100, economy: 100, premium_economy: 100)
-      allow(RouteDollars).to receive(:calculate).with(Date.today, airline.base, airline.base, nil, nil).and_return(route_dollars)
+      expect(RouteDollars).to receive(:between_markets).with(airline.base, airline.base, Date.today).and_return([route_dollars])
       subject.reload
 
       bos_global_demand = instance_double(GlobalDemand, business: 10, government: 10, leisure: 10, tourist: 10, airport: bos)
@@ -2103,7 +2103,7 @@ RSpec.describe Airplane do
       expect(subject.premium_economy_seats).to eq 2
       expect(subject.business_seats).to eq 3
       expect(subject.construction_date).to eq original_construction_date
-      expect(airline_route.revenue.revenue).to eq 0
+      expect(airline_route.revenue.revenue).to be > 0
       expect(airplane_route.flight_cost).to be > 1
     end
 
