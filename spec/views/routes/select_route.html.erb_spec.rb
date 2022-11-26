@@ -31,6 +31,20 @@ RSpec.describe "routes/select_route", type: :feature do
     Tourists.create!(market_id: funafuti.id, year: 2020, volume: 2700)
     Tourists.create!(market_id: nukualofa.id, year: 2022, volume: 20000)
     Tourists.create!(market_id: apia.id, year: 2022, volume: 20000)
+    route_dollars = instance_double(
+      RouteDollars,
+      origin_market: funafuti,
+      destination_market: nauru,
+      date: Date.today,
+      origin_airport_iata: "FUN",
+      destination_airport_iata: "INU",
+      distance: Calculation::Distance.between_airports(inu, fun),
+      economy: 100,
+      business: 50,
+      premium_economy: 75,
+    )
+    allow(RouteDollars).to receive(:calculate).with(Date.today, funafuti, nauru, nil, nil).and_return(route_dollars)
+    allow(RouteDollars).to receive(:between_markets).with(funafuti, nauru, Date.today).and_return([route_dollars])
 
     game = Fabricate(:game)
     Fabricate(:airline, is_user_airline: true, game_id: game.id, base_id: apia.id)

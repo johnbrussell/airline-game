@@ -58,6 +58,15 @@ RSpec.describe Calculation::RouteDollars do
       expect(subject.send(:leisure_dollars)).to eq 34
       assert_in_epsilon subject.business_class_dollars, 1.54, 0.000000001
     end
+
+    it "returns 0 when total market demand is 0" do
+      total_market_demand = instance_double(TotalMarketDemand, business: 0, government: 0, leisure: 0, tourist: 0)
+      allow(TotalMarketDemand).to receive(:calculate).and_return total_market_demand
+
+      subject = Calculation::RouteDollars.new(Date.today, origin_market, destination_market, origin_airport, destination_airport)
+
+      expect(subject.business_class_dollars).to eq 0
+    end
   end
 
   context "economy_class_dollars" do
@@ -71,6 +80,15 @@ RSpec.describe Calculation::RouteDollars do
 
       assert_in_epsilon subject.economy_class_dollars, 12 * 0.7 + 34 * 0.9, 0.000000001
     end
+
+    it "returns 0 when total market demand is 0" do
+      total_market_demand = instance_double(TotalMarketDemand, business: 0, government: 0, leisure: 0, tourist: 0)
+      allow(TotalMarketDemand).to receive(:calculate).and_return total_market_demand
+
+      subject = Calculation::RouteDollars.new(Date.today, origin_market, destination_market, origin_airport, destination_airport)
+
+      expect(subject.economy_class_dollars).to eq 0
+    end
   end
 
   context "premium_economy_class_dollars" do
@@ -83,6 +101,15 @@ RSpec.describe Calculation::RouteDollars do
       subject = Calculation::RouteDollars.new(Date.today, origin_market, destination_market, origin_airport, destination_airport)
 
       assert_in_epsilon subject.premium_economy_class_dollars, 12 * 0.2 + 34 * 0.09, 0.000000001
+    end
+
+    it "returns 0 when total market demand is 0" do
+      total_market_demand = instance_double(TotalMarketDemand, business: 0, government: 0, leisure: 0, tourist: 0)
+      allow(TotalMarketDemand).to receive(:calculate).and_return total_market_demand
+
+      subject = Calculation::RouteDollars.new(Date.today, origin_market, destination_market, origin_airport, destination_airport)
+
+      expect(subject.premium_economy_class_dollars).to eq 0
     end
   end
 

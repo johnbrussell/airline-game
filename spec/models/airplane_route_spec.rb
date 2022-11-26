@@ -365,6 +365,46 @@ RSpec.describe AirplaneRoute do
     end
   end
 
+  context "destination_market_airport_iata" do
+    let(:other_market) { Fabricate(:market, name: "Alphabetically first") }
+    let(:destination_airport) { Airport.new(iata: "DEF", market: Market.find_by(name: "Default")) }
+    let(:origin_airport) { Airport.new(iata: "ABC", market: other_market) }
+
+    it "uses the destination_airport_iata when the markets are alphabetized" do
+      airline_route = AirlineRoute.new(origin_airport: origin_airport, destination_airport: destination_airport)
+      subject = AirplaneRoute.new(route: airline_route)
+
+      expect(subject.destination_market_airport_iata).to eq "DEF"
+    end
+
+    it "uses the origin_airport_iata when the markets are not alphabetized" do
+      airline_route = AirlineRoute.new(origin_airport: destination_airport, destination_airport: origin_airport)
+      subject = AirplaneRoute.new(route: airline_route)
+
+      expect(subject.destination_market_airport_iata).to eq "DEF"
+    end
+  end
+
+  context "origin_market_airport_iata" do
+    let(:other_market) { Fabricate(:market, name: "Alphabetically first") }
+    let(:destination_airport) { Airport.new(iata: "DEF", market: Market.find_by(name: "Default")) }
+    let(:origin_airport) { Airport.new(iata: "ABC", market: other_market) }
+
+    it "uses the origin_airport_iata when the markets are alphabetized" do
+      airline_route = AirlineRoute.new(origin_airport: origin_airport, destination_airport: destination_airport)
+      subject = AirplaneRoute.new(route: airline_route)
+
+      expect(subject.origin_market_airport_iata).to eq "ABC"
+    end
+
+    it "uses the destination_airport_iata when the markets are not alphabetized" do
+      airline_route = AirlineRoute.new(origin_airport: destination_airport, destination_airport: origin_airport)
+      subject = AirplaneRoute.new(route: airline_route)
+
+      expect(subject.origin_market_airport_iata).to eq "ABC"
+    end
+  end
+
   context "recalculate_profits_and_block_time" do
     it "updates the block time, flight cost, and route revenue" do
       inu_market = Market.find_by(name: "Default")
@@ -389,6 +429,9 @@ RSpec.describe AirplaneRoute do
       subject.save(validate: false)
       flight_cost_calculator = instance_double(Calculation::FlightCostCalculator, cost: 100.40)
       allow(Calculation::FlightCostCalculator).to receive(:new).and_return(flight_cost_calculator)
+      route_dollars = instance_double(RouteDollars, origin_market: fun_market, destination_market: inu_market, origin_airport_iata: "FUN", destination_airport_iata: "INU", date: Date.today, distance: 1000, business: 100, economy: 100, premium_economy: 100)
+      allow(RouteDollars).to receive(:calculate).with(Date.today, fun_market, inu_market, nil, nil).and_return(route_dollars)
+      allow(RouteDollars).to receive(:between_markets).with(fun_market, inu_market, Date.today).and_return([route_dollars])
       airline_route.reload
 
       expect(AirlineRouteRevenue.count).to eq 0
@@ -399,9 +442,6 @@ RSpec.describe AirplaneRoute do
       expect(AirlineRouteRevenue.count).to eq 1
       revenue = AirlineRouteRevenue.last
       expect(revenue.revenue).to eq 2
-      expect(revenue.exclusive_economy_revenue).to eq 2
-      expect(revenue.exclusive_premium_economy_revenue).to eq 0
-      expect(revenue.exclusive_business_revenue).to eq 0
       expect(revenue.business_pax).to eq 0
       expect(revenue.premium_economy_pax).to eq 0
       expect(revenue.economy_pax).to eq 1
@@ -576,6 +616,9 @@ RSpec.describe AirplaneRoute do
       subject = AirplaneRoute.new(route: airline_route, airplane: airplane)
       flight_cost_calculator = instance_double(Calculation::FlightCostCalculator, cost: 100.40)
       allow(Calculation::FlightCostCalculator).to receive(:new).and_return(flight_cost_calculator)
+      route_dollars = instance_double(RouteDollars, origin_market: fun_market, destination_market: inu_market, origin_airport_iata: "FUN", destination_airport_iata: "INU", date: Date.today, distance: 1000, business: 100, economy: 100, premium_economy: 100)
+      allow(RouteDollars).to receive(:calculate).with(Date.today, fun_market, inu_market, nil, nil).and_return(route_dollars)
+      allow(RouteDollars).to receive(:between_markets).with(fun_market, inu_market, Date.today).and_return([route_dollars])
       airline_route.reload
 
       airplane_route_count = AirplaneRoute.count
@@ -589,9 +632,6 @@ RSpec.describe AirplaneRoute do
       expect(AirlineRouteRevenue.count).to eq 1
       revenue = AirlineRouteRevenue.last
       expect(revenue.revenue).to eq 2
-      expect(revenue.exclusive_economy_revenue).to eq 2
-      expect(revenue.exclusive_premium_economy_revenue).to eq 0
-      expect(revenue.exclusive_business_revenue).to eq 0
       expect(revenue.business_pax).to eq 0
       expect(revenue.premium_economy_pax).to eq 0
       expect(revenue.economy_pax).to eq 1
@@ -609,9 +649,6 @@ RSpec.describe AirplaneRoute do
       expect(AirlineRouteRevenue.count).to eq 1
       revenue = AirlineRouteRevenue.last
       expect(revenue.revenue).to eq 0
-      expect(revenue.exclusive_economy_revenue).to eq 0
-      expect(revenue.exclusive_premium_economy_revenue).to eq 0
-      expect(revenue.exclusive_business_revenue).to eq 0
       expect(revenue.business_pax).to eq 0
       expect(revenue.premium_economy_pax).to eq 0
       expect(revenue.economy_pax).to eq 0

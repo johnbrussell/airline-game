@@ -70,11 +70,19 @@ class Calculation::RouteDollars
     end
 
     def business_dollars_from_business
-      market_dollars.business * relative_demand.business / total_market_demand.business
+      if total_market_demand.business == 0
+        0
+      else
+        market_dollars.business * relative_demand.business / total_market_demand.business.to_f
+      end
     end
 
     def business_dollars_from_government
-      market_dollars.government * relative_demand.government / total_market_demand.government
+      if total_market_demand.government == 0
+        0
+      else
+        market_dollars.government * relative_demand.government / total_market_demand.government.to_f
+      end
     end
 
     def class_calculator
@@ -86,11 +94,19 @@ class Calculation::RouteDollars
     end
 
     def leisure_dollars_from_leisure
-      market_dollars.leisure * relative_demand.leisure / total_market_demand.leisure
+      if total_market_demand.leisure == 0
+        0
+      else
+        market_dollars.leisure * relative_demand.leisure / total_market_demand.leisure.to_f
+      end
     end
 
     def leisure_dollars_from_tourist
-      market_dollars.tourist * relative_demand.tourist / total_market_demand.tourist
+      if total_market_demand.tourist == 0
+        0
+      else
+        market_dollars.tourist * relative_demand.tourist / total_market_demand.tourist.to_f
+      end
     end
 
     def directional_business_dollars(global_demand, route_demand)

@@ -252,7 +252,10 @@ RSpec.describe AirlineRoute do
       original_record_count = AirlineRoute.count
 
       inertia = instance_double(Calculation::InertiaRouteService, economy_fare: 1, business_fare: 0, premium_economy_fare: 1.5)
-      expect(Calculation::InertiaRouteService).to receive(:new).with(fun, inu, Game.find(airline.game_id).current_date).and_return(inertia)
+      route_dollars = instance_double(RouteDollars, distance: 1, business: 2, economy: 3, premium_economy: 4)
+      allow(RouteDollars).to receive(:calculate).with(Date.today, fun.market, inu.market, nil, nil).and_return(route_dollars)
+      expect(RouteDollars).to receive(:between_markets).with(fun.market, inu.market, Date.today).and_return([route_dollars])
+      expect(Calculation::InertiaRouteService).to receive(:new).with(1, 2, 3, 4).and_return(inertia)
 
       actual = AirlineRoute.find_or_create_by_airline_and_route(airline, fun, inu)
 
@@ -383,9 +386,12 @@ RSpec.describe AirlineRoute do
     let(:family) { Fabricate(:aircraft_family) }
     let(:model) { Fabricate(:aircraft_model, family: family, floor_space: Airplane::ECONOMY_SEAT_SIZE * 10) }
     let(:inertia) { instance_double(Calculation::InertiaRouteService, business_fare: 50000, economy_fare: 30000, premium_economy_fare: 45750) }
+    let(:route_dollars) { instance_double(RouteDollars, distance: 1, business: 2, economy: 3, premium_economy: 4) }
 
     before(:each) do
-      allow(Calculation::InertiaRouteService).to receive(:new).with(origin, destination, Game.find(airline.game_id).current_date).and_return(inertia)
+      allow(RouteDollars).to receive(:calculate).with(Date.today, origin.market, destination.market, nil, nil).and_return(route_dollars)
+      allow(RouteDollars).to receive(:between_markets).with(origin.market, destination.market, Date.today).and_return([route_dollars])
+      allow(Calculation::InertiaRouteService).to receive(:new).with(1, 2, 3, 4).and_return(inertia)
     end
 
     it "is minimal for a minimal legroom reputation and a minimal in flight service reputation and a minimal fare reputation and a minimal frequency reputation" do
@@ -486,6 +492,9 @@ RSpec.describe AirlineRoute do
       airplane = Fabricate(:airplane, operator_id: airline.id, base_country_group: airline.base.country_group, business_seats: 1, economy_seats: 1, premium_economy_seats: 1, aircraft_family: family)
       AirplaneRoute.new(airplane: airplane, route: subject, frequencies: 1, flight_cost: 1, block_time_mins: 1).save(validate: false)
       AirlineRouteRevenue.create!(airline_route: subject, revenue: 12, exclusive_economy_revenue: 2, exclusive_business_revenue: 3, exclusive_premium_economy_revenue: 1, business_pax: 1, economy_pax: 1, premium_economy_pax: 1)
+      route_dollars = instance_double(RouteDollars, origin_market: fun_market, destination_market: inu_market, origin_airport_iata: "FUN", destination_airport_iata: "INU", date: Date.today, distance: 1000, business: 100, economy: 100, premium_economy: 100)
+      allow(RouteDollars).to receive(:calculate).with(Date.today, fun_market, inu_market, nil, nil).and_return(route_dollars)
+      allow(RouteDollars).to receive(:between_markets).with(fun_market, inu_market, Date.today).and_return([route_dollars])
       subject.reload
 
       expect(subject.revenue.revenue).to eq 12
@@ -506,9 +515,6 @@ RSpec.describe AirlineRoute do
       expect(subject.premium_economy_price).to eq 5
       expect(subject.business_price).to eq 6
       expect(subject.revenue.revenue).to eq 30
-      expect(subject.revenue.exclusive_economy_revenue).to eq 8
-      expect(subject.revenue.exclusive_premium_economy_revenue).to eq 10
-      expect(subject.revenue.exclusive_business_revenue).to eq 12
       expect(subject.revenue.business_pax).to eq 1
       expect(subject.revenue.economy_pax).to eq 1
       expect(subject.revenue.premium_economy_pax).to eq 1
@@ -547,6 +553,9 @@ RSpec.describe AirlineRoute do
       super_model = Fabricate(:aircraft_model, takeoff_distance: 100, max_range: 13000, floor_space: 100000)
       airplane = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model, business_seats: 1, premium_economy_seats: 5, economy_seats: 30)
       game = Game.find(airline_a.game_id)
+      route_dollars = instance_double(RouteDollars, origin_market: fun_market, destination_market: inu_market, origin_airport_iata: "FUN", destination_airport_iata: "INU", date: Date.today, distance: 1000, business: 100, economy: 100, premium_economy: 100)
+      allow(RouteDollars).to receive(:calculate).with(Date.today, fun_market, inu_market, nil, nil).and_return(route_dollars)
+      allow(RouteDollars).to receive(:between_markets).with(fun_market, inu_market, Date.today).and_return([route_dollars])
 
       Gates.create!(airport: inu, game: game, current_gates: 10)
       Slot.create!(gates_id: Gates.last.id, lessee_id: airline_a.id)
@@ -732,6 +741,9 @@ RSpec.describe AirlineRoute do
       airplane = Fabricate(:airplane, operator_id: airline.id, base_country_group: airline.base.country_group, business_seats: 1, economy_seats: 1, premium_economy_seats: 1, aircraft_family: family)
       AirplaneRoute.new(airplane: airplane, route: subject, frequencies: 1, flight_cost: 1, block_time_mins: 1).save(validate: false)
       AirlineRouteRevenue.new(airline_route: subject, revenue: 106, exclusive_economy_revenue: 105, exclusive_premium_economy_revenue: 100, exclusive_business_revenue: 1, business_pax: 10, economy_pax: 21, premium_economy_pax: 0).save(validate: false)
+      route_dollars = instance_double(RouteDollars, origin_market: fun_market, destination_market: inu_market, origin_airport_iata: "FUN", destination_airport_iata: "INU", date: Date.today, distance: 1000, business: 100, economy: 100, premium_economy: 100)
+      allow(RouteDollars).to receive(:calculate).with(Date.today, fun_market, inu_market, nil, nil).and_return(route_dollars)
+      allow(RouteDollars).to receive(:between_markets).with(fun_market, inu_market, Date.today).and_return([route_dollars])
       subject.reload
 
       subject.update_revenue
@@ -739,9 +751,6 @@ RSpec.describe AirlineRoute do
       result = subject.revenue
 
       expect(result.revenue).to eq 12
-      expect(result.exclusive_business_revenue).to eq 6
-      expect(result.exclusive_economy_revenue).to eq 2
-      expect(result.exclusive_premium_economy_revenue).to eq 4
       expect(result.business_pax).to eq 1
       expect(result.economy_pax).to eq 1
       expect(result.premium_economy_pax).to eq 1

@@ -2,15 +2,50 @@ require "rails_helper"
 require "capybara/rspec"
 
 RSpec.describe "routes/view_route", type: :feature do
+  let(:nauru) { Fabricate(:market, name: "Nauru", country: "Nauru", country_group: "Nauru") }
+  let(:funafuti) { Fabricate(:market, name: "Funafuti", country: "Tuvalu", country_group: "Tuvalu") }
+  let(:inu) { Fabricate(:airport, market: nauru, iata: "INU", municipality: nil, runway: 100, exclusive_catchment: 1) }
+  let(:fun) { Fabricate(:airport, market: funafuti, iata: "FUN", municipality: nil, runway: 10000, exclusive_catchment: 1) }
+  let(:maj) { Fabricate(:airport, iata: "MAJ", market: nauru, runway: 10000, exclusive_catchment: 1) }
+  let(:date) { Date.today }
+
+  let(:route_dollars_fun_inu) {
+    RouteDollars.create!(
+      origin_market: funafuti,
+      destination_market: nauru,
+      date: date,
+      origin_airport_iata: "FUN",
+      destination_airport_iata: "INU",
+      distance: Calculation::Distance.between_airports(inu, fun),
+      economy: 100,
+      business: 50,
+      premium_economy: 75,
+    )
+  }
+  let(:route_dollars_inu_fun) {
+    RouteDollars.create!(
+      origin_market: funafuti,
+      destination_market: nauru,
+      date: date,
+      origin_airport_iata: "FUN",
+      destination_airport_iata: "MAJ",
+      distance: Calculation::Distance.between_airports(maj, fun),
+      economy: 100,
+      business: 50,
+      premium_economy: 75,
+    )
+  }
+
   before(:each) do
-    nauru = Fabricate(:market, name: "Nauru", country: "Nauru", country_group: "Nauru")
-    funafuti = Fabricate(:market, name: "Funafuti", country: "Tuvalu", country_group: "Tuvalu")
-    Fabricate(:airport, market: nauru, iata: "INU", municipality: nil, runway: 100, exclusive_catchment: 1)
-    Fabricate(:airport, market: funafuti, iata: "FUN", municipality: nil, runway: 10000, exclusive_catchment: 1)
     Population.create!(market_id: funafuti.id, year: 2020, population: 10000)
     Population.create!(market_id: nauru.id, year: 2000, population: 14000)
     Tourists.create!(market_id: nauru.id, year: 1999, volume: 100)
     Tourists.create!(market_id: funafuti.id, year: 2020, volume: 2700)
+
+    allow(RouteDollars).to receive(:calculate).with(date, funafuti, nauru, nil, nil).and_return(route_dollars_fun_inu)
+    allow(RouteDollars).to receive(:calculate).with(date, nauru, funafuti, nil, nil).and_return(route_dollars_inu_fun)
+    allow(RouteDollars).to receive(:between_markets).with(funafuti, nauru, date).and_return([route_dollars_fun_inu, route_dollars_inu_fun])
+    allow(RouteDollars).to receive(:between_markets).with(nauru, funafuti, date).and_return([route_dollars_fun_inu, route_dollars_inu_fun])
   end
 
   it "has a link back to the game homepage" do
@@ -417,7 +452,7 @@ RSpec.describe "routes/view_route", type: :feature do
     funafuti = Market.find_by(name: "Funafuti")
     inu = Airport.find_by(iata: "INU")
     fun = Airport.find_by(iata: "FUN")
-    maj = Fabricate(:airport, iata: "MAJ", market: nauru, runway: 10000, exclusive_catchment: 1)
+    maj = Airport.find_by(iata: "MAJ")
     airline = Fabricate(:airline, base_id: nauru.id, game_id: game.id, is_user_airline: true)
     other_airline = Fabricate(:airline, base_id: funafuti.id, game_id: game.id, name: "TIA")
     family = Fabricate(:aircraft_family)

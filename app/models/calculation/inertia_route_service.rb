@@ -1,6 +1,4 @@
 class Calculation::InertiaRouteService
-  include Demandable
-
   INERTIA_PLANE_FUEL_BURN_CONSTANT = 118.4
   INERTIA_PLANE_MAX_NARROWBODY_SEATS = 199
   INERTIA_PLANE_SPEED = 556
@@ -17,6 +15,13 @@ class Calculation::InertiaRouteService
   SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS = 8
   SHORT_DISTANCE_ECONOMY_SEATS = 57
 
+  def initialize(distance, business_dollars, economy_dollars, premium_economy_dollars)
+    @distance = distance
+    @business_dollars = business_dollars
+    @economy_dollars = economy_dollars
+    @premium_economy_dollars = premium_economy_dollars
+  end
+
   def business_fare
     desired_business_fare * MANAGEMENT_OVERHEAD
   end
@@ -29,13 +34,17 @@ class Calculation::InertiaRouteService
     end
   end
 
+  def business_reputation_data
+    Calculation::ReputationData.new(nil, business_fare, business_frequencies, AirlineRoute::MIN_SERVICE_QUALITY, 0)
+  end
+
   def business_seats_per_flight
-    if flight_distance >= LONG_DISTANCE
+    if @distance >= LONG_DISTANCE
       LONG_DISTANCE_BUSINESS_SEATS
-    elsif flight_distance >= SHORT_DISTANCE
-      SHORT_DISTANCE_BUSINESS_SEATS + ((LONG_DISTANCE_BUSINESS_SEATS - SHORT_DISTANCE_BUSINESS_SEATS) * (flight_distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
+    elsif @distance >= SHORT_DISTANCE
+      SHORT_DISTANCE_BUSINESS_SEATS + ((LONG_DISTANCE_BUSINESS_SEATS - SHORT_DISTANCE_BUSINESS_SEATS) * (@distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
     else
-      (SHORT_DISTANCE_BUSINESS_SEATS * flight_distance / SHORT_DISTANCE).ceil()
+      (SHORT_DISTANCE_BUSINESS_SEATS * @distance / SHORT_DISTANCE).ceil()
     end
   end
 
@@ -51,18 +60,22 @@ class Calculation::InertiaRouteService
     end
   end
 
+  def economy_reputation_data
+    Calculation::ReputationData.new(nil, economy_fare, economy_frequencies, AirlineRoute::MIN_SERVICE_QUALITY, 0)
+  end
+
   def economy_seats_per_flight
-    if flight_distance >= LONG_DISTANCE
+    if @distance >= LONG_DISTANCE
       LONG_DISTANCE_ECONOMY_SEATS
-    elsif flight_distance >= SHORT_DISTANCE
-      SHORT_DISTANCE_ECONOMY_SEATS + ((LONG_DISTANCE_ECONOMY_SEATS - SHORT_DISTANCE_ECONOMY_SEATS) * (flight_distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
+    elsif @distance >= SHORT_DISTANCE
+      SHORT_DISTANCE_ECONOMY_SEATS + ((LONG_DISTANCE_ECONOMY_SEATS - SHORT_DISTANCE_ECONOMY_SEATS) * (@distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
     else
-      (SHORT_DISTANCE_ECONOMY_SEATS * flight_distance / SHORT_DISTANCE).ceil()
+      (SHORT_DISTANCE_ECONOMY_SEATS * @distance / SHORT_DISTANCE).ceil()
     end
   end
 
   def flight_cost
-    @flight_cost ||= Calculation::FlightCostCalculator.new(inertia_airplane, flight_distance, INERTIA_SERVICE_QUALITY).cost
+    @flight_cost ||= Calculation::FlightCostCalculator.new(inertia_airplane, @distance, INERTIA_SERVICE_QUALITY).cost
   end
 
   def premium_economy_fare
@@ -77,13 +90,17 @@ class Calculation::InertiaRouteService
     end
   end
 
+  def premium_economy_reputation_data
+    Calculation::ReputationData.new(nil, premium_economy_fare, premium_economy_frequencies, AirlineRoute::MIN_SERVICE_QUALITY, 0)
+  end
+
   def premium_economy_seats_per_flight
-    if flight_distance >= LONG_DISTANCE
+    if @distance >= LONG_DISTANCE
       LONG_DISTANCE_PREMIUM_ECONOMY_SEATS
-    elsif flight_distance >= SHORT_DISTANCE
-      SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS + ((LONG_DISTANCE_PREMIUM_ECONOMY_SEATS - SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS) * (flight_distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
+    elsif @distance >= SHORT_DISTANCE
+      SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS + ((LONG_DISTANCE_PREMIUM_ECONOMY_SEATS - SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS) * (@distance - SHORT_DISTANCE) / (LONG_DISTANCE - SHORT_DISTANCE)).ceil()
     else
-      (SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS * flight_distance / SHORT_DISTANCE).ceil()
+      (SHORT_DISTANCE_PREMIUM_ECONOMY_SEATS * @distance / SHORT_DISTANCE).ceil()
     end
   end
 
@@ -94,7 +111,7 @@ class Calculation::InertiaRouteService
     end
 
     def business_revenue
-      revenue.max_business_class_revenue_per_week * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
+      @business_dollars * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
     end
 
     def desired_business_fare
@@ -138,7 +155,7 @@ class Calculation::InertiaRouteService
     end
 
     def economy_revenue
-      revenue.max_economy_class_revenue_per_week * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
+      @economy_dollars * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
     end
 
     def inertia_airplane
@@ -153,7 +170,7 @@ class Calculation::InertiaRouteService
           name: "foo",
           production_start_year: Date.today.year,
           floor_space: business_seats_per_flight * Airplane::BUSINESS_SEAT_SIZE + premium_economy_seats_per_flight * Airplane::PREMIUM_ECONOMY_SEAT_SIZE + economy_seats_per_flight * Airplane::ECONOMY_SEAT_SIZE,
-          max_range: flight_distance.ceil(),
+          max_range: @distance.ceil(),
           fuel_burn: (Math.sqrt(total_seats) * INERTIA_PLANE_FUEL_BURN_CONSTANT).ceil(),
           speed: INERTIA_PLANE_SPEED,
           num_aisles: total_seats > INERTIA_PLANE_MAX_NARROWBODY_SEATS ? 2 : 1,
@@ -171,11 +188,7 @@ class Calculation::InertiaRouteService
     end
 
     def premium_economy_revenue
-      revenue.max_premium_economy_class_revenue_per_week * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
-    end
-
-    def revenue
-      @revenue ||= Calculation::MaximumRevenuePotential.new(@origin, @destination, @current_date)
+      @premium_economy_dollars * REVENUE_PERCENTAGE / 2.0  # divide by two because max_<class>_revenue_per_week is for both directions on route
     end
 
     def total_seat_area
