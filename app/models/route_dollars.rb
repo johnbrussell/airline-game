@@ -11,6 +11,8 @@ class RouteDollars < ApplicationRecord
 
   validate :markets_alphabetized
 
+  WEEKS_PER_YEAR = 365.25 / 7
+
   belongs_to :origin_market, class_name: "Market"
   belongs_to :destination_market, class_name: "Market"
   belongs_to :origin_airport, class_name: "Airport", foreign_key: :origin_airport_iata, primary_key: :iata, optional: true
@@ -49,6 +51,7 @@ class RouteDollars < ApplicationRecord
         RelativeDemand.calculate_between_markets(date, destination_market, origin_market)
         calculator_1 = Calculation::RouteDollars.new(date, origin_market, destination_market, origin_airport, destination_airport)
         calculator_2 = Calculation::RouteDollars.new(date, destination_market, origin_market, destination_airport, origin_airport)
+        # Dollars are total dollars in both directions per week
         create!(
           origin_market: origin_market,
           destination_market: destination_market,
@@ -56,9 +59,9 @@ class RouteDollars < ApplicationRecord
           destination_airport_iata: destination_airport&.iata || "",
           date: date,
           distance: calculator_1.distance,
-          business: calculator_1.business_class_dollars + calculator_2.business_class_dollars,
-          economy: calculator_1.economy_class_dollars + calculator_2.economy_class_dollars,
-          premium_economy: calculator_1.premium_economy_class_dollars + calculator_2.premium_economy_class_dollars,
+          business: (calculator_1.business_class_dollars + calculator_2.business_class_dollars) / WEEKS_PER_YEAR,
+          economy: (calculator_1.economy_class_dollars + calculator_2.economy_class_dollars) / WEEKS_PER_YEAR,
+          premium_economy: (calculator_1.premium_economy_class_dollars + calculator_2.premium_economy_class_dollars) / WEEKS_PER_YEAR,
         )
       else
         existing

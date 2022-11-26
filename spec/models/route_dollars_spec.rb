@@ -37,9 +37,9 @@ RSpec.describe RouteDollars do
       actual = RouteDollars.between_markets(market_1, market_2, date)
 
       expect(RouteDollars.count).to eq route_dollars_count + expected_increase_in_route_dollars_count
-      expect(RouteDollars.last.business).to eq 20
-      expect(RouteDollars.last.economy).to eq 40
-      expect(RouteDollars.last.premium_economy).to eq 10
+      expect(RouteDollars.last.business).to eq 20 / RouteDollars::WEEKS_PER_YEAR
+      expect(RouteDollars.last.economy).to eq 40 / RouteDollars::WEEKS_PER_YEAR
+      expect(RouteDollars.last.premium_economy).to eq 10 / RouteDollars::WEEKS_PER_YEAR
       expect(actual.length).to eq expected_increase_in_route_dollars_count
 
       actual_2 = RouteDollars.between_markets(market_2, market_1, date)
@@ -73,9 +73,9 @@ RSpec.describe RouteDollars do
       expect(RouteDollars.count).to eq route_dollars_count + 1
       expect(actual.date).to eq date
       expect(actual.distance).to eq 4
-      expect(actual.business).to eq 3
-      expect(actual.economy).to eq 6
-      expect(actual.premium_economy).to eq 9
+      expect(actual.business).to eq 3 / RouteDollars::WEEKS_PER_YEAR
+      expect(actual.economy).to eq 6 / RouteDollars::WEEKS_PER_YEAR
+      expect(actual.premium_economy).to eq 9 / RouteDollars::WEEKS_PER_YEAR
       expect(actual.origin_airport_iata).to eq ""
       expect(actual.destination_airport_iata).to eq ""
     end
