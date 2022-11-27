@@ -1,8 +1,6 @@
 require 'csv'
 
 class GameData::Inputter < ApplicationRecord
-  THRESHOLD_POPULATION_TO_PRECALCULATE_GLOBAL_DEMAND = 500000
-
   def self.run
     self.remove_unused_markets
     data = CSV.parse(File.read("data/metro_areas.csv"), headers: true)
@@ -150,7 +148,6 @@ class GameData::Inputter < ApplicationRecord
 
     def self.population
       Population.all.destroy_all
-      GlobalDemand.all.destroy_all
       RouteDemand.all.destroy_all
       MarketPopulation.all.destroy_all
       RelativeDemand.all.destroy_all
@@ -176,9 +173,6 @@ class GameData::Inputter < ApplicationRecord
           if Airline.any? { |a| a.base_id == market.id }
             raise ArgumentError.new "Cannot delete market in use by an airline.  Must update in rails console"
           end
-          market.airports.each do |a|
-            a.global_demands.destroy_all
-          end
           market.airports.destroy_all
           market.populations.destroy_all
           market.tourists.destroy_all
@@ -201,7 +195,6 @@ class GameData::Inputter < ApplicationRecord
 
     def self.tourists
       Tourists.all.destroy_all
-      GlobalDemand.all.destroy_all
 
       data = CSV.parse(File.read("data/tourists.csv"), headers: true)
       data.by_row.each do |data_point|

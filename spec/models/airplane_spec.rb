@@ -2078,11 +2078,6 @@ RSpec.describe Airplane do
       expect(RouteDollars).to receive(:between_markets).with(airline.base, airline.base, Date.today).and_return([route_dollars])
       subject.reload
 
-      bos_global_demand = instance_double(GlobalDemand, business: 10, government: 10, leisure: 10, tourist: 10, airport: bos)
-      lax_global_demand = instance_double(GlobalDemand, business: 10, government: 10, leisure: 10, tourist: 10, airport: lax)
-      allow(GlobalDemand).to receive(:calculate).with(game.current_date, bos).and_return(bos_global_demand)
-      allow(GlobalDemand).to receive(:calculate).with(game.current_date, lax).and_return(lax_global_demand)
-
       cost_to_reconfigure = subject.send(:cost_to_reconfigure, 1, 2, 3)
       expect(cost_to_reconfigure).to eq Airplane::RECONFIGURATION_COST_PER_SEAT_ECONOMY +
         Airplane::RECONFIGURATION_COST_PER_SEAT_PREMIUM_ECONOMY * 2 +
@@ -2228,11 +2223,6 @@ RSpec.describe Airplane do
       airplane_route = AirplaneRoute.last
       AirlineRouteRevenue.create!(airline_route: airline_route, revenue: 2, economy_pax: 1, business_pax: 0, premium_economy_pax: 0, exclusive_economy_revenue: 0, exclusive_business_revenue: 0, exclusive_premium_economy_revenue: 0)
       subject.reload
-
-      bos_global_demand = instance_double(GlobalDemand, business: 10, government: 10, leisure: 10, tourist: 10, airport: bos)
-      lax_global_demand = instance_double(GlobalDemand, business: 10, government: 10, leisure: 10, tourist: 10, airport: lax)
-      allow(GlobalDemand).to receive(:calculate).with(game.current_date, bos).and_return(bos_global_demand)
-      allow(GlobalDemand).to receive(:calculate).with(game.current_date, lax).and_return(lax_global_demand)
 
       expect(subject.set_configuration(0, 0, 100)).to be false
       subject.reload

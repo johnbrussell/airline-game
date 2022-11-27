@@ -23,8 +23,6 @@ class Airport < ApplicationRecord
 
   after_save :reload_market
 
-  has_many :global_demands
-
   def self.select_options
     all.order(:iata).map do |airport|
       ["#{airport.iata} - #{airport.display_name}, #{airport.market.country}", airport.id]
