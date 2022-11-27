@@ -112,14 +112,10 @@ RSpec.describe "routes/view_route", type: :feature do
     game = Fabricate(:game)
     airline = Fabricate(:airline, is_user_airline: true, game_id: game.id, name: "TIA", base_id: inu.market.id)
 
-    revenue_calculator = instance_double(
-      Calculation::MaximumRevenuePotential,
-      max_business_class_revenue_per_week: 1000,
-      max_premium_economy_class_revenue_per_week: 200,
-      max_economy_class_revenue_per_week: 400,
-    )
+    route_dollars = instance_double(RouteDollars)
+    route_dollars_display = { :business => 1000, :premium_economy => 200, :economy => 400 }
     allow(Calculation::Distance).to receive(:between_airports).and_return(1000)
-    allow(Calculation::MaximumRevenuePotential).to receive(:new).and_return(revenue_calculator)
+    allow(RouteDollars).to receive(:display_revenues_between_airports).with(fun, inu, game.current_date).and_return(route_dollars_display)
 
     visit game_airline_route_add_flights_path(game, -1, params: { origin_id: inu.id, destination_id: fun.id })
 

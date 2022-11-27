@@ -12,9 +12,9 @@
 <%= "#{@game.user_airline.name} has #{@route.destination_airport.leased_unused_slots(@game.user_airline)} available #{"slot".pluralize(@route.destination_airport.leased_unused_slots(@game.user_airline))} at #{@route.destination_airport.iata}" %></p>
 <p>At current demand levels, this route can support up to:
   <ul>
-    <li>$<%= number_with_precision(@revenue.max_economy_class_revenue_per_week, :precision => 2, :delimiter => ",") %> per week in economy class revenue</li>
-    <li>$<%= number_with_precision(@revenue.max_premium_economy_class_revenue_per_week, :precision => 2, :delimiter => ",") %> per week in premium economy class revenue</li>
-    <li>$<%= number_with_precision(@revenue.max_business_class_revenue_per_week, :precision => 2, :delimiter => ",") %> per week in business class revenue</li>
+    <li>$<%= number_with_precision(@revenue[:economy], :precision => 2, :delimiter => ",") %> per week in economy class revenue</li>
+    <li>$<%= number_with_precision(@revenue[:premium_economy], :precision => 2, :delimiter => ",") %> per week in premium economy class revenue</li>
+    <li>$<%= number_with_precision(@revenue[:business], :precision => 2, :delimiter => ",") %> per week in business class revenue</li>
   </ul>
 </p>
 <% if @game.user_airline.can_fly_between?(@route.origin_airport.market, @route.destination_airport.market) %>
