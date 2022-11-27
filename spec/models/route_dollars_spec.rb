@@ -110,6 +110,37 @@ RSpec.describe RouteDollars do
     end
   end
 
+  context "display_revenues_between_airports" do
+    let(:date) { Date.today }
+    let(:origin_market) { Fabricate(:market, name: "Nauru") }
+    let(:destination_market) { Fabricate(:market, name: "Tuvalu") }
+    let(:airport_1) { Fabricate(:airport, iata: "INU", market: origin_market) }
+    let(:airport_2) { Fabricate(:airport, iata: "FUN", market: destination_market) }
+
+    before(:each) do
+      RouteDollars.create!(origin_market: origin_market, destination_market: destination_market, origin_airport_iata: "", destination_airport_iata: "", date: date, distance: 1, business: 2, economy: 4, premium_economy: 5)
+      RouteDollars.create!(origin_market: origin_market, destination_market: destination_market, origin_airport_iata: "", destination_airport_iata: "FUN", date: date, distance: 1, business: 2, economy: 4, premium_economy: 5)
+      RouteDollars.create!(origin_market: origin_market, destination_market: destination_market, origin_airport_iata: "", destination_airport_iata: "TUV", date: date, distance: 1, business: 2, economy: 4, premium_economy: 5)
+      RouteDollars.create!(origin_market: origin_market, destination_market: destination_market, origin_airport_iata: "INU", destination_airport_iata: "", date: date, distance: 1, business: 2, economy: 4, premium_economy: 5)
+      RouteDollars.create!(origin_market: origin_market, destination_market: destination_market, origin_airport_iata: "INU", destination_airport_iata: "FUN", date: date, distance: 1, business: 2, economy: 4, premium_economy: 5)
+      RouteDollars.create!(origin_market: origin_market, destination_market: destination_market, origin_airport_iata: "INU", destination_airport_iata: "TUV", date: date, distance: 1, business: 2, economy: 4, premium_economy: 5)
+      RouteDollars.create!(origin_market: origin_market, destination_market: destination_market, origin_airport_iata: "NRU", destination_airport_iata: "", date: date, distance: 1, business: 2, economy: 4, premium_economy: 5)
+      RouteDollars.create!(origin_market: origin_market, destination_market: destination_market, origin_airport_iata: "NRU", destination_airport_iata: "FUN", date: date, distance: 1, business: 2, economy: 4, premium_economy: 5)
+      RouteDollars.create!(origin_market: origin_market, destination_market: destination_market, origin_airport_iata: "NRU", destination_airport_iata: "TUV", date: date, distance: 1, business: 2, economy: 4, premium_economy: 5)
+    end
+
+    it "calculates correctly" do
+      expected = {
+        :business => 8,
+        :economy => 16,
+        :premium_economy => 20,
+      }
+
+      expect(RouteDollars.display_revenues_between_airports(airport_1, airport_2, date)).to eq expected
+      expect(RouteDollars.display_revenues_between_airports(airport_2, airport_1, date)).to eq expected
+    end
+  end
+
   context "markets_alphabetized" do
     let(:market_1) { Fabricate(:market, name: "Boston") }
     let(:market_2) { Fabricate(:market, name: "Bostonia") }
