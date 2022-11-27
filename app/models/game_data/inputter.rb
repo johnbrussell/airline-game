@@ -152,7 +152,6 @@ class GameData::Inputter < ApplicationRecord
       Population.all.destroy_all
       GlobalDemand.all.destroy_all
       RouteDemand.all.destroy_all
-      AirportPopulation.all.destroy_all
       MarketPopulation.all.destroy_all
       RelativeDemand.all.destroy_all
       RouteDollars.all.destroy_all
