@@ -17,9 +17,6 @@ class GameData::Inputter < ApplicationRecord
     self.cabotage_exceptions
     self.rival_country_groups
     self.island_exceptions
-
-    # must be last
-    self.global_demands
   end
 
   private
@@ -137,19 +134,6 @@ class GameData::Inputter < ApplicationRecord
           is_island: data_point["isIsland"].downcase == "yes",
         ).save!
       end
-    end
-
-    def self.global_demands
-      game_dates = (Game.all.map(&:current_date) || ["01-01-1914".to_date]).uniq(&:year)
-      Market
-        .joins(:populations)
-        .where("populations.population >= ?", THRESHOLD_POPULATION_TO_PRECALCULATE_GLOBAL_DEMAND)
-        .flat_map(&:airports)
-        .each do |airport|
-          game_dates.each do |game_date|
-            GlobalDemand.calculate(game_date, airport)
-          end
-        end
     end
 
     def self.island_exceptions
