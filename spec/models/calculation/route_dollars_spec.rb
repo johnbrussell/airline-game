@@ -4,9 +4,6 @@ RSpec.describe Calculation::RouteDollars do
   before(:each) do
     airport = instance_double(Airport)
 
-    route_demand = instance_double(RouteDemand, business: 100, exclusive_business: 10, exclusive_government: 1, exclusive_leisure: 200, exclusive_tourist: 20, government: 10, leisure: 2000, tourist: 200)
-    allow(RouteDemand).to receive(:calculate).and_return(route_demand)
-
     market_dollars = instance_double(Calculation::MarketDollars, business: 5000, government: 10000, leisure: 50000, tourist: 1000)
     allow(Calculation::MarketDollars).to receive(:new).and_return(market_dollars)
 

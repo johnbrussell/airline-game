@@ -148,7 +148,6 @@ class GameData::Inputter < ApplicationRecord
 
     def self.population
       Population.all.destroy_all
-      RouteDemand.all.destroy_all
       MarketPopulation.all.destroy_all
       RelativeDemand.all.destroy_all
       RouteDollars.all.destroy_all
