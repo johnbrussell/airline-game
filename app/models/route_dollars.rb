@@ -32,8 +32,15 @@ class RouteDollars < ApplicationRecord
     end
   end
 
-  def inertia_service
-    @inertia_service ||= Calculation::InertiaRouteService.new(self)
+  def self.display_revenues_between_airports(airport_1, airport_2, date)
+    revenues = self.between_markets(airport_1.market, airport_2.market, date)
+      .reject { |rd| rd.origin_airport_iata.present? && rd.origin_airport_iata != airport_1.iata && rd.origin_airport_iata != airport_2.iata }
+      .reject { |rd| rd.destination_airport_iata.present? && rd.destination_airport_iata != airport_1.iata && rd.destination_airport_iata != airport_2.iata }
+    {
+      :business => revenues.sum(&:business),
+      :economy => revenues.sum(&:economy),
+      :premium_economy => revenues.sum(&:premium_economy),
+    }
   end
 
   private

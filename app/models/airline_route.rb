@@ -119,16 +119,6 @@ class AirlineRoute < ApplicationRecord
     "#{origin_airport_iata} - #{destination_airport_iata}"
   end
 
-  def relative_demand_to(other_origin_airport, other_destination_airport, class_of_service)
-    comparison_revenue = Calculation::MaximumRevenuePotential.new(other_origin_airport, other_destination_airport, game.current_date).send("max_#{class_of_service.to_s}_class_revenue_per_week".to_sym)
-
-    if comparison_revenue == 0
-      1
-    else
-      revenue_potential.send("max_#{class_of_service.to_s}_class_revenue_per_week".to_sym) / comparison_revenue
-    end
-  end
-
   def reputation
     @reputation ||= REPUTATION_WEIGHTS[:fare] * fare_reputation + REPUTATION_WEIGHTS[:frequency] * frequency_reputation + REPUTATION_WEIGHTS[:ifs] * ifs_reputation + REPUTATION_WEIGHTS[:legroom] * legroom_reputation
   end
@@ -247,10 +237,6 @@ class AirlineRoute < ApplicationRecord
 
     def premium_economy_fare_reputation
       1 - (premium_economy_price / max_route_premium_economy_fare.to_f)
-    end
-
-    def revenue_potential
-      Calculation::MaximumRevenuePotential.new(origin_airport, destination_airport, game.current_date)
     end
 
     def scale_reputation(input_reptuation, input_min, input_max)

@@ -1,8 +1,6 @@
 require 'csv'
 
 class GameData::Inputter < ApplicationRecord
-  THRESHOLD_POPULATION_TO_PRECALCULATE_GLOBAL_DEMAND = 500000
-
   def self.run
     self.remove_unused_markets
     data = CSV.parse(File.read("data/metro_areas.csv"), headers: true)
@@ -17,9 +15,6 @@ class GameData::Inputter < ApplicationRecord
     self.cabotage_exceptions
     self.rival_country_groups
     self.island_exceptions
-
-    # must be last
-    self.global_demands
   end
 
   private
@@ -139,19 +134,6 @@ class GameData::Inputter < ApplicationRecord
       end
     end
 
-    def self.global_demands
-      game_dates = (Game.all.map(&:current_date) || ["01-01-1914".to_date]).uniq(&:year)
-      Market
-        .joins(:populations)
-        .where("populations.population >= ?", THRESHOLD_POPULATION_TO_PRECALCULATE_GLOBAL_DEMAND)
-        .flat_map(&:airports)
-        .each do |airport|
-          game_dates.each do |game_date|
-            GlobalDemand.calculate(game_date, airport)
-          end
-        end
-    end
-
     def self.island_exceptions
       IslandException.all.destroy_all
 
@@ -166,13 +148,11 @@ class GameData::Inputter < ApplicationRecord
 
     def self.population
       Population.all.destroy_all
-      GlobalDemand.all.destroy_all
-      RouteDemand.all.destroy_all
-      AirportPopulation.all.destroy_all
       MarketPopulation.all.destroy_all
       RelativeDemand.all.destroy_all
       RouteDollars.all.destroy_all
       MarketDollars.all.destroy_all
+      TotalMarketDemand.all.destroy_all
 
       data = CSV.parse(File.read("data/populations.csv"), headers: true)
       data.by_row.each do |data_point|
@@ -191,9 +171,6 @@ class GameData::Inputter < ApplicationRecord
         if data.by_row.none? { |d| d["Metro Area"] == market.name }
           if Airline.any? { |a| a.base_id == market.id }
             raise ArgumentError.new "Cannot delete market in use by an airline.  Must update in rails console"
-          end
-          market.airports.each do |a|
-            a.global_demands.destroy_all
           end
           market.airports.destroy_all
           market.populations.destroy_all
@@ -217,7 +194,6 @@ class GameData::Inputter < ApplicationRecord
 
     def self.tourists
       Tourists.all.destroy_all
-      GlobalDemand.all.destroy_all
 
       data = CSV.parse(File.read("data/tourists.csv"), headers: true)
       data.by_row.each do |data_point|
