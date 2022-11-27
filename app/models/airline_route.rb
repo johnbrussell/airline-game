@@ -239,10 +239,6 @@ class AirlineRoute < ApplicationRecord
       1 - (premium_economy_price / max_route_premium_economy_fare.to_f)
     end
 
-    def revenue_potential
-      Calculation::MaximumRevenuePotential.new(origin_airport, destination_airport, game.current_date)
-    end
-
     def scale_reputation(input_reptuation, input_min, input_max)
       (input_reptuation - input_min) * (MAX_REPUTATION - MIN_REPUTATION) / (input_max - input_min).to_f + MIN_REPUTATION
     end
