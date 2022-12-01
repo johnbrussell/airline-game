@@ -190,8 +190,8 @@ class AirlineRoute < ApplicationRecord
     def calculate_inertia_route
       route_dollars_in_market = RouteDollars.between_markets(origin_airport.market, destination_airport.market, game.current_date)
       total_dollars_in_market = route_dollars_in_market.sum { |rd| rd.business + rd.economy + rd.premium_economy }
-      distance = route_dollars_in_market.sum { |rd| (rd.business.to_f / total_dollars_in_market + rd.economy.to_f / total_dollars_in_market + rd.premium_economy.to_f / total_dollars_in_market) * rd.distance }
-      @inertia_route ||= Calculation::InertiaRouteService.new(distance, route_dollars_in_market.sum(&:business), route_dollars_in_market.sum(&:economy), route_dollars_in_market.sum(&:premium_economy))
+      inertia_distance = route_dollars_in_market.sum { |rd| (rd.business.to_f / total_dollars_in_market + rd.economy.to_f / total_dollars_in_market + rd.premium_economy.to_f / total_dollars_in_market) * rd.distance }
+      @inertia_route ||= Calculation::InertiaRouteService.new(inertia_distance, route_dollars_in_market.sum(&:business), route_dollars_in_market.sum(&:economy), route_dollars_in_market.sum(&:premium_economy))
     end
 
     def economy_fare_reputation
