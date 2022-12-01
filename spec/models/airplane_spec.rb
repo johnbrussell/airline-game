@@ -2058,6 +2058,7 @@ RSpec.describe Airplane do
 
     it "updates the configuration, deducts cash from the airline, updates the flight costs, and adjusts the revenue on affected routes if the new configuration is valid" do
       initial_cash_on_hand = 1000000
+      other_market = Fabricate(:market, name: "Washington")
       airline = Fabricate(:airline, cash_on_hand: initial_cash_on_hand)
       airline.base.airports.each{ |a| a.update!(exclusive_catchment: 1) }
       subject = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, base_country_group: airline.base.country_group, operator_id: airline.id, economy_seats: 50, business_seats: 0, premium_economy_seats: 0)
@@ -2067,15 +2068,15 @@ RSpec.describe Airplane do
       Slot.create!(lessee_id: airline.id, gates: bos_gates)
       Population.create!(market_id: airline.base.id, year: 2000, population: 100)
       Tourists.create!(market_id: airline.base.id, year: 2000, volume: 10)
-      lax = Fabricate(:airport, iata: "LAX", market: airline.base, runway: 10000, exclusive_catchment: 1)
+      lax = Fabricate(:airport, iata: "LAX", market: other_market, runway: 10000, exclusive_catchment: 1)
       lax_gates = Gates.create!(airport: lax, game: game, current_gates: 5)
       Slot.create!(lessee_id: airline.id, gates: lax_gates)
       airline_route = AirlineRoute.create!(airline: airline, origin_airport: bos, destination_airport: lax, distance: 2, economy_price: 1, business_price: 2, premium_economy_price: 2)
       AirplaneRoute.new(airplane: subject, route: airline_route, flight_cost: 1, frequencies: 1, block_time_mins: 1).save(validate: false)
       airplane_route = AirplaneRoute.last
       AirlineRouteRevenue.create!(airline_route: airline_route, revenue: 0, economy_pax: 0, business_pax: 0, premium_economy_pax: 0, exclusive_economy_revenue: 0, exclusive_business_revenue: 0, exclusive_premium_economy_revenue: 0)
-      route_dollars = instance_double(RouteDollars, origin_market: airline.base, destination_market: airline.base, origin_airport_iata: "BOS", destination_airport_iata: "LAX", date: Date.today, distance: 1000, business: 100, economy: 100, premium_economy: 100)
-      expect(RouteDollars).to receive(:between_markets).with(airline.base, airline.base, Date.today).and_return([route_dollars])
+      route_dollars = instance_double(RouteDollars, origin_market: airline.base, destination_market: other_market, origin_airport_iata: "BOS", destination_airport_iata: "LAX", date: Date.today, distance: 1000, business: 100, economy: 100, premium_economy: 100)
+      expect(RouteDollars).to receive(:between_markets).with(airline.base, other_market, Date.today).and_return([route_dollars])
       subject.reload
 
       cost_to_reconfigure = subject.send(:cost_to_reconfigure, 1, 2, 3)
