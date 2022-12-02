@@ -44,7 +44,6 @@ class AirlineRoute < ApplicationRecord
         economy_price: inertia.economy_fare.round(2),
         premium_economy_price: inertia.premium_economy_fare.round(2),
         business_price: (inertia.business_fare > 0 ? inertia.business_fare : record.distance * 3).round(2),
-        distance: record.distance,
       )
       record.save
     end

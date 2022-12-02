@@ -229,10 +229,10 @@ RSpec.describe "airports/show", type: :feature do
     aircraft_1 = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, economy_seats: 100, premium_economy_seats: 10, business_seats: 8)
     aircraft_2 = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: other_airline.id, base_country_group: other_airline.base.country_group, economy_seats: 50, premium_economy_seats: 3, business_seats: 0)
 
-    fun_inu = AirlineRoute.create!(airline: airline, origin_airport: fun, destination_airport: inu, distance: 1, economy_price: 1, premium_economy_price: 2, business_price: 4)
+    fun_inu = AirlineRoute.create!(airline: airline, origin_airport: fun, destination_airport: inu, economy_price: 1, premium_economy_price: 2, business_price: 4)
     AirlineRouteRevenue.new(airline_route_id: fun_inu.id, revenue: 100, exclusive_economy_revenue: 1, exclusive_premium_economy_revenue: 2, exclusive_business_revenue: 3, business_pax: 1, economy_pax: 2, premium_economy_pax: 1).save(validate: false)
     AirplaneRoute.new(route: fun_inu, airplane: aircraft_1, flight_cost: 1, block_time_mins: 100, frequencies: 3).save(validate: false)
-    bos_inu = AirlineRoute.create!(airline: other_airline, origin_airport: bos, destination_airport: inu, distance: 1, economy_price: 1, premium_economy_price: 2, business_price: 4)
+    bos_inu = AirlineRoute.create!(airline: other_airline, origin_airport: bos, destination_airport: inu, economy_price: 1, premium_economy_price: 2, business_price: 4)
     AirlineRouteRevenue.new(airline_route_id: bos_inu.id, revenue: 100, exclusive_economy_revenue: 2, exclusive_premium_economy_revenue: 2, exclusive_business_revenue: 3, business_pax: 1, economy_pax: 2, premium_economy_pax: 1).save(validate: false)
     AirplaneRoute.new(route: bos_inu, airplane: aircraft_2, flight_cost: 1, block_time_mins: 100, frequencies: 4).save(validate: false)
 

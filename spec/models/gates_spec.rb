@@ -443,7 +443,7 @@ RSpec.describe Gates do
       subject = Gates.create!(airport: airport, game: game, current_gates: airport.start_gates)
       used_slot = Slot.create!(gates_id: subject.id, lessee_id: airline.id)
 
-      airline_route = AirlineRoute.create!(airline: airline, distance: 1, economy_price: 1, business_price: 1, premium_economy_price: 1, origin_airport: airport, destination_airport: other_airport)
+      airline_route = AirlineRoute.create!(airline: airline, economy_price: 1, business_price: 1, premium_economy_price: 1, origin_airport: airport, destination_airport: other_airport)
       family = Fabricate(:aircraft_family)
       airplane = Fabricate(:airplane, base_country_group: airline.base.country_group, aircraft_family: family)
       AirplaneRoute.new(airplane: airplane, route: airline_route, frequencies: 1, flight_cost: 1, block_time_mins: 1).save(validate: false)
