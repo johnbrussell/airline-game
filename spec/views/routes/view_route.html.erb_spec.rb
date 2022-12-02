@@ -421,7 +421,7 @@ RSpec.describe "routes/view_route", type: :feature do
     aircraft_2 = Fabricate(:airplane, aircraft_model: super_model, aircraft_family: family, operator_id: other_airline.id, base_country_group: airline.base.country_group, business_seats: other_business_seats)
     Slot.create!(gates: gates_inu, lessee_id: other_airline.id)
     Slot.create!(gates: gates_fun, lessee_id: other_airline.id)
-    other_airline_route = AirlineRoute.create!(airline: other_airline, business_price: 1, distance: 1, origin_airport: fun, destination_airport: inu, economy_price: 1000, premium_economy_price: 10000, service_quality: 5)
+    other_airline_route = AirlineRoute.create!(airline: other_airline, business_price: 1, origin_airport: fun, destination_airport: inu, economy_price: 1000, premium_economy_price: 10000, service_quality: 5)
     AirplaneRoute.new(route: other_airline_route, airplane: aircraft_2, frequencies: other_frequencies, flight_cost: 1, block_time_mins: 1).save(validate: false)
 
     click_on "Set frequencies"
@@ -471,10 +471,10 @@ RSpec.describe "routes/view_route", type: :feature do
     gates_maj = Gates.create!(airport: maj, game: game, current_gates: 100)
     Slot.create!(gates: gates_maj, lessee_id: airline.id)
 
-    other_route = AirlineRoute.create!(origin_airport: fun, destination_airport: inu, airline: other_airline, economy_price: 1, premium_economy_price: 2, business_price: 4000, distance: 1008)
+    other_route = AirlineRoute.create!(origin_airport: fun, destination_airport: inu, airline: other_airline, economy_price: 1, premium_economy_price: 2, business_price: 4000)
     AirplaneRoute.new(route: other_route, airplane: aircraft_2, frequencies: 1, block_time_mins: 1000, flight_cost: 100).save(validate: false)
 
-    other_market_route = AirlineRoute.create!(origin_airport: fun, destination_airport: maj, airline: airline, economy_price: 2, premium_economy_price: 3, business_price: 5, distance: 1009)
+    other_market_route = AirlineRoute.create!(origin_airport: fun, destination_airport: maj, airline: airline, economy_price: 2, premium_economy_price: 3, business_price: 5)
     AirplaneRoute.new(route: other_market_route, airplane: aircraft_3, frequencies: 1, block_time_mins: 0, flight_cost: 100).save(validate: false)
     AirlineRouteRevenue.create!(airline_route_id: other_market_route.id, revenue: 20, exclusive_economy_revenue: 1, exclusive_business_revenue: 1, exclusive_premium_economy_revenue: 1, economy_pax: 1, business_pax: 1, premium_economy_pax: 1)
 

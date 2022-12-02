@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_11_05_161753) do
+ActiveRecord::Schema.define(version: 2022_12_02_125455) do
 
   create_table "aircraft_families", force: :cascade do |t|
     t.string "name", null: false
@@ -69,7 +69,6 @@ ActiveRecord::Schema.define(version: 2022_11_05_161753) do
     t.float "business_price", null: false
     t.string "origin_airport_id", null: false
     t.string "destination_airport_id", null: false
-    t.integer "distance", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "airline_id", null: false

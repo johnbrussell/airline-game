@@ -5,7 +5,7 @@ RSpec.describe AirlineRouteRevenue do
     let(:origin_airport) { Fabricate(:airport, iata: "KWA") }
     let(:destination_airport) { Fabricate(:airport, market: origin_airport.market, iata: "MAJ") }
     let(:airline) { Fabricate(:airline, base_id: origin_airport.market.id) }
-    let(:airline_route) { AirlineRoute.create!(origin_airport: origin_airport, destination_airport: destination_airport, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline, distance: 1) }
+    let(:airline_route) { AirlineRoute.create!(origin_airport: origin_airport, destination_airport: destination_airport, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline) }
 
     before(:each) do
       family = Fabricate(:aircraft_family)
@@ -53,7 +53,7 @@ RSpec.describe AirlineRouteRevenue do
     let(:origin_airport) { Fabricate(:airport, iata: "KWA") }
     let(:destination_airport) { Fabricate(:airport, market: origin_airport.market, iata: "MAJ") }
     let(:airline) { Fabricate(:airline, base_id: origin_airport.market.id) }
-    let(:airline_route) { AirlineRoute.create!(origin_airport: origin_airport, destination_airport: destination_airport, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline, distance: 1) }
+    let(:airline_route) { AirlineRoute.create!(origin_airport: origin_airport, destination_airport: destination_airport, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline) }
 
     it "sets revenue and passengers to zero" do
       AirlineRouteRevenue.new(revenue: 174, exclusive_economy_revenue: 138, exclusive_premium_economy_revenue: 24, exclusive_business_revenue: 1, economy_pax: 138, premium_economy_pax: 12, business_pax: 4, airline_route: airline_route).save(validate: false)

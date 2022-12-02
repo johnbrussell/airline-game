@@ -24,18 +24,18 @@ RSpec.describe AirlineRoute do
       airplane_d = Fabricate(:airplane, aircraft_family: family, operator_id: airline_d.id, base_country_group: airline_d.base.country_group, aircraft_model: super_model)
       airplane_other_game = Fabricate(:airplane, aircraft_family: family, operator_id: other_game_airline.id, base_country_group: other_game_airline.base.country_group, aircraft_model: super_model)
 
-      airline_route_c = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_c)
-      airline_route_a = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_a)
-      airline_route_b = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_b)
-      airline_route_d = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: maj.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_d)
-      airline_route_other_game = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: other_game_airline)
+      airline_route_c = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline_c)
+      airline_route_a = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline_a)
+      airline_route_b = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline_b)
+      airline_route_d = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: maj.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline_d)
+      airline_route_other_game = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: other_game_airline)
       airplane_route_c = AirplaneRoute.new(airplane: airplane_c, route: airline_route_c, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
       airplane_route_a = AirplaneRoute.new(airplane: airplane_a, route: airline_route_a, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
       airplane_route_b = AirplaneRoute.new(airplane: airplane_b, route: airline_route_b, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
       airplane_route_d = AirplaneRoute.new(airplane: airplane_d, route: airline_route_d, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
       airplane_route_other_game = AirplaneRoute.new(airplane: airplane_other_game, route: airline_route_other_game, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
 
-      AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: other_airline)
+      AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: other_airline)
 
       expect(AirlineRoute.operators_in_market(fun.market, inu.market, game)).to eq [airline_route_a, airline_route_b, airline_route_c, airline_route_d]
     end
@@ -73,18 +73,18 @@ RSpec.describe AirlineRoute do
       airplane_d = Fabricate(:airplane, aircraft_family: family, operator_id: airline_d.id, base_country_group: airline_d.base.country_group, aircraft_model: super_model)
       airplane_other_game = Fabricate(:airplane, aircraft_family: family, operator_id: other_game_airline.id, base_country_group: other_game_airline.base.country_group, aircraft_model: super_model)
 
-      airline_route_c = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_c)
-      airline_route_a = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_a)
-      airline_route_b = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_b)
-      airline_route_d = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: maj.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_d)
-      airline_route_other_game = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: other_game_airline)
+      airline_route_c = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline_c)
+      airline_route_a = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline_a)
+      airline_route_b = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline_b)
+      airline_route_d = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: maj.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline_d)
+      airline_route_other_game = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: other_game_airline)
       airplane_route_c = AirplaneRoute.new(airplane: airplane_c, route: airline_route_c, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
       airplane_route_a = AirplaneRoute.new(airplane: airplane_a, route: airline_route_a, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
       airplane_route_b = AirplaneRoute.new(airplane: airplane_b, route: airline_route_b, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
       airplane_route_d = AirplaneRoute.new(airplane: airplane_d, route: airline_route_d, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
       airplane_route_other_game = AirplaneRoute.new(airplane: airplane_other_game, route: airline_route_other_game, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
 
-      AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: other_airline)
+      AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: other_airline)
 
       expect(AirlineRoute.operators_of_other_market_routes(fun, inu, game)).to eq [airline_route_d]
     end
@@ -110,16 +110,16 @@ RSpec.describe AirlineRoute do
       airplane_b = Fabricate(:airplane, aircraft_family: family, operator_id: airline_b.id, base_country_group: airline_b.base.country_group, aircraft_model: super_model)
       airplane_other_game = Fabricate(:airplane, aircraft_family: family, operator_id: other_game_airline.id, base_country_group: other_game_airline.base.country_group, aircraft_model: super_model)
 
-      airline_route_c = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_c)
-      airline_route_a = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_a)
-      airline_route_b = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_b)
-      airline_route_other_game = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: other_game_airline)
+      airline_route_c = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline_c)
+      airline_route_a = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline_a)
+      airline_route_b = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline_b)
+      airline_route_other_game = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: other_game_airline)
       airplane_route_c = AirplaneRoute.new(airplane: airplane_c, route: airline_route_c, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
       airplane_route_a = AirplaneRoute.new(airplane: airplane_a, route: airline_route_a, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
       airplane_route_b = AirplaneRoute.new(airplane: airplane_b, route: airline_route_b, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
       airplane_route_other_game = AirplaneRoute.new(airplane: airplane_other_game, route: airline_route_other_game, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
 
-      AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: other_airline)
+      AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: other_airline)
 
       expect(AirlineRoute.operators_of_route(fun, inu, game)).to eq [airline_route_a, airline_route_b, airline_route_c]
     end
@@ -155,13 +155,13 @@ RSpec.describe AirlineRoute do
       disconnected_network_airplane = Fabricate(:airplane, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, aircraft_model: super_model)
       incapable_of_airport_airplane = Fabricate(:airplane, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, aircraft_model: incapable_model)
 
-      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline)
-      other_airline_airline_route = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: other_airline)
-      too_much_time_airline_route = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: trw.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline)
+      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline)
+      other_airline_airline_route = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: other_airline)
+      too_much_time_airline_route = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: trw.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline)
       too_much_time_route = AirplaneRoute.new(route: too_much_time_airline_route, airplane: too_much_time_airplane, frequencies: 10000, block_time_mins: 1441 * 7, flight_cost: 1).save(validate: false)
-      disconnected_airline_route = AirlineRoute.create!(origin_airport_id: maj.id, destination_airport_id: trw.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline)
+      disconnected_airline_route = AirlineRoute.create!(origin_airport_id: maj.id, destination_airport_id: trw.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline)
       disconnected_route = AirplaneRoute.new(route: disconnected_airline_route, airplane: disconnected_network_airplane, frequencies: 1, block_time_mins: 1, flight_cost: 1).save(validate: false)
-      other_game_airline_route = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport: inu, economy_price: 1, premium_economy_price: 2, business_price: 4, distance: 5, airline: other_game_airline)
+      other_game_airline_route = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport: inu, economy_price: 1, premium_economy_price: 2, business_price: 4, airline: other_game_airline)
       other_game_route = AirplaneRoute.new(route: other_game_airline_route, airplane: other_game_airplane, frequencies: 1, block_time_mins: 2, flight_cost: 4).save(validate: false)
       subject.reload
 
@@ -176,7 +176,7 @@ RSpec.describe AirlineRoute do
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       airline = Fabricate(:airline, base_id: inu.market.id)
 
-      subject = AirlineRoute.new(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline)
+      subject = AirlineRoute.new(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline)
 
       expect(airline).to receive(:can_fly_between?).with(inu.market, inu.market).and_return(true)
 
@@ -191,7 +191,7 @@ RSpec.describe AirlineRoute do
       fun = Fabricate(:airport, iata: "FUN", market: fun_market)
       RivalCountryGroup.create!(country_one: "Nauru", country_two: "Tuvalu")
 
-      subject = AirlineRoute.new(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline)
+      subject = AirlineRoute.new(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline)
 
       expect(airline).to receive(:can_fly_between?).with(fun_market, inu_market).and_return(false)
 
@@ -205,7 +205,7 @@ RSpec.describe AirlineRoute do
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       airline = Fabricate(:airline, base_id: inu.market.id)
 
-      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline)
+      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline)
 
       expect(subject.validate).to be true
     end
@@ -214,7 +214,7 @@ RSpec.describe AirlineRoute do
       inu = Fabricate(:airport, iata: "INU")
       airline = Fabricate(:airline, base_id: inu.market.id)
 
-      subject = AirlineRoute.create(origin_airport_id: inu.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline)
+      subject = AirlineRoute.create(origin_airport_id: inu.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline)
 
       expect(subject.validate).to be false
       expect(subject.errors.full_messages).to include "Destination airport must correspond to an airport with iata alphabetically after origin airport's iata"
@@ -225,7 +225,7 @@ RSpec.describe AirlineRoute do
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       airline = Fabricate(:airline, base_id: inu.market.id)
 
-      subject = AirlineRoute.new(origin_airport_id: inu.id, destination_airport_id: fun.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline)
+      subject = AirlineRoute.new(origin_airport_id: inu.id, destination_airport_id: fun.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline)
 
       expect(subject.valid?).to be false
       expect(subject.errors.full_messages).to include "Destination airport must correspond to an airport with iata alphabetically after origin airport's iata"
@@ -237,7 +237,7 @@ RSpec.describe AirlineRoute do
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       airline = Fabricate(:airline, base_id: inu.market.id, name: "A")
-      airline_route = AirlineRoute.create!(economy_price: 1, distance: 2, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
+      airline_route = AirlineRoute.create!(economy_price: 1, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
 
       original_record_count = AirlineRoute.count
 
@@ -301,7 +301,7 @@ RSpec.describe AirlineRoute do
       airplane_1 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model)
       airplane_2 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model)
 
-      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_a)
+      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline_a)
       airplane_route_1 = AirplaneRoute.new(airplane: airplane_1, route: subject, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
       airplane_route_2 = AirplaneRoute.new(airplane: airplane_2, route: subject, block_time_mins: 1, frequencies: 2, flight_cost: 1).save(validate: false)
       subject.reload
@@ -364,7 +364,7 @@ RSpec.describe AirlineRoute do
 
     it "is minimal for a minimal legroom reputation and a minimal in flight service reputation and a minimal fare reputation and a minimal frequency reputation" do
       airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 10)
-      subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, distance: 1, airline: airline, economy_price: 50200, premium_economy_price: 81500, business_price: 50000)
+      subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, airline: airline, economy_price: 50200, premium_economy_price: 81500, business_price: 50000)
       AirplaneRoute.new(route: subject, frequencies: 1, block_time_mins: 1, flight_cost: 1, airplane: airplane).save(validate: false)
       subject.reload
 
@@ -374,7 +374,7 @@ RSpec.describe AirlineRoute do
     it "is maximal for a maximal legroom reputation and a maximal in flight service reputation and maximal fare reputation and a maximal frequency reputation" do
       model.update(floor_space: 10000000000)
       airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 1)
-      subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, distance: 1, service_quality: 5, airline: airline, economy_price: 0.01, premium_economy_price: 0.01, business_price: 0.01)
+      subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, service_quality: 5, airline: airline, economy_price: 0.01, premium_economy_price: 0.01, business_price: 0.01)
       AirplaneRoute.new(route: subject, frequencies: 245, block_time_mins: 1, flight_cost: 1, airplane: airplane).save(validate: false)
       subject.reload
 
@@ -383,7 +383,7 @@ RSpec.describe AirlineRoute do
 
     it "is weighted accurately between legroom, in flight service, and fare" do
       airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 10)
-      subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, distance: 1, service_quality: 5, airline: airline, economy_price: 30000 / 2, premium_economy_price: 45750 / 2, business_price: 50000 / 2)
+      subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, service_quality: 5, airline: airline, economy_price: 30000 / 2, premium_economy_price: 45750 / 2, business_price: 50000 / 2)
       AirplaneRoute.new(route: subject, frequencies: 1, block_time_mins: 1, flight_cost: 1, airplane: airplane).save(validate: false)
       subject.reload
 
@@ -394,7 +394,7 @@ RSpec.describe AirlineRoute do
       model.update(floor_space: Airplane::ECONOMY_SEAT_SIZE * 500000)
       airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 500000)
       other_airplane = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, economy_seats: 1)
-      subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, distance: 1, airline: airline, economy_price: 30000, premium_economy_price: 45750, business_price: 50000)
+      subject = AirlineRoute.create!(origin_airport: origin, destination_airport: destination, airline: airline, economy_price: 30000, premium_economy_price: 45750, business_price: 50000)
       AirplaneRoute.new(route: subject, frequencies: 1, block_time_mins: 1, flight_cost: 1, airplane: airplane).save(validate: false)
       AirplaneRoute.new(route: subject, frequencies: 1, block_time_mins: 1, flight_cost: 1, airplane: other_airplane).save(validate: false)
       subject.reload
@@ -411,7 +411,6 @@ RSpec.describe AirlineRoute do
       subject = AirlineRoute.new(
         origin_airport: origin,
         destination_airport: destination,
-        distance: 1,
         airline: airline,
         economy_price: 30000,
         premium_economy_price: 45750,
@@ -429,7 +428,7 @@ RSpec.describe AirlineRoute do
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       airline = Fabricate(:airline, base_id: inu.market.id, name: "A")
-      subject = AirlineRoute.create!(economy_price: 1, distance: 2, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
+      subject = AirlineRoute.create!(economy_price: 1, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
 
       expect(subject.revenue).to be nil
 
@@ -455,7 +454,7 @@ RSpec.describe AirlineRoute do
       inu = Fabricate(:airport, iata: "INU", market: inu_market)
       fun = Fabricate(:airport, iata: "FUN", market: fun_market)
       airline = Fabricate(:airline, base_id: inu.market.id, name: "A")
-      subject = AirlineRoute.create!(economy_price: 1, distance: 2, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
+      subject = AirlineRoute.create!(economy_price: 1, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
       family = Fabricate(:aircraft_family)
       airplane = Fabricate(:airplane, operator_id: airline.id, base_country_group: airline.base.country_group, business_seats: 1, economy_seats: 1, premium_economy_seats: 1, aircraft_family: family)
       AirplaneRoute.new(airplane: airplane, route: subject, frequencies: 1, flight_cost: 1, block_time_mins: 1).save(validate: false)
@@ -492,7 +491,7 @@ RSpec.describe AirlineRoute do
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       airline = Fabricate(:airline, base_id: inu.market.id, name: "A")
-      subject = AirlineRoute.create!(economy_price: 1, distance: 2, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
+      subject = AirlineRoute.create!(economy_price: 1, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
 
       subject.set_price(4, 5, -6)
 
@@ -530,7 +529,7 @@ RSpec.describe AirlineRoute do
       Gates.create!(airport: fun, game: game, current_gates: 10)
       Slot.create!(gates_id: Gates.last.id, lessee_id: airline_a.id)
 
-      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, service_quality: 3, airline: airline_a)
+      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, service_quality: 3, airline: airline_a)
       block_time = airplane.round_trip_block_time(subject.distance).round
       AirplaneRoute.new(airplane: airplane, route: subject, block_time_mins: block_time, frequencies: 1, flight_cost: 1).save(validate: false)
       subject.reload
@@ -563,7 +562,7 @@ RSpec.describe AirlineRoute do
       airplane_1 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model, business_seats: 1, premium_economy_seats: 5, economy_seats: 30)
       airplane_2 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model, business_seats: 2, premium_economy_seats: 4, economy_seats: 100)
 
-      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_a)
+      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline_a)
       airplane_route_1 = AirplaneRoute.new(airplane: airplane_1, route: subject, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
       airplane_route_2 = AirplaneRoute.new(airplane: airplane_2, route: subject, block_time_mins: 1, frequencies: 2, flight_cost: 1).save(validate: false)
       subject.reload
@@ -587,7 +586,7 @@ RSpec.describe AirlineRoute do
       airplane_1 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model, business_seats: 1, premium_economy_seats: 5, economy_seats: 30)
       airplane_2 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model, business_seats: 2, premium_economy_seats: 4, economy_seats: 100)
 
-      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_a)
+      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline_a)
       airplane_route_1 = AirplaneRoute.new(airplane: airplane_1, route: subject, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
       airplane_route_2 = AirplaneRoute.new(airplane: airplane_2, route: subject, block_time_mins: 1, frequencies: 2, flight_cost: 1).save(validate: false)
       subject.reload
@@ -628,7 +627,7 @@ RSpec.describe AirlineRoute do
       airplane_1 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model)
       airplane_2 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model)
 
-      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_a)
+      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline_a)
       airplane_route_1 = AirplaneRoute.new(airplane: airplane_1, route: subject, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
       airplane_route_2 = AirplaneRoute.new(airplane: airplane_2, route: subject, block_time_mins: 1, frequencies: 2, flight_cost: 1).save(validate: false)
       subject.reload
@@ -642,7 +641,7 @@ RSpec.describe AirlineRoute do
 
       airline_a = Fabricate(:airline, base_id: inu.market.id, name: "A")
 
-      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_a)
+      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline_a)
 
       expect(subject.total_frequencies).to eq 0
     end
@@ -663,7 +662,7 @@ RSpec.describe AirlineRoute do
       airplane_1 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model, business_seats: 1, premium_economy_seats: 5, economy_seats: 30)
       airplane_2 = Fabricate(:airplane, aircraft_family: family, operator_id: airline_a.id, base_country_group: airline_a.base.country_group, aircraft_model: super_model, business_seats: 2, premium_economy_seats: 4, economy_seats: 100)
 
-      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, distance: 4, airline: airline_a)
+      subject = AirlineRoute.create!(origin_airport_id: fun.id, destination_airport_id: inu.id, economy_price: 1, premium_economy_price: 2, business_price: 3, airline: airline_a)
       airplane_route_1 = AirplaneRoute.new(airplane: airplane_1, route: subject, block_time_mins: 1, frequencies: 1, flight_cost: 1).save(validate: false)
       airplane_route_2 = AirplaneRoute.new(airplane: airplane_2, route: subject, block_time_mins: 1, frequencies: 2, flight_cost: 1).save(validate: false)
       subject.reload
@@ -677,7 +676,7 @@ RSpec.describe AirlineRoute do
       inu = Fabricate(:airport, iata: "INU")
       fun = Fabricate(:airport, iata: "FUN", market: inu.market)
       airline = Fabricate(:airline, base_id: inu.market.id, name: "A")
-      subject = AirlineRoute.create!(economy_price: 1, distance: 2, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
+      subject = AirlineRoute.create!(economy_price: 1, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
       AirlineRouteRevenue.new(airline_route: subject, revenue: 1, exclusive_economy_revenue: 0.01, exclusive_business_revenue: 1, exclusive_premium_economy_revenue: 1, business_pax: 2, economy_pax: 3, premium_economy_pax: 4).save(validate: false)
       subject.reload
 
@@ -704,7 +703,7 @@ RSpec.describe AirlineRoute do
       inu = Fabricate(:airport, iata: "INU", market: inu_market)
       fun = Fabricate(:airport, iata: "FUN", market: fun_market)
       airline = Fabricate(:airline, base_id: inu.market.id, name: "A")
-      subject = AirlineRoute.create!(economy_price: 1, distance: 2, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
+      subject = AirlineRoute.create!(economy_price: 1, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
       family = Fabricate(:aircraft_family)
       airplane = Fabricate(:airplane, operator_id: airline.id, base_country_group: airline.base.country_group, business_seats: 1, economy_seats: 1, premium_economy_seats: 1, aircraft_family: family)
       AirplaneRoute.new(airplane: airplane, route: subject, frequencies: 1, flight_cost: 1, block_time_mins: 1).save(validate: false)

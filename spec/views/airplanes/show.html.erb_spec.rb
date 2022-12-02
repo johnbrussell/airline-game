@@ -81,7 +81,7 @@ RSpec.describe "airplanes/show", type: :feature do
 
       expect(page).to have_content "This airplane is utilized 0.0 hours per day"
 
-      AirlineRoute.new(origin_airport: fun, destination_airport: inu, distance: 1, economy_price: 1, business_price: 3, premium_economy_price: 2, airline: airline).save(validate: false)
+      AirlineRoute.new(origin_airport: fun, destination_airport: inu, economy_price: 1, business_price: 3, premium_economy_price: 2, airline: airline).save(validate: false)
       AirplaneRoute.new(airline_route_id: AirlineRoute.last.id, frequencies: 1, flight_cost: 11, block_time_mins: 60, airplane_id: airplane.id).save(validate: false)
       AirlineRouteRevenue.new(airline_route_id: AirlineRoute.last.id, revenue: 4, exclusive_economy_revenue: 3.54, exclusive_business_revenue: 1, exclusive_premium_economy_revenue: 2, business_pax: 0, economy_pax: 2, premium_economy_pax: 1).save(validate: false)
 
