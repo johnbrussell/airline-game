@@ -540,6 +540,136 @@ RSpec.describe "routes/view_route", type: :feature do
     expect(page).to have_link "FUN - INU"
   end
 
+  it "edits the user airline's fares when viewing the route using another airline's route ID" do
+    game = Fabricate(:game)
+    nauru = Market.find_by(name: "Nauru")
+    funafuti = Market.find_by(name: "Funafuti")
+    inu = Airport.find_by(iata: "INU")
+    fun = Airport.find_by(iata: "FUN")
+    airline = Fabricate(:airline, base_id: nauru.id, game_id: game.id, is_user_airline: true)
+    other_airline = Fabricate(:airline, base_id: funafuti.id, game_id: game.id, name: "TIA")
+    family = Fabricate(:aircraft_family)
+    model = Fabricate(:aircraft_model, max_range: 13000, takeoff_distance: 100, speed: 1000, family: family)
+    aircraft_1 = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, business_seats: 1, premium_economy_seats: 1, economy_seats: 1)
+    aircraft_2 = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: other_airline.id, base_country_group: other_airline.base.country_group, business_seats: 1, premium_economy_seats: 1, economy_seats: 1)
+    gates_inu = Gates.create!(airport: inu, game: game, current_gates: 100)
+    Slot.create!(gates: gates_inu, lessee_id: airline.id)
+    Slot.create!(gates: gates_inu, lessee_id: airline.id)
+    Slot.create!(gates: gates_inu, lessee_id: airline.id)
+    Slot.create!(gates: gates_inu, lessee_id: other_airline.id)
+    gates_fun = Gates.create!(airport: fun, game: game, current_gates: 100)
+    Slot.create!(gates: gates_fun, lessee_id: airline.id)
+    Slot.create!(gates: gates_fun, lessee_id: airline.id)
+    Slot.create!(gates: gates_fun, lessee_id: airline.id)
+    Slot.create!(gates: gates_fun, lessee_id: airline.id)
+    Slot.create!(gates: gates_fun, lessee_id: other_airline.id)
+
+    other_route = AirlineRoute.create!(origin_airport: fun, destination_airport: inu, airline: other_airline, economy_price: 1, premium_economy_price: 2, business_price: 4000)
+    AirplaneRoute.new(route: other_route, airplane: aircraft_2, frequencies: 1, block_time_mins: 1000, flight_cost: 100).save(validate: false)
+
+    frequencies = [1, 2, 3].sample
+    block_time = (aircraft_1.round_trip_block_time(Calculation::Distance.between_airports(inu, fun)) * frequencies / 60.0 / 7).round(1)
+    airplane_route_count = AirplaneRoute.count
+
+    visit game_airline_route_add_flights_path(game, -1, params: { origin_id: inu.id, destination_id: fun.id })
+
+    expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized 0.0 hours per day. Seating 1 economy, 1 premium economy, 1 business"
+    expect(page).to have_button "Set frequencies"
+    expect(page).to have_content "#{other_airline.name} operates 1 weekly flight with #{aircraft_2.economy_seats} economy seats, #{aircraft_2.premium_economy_seats} premium economy seats, and #{aircraft_2.business_seats} business seats. Tickets sell for $1.00 in economy, $2.00 in premium economy, and $4000.00 in business"
+
+    fill_in :frequencies, with: frequencies
+
+    click_on "Set frequencies"
+
+    expect(page).to have_content "#{airline.name} flights on FUN - INU"
+    expect(page).to have_content "#{airline.name} operates #{frequencies} weekly flight#{frequencies > 1 ? "s" : ""} on FUN - INU"
+    expect(page).to have_content "#{airline.name} has 0 airplanes able to add flights on FUN - INU"
+    expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized #{block_time} hours per day. Seating 1 economy, 1 premium economy, 1 business. Currently flies #{frequencies} weekly flight"
+    expect(page).to have_content "#{airline.name} operates #{frequencies} weekly #{if frequencies > 1 then "flights" else "flight" end} with #{aircraft_1.economy_seats * frequencies} economy seats, #{aircraft_1.premium_economy_seats * frequencies} premium economy seats, and #{aircraft_1.business_seats * frequencies} business seats."
+    expect(page).to have_content "#{other_airline.name} operates 1 weekly flight with #{aircraft_2.economy_seats} economy seats, #{aircraft_2.premium_economy_seats} premium economy seats, and #{aircraft_2.business_seats} business seats. Tickets sell for $1.00 in economy, $2.00 in premium economy, and $4000.00 in business"
+    expect(AirplaneRoute.count).to eq airplane_route_count + 1
+
+    visit game_airline_route_add_flights_path(game, other_route.id)
+
+    fill_in :economy_price, with: 1.51
+    fill_in :premium_economy_price, with: 1.52
+    fill_in :business_price, with: 1001.38
+
+    click_on "Set pricing"
+
+    expect(page).to have_content "#{airline.name} flights on FUN - INU"
+    expect(page).to have_content "#{airline.name} operates #{frequencies} weekly flight#{frequencies > 1 ? "s" : ""} on FUN - INU"
+    expect(page).to have_content "#{airline.name} has 0 airplanes able to add flights on FUN - INU"
+    expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized #{block_time} hours per day. Seating 1 economy, 1 premium economy, 1 business. Currently flies #{frequencies} weekly flight"
+    expect(page).to have_content "#{airline.name} operates #{frequencies} weekly #{if frequencies > 1 then "flights" else "flight" end} with #{aircraft_1.economy_seats * frequencies} economy seats, #{aircraft_1.premium_economy_seats * frequencies} premium economy seats, and #{aircraft_1.business_seats * frequencies} business seats."
+    expect(page).to have_content "Tickets sell for $1.51 in economy, $1.52 in premium economy, and $1001.38 in business"
+    expect(page).to have_content "#{other_airline.name} operates 1 weekly flight with #{aircraft_2.economy_seats} economy seats, #{aircraft_2.premium_economy_seats} premium economy seats, and #{aircraft_2.business_seats} business seats. Tickets sell for $1.00 in economy, $2.00 in premium economy, and $4000.00 in business"
+    expect(AirplaneRoute.count).to eq airplane_route_count + 1
+  end
+
+  it "edits the user airline's frequencies when viewing the route using the other airline's route ID" do
+    game = Fabricate(:game)
+    nauru = Market.find_by(name: "Nauru")
+    funafuti = Market.find_by(name: "Funafuti")
+    inu = Airport.find_by(iata: "INU")
+    fun = Airport.find_by(iata: "FUN")
+    airline = Fabricate(:airline, base_id: nauru.id, game_id: game.id, is_user_airline: true)
+    other_airline = Fabricate(:airline, base_id: funafuti.id, game_id: game.id, name: "TIA")
+    family = Fabricate(:aircraft_family)
+    model = Fabricate(:aircraft_model, max_range: 13000, takeoff_distance: 100, speed: 1000, family: family)
+    aircraft_1 = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: airline.id, base_country_group: airline.base.country_group, business_seats: 1, premium_economy_seats: 1, economy_seats: 1)
+    aircraft_2 = Fabricate(:airplane, aircraft_model: model, aircraft_family: family, operator_id: other_airline.id, base_country_group: other_airline.base.country_group, business_seats: 1, premium_economy_seats: 1, economy_seats: 1)
+    gates_inu = Gates.create!(airport: inu, game: game, current_gates: 100)
+    Slot.create!(gates: gates_inu, lessee_id: airline.id)
+    Slot.create!(gates: gates_inu, lessee_id: airline.id)
+    Slot.create!(gates: gates_inu, lessee_id: airline.id)
+    Slot.create!(gates: gates_inu, lessee_id: other_airline.id)
+    gates_fun = Gates.create!(airport: fun, game: game, current_gates: 100)
+    Slot.create!(gates: gates_fun, lessee_id: airline.id)
+    Slot.create!(gates: gates_fun, lessee_id: airline.id)
+    Slot.create!(gates: gates_fun, lessee_id: airline.id)
+    Slot.create!(gates: gates_fun, lessee_id: airline.id)
+    Slot.create!(gates: gates_fun, lessee_id: other_airline.id)
+
+    other_route = AirlineRoute.create!(origin_airport: fun, destination_airport: inu, airline: other_airline, economy_price: 1, premium_economy_price: 2, business_price: 4000)
+    AirplaneRoute.new(route: other_route, airplane: aircraft_2, frequencies: 1, block_time_mins: 1000, flight_cost: 100).save(validate: false)
+
+    frequencies = [1, 2, 3].sample
+    block_time = (aircraft_1.round_trip_block_time(Calculation::Distance.between_airports(inu, fun)) * frequencies / 60.0 / 7).round(1)
+    airplane_route_count = AirplaneRoute.count
+
+    visit game_airline_route_add_flights_path(game, -1, params: { origin_id: inu.id, destination_id: fun.id })
+
+    expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized 0.0 hours per day. Seating 1 economy, 1 premium economy, 1 business"
+    expect(page).to have_button "Set frequencies"
+    expect(page).to have_content "#{other_airline.name} operates 1 weekly flight with #{aircraft_2.economy_seats} economy seats, #{aircraft_2.premium_economy_seats} premium economy seats, and #{aircraft_2.business_seats} business seats. Tickets sell for $1.00 in economy, $2.00 in premium economy, and $4000.00 in business"
+
+    fill_in :frequencies, with: frequencies
+
+    click_on "Set frequencies"
+
+    expect(page).to have_content "#{airline.name} flights on FUN - INU"
+    expect(page).to have_content "#{airline.name} operates #{frequencies} weekly flight#{frequencies > 1 ? "s" : ""} on FUN - INU"
+    expect(page).to have_content "#{airline.name} has 0 airplanes able to add flights on FUN - INU"
+    expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized #{block_time} hours per day. Seating 1 economy, 1 premium economy, 1 business. Currently flies #{frequencies} weekly flight"
+    expect(page).to have_content "#{airline.name} operates #{frequencies} weekly #{if frequencies > 1 then "flights" else "flight" end} with #{aircraft_1.economy_seats * frequencies} economy seats, #{aircraft_1.premium_economy_seats * frequencies} premium economy seats, and #{aircraft_1.business_seats * frequencies} business seats."
+    expect(page).to have_content "#{other_airline.name} operates 1 weekly flight with #{aircraft_2.economy_seats} economy seats, #{aircraft_2.premium_economy_seats} premium economy seats, and #{aircraft_2.business_seats} business seats. Tickets sell for $1.00 in economy, $2.00 in premium economy, and $4000.00 in business"
+    expect(AirplaneRoute.count).to eq airplane_route_count + 1
+
+    visit game_airline_route_add_flights_path(game, other_route.id)
+
+    fill_in :frequencies, with: 0
+
+    click_on "Set frequencies"
+
+    expect(page).to have_content "Add service on FUN - INU"
+    expect(page).to have_content "#{airline.name} is not currently operating flights on FUN - INU"
+    expect(page).to have_content "#{airline.name} has 1 airplane able to add flights on FUN - INU"
+    expect(page).to have_content "#{family.manufacturer} #{model.name} currently utilized 0.0 hours per day. Seating 1 economy, 1 premium economy, 1 business"
+    expect(page).to have_content "#{other_airline.name} operates 1 weekly flight with #{aircraft_2.economy_seats} economy seats, #{aircraft_2.premium_economy_seats} premium economy seats, and #{aircraft_2.business_seats} business seats. Tickets sell for $1.00 in economy, $2.00 in premium economy, and $4000.00 in business"
+    expect(AirplaneRoute.count).to eq airplane_route_count
+  end
+
   it "refreshing the page after adding flights works" do
     game = Fabricate(:game)
     nauru = Market.find_by(name: "Nauru")

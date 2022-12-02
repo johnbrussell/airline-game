@@ -40,7 +40,8 @@ class RoutesController < ApplicationController
       destination = [Airport.find(params[:origin_id]), Airport.find(params[:destination_id])].max_by{ |a| a.iata }
       AirlineRoute.find_or_create_by_airline_and_route(@game.user_airline, origin, destination)
     else
-      AirlineRoute.find(params[:airline_route_id])
+      referring_airline_route = AirlineRoute.find(params[:airline_route_id])
+      AirlineRoute.find_or_create_by_airline_and_route(@game.user_airline, referring_airline_route.origin_airport, referring_airline_route.destination_airport)
     end
     @airplanes = @route.airplanes + @route.airplanes_available_to_add_service(@game)
     @revenue = RouteDollars.display_revenues_between_airports(@route.origin_airport, @route.destination_airport, @game.current_date)
