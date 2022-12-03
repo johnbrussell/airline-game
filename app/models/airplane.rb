@@ -15,6 +15,7 @@ class Airplane < ApplicationRecord
   validate :block_time_feasible
   validate :can_fly_routes
   validate :operator_changes_appropriately, unless: :new_record?
+  validate :operator_has_rights_to_plane
   validate :seats_fit_on_plane
 
   before_save :update_downstream_block_times
@@ -337,6 +338,12 @@ class Airplane < ApplicationRecord
         errors.add(:operator_id, "cannot be changed while airplane is utilized")
       elsif airline_to_airline_transfer?
         errors.add(:operator_id, "cannot be changed from one airline directly to another; must be put on the market first")
+      end
+    end
+
+    def operator_has_rights_to_plane
+      if owner.present? && operator.present? && owner != operator
+        errors.add(:operator_id, "cannot be different from owner_id when airplane is owned by an airline")
       end
     end
 

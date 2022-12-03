@@ -936,6 +936,49 @@ RSpec.describe Airplane do
     end
   end
 
+  context "operator_has_rights_to_plane" do
+    let(:market_1) { Fabricate(:market, name: "Nauru") }
+    let(:market_2) { Fabricate(:market, name: "Funafuti") }
+    let(:airline_1) { Fabricate(:airline, base_id: market_1.id) }
+    let(:airline_2) { Fabricate(:airline, base_id: market_2.id) }
+    let(:family) { Fabricate(:aircraft_family) }
+    let(:model) { Fabricate(:aircraft_model, family: family) }
+    let(:queue) { Fabricate(:aircraft_manufacturing_queue) }
+    let(:construction_date) { Date.today }
+    let(:end_of_useful_life) { construction_date + 1.year }
+
+    it "is valid when the operator is nil and the owner is nil" do
+      subject = Airplane.new(operator_id: nil, owner_id: nil, aircraft_model: model, base_country_group: "Nauru", construction_date: construction_date, aircraft_manufacturing_queue: queue, end_of_useful_life: end_of_useful_life)
+
+      expect(subject.valid?).to be true
+    end
+
+    it "is valid when the operator is nil and the owner is present" do
+      subject = Airplane.new(operator_id: nil, owner_id: airline_1.id, aircraft_model: model, base_country_group: "Nauru", construction_date: construction_date, aircraft_manufacturing_queue: queue, end_of_useful_life: end_of_useful_life)
+
+      expect(subject.valid?).to be true
+    end
+
+    it "is valid when the operator is present and the owner is nil" do
+      subject = Airplane.new(operator_id: airline_2.id, owner_id: nil, aircraft_model: model, base_country_group: market_2.country_group, construction_date: construction_date, aircraft_manufacturing_queue: queue, end_of_useful_life: end_of_useful_life)
+
+      expect(subject.valid?).to be true
+    end
+
+    it "is valid when the operator and owner are present and they match" do
+      subject = Airplane.new(operator_id: airline_2.id, owner_id: airline_2.id, aircraft_model: model, base_country_group: market_2.country_group, construction_date: construction_date, aircraft_manufacturing_queue: queue, end_of_useful_life: end_of_useful_life)
+
+      expect(subject.valid?).to be true
+    end
+
+    it "is invalid when the operator and owner are present but do not match" do
+      subject = Airplane.new(operator_id: airline_1.id, owner_id: airline_2.id, aircraft_model: model)
+
+      expect(subject.valid?).to be false
+      expect(subject.errors.full_messages).to include "Operator cannot be different from owner_id when airplane is owned by an airline"
+    end
+  end
+
   context "purchase_price" do
     purchase_price_new = 100000000
 
