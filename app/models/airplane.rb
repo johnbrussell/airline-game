@@ -109,6 +109,7 @@ class Airplane < ApplicationRecord
 
   def lease(airline, length_in_days, business_seats, premium_economy_seats, economy_seats)
     lease_start_date = built? ? aircraft_manufacturing_queue.game.current_date : construction_date
+    previous_owner = owner
     if built?
       assign_attributes(base_country_group: airline.base.country_group, lease_rate: lease_rate_per_day(length_in_days.to_i), lease_expiry: lease_start_date + length_in_days.to_i.days, owner_id: nil)
       airline.assign_attributes(cash_on_hand: airline.cash_on_hand - lease_rate_per_day(length_in_days.to_i))
@@ -142,7 +143,8 @@ class Airplane < ApplicationRecord
     errors.none? &&
       airline.errors.none? &&
       save &&
-      airline.save
+      airline.save &&
+      nil_or_true?(previous_owner&.update!(cash_on_hand: previous_owner.cash_on_hand + purchase_payment))
   end
 
   def lease_rate_per_day(lease_in_days)
@@ -179,6 +181,8 @@ class Airplane < ApplicationRecord
   end
 
   def purchase(airline, business_seats, premium_economy_seats, economy_seats)
+    previous_owner = owner
+
     if built?
       assign_attributes(
         base_country_group: airline.base.country_group,
@@ -205,7 +209,8 @@ class Airplane < ApplicationRecord
     errors.none? &&
       save &&
       update(operator_id: airline.id) &&
-      airline.update!(cash_on_hand: airline.cash_on_hand - purchase_payment)
+      airline.update!(cash_on_hand: airline.cash_on_hand - purchase_payment) &&
+      nil_or_true?(previous_owner&.update!(cash_on_hand: previous_owner.cash_on_hand + purchase_payment))
   end
 
   def purchase_price
@@ -322,6 +327,10 @@ class Airplane < ApplicationRecord
 
     def maintenance_rate
       [MIN_MAINTENANCE_RATE, MIN_MAINTENANCE_RATE + (1 - MIN_MAINTENANCE_RATE) * ((NUM_IN_FAMILY_FOR_MIN_MAINTENANCE_RATE - 1) - (num_in_family - 1)) / (NUM_IN_FAMILY_FOR_MIN_MAINTENANCE_RATE - 1)].max
+    end
+
+    def nil_or_true?(input)
+      input.nil? || input
     end
 
     def num_in_family
