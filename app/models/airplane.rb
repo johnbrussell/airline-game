@@ -180,13 +180,17 @@ class Airplane < ApplicationRecord
 
   def purchase(airline, business_seats, premium_economy_seats, economy_seats)
     if built?
-      assign_attributes(base_country_group: airline.base.country_group)
+      assign_attributes(
+        base_country_group: airline.base.country_group,
+        owner_id: airline.id,
+      )
     else
       assign_attributes(
         base_country_group: airline.base.country_group,
         business_seats: business_seats,
         premium_economy_seats: premium_economy_seats,
         economy_seats: economy_seats,
+        owner_id: airline.id,
       )
     end
     validate
