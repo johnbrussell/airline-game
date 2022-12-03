@@ -340,6 +340,10 @@ class Airplane < ApplicationRecord
       end
     end
 
+    def owner
+      Airline.find_by(id: owner_id)
+    end
+
     def percent_of_max_seats_uninstalled
       (max_economy_seats - num_seats) / max_economy_seats.to_f
     end
