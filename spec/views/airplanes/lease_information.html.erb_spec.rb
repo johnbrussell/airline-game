@@ -9,7 +9,7 @@ RSpec.describe "airplanes/lease_information", type: :feature do
       current_date: Date.today + 1.day,
     )
     market = Fabricate(
-      :market, 
+      :market,
       name: "AB",
       country: "AB",
       country_group: "AB",
@@ -204,6 +204,27 @@ RSpec.describe "airplanes/lease_information", type: :feature do
         expect(airplane.operator_id).to eq Airline.where(name: "A Air").last.id
       end
 
+      it "redirects to the airline fleet page after leasing a pre-owned aircraft" do
+        game = Game.last
+        previous_owner = Fabricate(:airline, base_id: Airline.last.base_id, cash_on_hand: 100, name: "Nauru Airlines")
+        airplane = Airplane.last
+        airplane.update!(owner_id: previous_owner.id)
+
+        visit game_airplane_lease_path(game.id, airplane.id)
+
+        fill_in :airplane_days, with: 1
+        click_button "Lease"
+
+        expect(page).to have_content "A Air fleet"
+        expect(page).to have_content "Boeing 737-300 constructed #{airplane.construction_date}"
+        airplane.reload
+        previous_owner.reload
+
+        expect(airplane.owner_id).to be nil
+        expect(airplane.operator_id).to eq Airline.where(name: "A Air").last.id
+        expect(previous_owner.cash_on_hand).to be > 100
+      end
+
       it "does not show the airplane on the used airplane page again after leasing" do
         game = Game.last
         airplane = Airplane.last
@@ -231,6 +252,8 @@ RSpec.describe "airplanes/lease_information", type: :feature do
         game = Game.last
         airplane = Airplane.last
         Airline.last.update!(cash_on_hand: 1)
+        previous_owner = Fabricate(:airline, base_id: Airline.last.base_id, cash_on_hand: 100)
+        airplane.update!(owner_id: previous_owner.id)
 
         visit game_airplane_lease_path(game.id, airplane.id)
 
@@ -241,6 +264,12 @@ RSpec.describe "airplanes/lease_information", type: :feature do
         expect(page).to have_content "Based in United States"
         expect(page).to have_content "Buyer does not have enough cash on hand to lease"
         expect(page).not_to have_content "A Air fleet"
+
+        airplane.reload
+        previous_owner.reload
+
+        expect(airplane.owner_id).to eq previous_owner.id
+        expect(previous_owner.cash_on_hand).to eq 100
       end
 
       it "has a functional cancel button" do

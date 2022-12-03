@@ -9,7 +9,7 @@ RSpec.describe "airplanes/purchase_information", type: :feature do
       current_date: Date.tomorrow,
     )
     market = Fabricate(
-      :market, 
+      :market,
       name: "AB",
       country: "AB",
       country_group: "AB",
@@ -188,6 +188,25 @@ RSpec.describe "airplanes/purchase_information", type: :feature do
         expect(page).to have_content "A Air fleet"
       end
 
+      it "redirects to the airline fleet page after purchasing a pre-owned aircraft" do
+        game = Game.last
+        previous_owner = Fabricate(:airline, base_id: Airline.last.base_id, cash_on_hand: 100, name: "Nauru Airlines")
+        airplane = Airplane.last
+        airplane.update!(owner_id: previous_owner.id)
+
+        visit game_airplane_purchase_path(game.id, airplane.id)
+
+        click_button "Purchase"
+
+        expect(page).to have_content "A Air fleet"
+
+        previous_owner.reload
+        airplane.reload
+
+        expect(previous_owner.cash_on_hand).to be > 100
+        expect(airplane.owner_id).to eq Airline.where(name: "A Air").last.id
+      end
+
       it "has a functional cancel button" do
         game = Game.last
         airplane = Airplane.last
@@ -241,6 +260,29 @@ RSpec.describe "airplanes/purchase_information", type: :feature do
         expect(page).to have_content("Based in United States")
         expect(page).to have_content "Operator cannot be present before buying an airplane"
         expect(page).not_to have_content "A Air fleet"
+      end
+
+      it "does not redirect to the airline fleet page when a validation error occurs" do
+        game = Game.last
+        airplane = Airplane.last
+        Airline.last.update!(cash_on_hand: 1)
+        previous_owner = Fabricate(:airline, base_id: Airline.last.base_id, cash_on_hand: 100)
+        airplane.update!(owner_id: previous_owner.id)
+
+        visit game_airplane_purchase_path(game.id, airplane.id)
+
+        click_button "Purchase"
+
+        expect(page).to have_content "Buy a used 737-300"
+        expect(page).to have_content("Based in United States")
+        expect(page).to have_content "Buyer does not have enough cash on hand to purchase"
+        expect(page).not_to have_content "A Air fleet"
+
+        previous_owner.reload
+        airplane.reload
+
+        expect(previous_owner.cash_on_hand).to eq 100
+        expect(airplane.owner_id).to eq previous_owner.id
       end
     end
   end
