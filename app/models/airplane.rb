@@ -15,6 +15,7 @@ class Airplane < ApplicationRecord
   validate :block_time_feasible
   validate :can_fly_routes
   validate :operator_changes_appropriately, unless: :new_record?
+  validate :operator_has_rights_to_plane
   validate :seats_fit_on_plane
 
   before_save :update_downstream_block_times
@@ -108,8 +109,9 @@ class Airplane < ApplicationRecord
 
   def lease(airline, length_in_days, business_seats, premium_economy_seats, economy_seats)
     lease_start_date = built? ? aircraft_manufacturing_queue.game.current_date : construction_date
+    previous_owner = owner
     if built?
-      assign_attributes(base_country_group: airline.base.country_group, lease_rate: lease_rate_per_day(length_in_days.to_i), lease_expiry: lease_start_date + length_in_days.to_i.days)
+      assign_attributes(base_country_group: airline.base.country_group, lease_rate: lease_rate_per_day(length_in_days.to_i), lease_expiry: lease_start_date + length_in_days.to_i.days, owner_id: nil)
       airline.assign_attributes(cash_on_hand: airline.cash_on_hand - lease_rate_per_day(length_in_days.to_i))
     else
       assign_attributes(
@@ -119,6 +121,7 @@ class Airplane < ApplicationRecord
         economy_seats: economy_seats,
         lease_expiry: lease_start_date + length_in_days.to_i.days,
         lease_rate: lease_rate_per_day(length_in_days.to_i),
+        owner_id: nil,
       )
     end
 
@@ -140,7 +143,8 @@ class Airplane < ApplicationRecord
     errors.none? &&
       airline.errors.none? &&
       save &&
-      airline.save
+      airline.save &&
+      nil_or_true?(previous_owner&.update!(cash_on_hand: previous_owner.cash_on_hand + purchase_payment))
   end
 
   def lease_rate_per_day(lease_in_days)
@@ -177,14 +181,20 @@ class Airplane < ApplicationRecord
   end
 
   def purchase(airline, business_seats, premium_economy_seats, economy_seats)
+    previous_owner = owner
+
     if built?
-      assign_attributes(base_country_group: airline.base.country_group)
+      assign_attributes(
+        base_country_group: airline.base.country_group,
+        owner_id: airline.id,
+      )
     else
       assign_attributes(
         base_country_group: airline.base.country_group,
         business_seats: business_seats,
         premium_economy_seats: premium_economy_seats,
         economy_seats: economy_seats,
+        owner_id: airline.id,
       )
     end
     validate
@@ -199,7 +209,8 @@ class Airplane < ApplicationRecord
     errors.none? &&
       save &&
       update(operator_id: airline.id) &&
-      airline.update!(cash_on_hand: airline.cash_on_hand - purchase_payment)
+      airline.update!(cash_on_hand: airline.cash_on_hand - purchase_payment) &&
+      nil_or_true?(previous_owner&.update!(cash_on_hand: previous_owner.cash_on_hand + purchase_payment))
   end
 
   def purchase_price
@@ -318,6 +329,10 @@ class Airplane < ApplicationRecord
       [MIN_MAINTENANCE_RATE, MIN_MAINTENANCE_RATE + (1 - MIN_MAINTENANCE_RATE) * ((NUM_IN_FAMILY_FOR_MIN_MAINTENANCE_RATE - 1) - (num_in_family - 1)) / (NUM_IN_FAMILY_FOR_MIN_MAINTENANCE_RATE - 1)].max
     end
 
+    def nil_or_true?(input)
+      input.nil? || input
+    end
+
     def num_in_family
       Airplane.
         joins(aircraft_model: :family).
@@ -328,7 +343,7 @@ class Airplane < ApplicationRecord
     end
 
     def operator
-      Airline.find(operator_id)
+      Airline.find_by(id: operator_id)
     end
 
     def operator_changes_appropriately
@@ -337,6 +352,16 @@ class Airplane < ApplicationRecord
       elsif airline_to_airline_transfer?
         errors.add(:operator_id, "cannot be changed from one airline directly to another; must be put on the market first")
       end
+    end
+
+    def operator_has_rights_to_plane
+      if owner.present? && operator.present? && owner != operator
+        errors.add(:operator_id, "cannot be different from owner_id when airplane is owned by an airline")
+      end
+    end
+
+    def owner
+      Airline.find_by(id: owner_id)
     end
 
     def percent_of_max_seats_uninstalled
