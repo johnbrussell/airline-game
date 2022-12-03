@@ -1015,11 +1015,12 @@ RSpec.describe Airplane do
 
   context "lease" do
     purchase_price_new = 100000000
+    previous_owner_id = 1
 
     it "returns false if the airline does not have enough money" do
       family = Fabricate(:aircraft_family, country_group: "St. Pierre and Miquelon")
       market = Fabricate(:market, country_group: "Canada")
-      subject = Fabricate(:airplane, aircraft_family: family)
+      subject = Fabricate(:airplane, aircraft_family: family, owner_id: previous_owner_id)
       buyer = Fabricate(:airline, cash_on_hand: 100, base_id: market.id)
 
       expect(subject.lease(airline = buyer, length_in_days = 100, business_seats = 3, premium_economy_seats = 4, economy_seats = 5)).to be false
@@ -1029,6 +1030,7 @@ RSpec.describe Airplane do
 
       expect(buyer.cash_on_hand).to eq 100
       expect(subject.operator_id).to be nil
+      expect(subject.owner_id).to eq 1
       expect(subject.business_seats).to eq 0
       expect(subject.premium_economy_seats).to eq 0
       expect(subject.economy_seats).to eq 0
@@ -1039,7 +1041,7 @@ RSpec.describe Airplane do
     it "returns false if the plane is already owned by the buyer" do
       family = Fabricate(:aircraft_family)
       buyer = Fabricate(:airline, cash_on_hand: 100000000)
-      subject = Fabricate(:airplane, aircraft_family: family, operator_id: buyer.id, base_country_group: buyer.base.country_group)
+      subject = Fabricate(:airplane, aircraft_family: family, operator_id: buyer.id, base_country_group: buyer.base.country_group, owner_id: buyer.id)
 
       initial_cash_on_hand = buyer.cash_on_hand
 
@@ -1050,6 +1052,7 @@ RSpec.describe Airplane do
 
       expect(buyer.cash_on_hand).to eq initial_cash_on_hand
       expect(subject.operator_id).to be buyer.id
+      expect(subject.owner_id).to eq buyer.id
       expect(subject.business_seats).to eq 0
       expect(subject.premium_economy_seats).to eq 0
       expect(subject.economy_seats).to eq 0
@@ -1061,7 +1064,7 @@ RSpec.describe Airplane do
       base = Fabricate(:market)
       buyer = Fabricate(:airline, name: "A Air", base_id: base.id, cash_on_hand: 100000000)
       other_airline = Fabricate(:airline, name: "B Air", base_id: base.id)
-      subject = Fabricate(:airplane, aircraft_family: family, operator_id: other_airline.id, base_country_group: buyer.base.country_group)
+      subject = Fabricate(:airplane, aircraft_family: family, operator_id: other_airline.id, base_country_group: buyer.base.country_group, owner_id: other_airline.id)
 
       initial_cash_on_hand = buyer.cash_on_hand
 
@@ -1072,6 +1075,7 @@ RSpec.describe Airplane do
 
       expect(buyer.cash_on_hand).to eq initial_cash_on_hand
       expect(subject.operator_id).to be buyer.id + 1
+      expect(subject.owner_id).to eq other_airline.id
       expect(subject.business_seats).to eq 0
       expect(subject.premium_economy_seats).to eq 0
       expect(subject.economy_seats).to eq 0
@@ -1098,6 +1102,7 @@ RSpec.describe Airplane do
 
         expect(buyer.cash_on_hand).to eq initial_cash_on_hand
         expect(subject.operator_id).to eq buyer.id
+        expect(subject.owner_id).to be nil
         expect(subject.business_seats).to eq 3
         expect(subject.premium_economy_seats).to eq 4
         expect(subject.economy_seats).to eq 5
@@ -1130,6 +1135,7 @@ RSpec.describe Airplane do
 
         expect(buyer.cash_on_hand).to eq initial_cash_on_hand
         expect(subject.operator_id).to be nil
+        expect(subject.owner_id).to be nil
         expect(subject.business_seats).to eq 0
         expect(subject.premium_economy_seats).to eq 0
         expect(subject.economy_seats).to eq 0
@@ -1143,7 +1149,7 @@ RSpec.describe Airplane do
         family = Fabricate(:aircraft_family, country_group: "United States")
         market = Fabricate(:market, country_group: "Nauru")
         buyer = Fabricate(:airline, cash_on_hand: 100000000, base_id: market.id)
-        subject = Fabricate(:airplane, aircraft_family: family)
+        subject = Fabricate(:airplane, aircraft_family: family, owner_id: previous_owner_id)
         game = subject.game
 
         subject.update(construction_date: game.current_date)
@@ -1157,6 +1163,7 @@ RSpec.describe Airplane do
 
         expect(buyer.cash_on_hand).to be < initial_cash_on_hand
         expect(subject.operator_id).to eq buyer.id
+        expect(subject.owner_id).to be nil
         expect(subject.business_seats).to eq 0
         expect(subject.premium_economy_seats).to eq 0
         expect(subject.economy_seats).to eq 0
