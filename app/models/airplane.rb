@@ -329,7 +329,7 @@ class Airplane < ApplicationRecord
     end
 
     def operator
-      Airline.find(operator_id)
+      Airline.find_by(id: operator_id)
     end
 
     def operator_changes_appropriately
