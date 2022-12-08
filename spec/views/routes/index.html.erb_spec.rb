@@ -7,6 +7,7 @@ RSpec.describe "routes/index", type: :feature do
     airline = Fabricate(:airline, is_user_airline: true, game_id: game.id, name: "Danielle's Dirigibles")
     visit game_airline_routes_path(game, airline)
 
+    expect(page).to have_content game.current_date_in_words
     expect(page).to have_content "Danielle's Dirigibles routes"
 
     click_link "Return to game overview"

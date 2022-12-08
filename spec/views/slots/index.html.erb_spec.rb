@@ -8,6 +8,7 @@ RSpec.describe "slots/index", type: :feature do
 
       visit game_airline_slots_path(game, airline)
 
+      expect(page).to have_content game.current_date_in_words
       expect(page).to have_link "Return to game overview"
 
       click_link "Return to game overview"

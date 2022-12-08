@@ -9,7 +9,7 @@ RSpec.describe "airplanes/index", type: :feature do
       current_date: "2021-12-31",
     )
     market = Fabricate(
-      :market, 
+      :market,
       name: "AB",
       country: "AB",
       country_group: "AB",
@@ -66,6 +66,8 @@ RSpec.describe "airplanes/index", type: :feature do
       airline = Airline.last
 
       visit game_airline_airplanes_path(game.id, airline.id)
+
+      expect(page).to have_content game.current_date_in_words
 
       click_link "Return to airline page"
 

@@ -63,6 +63,7 @@ RSpec.describe "airplanes/purchase_information", type: :feature do
 
         visit game_airplane_purchase_path(game.id, airplane.id)
 
+        expect(page).to have_content game.current_date_in_words
         expect(page).to have_content("Order a new 737-300")
         expect(page).to have_content("Constructed in United States")
         expect(page).to have_content(airplane.construction_date)
@@ -170,6 +171,7 @@ RSpec.describe "airplanes/purchase_information", type: :feature do
 
         visit game_airplane_purchase_path(game.id, airplane.id)
 
+        expect(page).to have_content game.current_date_in_words
         expect(page).to have_content("Buy a used 737-300")
         expect(page).to have_content("Based in United States")
         expect(page).to have_content("#{airplane.construction_date} (0 days old)")

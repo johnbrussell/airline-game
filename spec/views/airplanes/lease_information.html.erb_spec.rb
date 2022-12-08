@@ -63,6 +63,7 @@ RSpec.describe "airplanes/lease_information", type: :feature do
 
         visit game_airplane_lease_path(game.id, airplane.id)
 
+        expect(page).to have_content game.current_date_in_words
         expect(page).to have_content("Lease a new 737-300")
         expect(page).to have_content("Constructed in United States")
         expect(page).to have_content(airplane.construction_date)
@@ -175,6 +176,7 @@ RSpec.describe "airplanes/lease_information", type: :feature do
 
         visit game_airplane_lease_path(game.id, airplane.id)
 
+        expect(page).to have_content game.current_date_in_words
         expect(page).to have_content("Lease a used 737-300")
         expect(page).to have_content("Based in United States")
         expect(page).to have_content("#{airplane.construction_date} (1 day old)")

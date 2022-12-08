@@ -9,7 +9,7 @@ RSpec.describe "airlines/index", type: :feature do
       current_date: Date.tomorrow,
     )
     market = Fabricate(
-      :market, 
+      :market,
       name: "Nauru",
       country: "Nauru",
       country_group: "A",
@@ -31,6 +31,7 @@ RSpec.describe "airlines/index", type: :feature do
 
       visit game_airline_path(game.id, airline.id)
 
+      expect(page).to have_content game.current_date_in_words
       expect(page).to have_content("A Air")
       expect(page).to have_content("View fleet")
       expect(page).to have_content("View routes")
