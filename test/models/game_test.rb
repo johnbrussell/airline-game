@@ -5,6 +5,13 @@ class GameTest < ActiveSupport::TestCase
   yesterday = today - 1
   tomorrow = today + 1
 
+  test "current_date_in_words is the current date in words" do
+    date = Date.new(2022, 12, 9)
+    subject = Game.create!(start_date: date - 1.day, end_date: date + 1.day, current_date: date)
+
+    assert subject.current_date_in_words == "December 9, 2022"
+  end
+
   test "user_airline finds the user airline" do
     subject = Game.create!(start_date: yesterday, end_date: tomorrow, current_date: today)
 

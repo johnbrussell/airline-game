@@ -7,6 +7,10 @@ class Game < ApplicationRecord
 
   has_many :airlines
 
+  def current_date_in_words
+    current_date.strftime("%B %-d, %Y")
+  end
+
   def user_airline
     airlines.find { |a| a.is_user_airline }
   end
