@@ -10,6 +10,7 @@ RSpec.describe "airplanes/change_configuration", type: :feature do
     it "shows information about the airplane" do
       visit game_airline_airplane_change_configuration_path(game, airline, airplane)
 
+      expect(page).to have_content game.current_date_in_words
       expect(page).to have_content "#{airplane.family.manufacturer} #{airplane.aircraft_model.name}"
       expect(page).to have_content "Maximum seats in all economy configuration: #{airplane.aircraft_model.floor_space / Airplane::ECONOMY_SEAT_SIZE}"
       expect(page).to have_content "Cost per economy seat"

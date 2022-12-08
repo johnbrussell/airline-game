@@ -53,6 +53,7 @@ RSpec.describe "routes/view_route", type: :feature do
     Fabricate(:airline, is_user_airline: true, game_id: game.id, base_id: Market.last.id)
     visit game_airline_route_add_flights_path(game, -1, params: { origin_id: Airport.find_by(iata: "FUN"), destination_id: Airport.find_by(iata: "INU")})
 
+    expect(page).to have_content game.current_date_in_words
     expect(page).to have_content "FUN - INU"
 
     click_link "Return to game overview"

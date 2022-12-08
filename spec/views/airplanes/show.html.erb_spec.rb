@@ -13,6 +13,8 @@ RSpec.describe "airplanes/show", type: :feature do
     it "links back to the game homepage" do
       visit game_airline_airplane_path(game, airline, airplane)
 
+      expect(page).to have_content game.current_date_in_words
+
       expect(page).to have_link "Return to game overview"
 
       click_link "Return to game overview"

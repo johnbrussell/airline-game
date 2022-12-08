@@ -25,8 +25,10 @@ RSpec.describe "airports/index", type: :feature do
   end
 
   it "has a link back to the game homepage" do
-    visit game_airports_path(Game.last)
+    game = Game.last
+    visit game_airports_path(game)
 
+    expect(page).to have_content game.current_date_in_words
     expect(page).to have_content "Select an airport to view"
     expect(page).to have_content "There are 0 airports to choose from"
 

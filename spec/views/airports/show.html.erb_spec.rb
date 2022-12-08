@@ -38,8 +38,10 @@ RSpec.describe "airports/show", type: :feature do
   end
 
   it "shows information about the airport" do
-    visit game_airport_path(Game.last, Airport.find_by(iata: "INU"))
+    game = Game.last
+    visit game_airport_path(game, Airport.find_by(iata: "INU"))
 
+    expect(page).to have_content game.current_date_in_words
     expect(page).to have_content "Runway: 10000 feet"
     expect(page).to have_content "Elevation: 1 foot"
 
@@ -50,7 +52,7 @@ RSpec.describe "airports/show", type: :feature do
     expect(page).to have_content "The cost to build a new gate is $100,000,000.00."
     expect(page).to have_content "A Air has $10,000,000.00 available."
 
-    visit game_airport_path(Game.last, Airport.find_by(iata: "BOS"))
+    visit game_airport_path(game, Airport.find_by(iata: "BOS"))
 
     expect(page).to have_content "United States"
   end
