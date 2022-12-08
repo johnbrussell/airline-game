@@ -47,6 +47,8 @@ RSpec.describe "airlines/index", type: :feature do
 
       visit game_airlines_path(game.id)
 
+      expect(page).to have_content game.current_date_in_words
+
       expect(page).to have_content("A Air")
       expect(page).to have_content("B Air")
       expect(page).not_to have_content("C Air")
