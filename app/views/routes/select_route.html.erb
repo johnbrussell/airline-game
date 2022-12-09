@@ -13,3 +13,8 @@
   <%= form.select :destination_id, @airports, selected: @destination %>
   <%= form.submit "Go" %>
 <% end %>
+<% if @errors.any? %>
+  <% @errors.each do |message| %>
+    <div class="error"><%= message %></div>
+  <% end %>
+<% end %>

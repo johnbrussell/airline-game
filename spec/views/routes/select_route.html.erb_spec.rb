@@ -84,6 +84,29 @@ RSpec.describe "routes/select_route", type: :feature do
     expect(page).to have_content "FUN - INU"
   end
 
+  it "throws an error and does not let users view a route that is not between different airports" do
+    nauru = Fabricate(:market, name: "Nauru", country: "Nauru")
+    inu = Fabricate(:airport, market: nauru, iata: "INU", municipality: "Yaren")
+    Population.create!(market_id: nauru.id, year: 2000, population: 14000)
+    Tourists.create!(market_id: nauru.id, year: 1999, volume: 100)
+
+    game = Fabricate(:game)
+    Fabricate(:airline, is_user_airline: true, game_id: game.id, base_id: nauru.id)
+
+    visit game_select_route_path(game)
+
+    expect(page).to have_content "Select a route to view"
+
+    select("INU - Yaren, Nauru", from: "origin_id")
+    select("INU - Yaren, Nauru", from: "destination_id")
+
+    click_on "Go"
+
+    expect(page).to have_content "Select a route to view"
+    expect(page).to have_content "Origin airport and destination airport must be different to view a route"
+    expect(page).not_to have_content "INU - INU"
+  end
+
   it "has a link to view the user airline routes" do
     apia = Fabricate(:market, name: "Apia", country: "Samoa")
 
