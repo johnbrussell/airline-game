@@ -62,6 +62,28 @@ RSpec.describe "routes/select_route", type: :feature do
     expect(page).to have_content "FUN - INU"
   end
 
+  it "lets users view a route within a market" do
+    nauru = Fabricate(:market, name: "Nauru", country: "Pacific")
+    inu = Fabricate(:airport, market: nauru, iata: "INU", municipality: "Yaren")
+    fun = Fabricate(:airport, market: nauru, iata: "FUN", municipality: nil)
+    Population.create!(market_id: nauru.id, year: 2000, population: 14000)
+    Tourists.create!(market_id: nauru.id, year: 1999, volume: 100)
+
+    game = Fabricate(:game)
+    Fabricate(:airline, is_user_airline: true, game_id: game.id, base_id: nauru.id)
+
+    visit game_select_route_path(game)
+
+    expect(page).to have_content "Select a route to view"
+
+    select("INU - Yaren, Pacific", from: "origin_id")
+    select("FUN - Nauru, Pacific", from: "destination_id")
+
+    click_on "Go"
+
+    expect(page).to have_content "FUN - INU"
+  end
+
   it "has a link to view the user airline routes" do
     apia = Fabricate(:market, name: "Apia", country: "Samoa")
 
