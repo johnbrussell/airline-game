@@ -38,11 +38,11 @@ class AirlineRoute < ApplicationRecord
     if record.new_record?
       route_dollars_in_market = RouteDollars.between_markets(origin_airport.market, destination_airport.market, Game.find(airline.game_id).current_date)
       total_dollars_in_market = route_dollars_in_market.sum { |rd| rd.business + rd.economy + rd.premium_economy }
-      distance = route_dollars_in_market.sum { |rd| (rd.business.to_f / total_dollars_in_market + rd.economy.to_f / total_dollars_in_market + rd.premium_economy.to_f / total_dollars_in_market) * rd.distance }
+      distance = if total_dollars_in_market > 0 then route_dollars_in_market.sum { |rd| (rd.business.to_f / total_dollars_in_market + rd.economy.to_f / total_dollars_in_market + rd.premium_economy.to_f / total_dollars_in_market) * rd.distance } else 0 end
       inertia = Calculation::InertiaRouteService.new(distance, route_dollars_in_market.sum(&:business), route_dollars_in_market.sum(&:economy), route_dollars_in_market.sum(&:premium_economy))
       record.assign_attributes(
-        economy_price: inertia.economy_fare.round(2),
-        premium_economy_price: inertia.premium_economy_fare.round(2),
+        economy_price: (inertia.economy_fare > 0 ? inertia.economy_fare : record.distance).round(2),
+        premium_economy_price: (inertia.premium_economy_fare > 0 ? inertia.premium_economy_fare : record.distance * 2).round(2),
         business_price: (inertia.business_fare > 0 ? inertia.business_fare : record.distance * 3).round(2),
       )
       record.save

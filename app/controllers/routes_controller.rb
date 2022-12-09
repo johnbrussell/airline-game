@@ -9,6 +9,7 @@ class RoutesController < ApplicationController
     @airports = Airport.select_options
     @origin = params[:origin] || 1
     @destination = params[:destination] || 2
+    @errors = []
   end
 
   def update_price_or_frequency
@@ -38,6 +39,13 @@ class RoutesController < ApplicationController
       airports = [Airport.find(params[:origin_id]), Airport.find(params[:destination_id])]
       origin = [Airport.find(params[:origin_id]), Airport.find(params[:destination_id])].min_by{ |a| a.iata }
       destination = [Airport.find(params[:origin_id]), Airport.find(params[:destination_id])].max_by{ |a| a.iata }
+      if origin == destination
+        @airports = Airport.select_options
+        @origin = origin.id
+        @destination = destination.id
+        @errors = ["Origin airport and destination airport must be different to view a route"]
+        render :select_route
+      end
       AirlineRoute.find_or_create_by_airline_and_route(@game.user_airline, origin, destination)
     else
       referring_airline_route = AirlineRoute.find(params[:airline_route_id])
