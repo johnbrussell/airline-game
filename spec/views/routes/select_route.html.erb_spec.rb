@@ -15,7 +15,7 @@ RSpec.describe "routes/select_route", type: :feature do
     expect(page).to have_content "Airline Game Home"
   end
 
-  it "has a link back to the game homepage" do
+  it "lets users view a route" do
     nauru = Fabricate(:market, name: "Nauru", country: "Nauru")
     funafuti = Fabricate(:market, name: "Funafuti", country: "Tuvalu")
     nukualofa = Fabricate(:market, name: "Nukualofa", country: "Tonga")
