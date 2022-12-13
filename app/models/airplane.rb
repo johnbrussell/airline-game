@@ -255,6 +255,20 @@ class Airplane < ApplicationRecord
 
   private
 
+    def add_pre_sale_errors
+      if owner_id.nil?
+        errors.add(:owner_id, "cannot be empty when selling an airplane")
+      end
+
+      if airplane_routes.any?
+        errors.add(:routes, "cannot be flown by an aircraft for it to be sold")
+      end
+
+      if !built?
+        errors.add(:construction_date, "must be in the past in order to sell airplane")
+      end
+    end
+
     def age_in_days
       [(game.current_date - construction_date).to_i, 0].max
     end
