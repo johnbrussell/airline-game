@@ -163,9 +163,8 @@ class AirlineRoute < ApplicationRecord
   def update_revenue
     if total_frequencies == 0
       revenue&.zero_out
-    else
-      MarketRevenue::Updater.new(origin_airport.market, destination_airport.market, game).update
     end
+    MarketRevenue::Updater.new(origin_airport.market, destination_airport.market, game).update
   end
 
   private
