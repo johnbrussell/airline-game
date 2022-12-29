@@ -672,17 +672,32 @@ RSpec.describe AirlineRoute do
   end
 
   context "update_revenue" do
-    it "sets revenue to zero when frequencies are zero" do
-      inu = Fabricate(:airport, iata: "INU")
-      fun = Fabricate(:airport, iata: "FUN", market: inu.market)
+    it "sets revenue to zero when frequencies are zero and updates other airlines' revenue" do
+      inu_market = Fabricate(:market, name: "Nauru", country: "Nauru", country_group: "Nauru", income: 100000)
+      fun_market = Fabricate(:market, name: "Funafuti", country: "Tuvalu", country_group: "Tuvalu", income: 20000)
+      inu = Fabricate(:airport, iata: "INU", market: inu_market)
+      fun = Fabricate(:airport, iata: "FUN", market: fun_market)
       airline = Fabricate(:airline, base_id: inu.market.id, name: "A")
+      other_airline = Fabricate(:airline, base_id: inu.market.id, name: "B")
       subject = AirlineRoute.create!(economy_price: 1, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
+      other_airline_route = AirlineRoute.create!(economy_price: 1, premium_economy_price: 2, business_price: 3, origin_airport: fun, destination_airport: inu, airline: airline)
       AirlineRouteRevenue.new(airline_route: subject, revenue: 1, exclusive_economy_revenue: 0.01, exclusive_business_revenue: 1, exclusive_premium_economy_revenue: 1, business_pax: 2, economy_pax: 3, premium_economy_pax: 4).save(validate: false)
+      family = Fabricate(:aircraft_family)
+      other_airplane = Fabricate(:airplane, operator_id: other_airline.id, base_country_group: other_airline.base.country_group, business_seats: 1, economy_seats: 1, premium_economy_seats: 1, aircraft_family: family)
+      AirplaneRoute.new(airplane: other_airplane, route: other_airline_route, frequencies: 1, flight_cost: 1, block_time_mins: 1).save(validate: false)
+      AirlineRouteRevenue.new(airline_route: other_airline_route, revenue: 106, exclusive_economy_revenue: 105, exclusive_premium_economy_revenue: 100, exclusive_business_revenue: 1, business_pax: 10, economy_pax: 21, premium_economy_pax: 0).save(validate: false)
+      route_dollars = instance_double(RouteDollars, origin_market: fun_market, destination_market: inu_market, origin_airport_iata: "FUN", destination_airport_iata: "INU", date: Date.today, distance: 1000, business: 1000000, economy: 1000000, premium_economy: 1000000)
+      allow(RouteDollars).to receive(:calculate).with(Date.today, fun_market, inu_market, nil, nil).and_return(route_dollars)
+      allow(RouteDollars).to receive(:between_markets).with(fun_market, inu_market, Date.today).and_return([route_dollars])
       subject.reload
+      other_airline_route.reload
 
       subject.update_revenue
 
+      other_airline_route.reload
+
       result = subject.revenue
+      other_result = other_airline_route.revenue
 
       expect(result.revenue).to eq 0
       expect(result.exclusive_economy_revenue).to eq 0
@@ -691,6 +706,14 @@ RSpec.describe AirlineRoute do
       expect(result.business_pax).to eq 0
       expect(result.economy_pax).to eq 0
       expect(result.premium_economy_pax).to eq 0
+
+      expect(other_result.revenue).to eq 12
+      expect(other_result.exclusive_economy_revenue).to eq 0
+      expect(other_result.exclusive_premium_economy_revenue).to eq 0
+      expect(other_result.exclusive_business_revenue).to eq 0
+      expect(other_result.business_pax).to eq 1
+      expect(other_result.economy_pax).to eq 1
+      expect(other_result.premium_economy_pax).to eq 1
     end
 
     it "updates revenue when frequencies are nonzero" do
