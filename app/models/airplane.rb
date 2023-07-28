@@ -64,6 +64,7 @@ class Airplane < ApplicationRecord
   MAX_LEASE_DAYS = 3652
   MAX_TOTAL_BLOCK_TIME_HOURS_PER_DAY = 20
   MAX_TOTAL_BLOCK_TIME_MINS = MAX_TOTAL_BLOCK_TIME_HOURS_PER_DAY * 7 * 60
+  MIN_LEASE_FOR_SALE_LEASEBACK = 365
   MIN_PERCENT_OF_LEASE_NEEDED_AS_CASH_ON_HAND_TO_LEASE = 0.08
   MIN_TURN_TIME_MINS = 10
   MINUTES_PER_HOUR = 60.0
@@ -234,7 +235,7 @@ class Airplane < ApplicationRecord
   end
 
   def scrap
-    add_pre_sale_errors
+    add_pre_disposition_errors
     errors.none? &&
       owner.update(cash_on_hand: owner.cash_on_hand + scrap_value) &&
       update(
@@ -244,11 +245,24 @@ class Airplane < ApplicationRecord
   end
 
   def sell
-    add_pre_sale_errors
+    add_pre_disposition_errors
     if operator_id.nil?
       errors.add(:operator_id, "cannot be empty when selling an airplane")
     end
     errors.none? && update(operator_id: nil)
+  end
+
+  def sell_and_lease_back(length_in_days)
+    add_pre_sale_errors
+
+    if length_in_days < MIN_LEASE_FOR_SALE_LEASEBACK
+      errors.add(:lease_expiry, "must be at least #{MIN_LEASE_FOR_SALE_LEASEBACK} days to initiate sale and leaseback agreement")
+    end
+
+    airplane_operator = operator
+    assign_attributes(operator_id: nil)
+
+    errors.none? && lease(airplane_operator, length_in_days, nil, nil, nil)
   end
 
   def set_configuration(new_business, new_premium_economy, new_economy)
@@ -273,13 +287,17 @@ class Airplane < ApplicationRecord
 
   private
 
-    def add_pre_sale_errors
-      if owner_id.nil?
-        errors.add(:owner_id, "cannot be empty when selling or scrapping an airplane")
-      end
+    def add_pre_disposition_errors
+      add_pre_sale_errors
 
       if airplane_routes.any?
         errors.add(:routes, "cannot be flown by an aircraft for it to be sold or scrapped")
+      end
+    end
+
+    def add_pre_sale_errors
+      if owner_id.nil?
+        errors.add(:owner_id, "cannot be empty when selling or scrapping an airplane")
       end
 
       if !built?
