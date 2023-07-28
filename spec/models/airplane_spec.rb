@@ -2616,6 +2616,124 @@ RSpec.describe Airplane do
     end
   end
 
+  context "terminate_lease" do
+    let(:purchase_price_new) { 100000000 }
+    let(:initial_cash_on_hand) { 1000000 }
+    let(:initial_lease_rate) { 1000 }
+    let(:family) { Fabricate(:aircraft_family) }
+    let(:model) { Fabricate(:aircraft_model, family: family, floor_space: Airplane::ECONOMY_SEAT_SIZE * 100, takeoff_distance: 10000, speed: 1000, max_range: 13000, price: purchase_price_new) }
+    let(:operator) { Fabricate(:airline, cash_on_hand: initial_cash_on_hand) }
+    let(:days_remaining_on_lease) { 2 }
+    let(:initial_lease_expiry) { Game.find(operator.game_id).current_date + days_remaining_on_lease.days }
+    let(:subject) {
+      Fabricate(
+        :airplane,
+        aircraft_model: model,
+        aircraft_family: family,
+        base_country_group: operator.base.country_group,
+        operator_id: operator.id,
+        owner_id: nil,
+        lease_expiry: initial_lease_expiry,
+        lease_rate: initial_lease_rate,
+        construction_date: Game.find(operator.game_id).current_date - 100.days,
+        end_of_useful_life: Game.find(operator.game_id).current_date + model.useful_life * AircraftModel::DAYS_PER_YEAR - 100.days,
+    ) }
+
+    it "returns false if the airplane is not yet constructed" do
+      subject.update(construction_date: Game.find(operator.game_id).current_date + 1.day)
+
+      expect(subject.terminate_lease).to be false
+
+      subject.reload
+      operator.reload
+
+      expect(subject.lease_expiry).to eq initial_lease_expiry
+      expect(subject.lease_rate).to eq initial_lease_rate
+      expect(subject.operator_id).to eq operator.id
+      expect(Airplane.with_operator(operator)).to include subject
+      expect(operator.cash_on_hand).to eq initial_cash_on_hand
+      expect(subject.errors.full_messages).to include "Construction date must be in the past in order to sell or scrap an airplane"
+    end
+
+    it "returns false if the airplane is not leased" do
+      subject.update(owner_id: operator.id)
+
+      expect(subject.terminate_lease).to be false
+
+      subject.reload
+      operator.reload
+
+      expect(subject.lease_expiry).to eq initial_lease_expiry
+      expect(subject.lease_rate).to eq initial_lease_rate
+      expect(subject.operator_id).to eq operator.id
+      expect(Airplane.with_operator(operator)).to include subject
+      expect(operator.cash_on_hand).to eq initial_cash_on_hand
+      expect(subject.errors.full_messages).to include "Owner cannot terminate a lease for a plane that is owned"
+    end
+
+    it "returns false if the airline has insufficient cash on hand" do
+      operator.update(cash_on_hand: 1)
+
+      expect(subject.terminate_lease).to be false
+
+      subject.reload
+      operator.reload
+
+      expect(subject.lease_expiry).to eq initial_lease_expiry
+      expect(subject.lease_rate).to eq initial_lease_rate
+      expect(subject.operator_id).to eq operator.id
+      expect(Airplane.with_operator(operator)).to include subject
+      expect(operator.cash_on_hand).to eq 1
+      expect(subject.errors.full_messages).to include "Operator does not have enough cash on hand to pay the lease termination fee"
+    end
+
+    it "returns false if the airplane is still in service" do
+      game = Game.find(operator.game_id)
+      bos = Fabricate(:airport, iata: "BOS", market: operator.base, runway: 10000, exclusive_catchment: 1)
+      bos_gates = Gates.create!(airport: bos, game: game, current_gates: 5)
+      Slot.create!(lessee_id: operator.id, gates: bos_gates)
+      Population.create!(market_id: operator.base.id, year: 2000, population: 100)
+      Tourists.create!(market_id: operator.base.id, year: 2000, volume: 10)
+      other_market = Fabricate(:market, name: "Los Angeles")
+      lax = Fabricate(:airport, iata: "LAX", market: other_market, runway: 10000, exclusive_catchment: 1)
+      lax_gates = Gates.create!(airport: lax, game: game, current_gates: 5)
+      Slot.create!(lessee_id: operator.id, gates: lax_gates)
+      airline_route = AirlineRoute.create!(airline: operator, origin_airport: bos, destination_airport: lax, economy_price: 1, business_price: 2, premium_economy_price: 2)
+      AirplaneRoute.new(airplane: subject, route: airline_route, flight_cost: 1, frequencies: 1, block_time_mins: 1).save(validate: false)
+
+      subject.reload
+
+      expect(subject.terminate_lease).to be false
+
+      subject.reload
+      operator.reload
+
+      expect(subject.lease_expiry).to eq initial_lease_expiry
+      expect(subject.lease_rate).to eq initial_lease_rate
+      expect(subject.operator_id).to eq operator.id
+      expect(Airplane.with_operator(operator)).to include subject
+      expect(operator.cash_on_hand).to eq initial_cash_on_hand
+      expect(subject.errors.full_messages).to include "Routes cannot be flown by an aircraft for it to be sold or scrapped"
+    end
+
+    it "returns true, removes the airplane from the operator, and resets lease information" do
+      current_date = Game.find(operator.game_id).current_date
+      expected_termination_fee = initial_lease_rate / subject.send(:lease_premium) * days_remaining_on_lease
+
+      expect(subject.terminate_lease).to be true
+
+      subject.reload
+      operator.reload
+
+      expect(subject.lease_expiry).to be nil
+      expect(subject.lease_rate).to be nil
+      expect(subject.operator_id).to be nil
+      expect(subject.owner_id).to be nil
+      expect(Airplane.with_operator(operator)).not_to include subject
+      expect(operator.cash_on_hand).to eq initial_cash_on_hand - expected_termination_fee
+    end
+  end
+
   context "turn_time_mins" do
     it "is minimal for an empty plane" do
       family = Fabricate(:aircraft_family)
