@@ -233,6 +233,16 @@ class Airplane < ApplicationRecord
     origin_destination_pairs_connected?(routes.map { |r| [r.origin_airport.iata, r.destination_airport.iata] }.reject { |e| e.sort == [origin_iata, destination_iata].sort})
   end
 
+  def scrap
+    add_pre_sale_errors
+    errors.none? &&
+      owner.update(cash_on_hand: owner.cash_on_hand + scrap_value) &&
+      update(
+        end_of_useful_life: game.current_date,
+        operator_id: nil,
+      )
+  end
+
   def sell
     add_pre_sale_errors
     if operator_id.nil?
@@ -425,6 +435,10 @@ class Airplane < ApplicationRecord
       if floor_space_used > aircraft_model.floor_space
         errors.add(:seats, "require more total floor space than available on airplane")
       end
+    end
+
+    def scrap_value
+      value_at_age((end_of_useful_life - construction_date).to_i)
     end
 
     def takeoff_elevation_multiplier(elevation)
