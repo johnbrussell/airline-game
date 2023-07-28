@@ -235,7 +235,7 @@ class Airplane < ApplicationRecord
   end
 
   def scrap
-    add_pre_disposition_errors
+    add_pre_ownership_disposition_errors
     errors.none? &&
       owner.update(cash_on_hand: owner.cash_on_hand + scrap_value) &&
       update(
@@ -245,7 +245,7 @@ class Airplane < ApplicationRecord
   end
 
   def sell
-    add_pre_disposition_errors
+    add_pre_ownership_disposition_errors
     if operator_id.nil?
       errors.add(:operator_id, "cannot be empty when selling an airplane")
     end
@@ -287,7 +287,7 @@ class Airplane < ApplicationRecord
 
   private
 
-    def add_pre_disposition_errors
+    def add_pre_ownership_disposition_errors
       add_pre_sale_errors
 
       if airplane_routes.any?
