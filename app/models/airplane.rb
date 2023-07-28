@@ -234,7 +234,7 @@ class Airplane < ApplicationRecord
   end
 
   def scrap
-    add_pre_sale_errors
+    add_pre_disposition_errors
     errors.none? &&
       owner.update(cash_on_hand: owner.cash_on_hand + scrap_value) &&
       update(
@@ -244,7 +244,7 @@ class Airplane < ApplicationRecord
   end
 
   def sell
-    add_pre_sale_errors
+    add_pre_disposition_errors
     if operator_id.nil?
       errors.add(:operator_id, "cannot be empty when selling an airplane")
     end
@@ -273,13 +273,17 @@ class Airplane < ApplicationRecord
 
   private
 
-    def add_pre_sale_errors
-      if owner_id.nil?
-        errors.add(:owner_id, "cannot be empty when selling or scrapping an airplane")
-      end
+    def add_pre_disposition_errors
+      add_pre_sale_errors
 
       if airplane_routes.any?
         errors.add(:routes, "cannot be flown by an aircraft for it to be sold or scrapped")
+      end
+    end
+
+    def add_pre_sale_errors
+      if owner_id.nil?
+        errors.add(:owner_id, "cannot be empty when selling or scrapping an airplane")
       end
 
       if !built?
