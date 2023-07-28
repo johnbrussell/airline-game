@@ -2275,6 +2275,86 @@ RSpec.describe Airplane do
     end
   end
 
+  context "sell_and_lease_back" do
+    let(:purchase_price_new) { 100000000 }
+    let(:initial_cash_on_hand) { 1000000 }
+    let(:family) { Fabricate(:aircraft_family) }
+    let(:model) { Fabricate(:aircraft_model, family: family, floor_space: Airplane::ECONOMY_SEAT_SIZE * 100, takeoff_distance: 10000, speed: 1000, max_range: 13000, price: purchase_price_new) }
+    let(:owner) { Fabricate(:airline, cash_on_hand: initial_cash_on_hand) }
+    let(:subject) { Fabricate(:airplane, aircraft_model: model, aircraft_family: family, base_country_group: owner.base.country_group, operator_id: owner.id, owner_id: owner.id) }
+
+    it "returns false if the airplane has no owner" do
+      subject.update(owner_id: nil)
+
+      expect(subject.sell_and_lease_back(1000)).to be false
+
+      subject.reload
+      owner.reload
+
+      expect(subject.errors.full_messages).to include "Owner cannot be empty when selling or scrapping an airplane"
+      expect(Airplane.with_operator(owner)).to include subject
+      expect(subject.operator_id).to eq owner.id
+      expect(owner.cash_on_hand).to eq initial_cash_on_hand
+    end
+
+    it "returns false if the airplane is not yet constructed" do
+      subject.update(construction_date: Game.find(owner.game_id).current_date + 1.day)
+
+      expect(subject.sell_and_lease_back(1000)).to be false
+
+      subject.reload
+      owner.reload
+
+      expect(subject.errors.full_messages).to include "Construction date must be in the past in order to sell or scrap an airplane"
+      expect(Airplane.with_operator(owner)).to include subject
+      expect(subject.operator_id).to eq owner.id
+      expect(subject.owner_id).to eq owner.id
+      expect(owner.cash_on_hand).to eq initial_cash_on_hand
+    end
+
+    it "returns false if the requested lease is too short" do
+      expect(subject.sell_and_lease_back(Airplane::MIN_LEASE_FOR_SALE_LEASEBACK - 1)).to be false
+
+      subject.reload
+      owner.reload
+
+      expect(subject.errors.full_messages).to include "Lease expiry must be at least #{Airplane::MIN_LEASE_FOR_SALE_LEASEBACK} days to initiate sale and leaseback agreement"
+      expect(Airplane.with_operator(owner)).to include subject
+      expect(subject.operator_id).to eq owner.id
+      expect(subject.owner_id).to eq owner.id
+      expect(owner.cash_on_hand).to eq initial_cash_on_hand
+    end
+
+    it "returns false if the airline does not have enough money" do
+      insufficient_cash_on_hand = -100000000
+
+      owner.update(cash_on_hand: insufficient_cash_on_hand)
+
+      expect(subject.sell_and_lease_back(1000)).to be false
+
+      subject.reload
+      owner.reload
+
+      expect(subject.errors.full_messages).to include "Buyer does not have enough cash on hand to lease"
+      expect(Airplane.with_operator(owner)).to include subject
+      expect(subject.operator_id).to eq owner.id
+      expect(subject.owner_id).to eq owner.id
+      expect(owner.cash_on_hand).to eq insufficient_cash_on_hand
+    end
+
+    it "returns true, sets lease information, removes ownership information, and credits the airline with the purchase value of the airplane" do
+      expect(subject.sell_and_lease_back(1000)).to be true
+
+      subject.reload
+      owner.reload
+
+      expect(Airplane.with_operator(owner)).to include subject
+      expect(subject.operator_id).to eq owner.id
+      expect(subject.owner_id).to be nil
+      expect(owner.cash_on_hand).to eq initial_cash_on_hand + subject.purchase_price
+    end
+  end
+
   context "set_configuration" do
     let(:family) { Fabricate(:aircraft_family) }
     let(:model) { Fabricate(:aircraft_model, family: family, floor_space: Airplane::ECONOMY_SEAT_SIZE * 100, takeoff_distance: 10000, speed: 1000, max_range: 13000) }
