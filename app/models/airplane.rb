@@ -319,13 +319,13 @@ class Airplane < ApplicationRecord
 
     def add_pre_operation_disposition_errors
       if airplane_routes.any?
-        errors.add(:routes, "cannot be flown by an aircraft for it to be sold or scrapped")
+        errors.add(:routes, "cannot be flown by an aircraft for it to be removed from the fleet")
       end
     end
 
     def add_pre_ownership_change_errors
       if !built?
-        errors.add(:construction_date, "must be in the past in order to sell or scrap an airplane")
+        errors.add(:construction_date, "must be in the past in order to remove it from the fleet")
       end
     end
 

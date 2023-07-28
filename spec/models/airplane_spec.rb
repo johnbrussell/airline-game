@@ -1998,7 +1998,7 @@ RSpec.describe Airplane do
 
       owner.reload
 
-      expect(subject.errors.full_messages).to include "Routes cannot be flown by an aircraft for it to be sold or scrapped"
+      expect(subject.errors.full_messages).to include "Routes cannot be flown by an aircraft for it to be removed from the fleet"
       expect(Airplane.with_operator(owner)).to include subject
       expect(subject.operator_id).to eq owner.id
       expect(subject.owner_id).to eq owner.id
@@ -2026,7 +2026,7 @@ RSpec.describe Airplane do
 
       owner.reload
 
-      expect(subject.errors.full_messages).to include "Construction date must be in the past in order to sell or scrap an airplane"
+      expect(subject.errors.full_messages).to include "Construction date must be in the past in order to remove it from the fleet"
       expect(Airplane.with_operator(owner)).to include subject
       expect(subject.operator_id).to eq owner.id
       expect(subject.owner_id).to eq owner.id
@@ -2227,7 +2227,7 @@ RSpec.describe Airplane do
       subject.reload
 
       expect(subject.sell).to be false
-      expect(subject.errors.full_messages).to include "Routes cannot be flown by an aircraft for it to be sold or scrapped"
+      expect(subject.errors.full_messages).to include "Routes cannot be flown by an aircraft for it to be removed from the fleet"
       expect(Airplane.with_operator(owner)).to include subject
       expect(subject.operator_id).to eq owner.id
       expect(subject.owner_id).to eq owner.id
@@ -2255,7 +2255,7 @@ RSpec.describe Airplane do
       subject.update(construction_date: Game.find(owner.game_id).current_date + 1.day)
 
       expect(subject.sell).to be false
-      expect(subject.errors.full_messages).to include "Construction date must be in the past in order to sell or scrap an airplane"
+      expect(subject.errors.full_messages).to include "Construction date must be in the past in order to remove it from the fleet"
       expect(Airplane.with_operator(owner)).to include subject
       expect(subject.operator_id).to eq owner.id
       expect(subject.owner_id).to eq owner.id
@@ -2305,7 +2305,7 @@ RSpec.describe Airplane do
       subject.reload
       owner.reload
 
-      expect(subject.errors.full_messages).to include "Construction date must be in the past in order to sell or scrap an airplane"
+      expect(subject.errors.full_messages).to include "Construction date must be in the past in order to remove it from the fleet"
       expect(Airplane.with_operator(owner)).to include subject
       expect(subject.operator_id).to eq owner.id
       expect(subject.owner_id).to eq owner.id
@@ -2652,7 +2652,7 @@ RSpec.describe Airplane do
       expect(subject.operator_id).to eq operator.id
       expect(Airplane.with_operator(operator)).to include subject
       expect(operator.cash_on_hand).to eq initial_cash_on_hand
-      expect(subject.errors.full_messages).to include "Construction date must be in the past in order to sell or scrap an airplane"
+      expect(subject.errors.full_messages).to include "Construction date must be in the past in order to remove it from the fleet"
     end
 
     it "returns false if the airplane is not leased" do
@@ -2713,7 +2713,7 @@ RSpec.describe Airplane do
       expect(subject.operator_id).to eq operator.id
       expect(Airplane.with_operator(operator)).to include subject
       expect(operator.cash_on_hand).to eq initial_cash_on_hand
-      expect(subject.errors.full_messages).to include "Routes cannot be flown by an aircraft for it to be sold or scrapped"
+      expect(subject.errors.full_messages).to include "Routes cannot be flown by an aircraft for it to be removed from the fleet"
     end
 
     it "returns true, removes the airplane from the operator, and resets lease information" do
