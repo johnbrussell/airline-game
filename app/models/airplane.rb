@@ -31,7 +31,10 @@ class Airplane < ApplicationRecord
   has_many :routes, class_name: "AirlineRoute", through: :airplane_routes
 
   delegate :game, :to => :aircraft_manufacturing_queue
-  delegate :max_economy_seats, :to => :aircraft_model
+  delegate :lease_premium,
+           :max_economy_seats,
+           :value_at_age,
+           :to => :aircraft_model
 
   scope :available_new, ->(game) {
     joins(:aircraft_manufacturing_queue).
@@ -69,7 +72,6 @@ class Airplane < ApplicationRecord
   MIN_TURN_TIME_MINS = 10
   MINUTES_PER_HOUR = 60.0
   NUM_IN_FAMILY_FOR_MIN_MAINTENANCE_RATE = 100.0
-  PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE = 0.4
   RECONFIGURATION_COST_PER_SEAT_ECONOMY = 4000
   RECONFIGURATION_COST_PER_SEAT_PREMIUM_ECONOMY = 12500
   RECONFIGURATION_COST_PER_SEAT_BUSINESS = 60000
@@ -412,10 +414,6 @@ class Airplane < ApplicationRecord
       copy.operator_id != operator_id && airplane_routes.any?
     end
 
-    def lease_premium
-      model.price / (model.price - value_at_age(PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE * model.useful_life * AircraftModel::DAYS_PER_YEAR))
-    end
-
     def lease_termination_fee
       daily_lease_expense * days_left_on_lease / lease_premium
     end
@@ -559,9 +557,5 @@ class Airplane < ApplicationRecord
 
     def value
       value_at_age(age_in_days)
-    end
-
-    def value_at_age(days)
-      model.price * model.daily_value_retention ** days
     end
 end

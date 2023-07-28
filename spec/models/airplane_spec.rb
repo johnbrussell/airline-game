@@ -1312,7 +1312,7 @@ RSpec.describe Airplane do
       subject = Airplane.last
       model = AircraftModel.last
 
-      lease_length_days = Airplane::PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE * model.useful_life * AircraftModel::DAYS_PER_YEAR
+      lease_length_days = AircraftModel::PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE * model.useful_life * AircraftModel::DAYS_PER_YEAR
 
       lease_rate = subject.lease_rate_per_day(lease_length_days)
 
@@ -2718,7 +2718,7 @@ RSpec.describe Airplane do
 
     it "returns true, removes the airplane from the operator, and resets lease information" do
       current_date = Game.find(operator.game_id).current_date
-      expected_termination_fee = initial_lease_rate / subject.send(:lease_premium) * days_remaining_on_lease
+      expected_termination_fee = initial_lease_rate / subject.lease_premium * days_remaining_on_lease
 
       expect(subject.terminate_lease).to be true
 

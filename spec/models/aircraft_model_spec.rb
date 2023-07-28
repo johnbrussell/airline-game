@@ -49,12 +49,56 @@ RSpec.describe AircraftModel do
     end
   end
 
+  context "lease_premium" do
+    it "is greater than one" do
+      subject.update(useful_life: 100, price: 1000000)
+
+      expect(subject.lease_premium).to be > 1
+    end
+
+    it "decreases as aircraft useful life increases" do
+      subject.update(useful_life: 100, price: 1000000)
+      subject_2 = AircraftModel.new(useful_life: 101, price: subject.price)
+
+      expect(subject.lease_premium).to be > subject_2.lease_premium
+    end
+  end
+
   context "maintenance_cost_per_day" do
     it "is calculated correctly" do
       subject = Fabricate(:aircraft_model, useful_life: 100, price: 3652400)
 
       expect(subject.maintenance_cost_per_day(0)).to eq 300
       expect(subject.maintenance_cost_per_day(36524)).to eq 1200
+    end
+  end
+
+  context "value_at_age" do
+    it "decreases with aircraft age but always remains positive" do
+      subject.update(useful_life: 100, price: 1000000)
+
+      [1, 10, 1000, 10000, 50000].each do |age|
+        expect(subject.value_at_age(age)).to be > subject.value_at_age(age + 1)
+        expect(subject.value_at_age(age)).to be > 0
+      end
+    end
+
+    it "is greater at the same age for aircraft models with a greater useful life" do
+      subject.update(useful_life: 100, price: 1000000)
+      subject_2 = AircraftModel.new(useful_life: subject.useful_life - 1, price: subject.price)
+
+      age = 1000
+
+      expect(subject.value_at_age(age)).to be > subject_2.value_at_age(age)
+    end
+
+    it "is PERCENT_VALUE_MAINTAINED_AT_END_OF_USEFUL_LIFE of the price when at the end of its useful life" do
+      price = 1000000
+      useful_life_years = 30
+      useful_life_days = useful_life_years * AircraftModel::DAYS_PER_YEAR
+      subject.update(useful_life: useful_life_years, price: price)
+
+      assert_in_epsilon subject.value_at_age(useful_life_days), price * AircraftModel::PERCENT_VALUE_MAINTAINED_AT_END_OF_USEFUL_LIFE, 0.000000001
     end
   end
 end

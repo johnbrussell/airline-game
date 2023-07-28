@@ -30,6 +30,7 @@ class AircraftModel < ApplicationRecord
   MIN_TAXI_TIME_MINS = 3
   OLD_PLANE_MAINTENANCE_PREMIUM = 3
   PERCENT_OF_NEW_VALUE_SPENT_ON_MAINTENANCE_PER_YEAR = 0.03
+  PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE = 0.4
   PERCENT_VALUE_MAINTAINED_AT_END_OF_USEFUL_LIFE = 0.03
   SLOW_DISTANCE_TIME_MINS = 30
   SLOW_SPEED_MULTIPLE = 1/2.0
@@ -49,6 +50,10 @@ class AircraftModel < ApplicationRecord
     flight_time_mins_exc_taxi(distance) + 2 * MIN_TAXI_TIME_MINS
   end
 
+  def lease_premium
+    price / (price - value_at_age(PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE * useful_life * DAYS_PER_YEAR))
+  end
+
   def maintenance_cost_per_day(age_in_days)
     PERCENT_OF_NEW_VALUE_SPENT_ON_MAINTENANCE_PER_YEAR * maintenance_premium(age_in_days) * price / DAYS_PER_YEAR
   end
@@ -63,6 +68,10 @@ class AircraftModel < ApplicationRecord
 
   def max_premium_economy_seats
     floor_space / Airplane::PREMIUM_ECONOMY_SEAT_SIZE
+  end
+
+  def value_at_age(days)
+    price * daily_value_retention ** days
   end
 
   private
