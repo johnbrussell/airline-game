@@ -2116,6 +2116,77 @@ RSpec.describe Airplane do
     end
   end
 
+  context "sell" do
+    let(:family) { Fabricate(:aircraft_family) }
+    let(:model) { Fabricate(:aircraft_model, family: family, floor_space: Airplane::ECONOMY_SEAT_SIZE * 100, takeoff_distance: 10000, speed: 1000, max_range: 13000) }
+    let(:owner) { Fabricate(:airline, cash_on_hand: 1000000) }
+    let(:subject) { Fabricate(:airplane, aircraft_model: model, aircraft_family: family, base_country_group: owner.base.country_group, operator_id: owner.id, owner_id: owner.id) }
+
+    it "does not sell the airplane when it operates routes" do
+      game = Game.find(owner.game_id)
+      bos = Fabricate(:airport, iata: "BOS", market: owner.base, runway: 10000, exclusive_catchment: 1)
+      bos_gates = Gates.create!(airport: bos, game: game, current_gates: 5)
+      Slot.create!(lessee_id: owner.id, gates: bos_gates)
+      Population.create!(market_id: owner.base.id, year: 2000, population: 100)
+      Tourists.create!(market_id: owner.base.id, year: 2000, volume: 10)
+      other_market = Fabricate(:market, name: "Los Angeles")
+      lax = Fabricate(:airport, iata: "LAX", market: other_market, runway: 10000, exclusive_catchment: 1)
+      lax_gates = Gates.create!(airport: lax, game: game, current_gates: 5)
+      Slot.create!(lessee_id: owner.id, gates: lax_gates)
+      airline_route = AirlineRoute.create!(airline: owner, origin_airport: bos, destination_airport: lax, economy_price: 1, business_price: 2, premium_economy_price: 2)
+      AirplaneRoute.new(airplane: subject, route: airline_route, flight_cost: 1, frequencies: 1, block_time_mins: 1).save(validate: false)
+
+      subject.reload
+
+      expect(subject.sell).to be false
+      expect(subject.errors.full_messages).to include "Routes cannot be flown by an aircraft for it to be sold"
+      expect(Airplane.with_operator(owner)).to include subject
+      expect(subject.operator_id).to eq owner.id
+      expect(subject.owner_id).to eq owner.id
+      expect(subject.airplane_routes.count).to eq 1
+    end
+
+    it "does not sell the airplane when it has no operator" do
+      subject.update(operator_id: nil)
+
+      expect(subject.sell).to be false
+      expect(subject.errors.full_messages).to include "Operator cannot be empty when selling an airplane"
+      expect(subject.owner_id).to eq owner.id
+    end
+
+    it "does not sell the airplane when it has no owner" do
+      subject.update(owner_id: nil)
+
+      expect(subject.sell).to be false
+      expect(subject.errors.full_messages).to include "Owner cannot be empty when selling an airplane"
+      expect(Airplane.with_operator(owner)).to include subject
+      expect(subject.operator_id).to eq owner.id
+    end
+
+    it "does not sell the airplane when it has not yet been constructed" do
+      subject.update(construction_date: Game.find(owner.game_id).current_date + 1.day)
+
+      expect(subject.sell).to be false
+      expect(subject.errors.full_messages).to include "Construction date must be in the past in order to sell airplane"
+      expect(Airplane.with_operator(owner)).to include subject
+      expect(subject.operator_id).to eq owner.id
+      expect(subject.owner_id).to eq owner.id
+    end
+
+    it "removes the airplane from the operator's fleet, but does not change its ownership" do
+      expect(Airplane.with_operator(owner)).to include subject
+      expect(subject.operator_id).to eq owner.id
+      expect(subject.owner_id).to eq owner.id
+      expect(subject.airplane_routes.count).to eq 0
+
+      subject.sell
+
+      expect(subject.operator_id).to be nil
+      expect(subject.owner_id).to eq owner.id
+      expect(Airplane.with_operator(owner)).not_to include subject
+    end
+  end
+
   context "set_configuration" do
     let(:family) { Fabricate(:aircraft_family) }
     let(:model) { Fabricate(:aircraft_model, family: family, floor_space: Airplane::ECONOMY_SEAT_SIZE * 100, takeoff_distance: 10000, speed: 1000, max_range: 13000) }

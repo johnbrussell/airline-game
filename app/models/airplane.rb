@@ -233,6 +233,14 @@ class Airplane < ApplicationRecord
     origin_destination_pairs_connected?(routes.map { |r| [r.origin_airport.iata, r.destination_airport.iata] }.reject { |e| e.sort == [origin_iata, destination_iata].sort})
   end
 
+  def sell
+    add_pre_sale_errors
+    if operator_id.nil?
+      errors.add(:operator_id, "cannot be empty when selling an airplane")
+    end
+    errors.none? && update(operator_id: nil)
+  end
+
   def set_configuration(new_business, new_premium_economy, new_economy)
     if is_same_configuration?(new_economy, new_premium_economy, new_business)
       true
