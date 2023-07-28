@@ -275,15 +275,15 @@ class Airplane < ApplicationRecord
 
     def add_pre_sale_errors
       if owner_id.nil?
-        errors.add(:owner_id, "cannot be empty when selling an airplane")
+        errors.add(:owner_id, "cannot be empty when selling or scrapping an airplane")
       end
 
       if airplane_routes.any?
-        errors.add(:routes, "cannot be flown by an aircraft for it to be sold")
+        errors.add(:routes, "cannot be flown by an aircraft for it to be sold or scrapped")
       end
 
       if !built?
-        errors.add(:construction_date, "must be in the past in order to sell airplane")
+        errors.add(:construction_date, "must be in the past in order to sell or scrap an airplane")
       end
     end
 
