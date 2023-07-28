@@ -72,6 +72,8 @@ class Airplane < ApplicationRecord
   MIN_TURN_TIME_MINS = 10
   MINUTES_PER_HOUR = 60.0
   NUM_IN_FAMILY_FOR_MIN_MAINTENANCE_RATE = 100.0
+  PENALTY_LEASE_DAYS = 30
+  PENALTY_LEASE_PREMIUM = 1.1
   RECONFIGURATION_COST_PER_SEAT_ECONOMY = 4000
   RECONFIGURATION_COST_PER_SEAT_PREMIUM_ECONOMY = 12500
   RECONFIGURATION_COST_PER_SEAT_BUSINESS = 60000
@@ -96,6 +98,20 @@ class Airplane < ApplicationRecord
       takeoff_distance(airport_1.elevation, distance) <= airport_1.runway &&
       takeoff_distance(airport_2.elevation, distance) <= airport_2.runway &&
       routes_connected_with?(airport_1.iata, airport_2.iata)
+  end
+
+  def conclude_lease
+    add_pre_lease_disposition_errors
+
+    if errors.full_messages.exclude?("Lease expiry date must exist to disposition a lease") && errors.full_messages.include?("Routes cannot be flown by an aircraft for it to be removed from the fleet")
+      errors.clear
+      assign_penalty_lease_extension
+    else
+      if lease_expiry != game.current_date
+        errors.add(:lease_expiry, "cannot be in the future or past to conlude a lease")
+      end
+      return_to_lessor
+    end
   end
 
   def daily_profit
@@ -134,12 +150,17 @@ class Airplane < ApplicationRecord
     airline.errors.each do |error|
       errors.add("airline_#{error.attribute.to_sym}", error.message)
     end
-    if operator_id.present?
+    if operator_id.present? && operator_id != airline.id
       errors.add(:operator_id, "cannot be present before leasing an airplane")
     else
       assign_attributes(operator_id: airline.id)
     end
-    if airline.cash_on_hand < lease_rate_per_day(length_in_days * MIN_PERCENT_OF_LEASE_NEEDED_AS_CASH_ON_HAND_TO_LEASE)
+
+    if airline.id == previous_owner&.id
+      if airline.cash_on_hand + purchase_price < lease_rate_per_day(length_in_days * MIN_PERCENT_OF_LEASE_NEEDED_AS_CASH_ON_HAND_TO_LEASE)
+        errors.add(:buyer, "does not have enough cash on hand to lease")
+      end
+    elsif airline.cash_on_hand < lease_rate_per_day(length_in_days * MIN_PERCENT_OF_LEASE_NEEDED_AS_CASH_ON_HAND_TO_LEASE)
       errors.add(:buyer, "does not have enough cash on hand to lease")
     end
 
@@ -261,10 +282,7 @@ class Airplane < ApplicationRecord
       errors.add(:lease_expiry, "must be at least #{MIN_LEASE_FOR_SALE_LEASEBACK} days to initiate sale and leaseback agreement")
     end
 
-    airplane_operator = operator
-    assign_attributes(operator_id: nil)
-
-    errors.none? && lease(airplane_operator, length_in_days, nil, nil, nil)
+    errors.none? && lease(operator, length_in_days, nil, nil, nil)
   end
 
   def set_configuration(new_business, new_premium_economy, new_economy)
@@ -317,6 +335,10 @@ class Airplane < ApplicationRecord
       if owner_id.present?
         errors.add(:owner_id, "cannot terminate a lease for a plane that is owned")
       end
+
+      if lease_expiry.nil?
+        errors.add(:lease_expiry, "date must exist to disposition a lease")
+      end
     end
 
     def add_pre_operation_disposition_errors
@@ -351,6 +373,10 @@ class Airplane < ApplicationRecord
     def airline_to_airline_transfer?
       copy = Airplane.find(id)
       copy.operator_id != operator_id && copy.operator_id.present? && operator_id.present?
+    end
+
+    def assign_penalty_lease_extension
+      lease(operator, PENALTY_LEASE_DAYS, nil, nil, nil) && update(lease_rate: lease_rate * PENALTY_LEASE_PREMIUM)
     end
 
     def base_changes_appropriately
@@ -486,6 +512,15 @@ class Airplane < ApplicationRecord
 
     def range_with_unlimited_runway
       aircraft_model.max_range * (EMPTY_PLANE_RANGE_MULTIPLIER ** percent_of_max_seats_uninstalled)
+    end
+
+    def return_to_lessor
+      errors.none? &&
+        update(
+          operator_id: nil,
+          lease_expiry: nil,
+          lease_rate: nil,
+        )
     end
 
     def seats_elevation_range_constant(elevation)
