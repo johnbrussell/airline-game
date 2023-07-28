@@ -235,7 +235,7 @@ class Airplane < ApplicationRecord
   end
 
   def scrap
-    add_pre_disposition_errors
+    add_pre_ownership_disposition_errors
     errors.none? &&
       owner.update(cash_on_hand: owner.cash_on_hand + scrap_value) &&
       update(
@@ -245,7 +245,7 @@ class Airplane < ApplicationRecord
   end
 
   def sell
-    add_pre_disposition_errors
+    add_pre_ownership_disposition_errors
     if operator_id.nil?
       errors.add(:operator_id, "cannot be empty when selling an airplane")
     end
@@ -277,6 +277,27 @@ class Airplane < ApplicationRecord
     takeoff_elevation_multiplier(elevation) * 0.5 * aircraft_model.takeoff_distance * takeoff_seats_component * takeoff_flight_distance_component(flight_distance)
   end
 
+  def terminate_lease
+    add_pre_lease_disposition_errors
+
+    airplane_operator = operator
+    termination_fee = lease_termination_fee
+
+    if airplane_operator.cash_on_hand < lease_termination_fee
+      errors.add(:operator, "does not have enough cash on hand to pay the lease termination fee")
+    end
+
+    errors.none? &&
+      update(
+        operator_id: nil,
+        lease_expiry: nil,
+        lease_rate: nil,
+      ) &&
+      airplane_operator.update(
+        cash_on_hand: airplane_operator.cash_on_hand - termination_fee
+      )
+  end
+
   def turn_time_mins
     MIN_TURN_TIME_MINS + num_seats.to_f / (aircraft_model.num_aisles ** 0.5) * TURN_TIME_MINS_PER_SEAT
   end
@@ -287,21 +308,37 @@ class Airplane < ApplicationRecord
 
   private
 
-    def add_pre_disposition_errors
-      add_pre_sale_errors
+    def add_pre_lease_disposition_errors
+      add_pre_operation_disposition_errors
+      add_pre_ownership_change_errors
 
-      if airplane_routes.any?
-        errors.add(:routes, "cannot be flown by an aircraft for it to be sold or scrapped")
+      if owner_id.present?
+        errors.add(:owner_id, "cannot terminate a lease for a plane that is owned")
       end
     end
 
+    def add_pre_operation_disposition_errors
+      if airplane_routes.any?
+        errors.add(:routes, "cannot be flown by an aircraft for it to be removed from the fleet")
+      end
+    end
+
+    def add_pre_ownership_change_errors
+      if !built?
+        errors.add(:construction_date, "must be in the past in order to remove it from the fleet")
+      end
+    end
+
+    def add_pre_ownership_disposition_errors
+      add_pre_sale_errors
+      add_pre_operation_disposition_errors
+    end
+
     def add_pre_sale_errors
+      add_pre_ownership_change_errors
+
       if owner_id.nil?
         errors.add(:owner_id, "cannot be empty when selling or scrapping an airplane")
-      end
-
-      if !built?
-        errors.add(:construction_date, "must be in the past in order to sell or scrap an airplane")
       end
     end
 
@@ -354,6 +391,10 @@ class Airplane < ApplicationRecord
       lease_rate.nil? ? 0 : lease_rate
     end
 
+    def days_left_on_lease
+      (lease_expiry - game.current_date).to_i
+    end
+
     def days_to_reconfigure(new_total_seats)
       (RECONFIGURATION_DAYS_PER_SEAT * new_total_seats).ceil()
     end
@@ -373,6 +414,10 @@ class Airplane < ApplicationRecord
 
     def lease_premium
       model.price / (model.price - value_at_age(PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE * model.useful_life * AircraftModel::DAYS_PER_YEAR))
+    end
+
+    def lease_termination_fee
+      daily_lease_expense * days_left_on_lease / lease_premium
     end
 
     def maintenance_rate
