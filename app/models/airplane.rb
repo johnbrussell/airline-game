@@ -501,8 +501,4 @@ class Airplane < ApplicationRecord
     def value_at_age(days)
       model.price * model.daily_value_retention ** days
     end
-
-    def value_remaining_on_lease
-      (lease_expiry - [game.current_date, construction_date].max).to_i / lease_premium * lease_rate
-    end
 end
