@@ -287,12 +287,15 @@ class Airplane < ApplicationRecord
 
   private
 
-    def add_pre_ownership_disposition_errors
-      add_pre_sale_errors
-
+    def add_pre_operation_disposition_errors
       if airplane_routes.any?
         errors.add(:routes, "cannot be flown by an aircraft for it to be sold or scrapped")
       end
+    end
+
+    def add_pre_ownership_disposition_errors
+      add_pre_sale_errors
+      add_pre_operation_disposition_errors
     end
 
     def add_pre_sale_errors
