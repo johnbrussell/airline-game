@@ -233,6 +233,24 @@ class Airplane < ApplicationRecord
     origin_destination_pairs_connected?(routes.map { |r| [r.origin_airport.iata, r.destination_airport.iata] }.reject { |e| e.sort == [origin_iata, destination_iata].sort})
   end
 
+  def scrap
+    add_pre_sale_errors
+    errors.none? &&
+      owner.update(cash_on_hand: owner.cash_on_hand + scrap_value) &&
+      update(
+        end_of_useful_life: game.current_date,
+        operator_id: nil,
+      )
+  end
+
+  def sell
+    add_pre_sale_errors
+    if operator_id.nil?
+      errors.add(:operator_id, "cannot be empty when selling an airplane")
+    end
+    errors.none? && update(operator_id: nil)
+  end
+
   def set_configuration(new_business, new_premium_economy, new_economy)
     if is_same_configuration?(new_economy, new_premium_economy, new_business)
       true
@@ -254,6 +272,20 @@ class Airplane < ApplicationRecord
   end
 
   private
+
+    def add_pre_sale_errors
+      if owner_id.nil?
+        errors.add(:owner_id, "cannot be empty when selling or scrapping an airplane")
+      end
+
+      if airplane_routes.any?
+        errors.add(:routes, "cannot be flown by an aircraft for it to be sold or scrapped")
+      end
+
+      if !built?
+        errors.add(:construction_date, "must be in the past in order to sell or scrap an airplane")
+      end
+    end
 
     def age_in_days
       [(game.current_date - construction_date).to_i, 0].max
@@ -403,6 +435,10 @@ class Airplane < ApplicationRecord
       if floor_space_used > aircraft_model.floor_space
         errors.add(:seats, "require more total floor space than available on airplane")
       end
+    end
+
+    def scrap_value
+      value_at_age((end_of_useful_life - construction_date).to_i)
     end
 
     def takeoff_elevation_multiplier(elevation)
