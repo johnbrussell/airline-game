@@ -50,6 +50,10 @@ class AircraftModel < ApplicationRecord
     flight_time_mins_exc_taxi(distance) + 2 * MIN_TAXI_TIME_MINS
   end
 
+  def lease_buyout_premium
+    lease_premium / 3
+  end
+
   def lease_premium
     price / (price - value_at_age(PERCENT_OF_USEFUL_LIFE_LEASED_FOR_FULL_VALUE * useful_life * DAYS_PER_YEAR))
   end

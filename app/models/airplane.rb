@@ -31,7 +31,8 @@ class Airplane < ApplicationRecord
   has_many :routes, class_name: "AirlineRoute", through: :airplane_routes
 
   delegate :game, :to => :aircraft_manufacturing_queue
-  delegate :lease_premium,
+  delegate :lease_buyout_premium,
+           :lease_premium,
            :max_economy_seats,
            :value_at_age,
            :to => :aircraft_model
@@ -90,6 +91,17 @@ class Airplane < ApplicationRecord
     construction_date <= aircraft_manufacturing_queue.game.current_date
   end
 
+  def buy_out_lease
+    add_pre_lease_disposition_errors
+
+    buyout_fee = errors.none? ? lease_buyout_fee : nil
+    if errors.none? && operator.cash_on_hand < buyout_fee
+      errors.add(:operator, "does not have enough cash on hand to buy out lease")
+    end
+
+    errors.none? && purchase(operator, nil, nil, nil) && operator.update(cash_on_hand: operator.cash_on_hand - buyout_fee)
+  end
+
   def can_fly_between?(airport_1, airport_2)
     distance = Calculation::Distance.between_airports(airport_1, airport_2)
 
@@ -102,6 +114,7 @@ class Airplane < ApplicationRecord
 
   def conclude_lease
     add_pre_lease_disposition_errors
+    add_pre_operation_disposition_errors
 
     if errors.full_messages.exclude?("Lease expiry date must exist to disposition a lease") && errors.full_messages.include?("Routes cannot be flown by an aircraft for it to be removed from the fleet")
       errors.clear
@@ -207,24 +220,26 @@ class Airplane < ApplicationRecord
   def purchase(airline, business_seats, premium_economy_seats, economy_seats)
     previous_owner = owner
 
-    if built?
+    assign_attributes(
+      base_country_group: airline.base.country_group,
+      owner_id: airline.id,
+      lease_expiry: nil,
+      lease_rate: nil,
+    )
+    unless built?
       assign_attributes(
-        base_country_group: airline.base.country_group,
-        owner_id: airline.id,
-      )
-    else
-      assign_attributes(
-        base_country_group: airline.base.country_group,
         business_seats: business_seats,
         premium_economy_seats: premium_economy_seats,
         economy_seats: economy_seats,
-        owner_id: airline.id,
       )
     end
+
     validate
 
-    if operator_id.present?
+    if operator_id.present? && operator_id != airline.id
       errors.add(:operator_id, "cannot be present before buying an airplane")
+    elsif operator_id == airline.id
+      previous_owner = airline
     end
     if airline.cash_on_hand < purchase_payment
       errors.add(:buyer, "does not have enough cash on hand to purchase")
@@ -299,6 +314,7 @@ class Airplane < ApplicationRecord
 
   def terminate_lease
     add_pre_lease_disposition_errors
+    add_pre_operation_disposition_errors
 
     airplane_operator = operator
     termination_fee = lease_termination_fee
@@ -329,7 +345,6 @@ class Airplane < ApplicationRecord
   private
 
     def add_pre_lease_disposition_errors
-      add_pre_operation_disposition_errors
       add_pre_ownership_change_errors
 
       if owner_id.present?
@@ -440,8 +455,12 @@ class Airplane < ApplicationRecord
       copy.operator_id != operator_id && airplane_routes.any?
     end
 
+    def lease_buyout_fee
+      (value_component_left_on_lease + value_at_age((lease_expiry - construction_date).to_i)) * lease_buyout_premium
+    end
+
     def lease_termination_fee
-      daily_lease_expense * days_left_on_lease / lease_premium
+      value_component_left_on_lease
     end
 
     def maintenance_rate
@@ -592,5 +611,9 @@ class Airplane < ApplicationRecord
 
     def value
       value_at_age(age_in_days)
+    end
+
+    def value_component_left_on_lease
+      daily_lease_expense * days_left_on_lease / lease_premium
     end
 end
