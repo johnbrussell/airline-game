@@ -6,6 +6,6 @@ module Populatable
   private
 
     def market_population
-      @market_population ||= MarketPopulation.calculate(@destination.market, @current_date).population
+      @market_population ||= MarketPopulation.calculate(destination_market, @current_date).population
     end
 end
