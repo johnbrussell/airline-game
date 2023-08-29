@@ -1,10 +1,14 @@
 module Demandable
   extend ActiveSupport::Concern
 
-  def initialize(origin, destination, current_date)
+  def initialize(origin, destination, current_date, opts = {})
     @origin = origin
     @destination = destination
     @current_date = current_date
+
+    opts.each do |opt, value|
+      self.instance_variable_set("@#{opt}".to_sym, value)
+    end
   end
 
   private

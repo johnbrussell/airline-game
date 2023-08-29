@@ -20,6 +20,31 @@ RSpec.describe Demandable do
     end
   end
 
+  context "initialization" do
+    it "initializes successfully with no opts" do
+      subject = TestClass.new(airport1, airport2, Date.today)
+
+      expect(subject.instance_variable_get(:@flight_distance)).to be nil
+      expect(Calculation::Distance).to receive(:between_airports).with(airport1, airport2).and_return 100
+
+      expect(subject.send(:flight_distance)).to eq 100
+      expect(subject.instance_variable_get(:@flight_distance)).to eq 100
+    end
+
+    it "sets any opts as instance variables" do
+      subject = TestClass.new(airport1, airport2, Date.today, foo: 10, bar: 100, flight_distance: 200)
+
+      expect(subject.instance_variable_get(:@foo)).to eq 10
+      expect(subject.instance_variable_get(:@bar)).to eq 100
+      expect(subject.instance_variable_get(:@flight_distance)).to eq 200
+
+      expect(Calculation::Distance).not_to receive(:new)
+
+      expect(subject.send(:flight_distance)).to eq 200
+      expect(subject.instance_variable_get(:@flight_distance)).to eq 200
+    end
+  end
+
   context "same_country_group?" do
     it "is true when the airports are in the same country group" do
       subject = TestClass.new(airport3, airport4, Date.today)
