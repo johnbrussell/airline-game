@@ -3,7 +3,7 @@ class Calculation::GovernmentDemand
   include Populatable
 
   def demand
-    if origin_market == destination_market || !origin_market.is_national_capital || RivalCountryGroup.rivals?(origin_market.country_group, destination_market.country_group)
+    if origin_market == destination_market || !origin_market.is_national_capital || between_rival_countries?
       0
     else
       market_population / 100.0 * distance_demand * border_multiplier * island_multipler

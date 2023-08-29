@@ -13,6 +13,10 @@ module Demandable
 
   private
 
+    def between_rival_countries?
+      @between_rival_countries ||= RivalCountryGroup.rivals?(origin_market.country_group, destination_market.country_group)
+    end
+
     def destination_market
       @destination_market ||= @destination.market
     end

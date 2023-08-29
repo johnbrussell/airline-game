@@ -2,7 +2,7 @@ class Calculation::TouristDemand
   include Populatable
 
   def demand
-    if origin_market == destination_market || RivalCountryGroup.rivals?(origin_market.country_group, destination_market.country_group)
+    if origin_market == destination_market || between_rival_countries?
       0
     else
       market_population / 100.0 * distance_demand * border_multiplier
