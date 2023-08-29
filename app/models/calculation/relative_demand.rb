@@ -29,6 +29,10 @@ class Calculation::RelativeDemand
 
   private
 
+    def between_rival_countries?
+      @between_rival_countries ||= RivalCountryGroup.rivals?(@origin_market.country_group, @destination_market.country_group)
+    end
+
     def destination_airport_iata
       @destination_airport ? @destination_airport.iata : ""
     end
@@ -93,12 +97,12 @@ class Calculation::RelativeDemand
           if destination&.exclusive_catchment > 0
             origin_airports_with_demand.each do |origin|
               if origin&.exclusive_catchment > 0
-                resident_demand_calculator = Calculation::ResidentDemand.new(origin, destination, @date, market_population: destination_market_population, island_exception_exists: island_exception_exists?)
+                resident_demand_calculator = Calculation::ResidentDemand.new(origin, destination, @date, market_population: destination_market_population, island_exception_exists: island_exception_exists?, between_rival_countries: between_rival_countries?)
                 t[:business] += resident_demand_calculator.business_demand * origin.exclusive_catchment / origin_airports_with_demand.sum(&:exclusive_catchment) * destination.exclusive_catchment / destination_airports_with_demand.sum(&:exclusive_catchment)
                 t[:distance] += Calculation::Distance.between_airports(origin, destination) * origin.exclusive_catchment / origin_airports_with_demand.sum(&:exclusive_catchment) * destination.exclusive_catchment / destination_airports_with_demand.sum(&:exclusive_catchment)
-                t[:government] += Calculation::GovernmentDemand.new(origin, destination, @date, market_population: destination_market_population, island_exception_exists: island_exception_exists?).demand * origin.exclusive_catchment / origin_airports_with_demand.sum(&:exclusive_catchment) * destination.exclusive_catchment / destination_airports_with_demand.sum(&:exclusive_catchment)
+                t[:government] += Calculation::GovernmentDemand.new(origin, destination, @date, market_population: destination_market_population, island_exception_exists: island_exception_exists?, between_rival_countries: between_rival_countries?).demand * origin.exclusive_catchment / origin_airports_with_demand.sum(&:exclusive_catchment) * destination.exclusive_catchment / destination_airports_with_demand.sum(&:exclusive_catchment)
                 t[:leisure] += resident_demand_calculator.leisure_demand * origin.exclusive_catchment / origin_airports_with_demand.sum(&:exclusive_catchment) * destination.exclusive_catchment / destination_airports_with_demand.sum(&:exclusive_catchment)
-                t[:tourist] += Calculation::TouristDemand.new(origin, destination, @date, market_population: destination_market_population, island_exception_exists: island_exception_exists?).demand * origin.exclusive_catchment / origin_airports_with_demand.sum(&:exclusive_catchment) * destination.exclusive_catchment / destination_airports_with_demand.sum(&:exclusive_catchment)
+                t[:tourist] += Calculation::TouristDemand.new(origin, destination, @date, market_population: destination_market_population, island_exception_exists: island_exception_exists?, between_rival_countries: between_rival_countries?).demand * origin.exclusive_catchment / origin_airports_with_demand.sum(&:exclusive_catchment) * destination.exclusive_catchment / destination_airports_with_demand.sum(&:exclusive_catchment)
               end
             end
           end
