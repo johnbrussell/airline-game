@@ -30,7 +30,10 @@ class Calculation::RelativeDemand
   private
 
     def between_rival_countries?
-      @between_rival_countries ||= RivalCountryGroup.rivals?(@origin_market.country_group, @destination_market.country_group)
+      if !defined?(@between_rival_countries)
+        @between_rival_countries = RivalCountryGroup.rivals?(@origin_market.country_group, @destination_market.country_group)
+      end
+      @between_rival_countries
     end
 
     def destination_airport_iata
