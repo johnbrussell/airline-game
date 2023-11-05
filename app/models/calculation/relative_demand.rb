@@ -62,7 +62,10 @@ class Calculation::RelativeDemand
     end
 
     def island_exception_exists?
-      @island_exception_exists ||= IslandException.excepted?(@origin_market, @destination_market)
+      if !defined?(@island_exception_exists)
+        @island_exception_exists = IslandException.excepted?(@origin_market, @destination_market)
+      end
+      @island_exception_exists
     end
 
     def origin_airport_iata

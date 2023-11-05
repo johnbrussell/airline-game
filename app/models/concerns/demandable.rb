@@ -29,8 +29,15 @@ module Demandable
       @flight_distance ||= Calculation::Distance.between_airports(@origin, @destination)
     end
 
+    def has_island
+      origin_market.is_island || destination_market.is_island
+    end
+
     def island_exception_exists?
-      @island_exception_exists ||= IslandException.excepted?(origin_market, destination_market)
+      if !defined?(@island_exception_exists)
+        @island_exception_exists = has_island && IslandException.excepted?(origin_market, destination_market)
+      end
+      @island_exception_exists
     end
 
     def origin_market
