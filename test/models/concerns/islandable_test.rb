@@ -37,6 +37,13 @@ class IslandableTest < ActiveSupport::TestCase
 
     assert subject.send(:island_to_island?)
   end
+
+  test "island_to_island? memoizes" do
+    subject = TestClass.new(island_airport, island_airport, Date.today)
+    subject.instance_variable_set(:@island_to_island, false)
+
+    assert_not subject.send(:island_to_island?)
+  end
 end
 
 class TestClass
