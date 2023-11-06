@@ -10,6 +10,9 @@ module Islandable
     end
 
     def island_to_island?
-      @island_to_island ||= origin_market.is_island && destination_market.is_island && !island_exception_exists?
+      if !defined?(@island_to_island)
+        @island_to_island = origin_market.is_island && destination_market.is_island && !island_exception_exists?
+      end
+      @island_to_island
     end
 end
