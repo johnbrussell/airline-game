@@ -34,7 +34,9 @@ RSpec.describe "routes/index", type: :feature do
 
     other_market = Fabricate(:market, name: "Other")
     Population.create!(market_id: other_market.id, year: 2000, population: 1)
+    Population.create!(market_id: airline.base.id, year: 2000, population: 1)
     Tourists.create!(market_id: other_market.id, year: 2001, volume: 10000000)
+    Tourists.create!(market_id: airline.base.id, year: 2001, volume: 1)
 
     family = Fabricate(:aircraft_family)
     airplane_1 = Fabricate(:airplane, aircraft_family: family)

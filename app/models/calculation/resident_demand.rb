@@ -13,7 +13,7 @@ class Calculation::ResidentDemand
   private
 
     def border_multiplier
-      if origin_market.is_island && !IslandException.excepted?(origin_market, destination_market)
+      if origin_market.is_island && !island_exception_exists?
         island_border_multiplier
       else
         mainland_border_multiplier
@@ -33,7 +33,7 @@ class Calculation::ResidentDemand
     end
 
     def distance_demand(type)
-      if origin_market.is_island && !IslandException.excepted?(origin_market, destination_market)
+      if origin_market.is_island && !island_exception_exists?
         demand_curve(type).relative_demand_island(flight_distance)
       else
         demand_curve(type).relative_demand(flight_distance)
@@ -65,7 +65,7 @@ class Calculation::ResidentDemand
     end
 
     def raw_demand(type)
-      if origin_market == destination_market || RivalCountryGroup.rivals?(origin_market.country_group, destination_market.country_group)
+      if origin_market == destination_market || between_rival_countries?
         0
       else
         market_population / 100.0 * distance_demand(type) * border_multiplier * island_multipler
