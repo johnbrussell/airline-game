@@ -1,18 +1,21 @@
-Manufacturer,Family,Name,Country group,Production Start,Square inches,Num aisles,Range,Fuel burn per hour,Speed,Num pilots,Num flight attendants,Price,Takeoff length,Useful life,Winglet availability,Notes
-Benoist,XIV,XIV,United States,1914,476,1,100,13,64,1,0,117000,0,2,0,Guessed a lot of the purchase prices
-Sikorsky,Ilya Muromets,Ilya Muromets,Russia,1914,7616,1,340,26,68,3,0,1500000,0,5,0,"To calculate range, add the weight of a full tank of fuel to the empty weight of the plane and use the normal range/payload chart."
-Farman,F.60 Goliath,F.60 Goliath,Europe,1919,6664,1,500,35,105,3,0,1900000,0,5,0,I believe fuel burn per hour is just the gallons in the fuel tank divided by the quantity given by dividing the range by the speed
-Ford,Trimotor,Trimotor,United States,1925,5236,1,570,43,107,2,1,1400000,0,30,0,
-De Havilland,Dragon,DH.84 Dragon,Europe,1933,2856,1,460,13,128,1,0,700000,1700,8,0,
-De Havilland,Dragon,DH.89 Dragon,Europe,1934,3808,1,556,26,157,1,0,800000,870,8,0,
-Boeing,247,247,United States,1933,4760,1,745,69,189,2,1,1600000,0,30,0,
-Douglas,DC-2,DC-2,United States,1934,6664,1,1000,60,190,2,1,1700000,0,30,0,
-Douglas,DC-3,DC-3,United States,1936,9996,1,1580,108,207,2,1,1400000,1640,30,0,
-Douglas,DC-4,DC-4,United States,1942,40936,1,2500,400,227,2,2,9200000,5500,30,0,
-Convair,CV-240,CV-240,United States,1947,20944,1,1200,233,280,2,1,4800000,3970,30,0,
-Douglas,DC-7,DC-7,United States,1953,49980,1,4635,584,346,2,3,8500000,6360,30,0,
-Douglas,DC-8,DC-8-50,United States,1958,89964,1,6700,1941,556,3,4,130000000,9843,30,0,
-Boeing,737 Original,737-200,United States,1968,64736,1,2125,1200,494,2,3,40000000,9150,30,0,Standard day + 15 takeoff length at sea level.
-Boeing,737 Original,737-200 Advanced,United States,1971,64736,1,2225,1146,494,2,3,45000000,10000,30,0,JT8D-17R/17AR Engines
-Airbus,A320,A320-200,Europe,1988,85680,1,2474,1417,522,2,4,60000000,7250,30,2012,
-Boeing,737 Original,737-100,United States,1968,59024,1,1550,1130,494,2,3,33300000,8500,30,0,
+Manufacturer,Family,Name,Country group,Production Start,Max weightless seats,Maximum weight,Empty weight,Max payload,Fuel tank capacity,Max seats,Square inches,Payload exc fuel,Range NM,Range,Speed,Fuel tank capacity at max payload,Fuel burn per hour,Fuel burn per hour per seat,Takeoff length,Num aisles,Num pilots,Num flight attendants,Price,Useful life,Winglet availability,Notes
+Benoist,XIV,XIV,United States,1914,,,,,,,476,,,100,64,,13,13,0,1,1,0,117000,2,0,Guessed a lot of the purchase prices
+Sikorsky,Ilya Muromets,Ilya Muromets,Russia,1914,,,,,,,7616,,,340,68,,26,1.625,0,1,3,0,1500000,5,0,Range is the farthest you can go at 240 pounds per passenger plus OEW
+Farman,F.60 Goliath,F.60 Goliath,Europe,1919,,,,,,,6664,,,500,105,,35,2.5,0,1,3,0,1900000,5,0,"I believe fuel burn per hour is just the gallons in the fuel tank divided by the quantity given by dividing the range by the speed. But, you might not be able to fill the gas tank. To determine the gallons, subtract the airplane and passenger weight from the maximum weight and divide by 6.7."
+Ford,Trimotor,Trimotor,United States,1925,,,,,,,5236,,,570,107,,43,3.909,0,1,2,1,1400000,30,0,Standard day + 15 takeoff length at sea level.
+De Havilland,Dragon,DH.84 Dragon,Europe,1933,,,,,,,2856,,,460,128,,13,2.167,1700,1,1,0,700000,8,0,
+De Havilland,Dragon,DH.89 Dragon,Europe,1934,,,,,,,3808,,,556,157,,26,3.25,870,1,1,0,800000,8,0,
+Boeing,247,247,United States,1933,,,,,,,4760,,,745,189,,69,6.9,0,1,2,1,1600000,30,0,
+Douglas,DC-2,DC-2,United States,1934,,,,,,,6664,,,1000,190,,60,4.286,0,1,2,1,1700000,30,0,
+Douglas,DC-3,DC-3,United States,1936,,,,,,,9996,,,1580,207,,108,5.143,1640,1,2,1,1400000,30,0,
+Douglas,DC-4,DC-4,United States,1942,,,,,,,40936,,,2500,227,,400,4.651,5500,1,2,2,9200000,30,0,
+Convair,CV-240,CV-240,United States,1947,,,,,,,20944,,,1200,280,,233,5.295,3970,1,2,1,4800000,30,0,
+Douglas,DC-7,DC-7,United States,1953,,,,,,,49980,,,4635,346,,584,5.562,6360,1,2,3,8500000,30,0,
+Douglas,DC-8,DC-8-50,United States,1958,,,,,,,89964,,,6700,556,,1941,10.27,9843,1,3,4,130000000,30,0,
+Airbus,A320,A320-200,Europe,1988,,,,,,,85680,,,2474,522,,1417,7.872,7250,1,2,4,60000000,30,2012,
+Boeing,737 Original,737-100,United States,1968,110,111000,62000,28000,3540,110,52360,88400,1125,1295,494,3373,1287,11.7,8500,1,2,3,33300000,30,0,The structural payload limitations are so tight that the range hit for putting 118 seats on this plane - which is eminently feasible - make it infeasible to operate. I judged 110 is the best optimum for satisfying all types of game player.
+Boeing,737 Original,737-200,United States,1968,136,111000,59800,32500,4780,130,61880,91000,950,1093,494,2985,1349,10.377,8500,1,2,3,40000000,30,0,
+Boeing,737 Original,737-200 Advanced,United States,1971,136,120000,63100,31900,5160,127,60452,93580,1350,1554,494,3943,1253,9.866,8000,1,2,3,45000000,30,0,Performance characteristics mean that it's impractical to put 130 seats on the advanced; 127 is a better limit for that airframe.
+Boeing,737 Classic,737-300,United States,1984,149,125000,69400,35600,5311,142,67592,103480,1200,1381,494,3212,1149,8.092,6875,1,2,3,71000000,30,2003,
+Boeing,737 Classic,737-400,United States,1988,189,139000,73170,39830,5311,159,75684,111330,1500,1726,494,4130,1182,7.434,8000,1,2,4,75000000,30,,Winglets were never made for the 737-400
+Boeing,737 Classic,737-500,United States,1990,138,125000,69030,33470,5311,133,63308,100950,1400,1611,494,3590,1101,8.278,8000,1,2,3,69000000,30,2007,Needs one auxilary fuel tank to be useful
