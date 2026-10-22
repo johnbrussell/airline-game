@@ -2,7 +2,7 @@ Metro area,Year,Population,Notes
 Boston,2020,4873019,"Boston includes Suffolk, Middlesex, Norfolk, Essex, and Plymouth counties.  Income is average family income."
 Provincetown,2020,33664,Provincetown’s summer population is 60000.  Took wealthiest family income in Middlesex County to backfill the 56k who don’t live there full time for income
 Portsmouth,2020,287721,Includes half of Rockingham County population and all of Strafford County
-Los Angeles,2019,14643573,Thank you to CensusReporter for providing urbanized area data here. 
+Los Angeles,2019,14643573,Thank you to CensusReporter for providing urbanized area data here.
 Hyannis,2020,341638,Summer population of roughly 250000.  Just Barnstable County (exc. Provincetown)
 Chicago,2020,7421160,"Includes Cook, DuPage, Lake, and Lake (IN) counties"
 New York City,2019,17348011,"Includes NYC and Bergen, Hudson, Passaic, Westchester, Middlesex, Somerset, Essex, Union, Morris, Rockland, and Nassau counties, and half of Fairfield County CT"
@@ -13,7 +13,7 @@ Kosrae,2010,6616,
 Yap,2010,7371,
 Chuuk,2010,36158,
 Funafuti,2017,6320,http://prdrse4all.spc.int/system/files/tuvalu_hies_report_2010.pdf
-Nauru,2020,10000,https://spccfpstore1.blob.core.windows.net/digitallibrary-docs/files/9c/9c62fdc3882f7fa1a03d24da772c2da0.pdf 
+Nauru,2020,10000,https://spccfpstore1.blob.core.windows.net/digitallibrary-docs/files/9c/9c62fdc3882f7fa1a03d24da772c2da0.pdf
 Kwajalien,2000,14500,
 Kosrae,1980,5491,
 Danbury,2020,119677,1/8th of population of Fairfield County
@@ -56,7 +56,7 @@ Norfolk,2020,1655049,"York, James City, Isle of Wight counties; Newport News, Wi
 Pyongyang,2008,3255388,http://m.koreatimes.co.kr/pages/article.asp?newsIdx=191014
 Pyongyang,1938,235000,
 Chongjin,2008,1336507,
-Havana,2018,2130517,Could not find income source.  Country avg income seems to be roughly $22/month.  Perhaps Havana is 1.9 times that. 
+Havana,2018,2130517,Could not find income source.  Country avg income seems to be roughly $22/month.  Perhaps Havana is 1.9 times that.
 Roanoke,2020,373807,"Roanoke; Salem; Radford; Roanoke, Montgomery, and Botetourt counties"
 Lynchburg,2020,260951,"Lynchburg; Amherst, Appomattox, Bedford, Campbell counties"
 Charlottesville,2020,205510,"Charlottesville; Albemarle, Greene, Fluvanna counties"
@@ -160,3 +160,18 @@ Youngstown,2020,430591,Mahoning and Trumbull counties
 Youngstown,1970,536003,
 Detroit,2020,4321431,"Wayne, Washtenaw, Oakland, and Macomb counties"
 Detroit,1970,4434034,
+Lansing,2020,479610,
+Grand Rapids,2020,941779,
+Flint,2020,406770,
+Traverse City,2020,114289,
+Muskegon,2020,173679,
+Alpena,2020,41118,
+Iron Mountain,2020,25373,
+Ironwood,2020,20394,
+Escanaba,2020,35874,
+Houghton,2020,46329,
+Marquette,2020,66403,
+Beaver Island,2020,616,
+Pellston/Charlevoix,2020,84191,
+Saginaw,2020,448480,
+Kalamazoo,2020,398265,

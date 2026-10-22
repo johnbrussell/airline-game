@@ -1,8 +1,8 @@
-Country,Excepted country group,Notes
+Country or Territory,Excepted country group,Notes
 American Samoa,Samoa,
 Australia,,Australia allows any airline to have a subsidiary in Australia as long as it’s incorporated there
 New Zealand,Australia,New Zealand has an exception specific to Australia
-Micronesia,Nauru,
+Federated States of Micronesia,Nauru,
 Colombia,Chile,
 Ecuador,Chile,
 Peru,Chile,
@@ -15,8 +15,6 @@ Peru,El Salvador,
 Ecuador,El Salvador,
 Ecuador,Colombia,
 United Kingdom,Singapore,
-Albania,China,
-China,Albania,
+Singapore,United Kingdom,
 Brunei,New Zealand,
 New Zealand,Brunei,
-Singapore,United Kingdom,
