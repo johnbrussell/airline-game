@@ -105,7 +105,7 @@ class GameData::Inputter < ApplicationRecord
       data = CSV.parse(File.read("data/cabotage_exceptions.csv"), headers: true)
       data.by_row.each do |data_point|
         CabotageException.create!(
-          country: data_point["Country"],
+          country: data_point["Country or Territory"],
           excepted_country_group: data_point["Excepted country group"],
         )
       end
@@ -114,7 +114,7 @@ class GameData::Inputter < ApplicationRecord
     def self.create_or_update_market(data_point)
       if Market.exists?(name: data_point["Metro Area"])
         Market.find_by(name: data_point["Metro Area"]).update!(
-          country: data_point["Country"],
+          country: data_point["Country or Territory"],
           country_group: data_point["Country group"],
           territory_of: data_point["Territory"],
           income: data_point["Income"],
@@ -124,7 +124,7 @@ class GameData::Inputter < ApplicationRecord
       else
         Market.new(
           name: data_point["Metro Area"],
-          country: data_point["Country"],
+          country: data_point["Country or Territory"],
           territory_of: data_point["Territory"],
           country_group: data_point["Country group"],
           income: data_point["Income"],
