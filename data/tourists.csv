@@ -1,9 +1,9 @@
 Metro area,Year,Visitors,Notes
 Boston,2019,5932719,Assume 2/13 domestic visitors fly and all international visitors fly
-Provincetown,2020,1000,Total guess
-Portsmouth,2020,10000,Total guess
+Provincetown,2020,35000,Total guess
+Portsmouth,2020,60000,Total guess
 Los Angeles,2018,15933333,https://www.discoverlosangeles.com/sites/default/files/2019-05/2018%20QUICK%20FACTS.pdf  – assume all international visitors fly and 1/3rd of domestic ones do
-Hyannis,2020,10000,Total guess
+Hyannis,2020,315000,5.23m annual visitors to Cape Cod. Assume 90% Hyannis and 10% Provicetown
 Chicago,2013,6140000,Assume 1/5th of domestic visitors fly and all international visitors fly
 New York City,2019,20957143,https://www.baruch.cuny.edu/nycdata/tourism/visitors.htm – assume all international visitors and 1/7th of domestic visitors fly
 Majuro,2018,6761,https://pic.or.jp/ja/wp-content/uploads/2019/07/2018-Annual-Visitor-Arrivals-ReportF.pdf – seems high for Nauru so dividing by 2
@@ -25,103 +25,102 @@ Chuuk,2007,8024,
 New York City,2013,17614286,https://www.baruch.cuny.edu/nycdata/tourism/visitors.htm – assume all international visitors and 1/7th of domestic visitors fly
 New York City,2007,14100000,https://www.baruch.cuny.edu/nycdata/tourism/visitors.htm – assume all international visitors and 1/7th of domestic visitors fly
 New York City,2000,11000000,https://www.baruch.cuny.edu/nycdata/tourism/visitors.htm – assume all international visitors and 1/7th of domestic visitors fly
-Danbury,2020,1000,Total guess
-Bridgeport,2020,2000,Total guess
-Waterbury,2020,750,Total guess
-New Haven,2020,10000,Total guess
-Hartford,2020,20000,Total guess
-Providence,2020,20000,Total guess
-New London,2020,20000,Total guess
-Newport,2020,10000,Total guess
-Block Island,2020,1000,Total guess
-Nantucket,2020,30000,Total guess
-Martha’s Vineyard,2020,20000,Total guess
-New Bedford,2020,2500,Total guess
-Pittsfield,2020,5000,Total guess
-Worcester,2020,3000,Total guess
-Keene,2020,1000,Total guess
-Lebanon,2020,2500,Total guess
-Rutland,2020,1500,Total guess
-Montpelier,2020,3000,Total guess
-Burlington (VT),2020,524000,13.1 million total visitors to VT.  Most of them probably drive.  Assume 1/10th fly and 40% fly to Burlington
-Manchester (NH),2020,150000,Total guess
-Portland (ME),2020,300000,Total guess
-Augusta (ME),2020,1000,Total guess
-Rockland,2020,2500,Total guess
-Bangor,2020,100000,Total guess
-Bar Harbor,2020,20000,Total guess
-Auburn/Lewiston,2020,1000,Total guess
-Presque Isle,2020,500,Total guess
-Stowe,2020,4000,Total guess
-Pittsburgh,2020,50000,Total guess
-Erie,2020,5000,Total guess
-Cumberland,2020,1000,Total guess
-Hagerstown,2020,2000,Total guess
-Frederick,2020,1000,Total guess
-Salisbury,2020,20000,Total guess
-Baltimore/Washington,2020,2491703,https://viewer.joomag.com/visit-baltimore-annual-report-fy-2021-2022-2021/0903591001637096226?short&
-Richmond,2020,20000,Total guess
-Norfolk,2020,25000,Total guess
-Pyongyang,2020,100000,
+Danbury,2020,6000,Total guess
+Bridgeport,2020,10000,Total guess
+Waterbury,2020,7500,Total guess
+New Haven,2020,178000,1.25m annual overnight visitors
+Hartford,2020,200000,Total guess
+Providence,2020,200000,Total guess. 30m annual visitors to Rhode Island
+New London,2020,25000,Total guess
+Newport,2020,100000,Total guess
+Block Island,2020,10000,Total guess
+Nantucket,2020,300000,Total guess
+Martha’s Vineyard,2020,200000,Total guess
+New Bedford,2020,93000,1.4m annual visitors
+Pittsfield,2020,167000,2.5m annual visitors
+Worcester,2020,10000,Total guess
+Keene,2020,5000,Total guess
+Lebanon,2020,15000,Total guess
+Rutland,2020,15000,Total guess
+Montpelier,2020,30000,Total guess
+Burlington (VT),2020,524000,13.1 million total visitors to VT.  Most of them probably drive.  Assume 1/15th fly and 60% fly to Burlington
+Manchester (NH),2020,83000,900k fall visitors
+Portland (ME),2020,193000,2.9m annual visitors
+Augusta (ME),2020,2500,Total guess
+Rockland,2020,10000,Total guess
+Bangor,2020,280000,4m visitors to Acadia per year
+Auburn/Lewiston,2020,5000,Total guess
+Presque Isle,2020,35400,248k annual overnight visitors
+Stowe,2020,50000,750k annual visitors
+Pittsburgh,2020,1714000,12m annual overnight visitors
+Erie,2020,15000,Total guess
+Cumberland,2020,30000,Total guess
+Hagerstown,2020,92000,1.38m annual visitors
+Frederick,2020,110000,770k annual overnight visitors
+Salisbury,2020,35000,529k annual visitors
+Baltimore/Washington,2020,3500000,Each of Baltimore and DC gets 27-28m visitors
+Richmond,2020,1040000,7.3m annual overnight visitors
+Norfolk,2020,840000,5.88m annual overnight visitors
+Pyongyang,2020,10000,Total guess
 Chongjin,2020,1000,Total guess
 Havana,2020,1913500,"3.827 million annual tourists to Cuba – unsure of the split.  Assume 50% Havana, 25% Varadero, and split between others"
-Roanoke,2020,10000,Total guess
-Lynchburg,2020,5000,Total guess
-Charlottesville,2020,10000,Total guess
-Staunton,2020,10000,Total guess
-Charleston (WV),2020,2000,Total guess
-Morgantown,2020,2000,Total guess
-Bloomington (IN),2020,1000,Total guess
-South Bend,2020,2500,Total guess
-Fort Wayne,2020,1500,Total guess
-Terre Haute,2020,500,Total guess
-Lafayette (IN),2020,1000,Total guess
-Indianapolis,2020,17500,Total guess
-Huntington,2020,1750,Total guess
-Lewisburg/Beckley,2020,2500,Total guess
-Wheeling,2020,500,Total guess
-Parkersburg,2020,1625,Total guess
-Evansville/Owensboro,2020,1000,Total guess
-Bluefield,2020,1250,Total guess
-Islip,2020,10000,Total guess
+Roanoke,2020,100000,Total guess
+Lynchburg,2020,100000,Total guess
+Charlottesville,2020,200000,Total guess
+Staunton,2020,25000,Total guess
+Charleston (WV),2020,10000,Total guess
+Morgantown,2020,150000,Total guess
+Bloomington (IN),2020,133333,2m annual visitors
+South Bend,2020,380000,5.7m annual visitors
+Fort Wayne,2020,613000,9.2m annual visitors
+Terre Haute,2020,5000,Total guess
+Lafayette (IN),2020,187500,2.8m annual visitors
+Indianapolis,2020,2050000,30.5m annual visitors
+Huntington,2020,5250,At least 50k annual visitors
+Lewisburg/Beckley,2020,25000,Total guess
+Wheeling,2020,5000,Total guess
+Parkersburg,2020,48750,Total guess
+Evansville/Owensboro,2020,200000,Supposedly 3m annual visitors
+Bluefield,2020,3750,Total guess
+Islip,2020,150000,Total guess
 Pago Pago,2018,20221,https://pic.or.jp/ja/wp-content/uploads/2019/07/2018-Annual-Visitor-Arrivals-ReportF.pdf
 Fitiuta,2018,100,Total guess
 Ofu,2018,100,Total guess
 Newburgh,2020,25000,Total guess
 Albany (NY),2020,25000,Total guess
-Plattsburgh,2020,37600,Extra cross-border travelers for domestic flights
-Saranac Lake,2020,5000,Total guess
-Massena,2020,7500,Extra cross-border travelers for domestic flights
-Ogdensburg,2020,7000,Extra cross-border travelers for domestic flights
-Watertown,2020,1000,Total guess
-Utica,2020,1500,Total guess
-Syracuse,2020,30000,Total guess
-Binghamton,2020,7500,Total guess
-Elmira,2020,7250,Total guess
-Ithaca,2020,10000,Total guess
-Rochester (NY),2020,50000,Total guess
-Buffalo,2020,100000,Total guess
+Plattsburgh,2020,56400,Extra cross-border travelers for domestic flights
+Saranac Lake,2020,15000,Total guess
+Massena,2020,22500,Extra cross-border travelers for domestic flights
+Ogdensburg,2020,21000,Extra cross-border travelers for domestic flights
+Watertown,2020,10000,Total guess
+Utica,2020,15000,Total guess
+Syracuse,2020,100000,Total guess
+Binghamton,2020,20000,Total guess
+Elmira,2020,27500,200kish annual overnight visitors
+Ithaca,2020,50500,750kish annual visitors
+Rochester (NY),2020,133000,2m annual total visitors
+Buffalo,2020,506000,7.6m total visitors
 Jamestown (NY),2020,1000,Total guess
 Philadelphia,2020,3801429,Assume all international visitors fly and 1/7th of domestic visitors do. https://www.visitphilly.com/wp-content/uploads/2020/09/Greater-Philadelphia-Tourism-Visitation-and-Impact-2019.pdf
-Atlantic City,2020,100000,Total guess
+Atlantic City,2020,1575000,11m annual overnight visitors
 Dover,2020,1000,Total guess
 Allentown,2020,7500,Total guess
-Reading,2020,1000,Total guess
-Lancaster,2020,1000,Total guess
-Scranton,2020,5000,Total guess
-Harrisburg,2020,2500,Total guess
-Williamsport,2020,3750,Total guess
-State College,2020,2500,Total guess
+Reading,2020,2500,Total guess
+Lancaster,2020,2500,Total guess
+Scranton,2020,20000,Total guess
+Harrisburg,2020,25000,Total guess
+Williamsport,2020,75000,500k overnight visitors for LLWS
+State College,2020,250000,1.8m annual overnight visitors
 Altoona,2020,1000,Total guess
-Johnstown,2020,2000,Total guess
+Johnstown,2020,10000,Total guess
 Bradford,2020,1000,Total guess
 DuBois,2020,1000,Total guess
 Franklin,2020,1000,Total guess
-Akron,2020,10000,Total guess
+Akron,2020,150000,Total guess
 Mackinac Island,2020,25000,"Approx 1m annual tourists, mostly arriving by ferry"
-Sault Ste Marie,2020,10000,Total guess
-Manistee,2020,1000,Total guess
-Paducah,2020,1000,Total guess
+Sault Ste Marie,2020,35000,Total guess - assume many of the Mackinac Island folks fly here
+Manistee,2020,70400,500kish annual overnight tourists
+Paducah,2020,75400,500kish annual overnight tourists
 Bermuda,2019,191417,https://www.gotobermuda.com/sites/default/files/2022-06/2019_bermuda_visitor_arrivals_report_final_compressed.pdf
 Bermuda,2018,203697,
 Bermuda,2017,182439,
@@ -140,12 +139,12 @@ Bermuda,2005,170774,
 Bermuda,2004,172328,
 Bermuda,2003,166943,
 Bermuda,2002,218248,
-Lexington,2020,10000,Total guess
-Louisville,2020,13750,Total guess
-Cincinnati,2020,22500,Total guess
-Dayton,2020,7500,Total guess
-Columbus (OH),2020,20000,Total guess
-Cleveland,2020,30000,Total guess
+Lexington,2020,240000,3.6m annual tourists
+Louisville,2020,1250000,19m annual visitors
+Cincinnati,2020,1700000,25.9m annual visitors
+Dayton,2020,75000,Total guess
+Columbus (OH),2020,1600000,Supposedly 11.1 annual overnight visitors
+Cleveland,2020,1100000,7.9 annual overnight visitors
 Tarawa,2015,4883,https://pic.or.jp/ja/wp-content/uploads/2019/07/2018-Annual-Visitor-Arrivals-ReportF.pdf.  Going to assume 90% of tourists go to Tarawa and the last 10% to Kiritimati
 Tarawa,2016,4606,
 Tarawa,2017,5097,
@@ -154,15 +153,15 @@ Kiritimati,2015,543,
 Kiritimati,2016,512,
 Kiritimati,2017,566,
 Kiritimati,2018,682,
-Toledo,2020,5000,Total guess
+Toledo,2020,106000,City claims 15.9m annual tourists! I don't believe it. Assume it's a typo; divide by 10.
 Put in Bay,2020,15000,750000 tourists annually; assume 2% fly
-Port Clinton,2020,2500,Total guess
+Port Clinton,2020,36000,"Assume the balance of the 1/15 Put in Bay tourists fly to Port Clinton, plus 1000 of its own right"
 Youngstown,2020,3000,Total guess
-Detroit,2020,150000,15m annual tourists; assume 1% fly
+Detroit,2020,1000000,15m annual tourists; assume 1/15 fly
 Lansing,2020,3000,Total guess
 Grand Rapids,2020,10000,Total guess
 Flint,2020,2000,Total guess
-Traverse City,2020,300000,6m annual tourists; assume 5% fly
+Traverse City,2020,400000,6m annual tourists; assume 1/15 fly
 Muskegon,2020,20000,Total guess
 Alpena,2020,20000,Total guess
 Iron Mountain,2020,20000,Total guess
@@ -174,3 +173,40 @@ Beaver Island,2020,5000,Thousands of visitors each year
 Pellston/Charlevoix,2020,50000,Total guess
 Saginaw,2020,2000,Total guess
 Kalamazoo,2020,5000,Total guess
+St. Louis,2020,1400000,21m annual tourists
+Bloomington/Normal,2020,40000,Total guess
+Champaign/Urbana,2020,100000,Total guess
+Marion,2020,2000,Total guess
+Quad Cities,2020,200000,3m annual visitors
+Peoria,2020,20000,Total guess
+Quincy,2020,30000,Total guess
+Rockford,2020,10000,Total guess
+Springfield,2020,20000,Total guess
+Decatur,2020,3750,Total guess
+Asheville,2020,700000,5000000 overnight tourists. Assume 1/7 ish fly
+Charlotte,2020,2200000,30m annual visitors
+Fayetteville,2020,5000,Total guess
+Greensboro,2020,15000,Total guess
+Greenville,2020,2000,Total guess
+Kinston,2020,2000,Total guess
+Jacksonville (NC),2020,3000,Total guess
+New Bern,2020,13000,At least 200k visitors annually
+Raleigh,2020,1800000,13m annual overnight visitors
+Wilmington,2020,500000,5m annual visitors
+Kitty Hawk,2020,13000,Total guess
+Rocky Mount,2020,2000,Total guess
+Myrtle Beach,2020,2000000,Assume 1/7 of the 13.7m annual overnight visitors fly
+Charleston,2020,1125000,Assume 1/8 of the 9m annual overnight visitors fly
+Greenville/Spartanburg,2020,25000,Total guess
+Florence,2020,2000,Total guess
+Columbia,2020,10000,Total guess
+Anderson (SC),2020,5000,Total guess
+Hilton Head/Savannah,2020,1200000,7m overnight visitors to Savannah and 2.5 total to Hilton Head. Assume 1/7 to Savannah fly and 1/12 to HHH
+Albany (GA),2020,2000,Total guess
+Valdosta,2020,2000,Total guess
+Brunswick,2020,240000,Supposedly 2.4m annual visitors
+Macon,2020,10000,Total guess
+Augusta (GA),2020,400000,Supposedly 6m annual visitors
+Columbus (GA),2020,2500,Total guess
+Athens (GA),2020,5000,Total guess
+Atlanta,2020,3400000,Supposedly 51m annual visitors

@@ -1,3 +1,4 @@
-Island,Exception
-Provincetown,Hyannis
-Put in Bay,Port Clinton
+Island,Exception,isValid
+Provincetown,Hyannis,TRUE
+Put in Bay,Port Clinton,TRUE
+Mackinac Island,Sault Ste Marie,TRUE

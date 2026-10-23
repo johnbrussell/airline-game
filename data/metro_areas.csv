@@ -1,142 +1,178 @@
-Metro Area,Income,Country or Territory,Territory,isNationalCapital,isIsland,Country group
-Los Angeles,75629,United States,,No,No,United States
-New York City,78039,United States,,No,No,United States
-Chicago,70009,United States,,No,No,United States
-Boston,118453,United States,,No,No,United States
-Provincetown,212306,United States,,No,Yes,United States
-Portsmouth,82210,United States,,No,No,United States
-Hyannis,148042,United States,,No,No,United States
-Nauru,19000,Nauru,,Yes,Yes,Nauru
-Funafuti,30495,Tuvalu,,Yes,Yes,Tuvalu
-Majuro,12011,Marshall Islands,,Yes,Yes,United States
-Pohnpei,18736,Federated States of Micronesia,,Yes,Yes,United States
-Kwajalien,14956,Marshall Islands,,No,Yes,United States
-Kosrae,24025,Federated States of Micronesia,,No,Yes,United States
-Chuuk,15613,Federated States of Micronesia,,No,Yes,United States
-Yap,20789,Federated States of Micronesia,,No,Yes,United States
-Danbury,74420,United States,,No,No,United States
-Bridgeport,109317,United States,,No,No,United States
-Waterbury,63082,United States,,No,No,United States
-New Haven,80496,United States,,No,No,United States
-Hartford,73487,United States,,No,No,United States
-Providence,65715,United States,,No,No,United States
-New London,82886,United States,,No,No,United States
-Newport,82477,United States,,No,No,United States
-Block Island,143457,United States,,No,Yes,United States
-Nantucket,168864,United States,,No,Yes,United States
-Martha’s Vineyard,177071,United States,,No,Yes,United States
-New Bedford,70161,United States,,No,No,United States
-Pittsfield,64783,United States,,No,No,United States
-Worcester,79121,United States,,No,No,United States
-Keene,63256,United States,,No,No,United States
-Lebanon,64415,United States,,No,No,United States
-Rutland,58790,United States,,No,No,United States
-Montpelier,65076,United States,,No,No,United States
-Burlington (VT),74887,United States,,No,No,United States
-Manchester (NH),83116,United States,,No,No,United States
-Portland (ME),67994,United States,,No,No,United States
-Augusta (ME),56853,United States,,No,No,United States
-Rockland,53028,United States,,No,No,United States
-Bangor,53233,United States,,No,No,United States
-Bar Harbor,60092,United States,,No,No,United States
-Auburn/Lewiston,55045,United States,,No,No,United States
-Presque Isle,47114,United States,,No,No,United States
-Stowe,55421,United States,,No,No,United States
-Pittsburgh,88000,United States,,No,No,United States
-Erie,66226,United States,,No,No,United States
-Cumberland,53419,United States,,No,No,United States
-Hagerstown,72092,United States,,No,No,United States
-Frederick,95036,United States,,No,No,United States
-Salisbury,60306,United States,,No,No,United States
-Baltimore/Washington,107456,United States,,Yes,No,United States
-Richmond,93770,United States,,No,No,United States
-Norfolk,81751,United States,,No,No,United States
-Pyongyang,960,North Korea,,Yes,No,North Korea
-Chongjin,480,North Korea,,No,No,North Korea
-Havana,502,Cuba,,Yes,Yes,Cuba
-Roanoke,79166,United States,,No,No,United States
-Lynchburg,71416,United States,,No,No,United States
-Charlottesville,85135,United States,,No,No,United States
-Staunton,69357,United States,,No,No,United States
-Charleston (WV),56479,United States,,No,No,United States
-Morgantown,53314,United States,,No,No,United States
-Bloomington (IN),60845,United States,,No,No,United States
-South Bend,55881,United States,,No,No,United States
-Fort Wayne,60228,United States,,No,No,United States
-Terre Haute,50903,United States,,No,No,United States
-Lafayette (IN),60367,United States,,No,No,United States
-Indianapolis,67505,United States,,No,No,United States
-Huntington,50978,United States,,No,No,United States
-Lewisburg/Beckley,45641,United States,,No,No,United States
-Wheeling,49264,United States,,No,No,United States
-Parkersburg,52053,United States,,No,No,United States
-Evansville/Owensboro,55786,United States,,No,No,United States
-Bluefield,47310,United States,,No,No,United States
-Islip,84767,United States,,No,No,United States
-Pago Pago,24131,American Samoa,United States,Yes,Yes,United States
-Fitiuta,17344,American Samoa,United States,No,Yes,United States
-Ofu,18438,American Samoa,United States,No,Yes,United States
-Newburgh,84065,United States,,No,No,United States
-Albany (NY),64396,United States,,No,No,United States
-Plattsburgh,78004,United States,,No,No,United States
-Saranac Lake,64388,United States,,No,No,United States
-Massena,55561,United States,,No,No,United States
-Ogdensburg,55561,United States,,No,No,United States
-Watertown,65378,United States,,No,No,United States
-Utica,74515,United States,,No,No,United States
-Syracuse,79499,United States,,No,No,United States
-Binghamton,69767,United States,,No,No,United States
-Elmira,69138,United States,,No,No,United States
-Ithaca,82518,United States,,No,No,United States
-Rochester (NY),82058,United States,,No,No,United States
-Buffalo,79244,United States,,No,No,United States
-Jamestown (NY),62403,United States,,No,No,United States
-Philadelphia,95065,United States,,No,No,United States
-Atlantic City,81226,United States,,No,No,United States
-Dover,70383,United States,,No,No,United States
-Allentown,83331,United States,,No,No,United States
-Reading,81425,United States,,No,No,United States
-Lancaster,82568,United States,,No,No,United States
-Scranton,69926,United States,,No,No,United States
-Harrisburg,83612,United States,,No,No,United States
-Williamsport,66458,United States,,No,No,United States
-State College,87643,United States,,No,No,United States
-Altoona,67072,United States,,No,No,United States
-Johnstown,65311,United States,,No,No,United States
-Bradford,62352,United States,,No,No,United States
-DuBois,61589,United States,,No,No,United States
-Franklin,62848,United States,,No,No,United States
-Akron,73941,United States,,No,No,United States
-Mackinac Island,66250,United States,,No,Yes,United States
-Sault Ste Marie,61799,United States,,No,No,United States
-Manistee,64990,United States,,No,No,United States
-Paducah,67602,United States,,No,No,United States
-Bermuda,120736,Bermuda,United Kingdom,Yes,Yes,United Kingdom
-Lexington,78894,United States,,No,No,United States
-Louisville,77864,United States,,No,No,United States
-Cincinnati,83395,United States,,No,No,United States
-Dayton,73653,United States,,No,No,United States
-Columbus (OH),85223,United States,,No,No,United States
-Cleveland,71500,United States,,No,No,United States
-Tarawa,20466,Kiribati,,Yes,Yes,Kiribati
-Kiritimati,16077,Kiribati,,No,Yes,Kiribati
-Toledo,70204,United States,,No,No,United States
-Put in Bay,232107,United States,,No,Yes,United States
-Port Clinton,75237,United States,,No,No,United States
-Youngstown,60185,United States,,No,No,United States
-Detroit,83250,United States,,No,No,United States
-Lansing,79433,United States,,No,No,United States
-Grand Rapids,82806,United States,,No,No,United States
-Flint,62084,United States,,No,No,United States
-Traverse City,82624,United States,,No,No,United States
-Muskegon,64668,United States,,No,No,United States
-Alpena,56747,United States,,No,No,United States
-Iron Mountain,64973,United States,,No,No,United States
-Ironwood,57624,United States,,No,No,United States
-Escanaba,60681,United States,,No,No,United States
-Houghton,66187,United States,,No,No,United States
-Marquette,70290,United States,,No,No,United States
-Beaver Island,75938,United States,,No,Yes,United States
-Pellston/Charlevoix,68383,United States,,No,No,United States
-Saginaw,66209,United States,,No,No,United States
-Kalamazoo,75136,United States,,No,No,United States
+Metro Area,Income,Country or Territory,Territory,isNationalCapital,isIsland,Country group,isUnique,
+Los Angeles,75629,United States,,No,No,United States,TRUE,
+New York City,78039,United States,,No,No,United States,TRUE,
+Chicago,70009,United States,,No,No,United States,TRUE,
+Boston,118453,United States,,No,No,United States,TRUE,
+Provincetown,212306,United States,,No,Yes,United States,TRUE,
+Portsmouth,104127,United States,,No,No,United States,TRUE,
+Hyannis,148042,United States,,No,No,United States,TRUE,
+Nauru,19000,Nauru,,Yes,Yes,Nauru,TRUE,
+Funafuti,30495,Tuvalu,,Yes,Yes,Tuvalu,TRUE,
+Majuro,12011,Marshall Islands,,Yes,Yes,United States,TRUE,
+Pohnpei,18736,Federated States of Micronesia,,Yes,Yes,United States,TRUE,
+Kwajalien,14956,Marshall Islands,,No,Yes,United States,TRUE,
+Kosrae,24025,Federated States of Micronesia,,No,Yes,United States,TRUE,
+Chuuk,15613,Federated States of Micronesia,,No,Yes,United States,TRUE,
+Yap,20789,Federated States of Micronesia,,No,Yes,United States,TRUE,
+Danbury,84420,United States,,No,No,United States,TRUE,
+Bridgeport,109317,United States,,No,No,United States,TRUE,
+Waterbury,73082,United States,,No,No,United States,TRUE,
+New Haven,80496,United States,,No,No,United States,TRUE,
+Hartford,90408,United States,,No,No,United States,TRUE,
+Providence,83596,United States,,No,No,United States,TRUE,
+New London,82886,United States,,No,No,United States,TRUE,
+Newport,82477,United States,,No,No,United States,TRUE,
+Block Island,143457,United States,,No,Yes,United States,TRUE,
+Nantucket,168864,United States,,No,Yes,United States,TRUE,
+Martha’s Vineyard,177071,United States,,No,Yes,United States,TRUE,
+New Bedford,90033,United States,,No,No,United States,TRUE,
+Pittsfield,82207,United States,,No,No,United States,TRUE,
+Worcester,99320,United States,,No,No,United States,TRUE,
+Keene,79759,United States,,No,No,United States,TRUE,
+Lebanon,83768,United States,,No,No,United States,TRUE,
+Rutland,75318,United States,,No,No,United States,TRUE,
+Montpelier,79908,United States,,No,No,United States,TRUE,
+Burlington (VT),95061,United States,,No,No,United States,TRUE,
+Manchester (NH),102483,United States,,No,No,United States,TRUE,
+Portland (ME),90280,United States,,No,No,United States,TRUE,
+Augusta (ME),73576,United States,,No,No,United States,TRUE,
+Rockland,70501,United States,,No,No,United States,TRUE,
+Bangor,68355,United States,,No,No,United States,TRUE,Includes Bar Harbor because most tourists will fly into Bangor
+Auburn/Lewiston,70817,United States,,No,No,United States,TRUE,
+Presque Isle,57697,United States,,No,No,United States,TRUE,
+Stowe,71742,United States,,No,No,United States,TRUE,
+Pittsburgh,88000,United States,,No,No,United States,TRUE,
+Erie,66226,United States,,No,No,United States,TRUE,
+Cumberland,53419,United States,,No,No,United States,TRUE,
+Hagerstown,72092,United States,,No,No,United States,TRUE,
+Frederick,95036,United States,,No,No,United States,TRUE,
+Salisbury,60306,United States,,No,No,United States,TRUE,
+Baltimore/Washington,107456,United States,,Yes,No,United States,TRUE,
+Richmond,93770,United States,,No,No,United States,TRUE,
+Norfolk,81751,United States,,No,No,United States,TRUE,
+Pyongyang,960,North Korea,,Yes,No,North Korea,TRUE,
+Chongjin,480,North Korea,,No,No,North Korea,TRUE,
+Havana,502,Cuba,,Yes,Yes,Cuba,TRUE,
+Roanoke,79166,United States,,No,No,United States,TRUE,
+Lynchburg,71416,United States,,No,No,United States,TRUE,
+Charlottesville,85135,United States,,No,No,United States,TRUE,
+Staunton,69357,United States,,No,No,United States,TRUE,
+Charleston (WV),56479,United States,,No,No,United States,TRUE,
+Morgantown,53314,United States,,No,No,United States,TRUE,
+Bloomington (IN),60845,United States,,No,No,United States,TRUE,
+South Bend,55881,United States,,No,No,United States,TRUE,
+Fort Wayne,60228,United States,,No,No,United States,TRUE,
+Terre Haute,50903,United States,,No,No,United States,TRUE,
+Lafayette (IN),60367,United States,,No,No,United States,TRUE,
+Indianapolis,67505,United States,,No,No,United States,TRUE,
+Huntington,50978,United States,,No,No,United States,TRUE,
+Lewisburg/Beckley,45641,United States,,No,No,United States,TRUE,
+Wheeling,49264,United States,,No,No,United States,TRUE,
+Parkersburg,52053,United States,,No,No,United States,TRUE,
+Evansville/Owensboro,55786,United States,,No,No,United States,TRUE,
+Bluefield,47310,United States,,No,No,United States,TRUE,
+Islip,84767,United States,,No,No,United States,TRUE,
+Pago Pago,24131,American Samoa,United States,Yes,Yes,United States,TRUE,
+Fitiuta,17344,American Samoa,United States,No,Yes,United States,TRUE,
+Ofu,18438,American Samoa,United States,No,Yes,United States,TRUE,
+Newburgh,84065,United States,,No,No,United States,TRUE,
+Albany (NY),64396,United States,,No,No,United States,TRUE,
+Plattsburgh,78004,United States,,No,No,United States,TRUE,
+Saranac Lake,64388,United States,,No,No,United States,TRUE,
+Massena,55561,United States,,No,No,United States,TRUE,
+Ogdensburg,55561,United States,,No,No,United States,TRUE,
+Watertown,65378,United States,,No,No,United States,TRUE,
+Utica,74515,United States,,No,No,United States,TRUE,
+Syracuse,79499,United States,,No,No,United States,TRUE,
+Binghamton,69767,United States,,No,No,United States,TRUE,
+Elmira,69138,United States,,No,No,United States,TRUE,
+Ithaca,82518,United States,,No,No,United States,TRUE,
+Rochester (NY),82058,United States,,No,No,United States,TRUE,
+Buffalo,79244,United States,,No,No,United States,TRUE,
+Jamestown (NY),62403,United States,,No,No,United States,TRUE,
+Philadelphia,95065,United States,,No,No,United States,TRUE,
+Atlantic City,81226,United States,,No,No,United States,TRUE,
+Dover,70383,United States,,No,No,United States,TRUE,
+Allentown,83331,United States,,No,No,United States,TRUE,
+Reading,81425,United States,,No,No,United States,TRUE,
+Lancaster,82568,United States,,No,No,United States,TRUE,
+Scranton,69926,United States,,No,No,United States,TRUE,
+Harrisburg,83612,United States,,No,No,United States,TRUE,
+Williamsport,66458,United States,,No,No,United States,TRUE,
+State College,87643,United States,,No,No,United States,TRUE,
+Altoona,67072,United States,,No,No,United States,TRUE,
+Johnstown,65311,United States,,No,No,United States,TRUE,
+Bradford,62352,United States,,No,No,United States,TRUE,
+DuBois,61589,United States,,No,No,United States,TRUE,
+Franklin,62848,United States,,No,No,United States,TRUE,
+Akron,73941,United States,,No,No,United States,TRUE,
+Mackinac Island,66250,United States,,No,Yes,United States,TRUE,
+Sault Ste Marie,61799,United States,,No,No,United States,TRUE,
+Manistee,64990,United States,,No,No,United States,TRUE,
+Paducah,67602,United States,,No,No,United States,TRUE,
+Bermuda,120736,Bermuda,United Kingdom,Yes,Yes,United Kingdom,TRUE,
+Lexington,78894,United States,,No,No,United States,TRUE,
+Louisville,77864,United States,,No,No,United States,TRUE,
+Cincinnati,83395,United States,,No,No,United States,TRUE,
+Dayton,73653,United States,,No,No,United States,TRUE,
+Columbus (OH),85223,United States,,No,No,United States,TRUE,
+Cleveland,71500,United States,,No,No,United States,TRUE,
+Tarawa,20466,Kiribati,,Yes,Yes,Kiribati,TRUE,
+Kiritimati,16077,Kiribati,,No,Yes,Kiribati,TRUE,
+Toledo,70204,United States,,No,No,United States,TRUE,
+Put in Bay,232107,United States,,No,Yes,United States,TRUE,
+Port Clinton,75237,United States,,No,No,United States,TRUE,
+Youngstown,60185,United States,,No,No,United States,TRUE,
+Detroit,83250,United States,,No,No,United States,TRUE,
+Lansing,79433,United States,,No,No,United States,TRUE,
+Grand Rapids,82806,United States,,No,No,United States,TRUE,
+Flint,62084,United States,,No,No,United States,TRUE,
+Traverse City,82624,United States,,No,No,United States,TRUE,
+Muskegon,64668,United States,,No,No,United States,TRUE,
+Alpena,56747,United States,,No,No,United States,TRUE,
+Iron Mountain,64973,United States,,No,No,United States,TRUE,
+Ironwood,57624,United States,,No,No,United States,TRUE,
+Escanaba,60681,United States,,No,No,United States,TRUE,
+Houghton,66187,United States,,No,No,United States,TRUE,
+Marquette,70290,United States,,No,No,United States,TRUE,
+Beaver Island,75938,United States,,No,Yes,United States,TRUE,
+Pellston/Charlevoix,68383,United States,,No,No,United States,TRUE,
+Saginaw,66209,United States,,No,No,United States,TRUE,
+Kalamazoo,75136,United States,,No,No,United States,TRUE,
+St. Louis,85928,United States,,No,No,United States,TRUE,
+Bloomington/Normal,93882,United States,,No,No,United States,TRUE,
+Champaign/Urbana,82958,United States,,No,No,United States,TRUE,
+Marion,67617,United States,,No,No,United States,TRUE,
+Quad Cities,77591,United States,,No,No,United States,TRUE,
+Peoria,77270,United States,,No,No,United States,TRUE,
+Quincy,72091,United States,,No,No,United States,TRUE,
+Rockford,69785,United States,,No,No,United States,TRUE,
+Springfield,83512,United States,,No,No,United States,TRUE,
+Decatur,71270,United States,,No,No,United States,TRUE,
+Asheville,71863,United States,,No,No,United States,TRUE,
+Charlotte,84755,United States,,No,No,United States,TRUE,
+Fayetteville,60552,United States,,No,No,United States,TRUE,
+Greensboro,69377,United States,,No,No,United States,TRUE,
+Greenville,62474,United States,,No,No,United States,TRUE,
+Kinston,53964,United States,,No,No,United States,TRUE,
+Jacksonville (NC),57756,United States,,No,No,United States,TRUE,
+New Bern,69577,United States,,No,No,United States,TRUE,
+Raleigh,99481,United States,,No,No,United States,TRUE,
+Wilmington,76910,United States,,No,No,United States,TRUE,
+Kitty Hawk,82428,United States,,No,No,United States,TRUE,
+Rocky Mount,57672,United States,,No,No,United States,TRUE,
+Myrtle Beach,62730,United States,,No,No,United States,TRUE,
+Charleston,84228,United States,,No,No,United States,TRUE,
+Greenville/Spartanburg,73263,United States,,No,No,United States,TRUE,
+Florence,58506,United States,,No,No,United States,TRUE,
+Columbia,74008,United States,,No,No,United States,TRUE,
+Anderson (SC),66713,United States,,No,No,United States,TRUE,
+Hilton Head/Savannah,75045,United States,,No,No,United States,TRUE,
+Albany (GA),57007,United States,,No,No,United States,TRUE,
+Valdosta,61235,United States,,No,No,United States,TRUE,
+Brunswick,72425,United States,,No,No,United States,TRUE,
+Macon,67619,United States,,No,No,United States,TRUE,
+Augusta (GA),68387,United States,,No,No,United States,TRUE,
+Columbus (GA),66374,United States,,No,No,United States,TRUE,
+Athens (GA),71519,United States,,No,No,United States,TRUE,
+Atlanta,88186,United States,,No,No,United States,TRUE,
