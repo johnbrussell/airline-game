@@ -8,7 +8,7 @@ class GameData::InputterTest < ActiveSupport::TestCase
   test "new Markets created" do
     data_point = {
       "Metro Area" => "Funafuti",
-      "Country" => "Tuvalu",
+      "Country or Territory" => "Tuvalu",
       "Country group" => "Tuvalu",
       "Income" => 40000,
       "isNationalCapital" => "yes",
@@ -32,7 +32,7 @@ class GameData::InputterTest < ActiveSupport::TestCase
   test "extant Markets updated" do
     data_point = {
       "Metro Area" => "Yaren",
-      "Country" => "Republic of Nauru",
+      "Country or Territory" => "Republic of Nauru",
       "Country group" => "Republic of Nauru",
       "Income" => 100001,
       "isNationalCapital" => "no",
