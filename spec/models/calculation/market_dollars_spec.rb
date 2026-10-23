@@ -6,11 +6,15 @@ RSpec.describe Calculation::MarketDollars do
   mainland_airport = Airport.new(market: Market.new(is_island: false, income: 10000))
 
   let(:market_population_calculator) { instance_double(Calculation::MarketPopulation) }
+  let(:market_population_calculator_large_island) { instance_double(Calculation::MarketPopulation) }
 
   before(:each) do
     allow(market_population_calculator).to receive(:government_workers).and_return 10
     allow(market_population_calculator).to receive(:population).and_return 100
     allow(market_population_calculator).to receive(:tourists).and_return 20
+    allow(market_population_calculator_large_island).to receive(:government_workers).and_return 10
+    allow(market_population_calculator_large_island).to receive(:population).and_return 10000
+    allow(market_population_calculator_large_island).to receive(:tourists).and_return 20
   end
 
   context "business" do
@@ -22,12 +26,20 @@ RSpec.describe Calculation::MarketDollars do
       assert_in_epsilon subject.business, 1200, 0.0000001
     end
 
-    it "calculates islands correctly" do
+    it "calculates small islands correctly" do
       expect(Calculation::MarketPopulation).to receive(:new).with(island_airport.market, date).and_return(market_population_calculator)
 
       subject = described_class.new(island_airport, date)
 
       expect(subject.business).to eq 12000
+    end
+
+    it "calculates large islands correctly" do
+      expect(Calculation::MarketPopulation).to receive(:new).with(island_airport.market, date).and_return(market_population_calculator_large_island)
+
+      subject = described_class.new(island_airport, date)
+
+      assert_in_epsilon subject.business, 360000, 0.00001
     end
   end
 
@@ -45,7 +57,7 @@ RSpec.describe Calculation::MarketDollars do
 
       subject = described_class.new(island_airport, date)
 
-      expect(subject.government).to eq 6000
+      expect(subject.government).to eq 9000
     end
   end
 
@@ -73,7 +85,7 @@ RSpec.describe Calculation::MarketDollars do
 
       subject = described_class.new(mainland_airport, date)
 
-      expect(subject.tourist).to eq 6000
+      expect(subject.tourist).to eq 9000
     end
 
     it "calculates islands correctly" do
@@ -81,7 +93,7 @@ RSpec.describe Calculation::MarketDollars do
 
       subject = described_class.new(island_airport, date)
 
-      expect(subject.tourist).to eq 6000
+      expect(subject.tourist).to eq 13500
     end
   end
 end
