@@ -1,6 +1,6 @@
 class Calculation::DemandCurve
   PERCENT_ISLAND_NORMAL = Calculation::MarketDollars::PERCENT_INCOME_SPENT_ON_TRAVEL.to_f / \
-    (Calculation::MarketDollars::PERCENT_INCOME_SPENT_ON_TRAVEL + Calculation::MarketDollars::PERCENT_INCOME_SPENT_ON_TRAVEL_ISLAND)
+    (Calculation::MarketDollars::PERCENT_INCOME_SPENT_ON_TRAVEL + Calculation::MarketDollars::PERCENT_INCOME_SPENT_ON_TRAVEL_ISLAND_MAX)
   SHORT_CONSTANTS = { :business => 1.3223140496, :leisure => 1.5625 }
   SHORT_EXPONENTS = { :business => 2, :leisure => 3 }
   SHORT_SIGNIFICANCES = { :business => 10 ** -3, :leisure => 10 ** -6 }
