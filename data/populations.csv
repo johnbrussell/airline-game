@@ -1,7 +1,7 @@
 Metro area,Year,Population,Notes
 Boston,2020,4873019,"Boston includes Suffolk, Middlesex, Norfolk, Essex, and Plymouth counties.  Income is average family income."
 Provincetown,2020,33664,Provincetown’s summer population is 60000.  Took wealthiest family income in Middlesex County to backfill the 56k who don’t live there full time for income
-Portsmouth,2020,287721,Includes half of Rockingham County population and all of Strafford County
+Portsmouth,2020,284267,Includes half of Rockingham County population and all of Strafford County
 Los Angeles,2019,14643573,Thank you to CensusReporter for providing urbanized area data here.
 Hyannis,2020,341638,Summer population of roughly 250000.  Just Barnstable County (exc. Provincetown)
 Chicago,2020,7421160,"Includes Cook, DuPage, Lake, and Lake (IN) counties"
@@ -20,30 +20,29 @@ Danbury,2020,119677,1/8th of population of Fairfield County
 Bridgeport,2020,359032,3/8ths of population of Fairfield County
 Waterbury,2020,154812,"Populations of Waterbury, Oxford, Middlebury, and Southbury"
 New Haven,2020,710023,New Haven County exc. Waterbury metro area population
-Hartford,2020,1526153,"Includes Hartford, Hampden, and Hampshire Counties"
-Providence,2020,873512,"Includes Providence, Kent, and Bristol counties"
+Hartford,2020,1520161,"Includes Hartford, Hampden, and Hampshire Counties"
+Providence,2020,848928,"Includes Providence, Kent, and Bristol counties"
 New London,2020,389373,"Includes New London County and Washington County RI, exc. New Shoreham"
 Newport,2019,82082,Newport County only
 Block Island,2020,3110,New Shoreham only.  3400 summer residents
 Nantucket,2020,32128,Nantucket County.  Summer population 50000
 Martha’s Vineyard,2020,110300,Summer population roughly 200000.  Year round 20600
-New Bedford,2020,579200,Bristol County MA only
-Pittsfield,2020,124944,Berkshire County MA only
-Worcester,2020,862111,Worcester County MA only
-Keene,2019,121990,Cheshire County NH and Windham County VT
-Lebanon,2020,190785,"Sullivan and Grafton counties, NH; Windsor County VT"
-Rutland,2020,60572,Rutland County only
-Montpelier,2020,89086,Washington and Orange counties
-Burlington (VT),2020,262925,"Chittenden, Grand Isle, Addison, and Franklin counties"
-Manchester (NH),2020,796352,"½ Rockingham, Hillsborough, Merrimack, Belknap counties"
-Portland (ME),2020,586374,"Cumberland, York, Sagadahoc, Lincoln counties"
-Augusta (ME),2020,123642,Kennebec County only
-Rockland,2020,79487,Knox and Waldo counties
-Bangor,2020,168933,Piscataquis and Penobscot counties
-Bar Harbor,2020,54987,Hancock County
-Auburn/Lewiston,2020,111139,Androscoggin County
-Presque Isle,2020,67105,Aroostook County
-Stowe,2020,53338,Lamoille and Orleans counties
+New Bedford,2020,563301,Bristol County MA only
+Pittsfield,2020,125927,Berkshire County MA only
+Worcester,2020,826655,Worcester County MA only
+Keene,2020,118668,Cheshire County NH and Windham County VT
+Lebanon,2020,188695,"Sullivan and Grafton counties, NH; Windsor County VT"
+Rutland,2020,58527,Rutland County only
+Montpelier,2020,87209,Washington and Orange counties
+Burlington (VT),2020,256711,"Chittenden, Grand Isle, Addison, and Franklin counties"
+Manchester (NH),2020,781487,"½ Rockingham, Hillsborough, Merrimack, Belknap counties"
+Portland (ME),2020,570729,"Cumberland, York, Sagadahoc, Lincoln counties"
+Augusta (ME),2020,122158,Kennebec County only
+Rockland,2020,79532,Knox and Waldo counties
+Bangor,2020,223392,"Hancock, Piscataquis, and Penobscot counties"
+Auburn/Lewiston,2020,107958,Androscoggin County
+Presque Isle,2020,67431,Aroostook County
+Stowe,2020,52219,Lamoille and Orleans counties
 Pittsburgh,2020,2176568,"Allegheny, Beaver, Butler, Washington, and Westmoreland counties"
 Erie,2020,354814,Erie and Crawford counties
 Cumberland,2020,118762,"Allegany County MD, Mineral County WV, ½ of Bedford County PA"
@@ -175,3 +174,40 @@ Beaver Island,2020,616,
 Pellston/Charlevoix,2020,84191,
 Saginaw,2020,448480,
 Kalamazoo,2020,398265,
+St. Louis,2020,2224949,
+Bloomington/Normal,2020,172164,
+Champaign/Urbana,2020,210006,
+Marion,2020,136837,
+Quad Cities,2020,364771,
+Peoria,2020,313635,
+Quincy,2020,65670,
+Rockford,2020,336928,
+Springfield,2020,195963,
+Decatur,2020,104688,
+Asheville,2020,459344,
+Charlotte,2020,2038548,
+Fayetteville,2020,523480,
+Greensboro,2020,1077599,
+Greenville,2020,200948,
+Kinston,2020,56350,
+Jacksonville (NC),2020,198377,
+New Bern,2020,171591,
+Raleigh,2020,1628534,
+Wilmington,2020,368751,
+Kitty Hawk,2020,63908,
+Rocky Mount,2020,227935,
+Myrtle Beach,2020,344186,
+Charleston,2020,629646,
+Greenville/Spartanburg,2020,829917,
+Florence,2020,205095,
+Columbia,2020,709693,
+Anderson (SC),2020,200183,
+Hilton Head/Savannah,2020,508939,
+Albany (GA),2020,118431,
+Valdosta,2020,116436,
+Brunswick,2020,99225,
+Macon,2020,348112,
+Augusta (GA),2020,548949,
+Columbus (GA),2020,427287,
+Athens (GA),2020,210810,
+Atlanta,2020,4211157,
